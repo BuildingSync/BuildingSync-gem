@@ -38,8 +38,14 @@ require "buildingsync/version"
 require "openstudio/extension"
 
 module BuildingSync
-  class BuildingSync
-    include OpenStudio::Extension
+  class BuildingSync < OpenStudio::Extension::Class
+    # include OpenStudio::Extension
+
+    def list_measures
+      super()
+
+      # do our own stuff
+    end
 
     def do_something
       puts "what am I trying to do here?"
