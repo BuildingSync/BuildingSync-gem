@@ -1,0 +1,12 @@
+{
+  "compatible": true,
+  "message": "",
+  "openstudio_version": "2.7.2",
+  "measure_min_version": "2.0.0",
+  "measure_max_version": "None",
+  "loaded": true,
+  "load_errors": [
+
+  ],
+  "measure_name": "RotateBuilding"
+}

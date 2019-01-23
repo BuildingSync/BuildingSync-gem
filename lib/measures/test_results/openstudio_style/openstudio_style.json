@@ -1,0 +1,39 @@
+{
+  "by_measure": {
+    "RotateBuilding": {
+      "measure_info": 1,
+      "measure_warnings": 1,
+      "measure_errors": 3,
+      "issues": [
+        {
+          "message": "Measure directory name 'Rotate Building' is not snake_case.",
+          "type": "syntax",
+          "severity": "warning"
+        },
+        {
+          "message": "Could not find \"def description\" in measure.rb",
+          "type": "structure",
+          "severity": "error"
+        },
+        {
+          "message": "Could not find \"def modeler_description\" in measure.rb",
+          "type": "structure",
+          "severity": "error"
+        },
+        {
+          "message": "Argument display name 'Number of Degrees to Rotate Building (positive value is clockwise).' appears to have units. Set units in the setUnits method.",
+          "type": "error",
+          "severity": "info"
+        },
+        {
+          "message": "Argument display name 'Number of Degrees to Rotate Building (positive value is clockwise).' cannot contain ?#.[] characters.",
+          "type": "syntax",
+          "severity": "error"
+        }
+      ]
+    }
+  },
+  "total_info": 1,
+  "total_warnings": 1,
+  "total_errors": 3
+}
