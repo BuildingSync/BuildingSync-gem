@@ -10,6 +10,13 @@ else
   gem 'openstudio-extension', github: 'NREL/OpenStudio-extension-gem', branch: 'bundle_methods'
 end
 
+if File.exists?('../openstudio-model-articulation-gem')
+  # gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', branch: 'develop'
+  gem 'openstudio-model-articulation', path: '../openstudio-model-articulation-gem'
+else
+  gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', branch: 'develop'
+end
+
 gem 'openstudio_measure_tester', '= 0.1.7' # This includes the dependencies for running unit tests, coverage, and rubocop
 #gem 'openstudio_measure_tester', :github => 'NREL/OpenStudio-measure-tester-gem', :ref => '273d1f1a5c739312688ea605ef4a5b6e7325332c'
 
