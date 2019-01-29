@@ -39,8 +39,10 @@ require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new(:spec)
 
-# Load in the rake tasks from the base extension gem
+# Load in the rake tasks from the base openstudio-extension gem
+# Also set measures_dir location for this gem for openstudio-extension gem to use
 require "openstudio/extension/rake_task"
-OpenStudio::Extension::RakeTask.new
+os_extension = OpenStudio::Extension::RakeTask.new
+os_extension.set_measures_dir(File.join(File.expand_path(File.dirname(__FILE__)), 'lib/measures'))
 
 task :default => :spec
