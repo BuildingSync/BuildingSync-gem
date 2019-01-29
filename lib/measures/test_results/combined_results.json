@@ -1,7 +1,7 @@
 {
   "repo_name": "BuildingSync-gem",
   "current_branch": "master",
-  "sha": "dcc32d9b41c3c102caec17b4b069005b09c134e3",
+  "sha": "7690e584f5dd19b74aaa83f8774cae8e84528c62",
   "openstudio_style": {
     "by_measure": {
       "RotateBuilding": {
@@ -103,7 +103,7 @@
     }
   },
   "minitest": {
-    "test_directory": "/Users/kflemin/repos/BuildingSync-gem/lib/measures/test_results/minitest",
+    "test_directory": "D:/BuildingSync-gem/lib/measures/test_results/minitest",
     "total_tests": 2,
     "total_assertions": 10,
     "total_errors": 0,

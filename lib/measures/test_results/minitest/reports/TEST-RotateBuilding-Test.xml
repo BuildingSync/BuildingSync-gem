@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <test_suites>
-  <testsuite name="RotateBuilding_Test" filepath="lib/measures/Rotate Building/tests/RotateBuilding_Test.rb" skipped="0" failures="0" errors="0" tests="2" assertions="10" time="4.352409">
-    <testcase name="test_RotateBuilding" lineno="50" classname="RotateBuilding_Test" assertions="7" time="4.308333">
+  <testsuite name="RotateBuilding_Test" filepath="lib/measures/Rotate Building/tests/RotateBuilding_Test.rb" skipped="0" failures="0" errors="0" tests="2" assertions="10" time="5.310857">
+    <testcase name="test_RotateBuilding" lineno="50" classname="RotateBuilding_Test" assertions="7" time="5.27392">
     </testcase>
-    <testcase name="test_RotateBuilding_EmptySpaceNoLoadsOrSurfaces" lineno="89" classname="RotateBuilding_Test" assertions="3" time="0.044076">
+    <testcase name="test_RotateBuilding_EmptySpaceNoLoadsOrSurfaces" lineno="89" classname="RotateBuilding_Test" assertions="3" time="0.036937">
     </testcase>
   </testsuite>
 </test_suites>

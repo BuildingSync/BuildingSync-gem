@@ -38,7 +38,7 @@ require "buildingsync/version"
 require "openstudio/extension"
 
 module BuildingSync
-  class BuildingSync < OpenStudio::Extension::Class
+  class BuildingSync < OpenStudio::Extension::Extension
     # include OpenStudio::Extension
 
     def list_measures
