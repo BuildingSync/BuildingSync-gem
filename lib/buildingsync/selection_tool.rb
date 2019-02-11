@@ -34,32 +34,14 @@
 #  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ########################################################################################################################
 
-require "buildingsync/version"
-require "openstudio/extension"
-require "buildingsync/xmlfile"
-require "buildingsync/selection_tool"
-
 module BuildingSync
-  class BuildingSync #< OpenStudio::Extension::Extension
 
-    # def initialize
-    #   puts "new instance of BuildingSync"
-    # end
-    #
-    # Return the absolute path of the measures or nil if there is none, can be used when configuring OSWs
-    def measures_dir
-      return File.absolute_path(File.join(File.dirname(__FILE__), '../measures/'))
-    end
+  # Class for communicating with SelectionTool
+  class SelectionTool
 
-    # Relevant files such as weather data, design days, etc.
-    # return the absolute path of the files or nil if there is none, can be used when configuring OSWs
-    def files_dir
-      return File.absolute_path(File.join(File.dirname(__FILE__), '../files/'))
-    end
-
-    # return the absolute path of root of this gem
-    def root_dir
-      return File.absolute_path(File.join(File.dirname(__FILE__), '../../'))
+    # See documentation here: https://github.com/buildingsync/selection-tool#validator
+    def initialize
+      return nil
     end
   end
 end

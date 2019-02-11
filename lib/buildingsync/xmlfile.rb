@@ -34,32 +34,29 @@
 #  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ########################################################################################################################
 
-require "buildingsync/version"
-require "openstudio/extension"
-require "buildingsync/xmlfile"
-require "buildingsync/selection_tool"
-
 module BuildingSync
-  class BuildingSync #< OpenStudio::Extension::Extension
+  # Class for holding an instance of the BuildingSync file
+  class XmlFile
 
-    # def initialize
-    #   puts "new instance of BuildingSync"
-    # end
-    #
-    # Return the absolute path of the measures or nil if there is none, can be used when configuring OSWs
-    def measures_dir
-      return File.absolute_path(File.join(File.dirname(__FILE__), '../measures/'))
+    # Read in an existing buildingsync file
+    # @param buildingsync_file [string]: path to BuildingSync XML
+    def self.from_file(buildingsync_file)
+      bsync = BuildingSync.File.new
+      bsync.read_from_xml(buildingsync_file)
+      return bsync
     end
 
-    # Relevant files such as weather data, design days, etc.
-    # return the absolute path of the files or nil if there is none, can be used when configuring OSWs
-    def files_dir
-      return File.absolute_path(File.join(File.dirname(__FILE__), '../files/'))
+    # initialize
+    def initialize
+
+      return nil
     end
 
-    # return the absolute path of root of this gem
-    def root_dir
-      return File.absolute_path(File.join(File.dirname(__FILE__), '../../'))
+    # read the XML from file
+    def read_from_xml(buildingsync_file)
+      return nil
     end
+
+
   end
 end

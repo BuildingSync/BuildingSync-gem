@@ -24,10 +24,13 @@ To be filled out later.
 
 ## TODO
 
-- [ ] Add initial BuildingSync class (can use [BRICR](https://github.com/NREL/bricr/blob/develop/lib/bricr/building_sync.rb) class as example, don't use native gems for XML parsing)
-- [ ] Add ForwardTranslator class (following [other OpenStudio conventions](https://github.com/NREL/OpenStudio/blob/develop/openstudiocore/src/gbxml/ForwardTranslator.hpp)) that translates BuildingSync to OpenStudio
+- [ ] Add initial BuildingSync class (can use [BRICR](https://github.com/NREL/bricr/blob/develop/lib/bricr/building_sync.rb) class as example). Use REXML for reading and writing BSync.
+- [ ] Add ForwardTranslator class (following [other OpenStudio conventions](https://github.com/NREL/OpenStudio/blob/develop/openstudiocore/src/gbxml/ForwardTranslator.hpp)) that translates BuildingSync to OpenStudio (using pure Ruby)
+- [ ] Move BuildingSync specific measures into this gem. See list from [here](https://docs.google.com/spreadsheets/d/1PCB4nZoLQ1cWhnlrlnHwo9kI4G8ChOeblU3L4uZu7bc/edit#gid=1482405742) 
 - [ ] Add example on how to use some code from ```openstudio-standards``` or ```openstudio-model-articulation``` during the translation
 - [ ] Add unit test for BuildingSync -> OSM translation
+- [ ] Add ability to perform validation using https://selectiontool.buildingsync.net. Return which use cases existing BuildingSync XML is valid for.
+
 
 # Releasing
 

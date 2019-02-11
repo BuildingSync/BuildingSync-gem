@@ -15,3 +15,4 @@
 
 # Ignore IDE files
 /.idea
+*.rubocop-http*
