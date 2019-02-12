@@ -35,10 +35,8 @@
 ########################################################################################################################
 
 module BuildingSync
-
   # Class for communicating with SelectionTool
   class SelectionTool
-
     # See documentation here: https://github.com/buildingsync/selection-tool#validator
     # Use core Net::HTTPS
     def initialize

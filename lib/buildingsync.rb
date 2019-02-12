@@ -34,17 +34,15 @@
 #  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ########################################################################################################################
 
-require "buildingsync/version"
-require "openstudio/extension"
-require "buildingsync/selection_tool"
+require 'buildingsync/version'
+require 'openstudio/extension'
+require 'buildingsync/selection_tool'
 
 module BuildingSync
-
   # The BuildingSync class contains both the instance of the BuildingSync file (in XML) and the
   # helper methods from the OpenStudio::Extension gem to support managing measures that are related
   # to BuildingSync.
   class BuildingSync < OpenStudio::Extension::Extension
-
     def initialize
       # Initialize the root directory for use in the extension class. This must be done, otherwise the
       # root_dir will be the root_dir in the OpenStudio Extension Gem.
@@ -79,5 +77,4 @@ module BuildingSync
       return nil
     end
   end
-
 end
