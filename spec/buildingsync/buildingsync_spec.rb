@@ -39,13 +39,17 @@ RSpec.describe BuildingSync do
     expect(BuildingSync::VERSION).not_to be nil
   end
 
-  it 'has a base version number' do
-    instance = BuildingSync::BuildingSync.new
-    expect(instance.openstudio_extension_version).not_to be nil
-  end
-
   it 'has a measures directory' do
     instance = BuildingSync::BuildingSync.new
-    expect(instance.measures_dir).to eq 'unknown directory'
+    measure_path = File.expand_path('lib/measures')
+    expect(instance.measures_dir).to eq measure_path
+    expect(Dir.exist?(instance.measures_dir)).to eq true
+  end
+
+  it 'has a files directory' do
+    instance = BuildingSync::BuildingSync.new
+    file_path = File.expand_path('lib/files')
+    expect(instance.files_dir).to eq file_path
+    expect(Dir.exist?(instance.files_dir)).to eq true
   end
 end

@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["nicholas.long@nrel.gov", "daniel.macumber@nrel.gov", "katherine.fleming@nrel.gov"]
 
   spec.summary       = "BuildingSync library for reading, writing, and exporting BuildingSync to OpenStudio"
-  spec.description       = "BuildingSync library for reading, writing, and exporting BuildingSync to OpenStudio"
+  spec.description   = "BuildingSync library for reading, writing, and exporting BuildingSync to OpenStudio"
   spec.homepage      = "https://buildingsync.net"
 
   # Specify which files should be added to the gem when it is released.

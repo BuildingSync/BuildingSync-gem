@@ -45,6 +45,6 @@ require "openstudio/extension/rake_task"
 require "buildingsync"
 rake_task = OpenStudio::Extension::RakeTask.new
 rake_task.set_extension_class(BuildingSync::BuildingSync)
-rake_task.set_measures_dir(File.join(File.expand_path(File.dirname(__FILE__)), 'lib/measures'))
+# rake_task.set_measures_dir(File.join(File.expand_path(File.dirname(__FILE__)), 'lib/measures'))
 
 task :default => :spec

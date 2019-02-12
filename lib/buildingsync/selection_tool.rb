@@ -40,6 +40,7 @@ module BuildingSync
   class SelectionTool
 
     # See documentation here: https://github.com/buildingsync/selection-tool#validator
+    # Use core Net::HTTPS
     def initialize
       return nil
     end
