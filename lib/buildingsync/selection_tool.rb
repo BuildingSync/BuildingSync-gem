@@ -35,5 +35,12 @@
 ########################################################################################################################
 
 module BuildingSync
-  VERSION = '0.1.0'.freeze
+  # Class for communicating with SelectionTool
+  class SelectionTool
+    # See documentation here: https://github.com/buildingsync/selection-tool#validator
+    # Use core Net::HTTPS
+    def initialize
+      return nil
+    end
+  end
 end

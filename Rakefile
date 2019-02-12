@@ -34,15 +34,19 @@
 #  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ########################################################################################################################
 
-require "bundler/gem_tasks"
-require "rspec/core/rake_task"
+require 'bundler/gem_tasks'
+require 'rspec/core/rake_task'
 
 RSpec::Core::RakeTask.new(:spec)
 
 # Load in the rake tasks from the base openstudio-extension gem
 # Also set measures_dir location for this gem for openstudio-extension gem to use
-require "openstudio/extension/rake_task"
-os_extension = OpenStudio::Extension::RakeTask.new
-os_extension.set_measures_dir(File.join(File.expand_path(File.dirname(__FILE__)), 'lib/measures'))
+require 'openstudio/extension/rake_task'
+require 'buildingsync'
+rake_task = OpenStudio::Extension::RakeTask.new
+rake_task.set_extension_class(BuildingSync::BuildingSync)
 
-task :default => :spec
+require 'rubocop/rake_task'
+RuboCop::RakeTask.new
+
+task default: :spec
