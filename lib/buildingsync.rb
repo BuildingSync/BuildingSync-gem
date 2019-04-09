@@ -58,6 +58,13 @@ module BuildingSync
       return bsync
     end
 
+    # validate the buildingsync xml file with the Selection Tool API5
+    #  to validate the schema
+    #  and use cases
+    def validate_xml(buildingsync_file)
+      return nil
+    end
+
     # read the XML from file
     def read_from_xml(buildingsync_file)
       return nil
