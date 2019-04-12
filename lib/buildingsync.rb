@@ -70,10 +70,9 @@ module BuildingSync
       return nil
     end
 
-    # write OSW file
-    # This method will write a single OSW from the BuildingSync file. The OSW will not include any of the scenarios
-    # other than the baseline.
-    def to_osw
+    # write OSM file
+    # This method will write a single OSM from the BuildingSync file. The OSM will include the baseline.
+    def to_osm
       return nil
     end
 
