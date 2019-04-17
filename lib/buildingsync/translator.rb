@@ -2,7 +2,8 @@
 require 'rexml/document'
 
 require_relative 'workflow_maker'
-require_relative 'workflows/phase_zero_workflow_maker'
+require_relative 'translators/translator_level_zero'
+#require_relative 'workflows/phase_zero_workflow_maker'
 
 module BuildingSync
   class Translator
@@ -52,12 +53,12 @@ module BuildingSync
 
     def chooseWorkflowMaker
       # for now there is only one workflow maker
-      @workflow_maker = PhaseZeroWorkflowMaker.new(@doc, @ns)
+      @workflow_maker = TranslatorLevelZero.new(@doc, @ns)
     end
 
     def generate_baseline_OSM(dir)
       # for now there is only one workflow maker
-      @workflow_maker = PhaseZeroWorkflowMaker.new(@doc, @ns)
+      @workflow_maker = TranslatorLevelZero.new(@doc, @ns)
     end
   end
 end
