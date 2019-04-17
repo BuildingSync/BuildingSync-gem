@@ -34,8 +34,38 @@
 #  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ########################################################################################################################
 
+# try to load configuration, use defaults if doesn't exist
+begin
+  require_relative '../config'
+rescue LoadError, StandardError
+  module BuildingSync
+    # location of openstudio CLI
+    OPENSTUDIO_EXE = 'openstudio'.freeze
+
+    # one or more measure paths
+    OPENSTUDIO_MEASURES = [].freeze
+
+    # one or more file paths
+    OPENSTUDIO_FILES = [].freeze
+
+    # max number of datapoints to run
+    MAX_DATAPOINTS = Float::INFINITY
+    # MAX_DATAPOINTS = 2
+
+    # number of parallel jobs
+    NUM_PARALLEL = 7
+
+    # do simulations
+    DO_SIMULATIONS = false
+  end
+end
+
+# for all testing
+$LOAD_PATH.unshift(File.dirname(__FILE__))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+
 require 'bundler/setup'
-require 'buildingsync'
+require 'buildingsync/translator'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

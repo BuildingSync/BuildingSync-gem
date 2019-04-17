@@ -22,3 +22,15 @@ gem 'openstudio_measure_tester', '= 0.1.7' # This includes the dependencies for 
 
 # simplecov has an unneccesary dependency on native json gem, use fork that does not require this
 gem 'simplecov', github: 'NREL/simplecov'
+
+gem "rspec", "~> 3.8"
+
+gem "rake", "~> 12.3"
+
+gem "ruby-prof", "~> 0.17.0"
+
+gem "ci_reporter_rspec", "~> 1.0"
+
+gem "rubocop", "~> 0.54.0"
+
+gem "rubocop-checkstyle_formatter", "~> 0.4.0"

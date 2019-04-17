@@ -1,32 +1,92 @@
-require 'rspec'
+require_relative './../spec_helper'
 
-describe 'BuildingSync' do
+require 'fileutils'
+require 'parallel'
+
+RSpec.describe "BuildingSync" do
   it 'should have a version' do
-      pending 'Not implemented'
+    expect(BuildingSync::VERSION).not_to be_nil
   end
 
-  it 'should validate building 151 file' do
-    pending 'Not implemented'
+  it 'should parse a phase zero xml' do
+    xml_path = File.join(File.dirname(__FILE__), '../files/phase0/building_151.xml')
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.join(File.dirname(__FILE__), '../output/phase0_building_151/')
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    translator = BuildingSync::Translator.new(xml_path)
+    translator.writeOSWs(out_path)
+
+    osw_files = []
+    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
+
+    expect(osw_files.size).to eq 30
+
+    if BuildingSync::DO_SIMULATIONS
+      num_sims = 0
+      Parallel.each(osw_files, in_threads: [BuildingSync::NUM_PARALLEL, BuildingSync::MAX_DATAPOINTS].min) do |osw|
+        break if num_sims > BuildingSync::MAX_DATAPOINTS
+
+        cmd = "\"#{BuildingSync::OPENSTUDIO_EXE}\" run -w \"#{osw}\""
+        puts "Running cmd: #{cmd}"
+        result = system(cmd)
+        expect(result).to be true
+
+        num_sims += 1
+      end
+
+      translator.gatherResults(out_path)
+      translator.saveXML(File.join(out_path, 'results.xml'))
+
+      expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
+    end
   end
 
-  it 'should parse building 151 file' do
-    pending 'Not implemented'
-  end
+  it 'should parse a phase zero xml with n1 namespace' do
+    xml_path = File.join(File.dirname(__FILE__), '../files/phase0/building_151_n1.xml')
+    expect(File.exist?(xml_path)).to be true
 
-  # this file should not be tested yet, need to wait for an update from Nick
-  it 'should validate ASHRAE 211 Export file' do
-    pending 'Not implemented'
-  end
+    out_path = File.join(File.dirname(__FILE__), '../output/phase0_building_151_n1/')
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    expect(File.exist?(out_path)).not_to be true
 
-  it 'should parse ASHRAE 211 Export file' do
-    pending 'Not implemented'
-  end
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
 
-  it 'should validate Golden Test file' do
-    pending 'Not implemented'
-  end
+    translator = BuildingSync::Translator.new(xml_path)
+    translator.writeOSWs(out_path)
 
-  it 'should parse Golden Test file' do
-    pending 'Not implemented'
+    osw_files = []
+    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
+
+    expect(osw_files.size).to eq 30
+
+    if BuildingSync::DO_SIMULATIONS
+      num_sims = 0
+      Parallel.each(osw_files, in_threads: [BuildingSync::NUM_PARALLEL, BuildingSync::MAX_DATAPOINTS].min) do |osw|
+        break if num_sims > BuildingSync::MAX_DATAPOINTS
+
+        cmd = "\"#{BuildingSync::OPENSTUDIO_EXE}\" run -w \"#{osw}\""
+        puts "Running cmd: #{cmd}"
+        result = system(cmd)
+        expect(result).to be true
+
+        num_sims += 1
+      end
+
+      translator.gatherResults(out_path)
+      translator.saveXML(File.join(out_path, 'results.xml'))
+
+      expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
+    end
   end
 end
