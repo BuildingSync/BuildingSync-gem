@@ -7,6 +7,7 @@ module OpenStudio
       # initialize
       def initialize(site_xml)
         # code to initialize
+        @address
       end
 
       # adding a site to the facility
