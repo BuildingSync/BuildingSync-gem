@@ -35,11 +35,26 @@ module BuildingSync
       @ns = ns
     end
 
-    def writeOSWs(dir)
-      FileUtils.mkdir_p(dir)
+    def set_floor_areas(build_element)
+      # TM: is this a function that could be shared between building and subsection??
+      build_element.elements.each("/#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
+        floor_area = floor_area_element.elements["#{@ns}:FloorAreaValue"].text.to_f
+        next if floor_area.nil?
+
+        floor_area_type = floor_area_element.elements["#{@ns}:FloorAreaType"].text
+        if floor_area_type == 'Gross'
+          @gross_floor_area = floor_area
+        elsif floor_area_type == 'Heated and Cooled'
+          @heated_and_cooled_floor_area = floor_area
+        elsif floor_area_type == 'Footprint'
+          @footprint_floor_area = floor_area
+        end
+      end
     end
 
-    def gatherResults(dir)
+
+    def writeOSWs(dir)
+      FileUtils.mkdir_p(dir)
     end
 
     def failed_scenarios

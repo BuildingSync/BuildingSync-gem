@@ -26,6 +26,15 @@ module BuildingSync
       configureForDoc(@workflow)
     end
 
+    def generate_baseline_OSM()
+      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
+        address = site_element.elements["#{@ns}:Address"].text.to_f
+        next if address.nil?
+        # TM: can we do it like this or is other information needed to generate a facility?
+        @facilities.push(facility.new(facility_element))
+      end
+    end
+
     def configureForDoc(osw)
 
       # get the facility floor areas

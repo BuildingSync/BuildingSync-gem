@@ -10,7 +10,7 @@ module BuildingSync
     # load the building sync file and chooses the correct workflow
     def initialize(path)
       @doc = nil
-      @workflow_maker = nil
+      @translator = nil
 
       # parse the xml
       raise "File '#{path}' does not exist" unless File.exist?(path)
@@ -30,30 +30,26 @@ module BuildingSync
       raise 'BuildingSync file must have exactly 1 facility' if facilities.size != 1
 
       # choose the correct workflow maker based on xml
-      chooseWorkflowMaker
+      choose_translator
     end
 
     def writeOSWs(dir)
-      @workflow_maker.writeOSWs(dir)
+      @translator.writeOSWs(dir)
     end
 
     def gatherResults(dir)
-      @workflow_maker.gatherResults(dir)
+      @translator.gatherResults(dir)
     end
 
     def failed_scenarios()
-      @workflow_maker.failed_scenarios
-    end
-
-    def saveXML(filename)
-      @workflow_maker.saveXML(filename)
+      @translator.failed_scenarios
     end
 
     private
 
-    def chooseWorkflowMaker
+    def choose_translator
       # for now there is only one workflow maker
-      @workflow_maker = TranslatorLevelZero.new(@doc, @ns)
+      @translator = TranslatorLevelZero.new(@doc, @ns)
     end
   end
 end

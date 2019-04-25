@@ -1,5 +1,4 @@
-module OpenStudio
-  module ModelArticulation
+module BuildingSync
     class BuildingSystem
       #
 
@@ -13,6 +12,5 @@ module OpenStudio
         # creating the typical system
       end
     end
-  end
 end
 

@@ -1,24 +1,23 @@
-module OpenStudio
-  module ModelArticulation
-    class Facility < WorkflowMaker
+module BuildingSync
+    class Facility < SpatialElement
       # an array that contains all the sites
       @sites = []
 
       # initialize
       def initialize(facility_xml)
         # code to initialize
+        create_site(facility_xml)
+      end
 
-        @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites") do |site_element|
+      # adding a site to the facility
+      def create_site(facility_xml)
+        # code to create a site
+        @doc.elements.each("/#{@ns}:Sites") do |site_element|
           address = site_element.elements["#{@ns}:Address"].text.to_f
           next if address.nil?
-          @sites.push(site_element)
-        end
-      end
-      # adding a site to the facility
-      def create_site
-        # code to create a site
-        @sites.each do |item|
-          site.new(@doc)
+          # TM: what is the purpose of this address check?
+          # TM: do we need anything else to create the site?
+          @sites.push(site.new(site_element))
         end
       end
 
@@ -27,5 +26,4 @@ module OpenStudio
         # code to add typical HVAC systems
       end
     end
-  end
-  end
+end

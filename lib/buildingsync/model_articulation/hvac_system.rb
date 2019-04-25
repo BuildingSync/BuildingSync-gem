@@ -1,5 +1,4 @@
-module OpenStudio
-  module ModelArticulation
+module BuildingSync
     class HVACSystem < BuildingSystem
       #
 
@@ -13,5 +12,4 @@ module OpenStudio
         # creating the typical HVAC systems
       end
     end
-  end
 end
