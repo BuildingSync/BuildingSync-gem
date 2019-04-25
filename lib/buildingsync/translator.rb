@@ -1,7 +1,7 @@
 
 require 'rexml/document'
 
-require_relative 'workflow_maker'
+require_relative 'model_articulation/spatial_element'
 require_relative 'translators/translator_level_zero'
 #require_relative 'workflows/phase_zero_workflow_maker'
 
@@ -25,9 +25,9 @@ module BuildingSync
       end
 
       # validate the doc
-      audits = []
-      @doc.elements.each("#{@ns}:Audits/#{@ns}:Audit/") { |audit| audits << audit }
-      raise 'BuildingSync file must have exactly 1 audit' if audits.size != 1
+      facilities = []
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") { |facility| facilities << facility }
+      raise 'BuildingSync file must have exactly 1 facility' if facilities.size != 1
 
       # choose the correct workflow maker based on xml
       chooseWorkflowMaker
@@ -52,11 +52,6 @@ module BuildingSync
     private
 
     def chooseWorkflowMaker
-      # for now there is only one workflow maker
-      @workflow_maker = TranslatorLevelZero.new(@doc, @ns)
-    end
-
-    def generate_baseline_OSM(dir)
       # for now there is only one workflow maker
       @workflow_maker = TranslatorLevelZero.new(@doc, @ns)
     end

@@ -1,5 +1,5 @@
 module BuildingSync
-  class TranslatorLevelZero < WorkflowMaker
+  class TranslatorLevelZero < SpecialElement
     def initialize(doc, ns)
       super
 
@@ -19,14 +19,6 @@ module BuildingSync
         @workflow = JSON.parse(file.read)
       end
 
-      if BuildingSync::OPENSTUDIO_MEASURES
-        @workflow['measure_paths'] = BuildingSync::OPENSTUDIO_MEASURES
-      end
-
-      if BuildingSync::OPENSTUDIO_FILES
-        @workflow['file_paths'] = BuildingSync::OPENSTUDIO_FILES
-      end
-
       @facility = {}
       @subsections = []
 
@@ -40,7 +32,7 @@ module BuildingSync
       @facility['gross_floor_area'] = nil
       @facility['heated_and_cooled_floor_area'] = nil
       @facility['footprint_floor_area'] = nil
-      @doc.elements.each("/#{@ns}:Audits/#{@ns}:Audit/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
+      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building/#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
         floor_area = floor_area_element.elements["#{@ns}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
 
@@ -56,7 +48,7 @@ module BuildingSync
 
       # SHL- get the template (vintage)
       @facility['template'] = nil
-      @doc.elements.each("/#{@ns}:Audits/#{@ns}:Audit/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
+      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building") do |facility_element|
         built_year = facility_element.elements["#{@ns}:YearOfConstruction"].text.to_f
 
         if facility_element.elements["#{@ns}:YearOfLastMajorRemodel"]
@@ -87,7 +79,7 @@ module BuildingSync
       @facility['floor_height'] = nil # TBD
       @facility['wwr'] = nil # TBD
 
-      @doc.elements.each("/#{@ns}:Audits/#{@ns}:Audit/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
+      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building") do |facility_element|
 
         if facility_element.elements["#{@ns}:FloorsAboveGrade"]
           @facility['num_stories_above_grade'] = facility_element.elements["#{@ns}:FloorsAboveGrade"].text.to_f
@@ -179,42 +171,42 @@ module BuildingSync
 
       # set this value in the osw
       # For measure: create_bar_from_building_type_ratios
-      set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'total_bldg_floor_area', @facility['gross_floor_area'])
-      set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'template', @facility['template'])
-      set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bldg_type_a', @subsections[0]['bldg_type'])
+      set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'total_bldg_floor_area', @facility['gross_floor_area'])
+      set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'template', @facility['template'])
+      set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bldg_type_a', @subsections[0]['bldg_type'])
       if @subsections.size > 1
-        set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bldg_type_b', @subsections[1]['bldg_type'])
-        set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bldg_type_b_fract_bldg_area', @subsections[1]['fract_bldg_area'])
+        set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bldg_type_b', @subsections[1]['bldg_type'])
+        set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bldg_type_b_fract_bldg_area', @subsections[1]['fract_bldg_area'])
       else
-        set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bldg_type_b', @facility['bldg_type'])
+        set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bldg_type_b', @facility['bldg_type'])
       end
       if @subsections.size > 2
-        set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bldg_type_c', @subsections[2]['bldg_type'])
-        set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bldg_type_c_fract_bldg_area', @subsections[2]['fract_bldg_area'])
+        set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bldg_type_c', @subsections[2]['bldg_type'])
+        set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bldg_type_c_fract_bldg_area', @subsections[2]['fract_bldg_area'])
       else
-        set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bldg_type_c', @facility['bldg_type'])
+        set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bldg_type_c', @facility['bldg_type'])
       end
       if @subsections.size > 3
-        set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bldg_type_d', @subsections[3]['bldg_type'])
-        set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bldg_type_d_fract_bldg_area', @subsections[3]['fract_bldg_area'])
+        set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bldg_type_d', @subsections[3]['bldg_type'])
+        set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bldg_type_d_fract_bldg_area', @subsections[3]['fract_bldg_area'])
       else
-        set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bldg_type_d', @facility['bldg_type'])
+        set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bldg_type_d', @facility['bldg_type'])
       end
-      set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'floor_height', @facility['floor_height'])
-      set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'num_stories_above_grade', @facility['num_stories_above_grade'])
-      set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'num_stories_below_grade', @facility['num_stories_below_grade'])
-      set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'building_rotation', @facility['building_rotation'])
-      set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'ns_to_ew_ratio', @facility['ns_to_ew_ratio'])
-      set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'wwr', @facility['wwr'])
-      set_measure_argument(osw, 'create_bar_from_building_type_ratios', 'bar_division_method', @facility['bar_division_method'])
+      set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'floor_height', @facility['floor_height'])
+      set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'num_stories_above_grade', @facility['num_stories_above_grade'])
+      set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'num_stories_below_grade', @facility['num_stories_below_grade'])
+      set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'building_rotation', @facility['building_rotation'])
+      set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'ns_to_ew_ratio', @facility['ns_to_ew_ratio'])
+      set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'wwr', @facility['wwr'])
+      set_measure_argument(osw, 'create_bar_from_building_type_ratios_bricr', 'bar_division_method', @facility['bar_division_method'])
 
       # For measure: create_typical_building_from_model
-      set_measure_argument(osw, 'create_typical_building_from_model', 'template', @facility['template'])
-      set_measure_argument(osw, 'create_typical_building_from_model', 'system_type', @facility['system_type'] )
+      set_measure_argument(osw, 'create_typical_building_from_model_bricr', 'template', @facility['template'])
+      set_measure_argument(osw, 'create_typical_building_from_model_bricr', 'system_type', @facility['system_type'] )
       # Calibration
       set_measure_argument(osw, 'calibrate_baseline_model', 'template', @facility['template'])
       set_measure_argument(osw, 'calibrate_baseline_model', 'bldg_type', @facility['bldg_type'])
-      if defined?(BRICR::DO_MODEL_CALIBRATION) and BRICR::DO_MODEL_CALIBRATION
+      if defined?(BuildingSync::DO_MODEL_CALIBRATION) and BuildingSync::DO_MODEL_CALIBRATION
         set_measure_argument(osw, 'calibrate_baseline_model', '__SKIP__', false)
       end
     end
@@ -614,7 +606,7 @@ module BuildingSync
 
       #ensure there is a 'Baseline' scenario
       found_baseline = false
-      @doc.elements.each("#{@ns}:Audits/#{@ns}:Audit/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         if scenario_name == 'Baseline'
           found_baseline = true
@@ -623,7 +615,7 @@ module BuildingSync
       end
 
       if !found_baseline
-        scenarios_element = @doc.elements["#{@ns}:Audits/#{@ns}:Audit/#{@ns}:Report/#{@ns}:Scenarios"]
+        scenarios_element = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios"]
 
         scenario_element = REXML::Element.new("#{@ns}:Scenario")
         scenario_element.attributes['ID'] = 'Baseline'
@@ -644,7 +636,7 @@ module BuildingSync
       end
 
       found_baseline = false
-      @doc.elements.each("#{@ns}:Audits/#{@ns}:Audit/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         if scenario_name == 'Baseline'
           found_baseline = true
@@ -658,10 +650,10 @@ module BuildingSync
       end
 
       # write an osw for each scenario
-      @doc.elements.each("#{@ns}:Audits/#{@ns}:Audit/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) and BRICR::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
+        next if defined?(BuildingSync::SIMULATE_BASELINE_ONLY) and BuildingSync::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
 
         # deep clone
         osw = JSON.load(JSON.generate(@workflow))
@@ -708,10 +700,10 @@ module BuildingSync
       results = {}
 
       # write an osw for each scenario
-      @doc.elements.each("#{@ns}:Audits/#{@ns}:Audit/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) and BRICR::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
+        next if defined?(BuildingSync::SIMULATE_BASELINE_ONLY) and BuildingSync::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
 
         # dir for the osw
         osw_dir = File.join(dir, scenario_name)
@@ -725,10 +717,6 @@ module BuildingSync
 
         path = File.join(osw_dir, 'eplusout.eso')
         FileUtils.rm_f(path) if File.exists?(path)
-
-        Dir.glob(File.join(osw_dir, '*create_typical_building_from_model')).each do |path|
-          FileUtils.rm_rf(path) if File.exists?(path)
-        end
 
         # find the osw
         path = File.join(osw_dir, 'out.osw')
@@ -745,10 +733,10 @@ module BuildingSync
 
       end
 
-      @doc.elements.each("#{@ns}:Audits/#{@ns}:Audit/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) and BRICR::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
+        next if defined?(BuildingSync::SIMULATE_BASELINE_ONLY) and BuildingSync::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
 
         package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
 
@@ -886,6 +874,7 @@ module BuildingSync
     def failed_scenarios
       return @failed_scenarios
     end
+
 
   end
 end

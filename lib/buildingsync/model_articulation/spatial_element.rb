@@ -29,7 +29,7 @@ require 'json'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
-  class WorkflowMaker
+  class SpecialElement
     def initialize(doc, ns)
       @doc = doc
       @ns = ns
@@ -41,7 +41,7 @@ module BuildingSync
 
     def gatherResults(dir)
     end
-    
+
     def failed_scenarios
       return []
     end
@@ -59,6 +59,10 @@ module BuildingSync
           step['arguments'][argument_name] = argument_value
           result = true
         end
+      end
+
+      if !result
+        raise "Could not set '#{argument_name}' to '#{argument_value}' for measure '#{measure_dir_name}'"
       end
 
       return result
