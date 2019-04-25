@@ -8,7 +8,7 @@ module OpenStudio
       def initialize(facility_xml)
         # code to initialize
 
-        @doc.elements.each("/#{@ns}:Audits/#{@ns}:Audit/#{@ns}:Sites") do |site_element|
+        @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites") do |site_element|
           address = site_element.elements["#{@ns}:Address"].text.to_f
           next if address.nil?
           @sites.push(site_element)
