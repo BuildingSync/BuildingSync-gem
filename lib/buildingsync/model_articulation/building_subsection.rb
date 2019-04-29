@@ -1,5 +1,5 @@
 module BuildingSync
-  class BuildingSubsection < SpatialElement
+  class BuildingSubsection
     type = null
     faction_area = null
     num_of_units = null
@@ -20,27 +20,27 @@ module BuildingSync
     end
 
     def set_bldg_system_type_based_on_occupancy_type(subSectionElement)
-        @occupancy_type = subSectionElement.elements["#{@ns}:OccupancyClassification"].text
-        if @occupancy_type == 'Retail'
-          @bldg_type = 'RetailStandalone'
-          @bar_division_method = 'Multiple Space Types - Individual Stories Sliced'
+      @occupancy_type = subSectionElement.elements["#{@ns}:OccupancyClassification"].text
+      if @occupancy_type == 'Retail'
+        @bldg_type = 'RetailStandalone'
+        @bar_division_method = 'Multiple Space Types - Individual Stories Sliced'
+        @system_type = 'PSZ-AC with gas coil heat'
+      elsif @occupancy_type  == 'Office'
+        @bar_division_method = 'Single Space Type - Core and Perimeter'
+        if @gross_floor_area > 0 && @gross_floor_area < 20000
+          @bldg_type = 'SmallOffice'
           @system_type = 'PSZ-AC with gas coil heat'
-        elsif @occupancy_type  == 'Office'
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          if @gross_floor_area > 0 && @gross_floor_area < 20000
-            @bldg_type = 'SmallOffice'
-            @system_type = 'PSZ-AC with gas coil heat'
-          elsif @gross_floor_area >= 20000 && @gross_floor_area < 75000
-            @bldg_type = 'MediumOffice'
-            @system_type = 'PVAV with reheat'
-          else
-            raise "Office building size is beyond BuildingSync scope"
-          end
+        elsif @gross_floor_area >= 20000 && @gross_floor_area < 75000
+          @bldg_type = 'MediumOffice'
+          @system_type = 'PVAV with reheat'
         else
-          raise "Building type '#{@occupancy_type}' is beyond BuildingSync scope"
+          raise "Office building size is beyond BuildingSync scope"
         end
+      else
+        raise "Building type '#{@occupancy_type}' is beyond BuildingSync scope"
+      end
 
-        raise "Subsection does not define gross floor area" if @gross_floor_area.nil?
+      raise "Subsection does not define gross floor area" if @gross_floor_area.nil?
       end
 
     # create geometry
