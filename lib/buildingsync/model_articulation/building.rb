@@ -29,15 +29,11 @@ module BuildingSync
       build_element.elements.each("#{@ns}:Subsections/#{@ns}:Subsection") do |subsection_element|
         floor_area = subsection_element.elements["#{@ns}:FloorAreas"].text.to_f
         next if floor_area.nil?
-        @building_subsections.push(BuildingSubsection.new(subsection_element))
+        @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template))
       end
 
       # need to set those defaults after initializing the subsections
       set_building_form_defaults
-
-      if !check_building_faction
-        return
-      end
     end
 
     def set_standard_template_based_on_year(build_element)
@@ -93,31 +89,35 @@ module BuildingSync
       building_form_defaults = building_form_defaults(@building_subsections[0].bldg_type)
       if @ns_to_ew_ratio == 0.0
         @ns_to_ew_ratio = building_form_defaults[:aspect_ratio]
-        # runner.registerInfo("0.0 value for aspect ratio will be replaced with smart default for #{args['bldg_type_a']} of #{building_form_defaults[:aspect_ratio]}.")
+        puts "Warning: 0.0 value for aspect ratio will be replaced with smart default for #{@building_subsections[0].bldg_type} of #{building_form_defaults[:aspect_ratio]}."
       end
       if @floor_height == 0.0
         @floor_height = building_form_defaults[:typical_story]
-        # runner.registerInfo("0.0 value for floor height will be replaced with smart default for #{args['bldg_type_a']} of #{building_form_defaults[:typical_story]}.")
+        puts "Warning: 0.0 value for floor height will be replaced with smart default for #{@building_subsections[0].bldg_type} of #{building_form_defaults[:typical_story]}."
       end
       # because of this can't set wwr to 0.0. If that is desired then we can change this to check for 1.0 instead of 0.0
       if @wwr == 0.0
         @wwr = building_form_defaults[:wwr]
-        # runner.registerInfo("0.0 value for window to wall ratio will be replaced with smart default for #{args['bldg_type_a']} of #{building_form_defaults[:wwr]}.")
+        puts "Warning: 0.0 value for window to wall ratio will be replaced with smart default for #{@building_subsections[0].bldg_type} of #{building_form_defaults[:wwr]}."
       end
     end
 
     def check_building_faction
+      # check that sum of fractions for b,c, and d is less than 1.0 (so something is left for primary building type)
       building_fraction = 1.0
       @building_subsections.each do |subsection|
         next if subsection.fraction.nil?
         building_fraction -= subsection.fraction
       end
       if building_fraction <= 0.0
-        # runner.registerError('Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
-        # # TM: how do we do the logging?
+        puts 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
         return false
       end
-      return true
+      true
+    end
+
+    def create_space_types
+      @building_subsections.each.create_space_types
     end
   end
 end

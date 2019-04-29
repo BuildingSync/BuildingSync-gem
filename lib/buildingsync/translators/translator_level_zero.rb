@@ -42,6 +42,8 @@ module BuildingSync
     else
       puts 'This is working fine.'
     end
+
+    @facilities.each(&:generate_baseline_osm)
   end
 
   def configureForDoc(osw)
