@@ -1,8 +1,7 @@
-
 require_relative '../model_articulation/facility'
 module BuildingSync
-  class TranslatorLevelZero < SpecialElement
-    def initialize(doc, ns)
+  class TranslatorLevelZero < Translator
+    def initialize(doc)
       super
 
       # load the workflow
@@ -33,7 +32,7 @@ module BuildingSync
     def generate_baseline_osm(osw)
 
       @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
-        @facility.push(Facility.new(facility_element))
+        @facility.push(Facility.new(facility_element.to_s))
       end
 
       if @facility.count == 0

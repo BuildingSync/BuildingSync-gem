@@ -1,19 +1,22 @@
-require_relative 'building_subsection'
 module BuildingSync
   class Building < SpecialElement
     # an array that contains all the building subsections
     @building_subsections = []
-    @gross_floor_area = nil
+    @total_floor_area = nil # also gross_floor_area
+    @total_floor_area_SI = nil
     @heated_and_cooled_floor_area = nil
     @footprint_floor_area = nil
     @standard_template = nil
+    @num_stories = nil
     @num_stories_above_grade = nil
     @num_stories_below_grade = nil
     @ns_to_ew_ratio = nil
 
     @building_rotation = 0.0 # setDefaultValue
     @floor_height = 0.0 # setDefaultValue in ft
+    @floor_height_si = nil
     @wwr = 0.0 # setDefaultValue in fraction
+    @name = nil
 
     # initialize
     def initialize(build_element)
@@ -35,6 +38,21 @@ module BuildingSync
 
       # need to set those defaults after initializing the subsections
       set_building_form_defaults
+
+      # generate building name
+      generate_building_name
+
+      footprint_si = null
+      # handle user-assigned single floor plate size condition
+      if @single_floor_area > 0.0
+        footprint_si = OpenStudio.convert(@single_floor_area, 'ft2', 'm2')
+        @total_bldg_floor_area_si = footprint_si * @num_stories.to_f
+        puts 'INFO: User-defined single floor area was used for calculation of total building floor area'
+      else
+        footprint_si = @total_bldg_floor_area_si / @num_stories.to_f
+      end
+      @width = Math.sqrt(footprint_si / @ns_to_ew_ratio)
+      @length = footprint_si / width
     end
 
     def set_standard_template_based_on_year(build_element)
@@ -75,6 +93,8 @@ module BuildingSync
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
+
+      @num_stories = @num_stories_below_grade + @num_stories_above_grade
     end
 
     def set_aspect_ratio(build_element)
@@ -96,6 +116,7 @@ module BuildingSync
         @floor_height = building_form_defaults[:typical_story]
         puts "Warning: 0.0 value for floor height will be replaced with smart default for #{@building_subsections[0].bldg_type} of #{building_form_defaults[:typical_story]}."
       end
+      @floor_height_si = OpenStudio.convert(@floor_height, 'ft', 'm').get
       # because of this can't set wwr to 0.0. If that is desired then we can change this to check for 1.0 instead of 0.0
       if @wwr == 0.0
         @wwr = building_form_defaults[:wwr]
@@ -115,6 +136,12 @@ module BuildingSync
         return false
       end
       true
+    end
+
+    def generate_building_name
+      name_array = [@standard_template]
+      name_array << @building_subsections.each.bldg_type
+      @name = name_array.join('|').to_s
     end
 
     def create_space_types

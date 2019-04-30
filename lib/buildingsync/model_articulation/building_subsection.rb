@@ -9,6 +9,7 @@ module BuildingSync
     @space_types = nil
     @bar_division_method = nil
     @subsection_element = nil
+
     # initialize
     def initialize(subSectionElement, standard_template)
       # code to initialize
@@ -30,10 +31,10 @@ module BuildingSync
         @system_type = 'PSZ-AC with gas coil heat'
       elsif @occupancy_type  == 'Office'
         @bar_division_method = 'Single Space Type - Core and Perimeter'
-        if @gross_floor_area > 0 && @gross_floor_area < 20000
+        if @total_floor_area > 0 && @total_floor_area < 20000
           @bldg_type = 'SmallOffice'
           @system_type = 'PSZ-AC with gas coil heat'
-        elsif @gross_floor_area >= 20000 && @gross_floor_area < 75000
+        elsif @total_floor_area >= 20000 && @total_floor_area < 75000
           @bldg_type = 'MediumOffice'
           @system_type = 'PVAV with reheat'
         else
@@ -43,8 +44,8 @@ module BuildingSync
         raise "Building type '#{@occupancy_type}' is beyond BuildingSync scope"
       end
 
-      raise "Subsection does not define gross floor area" if @gross_floor_area.nil?
-      end
+      raise "Subsection does not define gross floor area" if @total_floor_area.nil?
+    end
 
     # create geometry
     def create_geometry
@@ -89,6 +90,12 @@ module BuildingSync
 
       # store multiplier needed to adjust sum of ratios to equal 1.0
       @ratio_adjustment_multiplier = 1.0 / sum_of_ratios
+
+      @space_types.each do |space_type, hash|
+        ratio_of_bldg_total = hash[:ratio] * @ratio_adjustment_multiplier * @frac_bldg_area
+        final_floor_area = ratio_of_bldg_total * total_bldg_floor_area_si # I think I can just pass ratio but passing in area is cleaner
+        space_types_hash[space_type] = { floor_area: final_floor_area }
+      end
     end
   end
 end

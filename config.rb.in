@@ -1,4 +1,4 @@
-module BRICR
+module BuildingSync
 
   #ENV['GEM_HOME'] = 'C:/bricr/gems'
   #ENV['GEM_PATH'] = 'C:/bricr/gems'
