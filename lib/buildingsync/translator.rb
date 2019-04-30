@@ -1,9 +1,7 @@
-
 require 'rexml/document'
 
 require_relative 'model_articulation/spatial_element'
 require_relative 'translators/translator_level_zero'
-#require_relative 'workflows/phase_zero_workflow_maker'
 
 module BuildingSync
   class Translator
@@ -37,19 +35,11 @@ module BuildingSync
       @translator.writeOSWs(dir)
     end
 
-    def gatherResults(dir)
-      @translator.gatherResults(dir)
-    end
-
-    def failed_scenarios()
-      @translator.failed_scenarios
-    end
-
     private
 
     def choose_translator
       # for now there is only one workflow maker
-      @translator = TranslatorLevelZero.new(@doc, @ns)
+      @translator = TranslatorLevelZero.new(@doc)
     end
   end
 end

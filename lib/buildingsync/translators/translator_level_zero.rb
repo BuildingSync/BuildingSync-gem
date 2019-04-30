@@ -1,7 +1,7 @@
 
 module BuildingSync
-  class TranslatorLevelZero < SpecialElement
-    def initialize(doc, ns)
+  class TranslatorLevelZero < Translator
+    def initialize(doc)
       super
 
       # load the workflow

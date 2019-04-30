@@ -43,7 +43,8 @@ module BuildingSync
 
         floor_area_type = floor_area_element.elements["#{@ns}:FloorAreaType"].text
         if floor_area_type == 'Gross'
-          @gross_floor_area = floor_area
+          @total_floor_area = floor_area
+          @total_bldg_floor_area_si = OpenStudio.convert(@total_floor_area, 'ft^2', 'm^2').get
         elsif floor_area_type == 'Heated and Cooled'
           @heated_and_cooled_floor_area = floor_area
         elsif floor_area_type == 'Footprint'
@@ -51,7 +52,6 @@ module BuildingSync
         end
       end
     end
-
 
     def writeOSWs(dir)
       FileUtils.mkdir_p(dir)
