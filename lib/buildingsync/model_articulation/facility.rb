@@ -36,10 +36,10 @@ module BuildingSync
       # the original measure reads in potential values from a previous measure, I think we do not need this anymore (maybe the zip code??)
 
       # TODO: the original measure contains value range checks, should we implement them here or while importing data??
-      # 'bldg_type_b_fract_bldg_area', 'bldg_type_c_fract_bldg_area', 'bldg_type_d_fract_bldg_area', 'wwr', 'party_wall_fraction' 0 =<= 1
-      # 'total_bldg_floor_area' 0 <= nil
-      # 'num_stories_above_grade' 1 =< nil
-      # 'bldg_type_a_num_units', 'bldg_type_c_num_units', 'bldg_type_d_num_units', 'num_stories_below_grade', 'floor_height', 'ns_to_ew_ratio', 'party_wall_stories_north',
+      # Fraction: 'bldg_type_b_fract_bldg_area', 'bldg_type_c_fract_bldg_area', 'bldg_type_d_fract_bldg_area', 'wwr', 'party_wall_fraction' 0 =<= 1
+      # Bigger than 0 (excluding 0): 'total_bldg_floor_area' 0 <= nil
+      # Bigger than 1 (including 1): 'num_stories_above_grade' 1 =< nil
+      # Bigger than 0 (including 0): 'bldg_type_a_num_units', 'bldg_type_c_num_units', 'bldg_type_d_num_units', 'num_stories_below_grade', 'floor_height', 'ns_to_ew_ratio', 'party_wall_stories_north',
       # 'party_wall_stories_south', 'party_wall_stories_east', 'party_wall_stories_west', 'single_floor_area' 0 =<= nil
 
       # TODO: we have not really defined a good logic what happens with multiple sites, versus multiple buildings, here we just take the first building on the first site
