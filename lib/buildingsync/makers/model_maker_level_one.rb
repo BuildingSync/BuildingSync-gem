@@ -1,5 +1,5 @@
 module BuildingSync
-  class TranslatorLevelOne < Translator
+  class ModelMakerLevelOne < ModelMaker
     # load the building sync file and chooses the correct workflow
     def initialize(path)
       # init

@@ -3,7 +3,7 @@ require_relative './../spec_helper'
 require 'fileutils'
 require 'parallel'
 
-RSpec.describe "BuildingSync" do
+RSpec.describe 'BuildingSync' do
   it 'should have a version' do
     expect(BuildingSync::VERSION).not_to be_nil
   end

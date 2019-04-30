@@ -1,14 +1,15 @@
 require 'rexml/document'
 
 require_relative 'model_articulation/spatial_element'
-require_relative 'translators/translator_level_zero'
+require_relative 'makers/model_maker_level_zero'
 
 module BuildingSync
   class Translator
     # load the building sync file and chooses the correct workflow
     def initialize(path)
       @doc = nil
-      @translator = nil
+      @model_maker = nil
+      @workflow_maker = nil
 
       # parse the xml
       raise "File '#{path}' does not exist" unless File.exist?(path)
@@ -28,18 +29,14 @@ module BuildingSync
       raise 'BuildingSync file must have exactly 1 facility' if facilities.size != 1
 
       # choose the correct workflow maker based on xml
-      choose_translator
-    end
-
-    def writeOSWs(dir)
-      @translator.writeOSWs(dir)
+      choose_model_maker
     end
 
     private
 
-    def choose_translator
+    def choose_model_maker
       # for now there is only one workflow maker
-      @translator = TranslatorLevelZero.new(@doc)
+      @model_maker = ModelMakerLevelZero.new(@doc, @ns)
     end
   end
 end
