@@ -1,3 +1,4 @@
+require_relative 'site'
 module BuildingSync
   class Facility
     # an array that contains all the sites
@@ -7,7 +8,6 @@ module BuildingSync
     def initialize(facility_xml)
       # code to initialize
       create_site(facility_xml)
-
     end
 
     # adding a site to the facility

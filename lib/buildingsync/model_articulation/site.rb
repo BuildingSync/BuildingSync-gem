@@ -1,3 +1,4 @@
+require_relative 'building'
 module BuildingSync
   class Site
     # an array that contains all the buildings

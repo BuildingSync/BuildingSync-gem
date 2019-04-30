@@ -1,13 +1,13 @@
 module BuildingSync
-  class BuildingSubsection
-    type = null
-    faction_area = null
-    num_of_units = null
-    @occupancy_type = null
-    @bldg_type = null
-    @system_type = null
-    @space_types = null
-    @bar_division_method = null
+  class BuildingSubsection < SpecialElement
+    @type = nil
+    @faction_area = nil
+    @num_of_units = nil
+    @occupancy_type = nil
+    @bldg_type = nil
+    @system_type = nil
+    @space_types = nil
+    @bar_division_method = nil
     @subsection_element = nil
     # initialize
     def initialize(subSectionElement, standard_template)

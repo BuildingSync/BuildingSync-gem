@@ -1,14 +1,15 @@
+require_relative 'building_subsection'
 module BuildingSync
-  class Building
+  class Building < SpecialElement
     # an array that contains all the building subsections
     @building_subsections = []
-    @gross_floor_area = null
-    @heated_and_cooled_floor_area = null
-    @footprint_floor_area = null
-    @standard_template = null
-    @num_stories_above_grade = null
-    @num_stories_below_grade = null
-    @ns_to_ew_ratio = null
+    @gross_floor_area = nil
+    @heated_and_cooled_floor_area = nil
+    @footprint_floor_area = nil
+    @standard_template = nil
+    @num_stories_above_grade = nil
+    @num_stories_below_grade = nil
+    @ns_to_ew_ratio = nil
 
     @building_rotation = 0.0 # setDefaultValue
     @floor_height = 0.0 # setDefaultValue in ft
