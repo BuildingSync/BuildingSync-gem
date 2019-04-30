@@ -2,6 +2,7 @@ require 'rexml/document'
 
 require_relative 'model_articulation/spatial_element'
 require_relative 'makers/model_maker_level_zero'
+require_relative 'makers/workflow_maker_phase_zero'
 
 module BuildingSync
   class Translator
@@ -32,17 +33,25 @@ module BuildingSync
       choose_model_maker
 
       # choose the correct workflow maker based on xml
-      choose_workflow_maker
+      # choose_workflow_maker
+    end
+
+    def write_osm(dir)
+      @model_maker.generate_baseline_osm(dir)
+    end
+
+    def writeOSWs(dir)
+      @workflow_maker.writeOSWs(dir)
     end
 
     private
 
     def choose_model_maker
-      # for now there is only one workflow maker
+      # for now there is only one model maker
       @model_maker = ModelMakerLevelZero.new(@doc, @ns)
     end
 
-    def chooseWorkflowMaker
+    def choose_workflow_maker
       # for now there is only one workflow maker
       @workflow_maker = PhaseZeroWorkflowMaker.new(@doc, @ns)
     end

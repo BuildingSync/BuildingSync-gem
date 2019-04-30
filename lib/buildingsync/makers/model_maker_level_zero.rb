@@ -8,9 +8,9 @@ module BuildingSync
       @facility = []
     end
 
-    def generate_baseline_osm
+    def generate_baseline_osm(dir)
       @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
-        @facility.push(Facility.new(facility_element.to_s))
+        @facility.push(Facility.new(REXML::Elements.new(facility_element)))
       end
 
       if @facility.count == 0
@@ -20,8 +20,11 @@ module BuildingSync
       end
 
       # @facilities.each(&:generate_baseline_osm)
+      write_osm(dir)
     end
 
-    def write_osm; end
+    private
+
+    def write_osm(dir); end
   end
 end

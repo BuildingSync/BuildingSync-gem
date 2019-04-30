@@ -23,8 +23,8 @@
 #  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ########################################################################################################################
-
-module BRICR
+require_relative '../workflow_maker'
+module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class PhaseZeroWorkflowMaker < WorkflowMaker
     def initialize(doc, ns)

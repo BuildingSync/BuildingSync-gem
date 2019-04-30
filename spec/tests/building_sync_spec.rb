@@ -23,7 +23,7 @@ RSpec.describe 'BuildingSync' do
     expect(File.exist?(out_path)).to be true
 
     translator = BuildingSync::Translator.new(xml_path)
-    translator.generate_baseline_osm(out_path)
+    translator.write_osm(out_path)
   end
 
   it 'should parse a phase zero xml with n1 namespace' do
