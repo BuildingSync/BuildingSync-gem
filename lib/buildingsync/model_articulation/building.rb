@@ -21,6 +21,10 @@ module BuildingSync
     # initialize
     def initialize(build_element)
       # code to initialize
+      read_xml(build_element)
+    end
+
+    def read_xml(build_element)
       # floor areas
       set_floor_areas(build_element)
       # standard template
@@ -33,7 +37,7 @@ module BuildingSync
       build_element.elements.each("#{@ns}:Subsections/#{@ns}:Subsection") do |subsection_element|
         floor_area = subsection_element.elements["#{@ns}:FloorAreas"].text.to_f
         next if floor_area.nil?
-        @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template))
+        @building_subsections.push(BuildingSubsection.new(REXML::Elements.new(subsection_element), @standard_template))
       end
 
       # need to set those defaults after initializing the subsections

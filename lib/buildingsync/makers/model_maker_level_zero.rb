@@ -16,7 +16,7 @@ module BuildingSync
       if @facility.count == 0
         puts 'Error: There are no facilities in your BuildingSync file.'
       else
-        puts 'This is working fine.'
+        puts "Info: #{@facility.count} facilities found in this BuildingSync file."
       end
 
       # @facilities.each(&:generate_baseline_osm)

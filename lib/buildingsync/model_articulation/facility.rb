@@ -7,14 +7,15 @@ module BuildingSync
     # initialize
     def initialize(facility_xml)
       # code to initialize
-      create_site(facility_xml)
+      read_xml(facility_xml)
     end
 
     # adding a site to the facility
-    def create_site(facility_xml)
-      facility_xml.elements.each("/#{@ns}:Sites/#{@ns}:Site") do |site_element|
+    def read_xml(facility_xml)
+      # puts facility_xml.to_a
+      REXML::Elements.new(facility_xml).elements.each("/#{@ns}:Sites/#{@ns}:Site") do |site_element|
         puts "#{facility_xml.elements["#{@ns}:Sites/#{@ns}:Site/#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"].text} value is correct"
-        @sites.push(Site.new(site_element))
+        @sites.push(Site.new(REXML::Elements.new(site_element)))
       end
     end
 

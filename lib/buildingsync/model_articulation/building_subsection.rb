@@ -13,6 +13,10 @@ module BuildingSync
     # initialize
     def initialize(subSectionElement, standard_template)
       # code to initialize
+      read_xml(subSectionElement)
+    end
+
+    def read_xml(subSectionElement)
       # floor areas
       set_floor_areas(subSectionElement)
       # based on the occupancy type set building type, system type and bar division method
@@ -20,7 +24,7 @@ module BuildingSync
 
       @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
 
-      @subsection_element = subSectionElement
+      @subsection_element = REXML::Elements.new(subSectionElement)
     end
 
     def set_bldg_system_type_based_on_occupancy_type(subSectionElement)
@@ -45,20 +49,6 @@ module BuildingSync
       end
 
       raise "Subsection does not define gross floor area" if @total_floor_area.nil?
-    end
-
-    # create geometry
-    def create_geometry
-      # need to do some parameter checking
-      #
-      #
-      # creating the geometry
-      #
-      # deal with party walls. etc
-      #
-      # create bar
-      #
-      # check expected floor areas against actual
     end
 
     # create space types
