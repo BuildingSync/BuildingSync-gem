@@ -8,7 +8,7 @@ module BuildingSync
       @facility = []
     end
 
-    def generate_baseline_osm(dir)
+    def generate_baseline(dir)
       @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
         @facility.push(Facility.new(facility_element, @ns))
       end
