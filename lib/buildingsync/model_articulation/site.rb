@@ -7,6 +7,7 @@ module BuildingSync
     # initialize
     def initialize(build_element, ns)
       # code to initialize
+      @buildings = []
       # TM: just use the XML snippet to search for the buildings on the site
       read_xml(build_element, ns)
     end

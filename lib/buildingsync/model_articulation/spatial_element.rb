@@ -23,46 +23,54 @@
 #  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ########################################################################################################################
-
+require 'openstudio'
 require 'fileutils'
 require 'json'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpecialElement
+    include OpenStudio
+    @total_floor_area = nil
     def initialize(doc, ns)
       @doc = doc
       @ns = ns
+      @total_floor_area = nil
     end
 
     def set_floor_areas(build_element, nodeSap)
-      build_element.elements.each("/#{nodeSap}:FloorAreas/#{nodeSap}:FloorArea") do |floor_area_element|
+      build_element.elements.each("#{nodeSap}:FloorAreas/#{nodeSap}:FloorArea") do |floor_area_element|
         floor_area = floor_area_element.elements["#{nodeSap}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
 
         floor_area_type = floor_area_element.elements["#{nodeSap}:FloorAreaType"].text
         if floor_area_type == 'Gross'
-          @total_floor_area = OpenStudio.convert(validate_positive_no('gross_floor_area', floor_area), 'ft^2', 'm^2').get
+          @total_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('gross_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Heated and Cooled'
-          @heated_and_cooled_floor_area = validate_positive_no('@heated_and_cooled_floor_area', floor_area)
+          @heated_and_cooled_floor_area = validate_positive_number_excluding_zero('@heated_and_cooled_floor_area', floor_area)
         elsif floor_area_type == 'Footprint'
-          @footprint_floor_area = validate_positive_no('@footprint_floor_area', floor_area)
+          @footprint_floor_area = validate_positive_number_excluding_zero('@footprint_floor_area', floor_area)
         end
 
         raise 'Subsection does not define gross floor area' if @total_floor_area.nil?
       end
     end
 
-    def validate_positive_no(name, value)
+    def validate_positive_number_excluding_zero(name, value)
+      if value <= 0
+        puts "Error: parameter #{name} must be positive and not zero."
+      end
+      return value
+    end
+
+    def validate_positive_number_including_zero(name, value)
       if value < 0
-        puts "Error: parameter #{name} must be positive."
+        puts "Error: parameter #{name} must be positive or zero."
       end
       return value
     end
 
     def validate_fraction; end
-
-    def validate_positiveNo_with_Zero; end
 
     def writeOSWs(dir)
       FileUtils.mkdir_p(dir)

@@ -33,7 +33,7 @@ module BuildingSync
       choose_model_maker
 
       # choose the correct workflow maker based on xml
-      # choose_workflow_maker
+      choose_workflow_maker
     end
 
     def write_osm(dir)

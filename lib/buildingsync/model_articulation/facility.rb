@@ -7,6 +7,8 @@ module BuildingSync
     # initialize
     def initialize(facility_xml, ns)
       # code to initialize
+      @sites = []
+      # reading the xml
       read_xml(facility_xml, ns)
     end
 
@@ -33,8 +35,6 @@ module BuildingSync
         puts "Info: There is/are #{@sites.count} sites in this facility."
       end
       # TODO: do we have any kind of identifier for facility/site that we can use also in the logging??
-
-      # the original measure reads in potential values from a previous measure, I think we do not need this anymore (maybe the zip code??)
 
       # TODO: the original measure contains value range checks, should we implement them here or while importing data??
       # Fraction: 'bldg_type_b_fract_bldg_area', 'bldg_type_c_fract_bldg_area', 'bldg_type_d_fract_bldg_area', 'wwr', 'party_wall_fraction' 0 =<= 1

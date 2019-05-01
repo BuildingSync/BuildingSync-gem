@@ -4,7 +4,7 @@ module BuildingSync
     include OsLib_ModelGenerationBRICR
     # an array that contains all the building subsections
     @building_subsections = []
-    @total_floor_area = nil # ft2 -> m2 -- also gross_floor_area
+    # @total_floor_area = nil # ft2 -> m2 -- also gross_floor_area
     @heated_and_cooled_floor_area = nil
     @footprint_floor_area = nil
     @num_stories_above_grade = nil
@@ -23,6 +23,10 @@ module BuildingSync
       @single_floor_area = 0.0
       # code to initialize
       read_xml(build_element, ns)
+    end
+
+    def num_stories
+      return @num_stories_above_grade + @num_stories_below_grade
     end
 
     def read_xml(build_element, nodeSap)
@@ -49,17 +53,13 @@ module BuildingSync
       # handle user-assigned single floor plate size condition
       if @single_floor_area > 0.0
         footprint_si = OpenStudio.convert(@single_floor_area, 'ft2', 'm2')
-        @total_bldg_floor_area_si = footprint_si * @num_stories.to_f
+        @total_floor_area = footprint_si * num_stories.to_f
         puts 'INFO: User-defined single floor area was used for calculation of total building floor area'
       else
-        footprint_si = @total_bldg_floor_area_si / @num_stories.to_f
+        footprint_si = @total_floor_area / num_stories.to_f
       end
       @width = Math.sqrt(footprint_si / @ns_to_ew_ratio)
-      @length = footprint_si / width
-    end
-
-    def num_stories
-      return @num_stories_above_grade + @num_stories_below_grade
+      @length = footprint_si / @width
     end
 
     def set_standard_template_based_on_year(build_element, nodeSap)
@@ -100,8 +100,6 @@ module BuildingSync
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
-
-      @num_stories = @num_stories_below_grade + @num_stories_above_grade
     end
 
     def set_aspect_ratio(build_element, nodeSap)
