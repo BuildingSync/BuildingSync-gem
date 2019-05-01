@@ -22,6 +22,7 @@ module BuildingSync
     def initialize(build_element, ns)
       @building_subsections = []
       @standard_template = nil
+      @single_floor_area = 0.0
       # code to initialize
       read_xml(build_element, ns)
     end
@@ -46,7 +47,7 @@ module BuildingSync
       # generate building name
       generate_building_name
 
-      footprint_si = null
+      footprint_si = nil
       # handle user-assigned single floor plate size condition
       if @single_floor_area > 0.0
         footprint_si = OpenStudio.convert(@single_floor_area, 'ft2', 'm2')
@@ -143,7 +144,9 @@ module BuildingSync
 
     def generate_building_name
       name_array = [@standard_template]
-      name_array << @building_subsections.each.bldg_type
+      @building_subsections.each do |bld_tp|
+        name_array << bld_tp.bldg_type
+      end
       @name = name_array.join('|').to_s
     end
 
