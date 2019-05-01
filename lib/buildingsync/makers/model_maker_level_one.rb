@@ -5,7 +5,7 @@ module BuildingSync
       # init
     end
 
-    def generate_baseline_OSM(dir)
+    def generate_baseline(dir)
       # generate the baseline open studio model
     end
 

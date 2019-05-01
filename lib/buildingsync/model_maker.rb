@@ -9,7 +9,7 @@ module BuildingSync
       @ns = ns
     end
 
-    def generate_baseline_osm; end
+    def generate_baseline; end
 
     def write_osm; end
   end

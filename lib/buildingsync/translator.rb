@@ -37,7 +37,7 @@ module BuildingSync
     end
 
     def write_osm(dir)
-      @model_maker.generate_baseline_osm(dir)
+      @model_maker.generate_baseline(dir)
     end
 
     def writeOSWs(dir)
