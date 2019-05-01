@@ -36,20 +36,20 @@ module BuildingSync
     end
 
     def set_floor_areas(build_element)
-      # TM: is this a function that could be shared between building and subsection??
       build_element.elements.each("/#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
         floor_area = floor_area_element.elements["#{@ns}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
 
         floor_area_type = floor_area_element.elements["#{@ns}:FloorAreaType"].text
         if floor_area_type == 'Gross'
-          @total_floor_area = validate_positive_no('gross_floor_area', floor_area)
-          @total_bldg_floor_area_si = OpenStudio.convert(@total_floor_area, 'ft^2', 'm^2').get
+          @total_floor_area = OpenStudio.convert(validate_positive_no('gross_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Heated and Cooled'
           @heated_and_cooled_floor_area = validate_positive_no('@heated_and_cooled_floor_area', floor_area)
         elsif floor_area_type == 'Footprint'
           @footprint_floor_area = validate_positive_no('@footprint_floor_area', floor_area)
         end
+
+        raise 'Subsection does not define gross floor area' if @total_floor_area.nil?
       end
     end
 

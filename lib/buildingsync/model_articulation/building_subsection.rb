@@ -47,8 +47,6 @@ module BuildingSync
       else
         raise "Building type '#{@occupancy_type}' is beyond BuildingSync scope"
       end
-
-      raise "Subsection does not define gross floor area" if @total_floor_area.nil?
     end
 
     # create space types

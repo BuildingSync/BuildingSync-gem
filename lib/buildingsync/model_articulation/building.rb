@@ -2,8 +2,7 @@ module BuildingSync
   class Building < SpecialElement
     # an array that contains all the building subsections
     @building_subsections = []
-    @total_floor_area = nil # also gross_floor_area
-    @total_floor_area_SI = nil
+    @total_floor_area = nil # ft2 -> m2 -- also gross_floor_area
     @heated_and_cooled_floor_area = nil
     @footprint_floor_area = nil
     @standard_template = nil
@@ -13,8 +12,7 @@ module BuildingSync
     @ns_to_ew_ratio = nil
 
     @building_rotation = 0.0 # setDefaultValue
-    @floor_height = 0.0 # setDefaultValue in ft
-    @floor_height_si = nil
+    @floor_height = 0.0 # ft -> m -- setDefaultValue in ft
     @wwr = 0.0 # setDefaultValue in fraction
     @name = nil
 
@@ -117,10 +115,9 @@ module BuildingSync
         puts "Warning: 0.0 value for aspect ratio will be replaced with smart default for #{@building_subsections[0].bldg_type} of #{building_form_defaults[:aspect_ratio]}."
       end
       if @floor_height == 0.0
-        @floor_height = building_form_defaults[:typical_story]
+        @floor_height = OpenStudio.convert(building_form_defaults[:typical_story], 'ft', 'm').get
         puts "Warning: 0.0 value for floor height will be replaced with smart default for #{@building_subsections[0].bldg_type} of #{building_form_defaults[:typical_story]}."
       end
-      @floor_height_si = OpenStudio.convert(@floor_height, 'ft', 'm').get
       # because of this can't set wwr to 0.0. If that is desired then we can change this to check for 1.0 instead of 0.0
       if @wwr == 0.0
         @wwr = building_form_defaults[:wwr]
