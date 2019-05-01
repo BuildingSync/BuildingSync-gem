@@ -1,12 +1,13 @@
+require_relative 'building_subsection'
 module BuildingSync
   class Building < SpecialElement
     # an array that contains all the building subsections
-    @building_subsections = []
+
     @total_floor_area = nil # also gross_floor_area
     @total_floor_area_SI = nil
     @heated_and_cooled_floor_area = nil
     @footprint_floor_area = nil
-    @standard_template = nil
+
     @num_stories = nil
     @num_stories_above_grade = nil
     @num_stories_below_grade = nil
@@ -19,25 +20,25 @@ module BuildingSync
     @name = nil
 
     # initialize
-    def initialize(build_element)
+    def initialize(build_element, ns)
+      @building_subsections = []
+      @standard_template = nil
       # code to initialize
-      read_xml(build_element)
+      read_xml(build_element, ns)
     end
 
-    def read_xml(build_element)
+    def read_xml(build_element, nodeSap)
       # floor areas
-      set_floor_areas(build_element)
+      set_floor_areas(build_element, nodeSap)
       # standard template
-      set_standard_template_based_on_year(build_element)
+      set_standard_template_based_on_year(build_element, nodeSap)
       # deal with stories above and below grade
-      set_stories_above_and_below_grade(build_element)
+      set_stories_above_and_below_grade(build_element, nodeSap)
       # aspect ratio
-      set_aspect_ratio(build_element)
+      set_aspect_ratio(build_element, nodeSap)
 
-      build_element.elements.each("#{@ns}:Subsections/#{@ns}:Subsection") do |subsection_element|
-        floor_area = subsection_element.elements["#{@ns}:FloorAreas"].text.to_f
-        next if floor_area.nil?
-        @building_subsections.push(BuildingSubsection.new(REXML::Elements.new(subsection_element), @standard_template))
+      build_element.elements.each("#{nodeSap}:Subsections/#{nodeSap}:Subsection") do |subsection_element|
+        @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template, nodeSap))
       end
 
       # need to set those defaults after initializing the subsections
@@ -59,11 +60,11 @@ module BuildingSync
       @length = footprint_si / width
     end
 
-    def set_standard_template_based_on_year(build_element)
-      built_year = build_element.elements["#{@ns}:YearOfConstruction"].text.to_f
+    def set_standard_template_based_on_year(build_element, nodeSap)
+      built_year = build_element.elements["#{nodeSap}:YearOfConstruction"].text.to_f
 
-      if build_element.elements["#{@ns}:YearOfLastMajorRemodel"]
-        major_remodel_year = build_element.elements["#{@ns}:YearOfLastMajorRemodel"].text.to_f
+      if build_element.elements["#{nodeSap}:YearOfLastMajorRemodel"]
+        major_remodel_year = build_element.elements["#{nodeSap}:YearOfLastMajorRemodel"].text.to_f
         built_year = major_remodel_year if major_remodel_year > built_year
       end
 
@@ -82,9 +83,9 @@ module BuildingSync
       end
     end
 
-    def set_stories_above_and_below_grade(build_element)
-      if build_element.elements["#{@ns}:FloorsAboveGrade"]
-        @num_stories_above_grade = build_element.elements["#{@ns}:FloorsAboveGrade"].text.to_f
+    def set_stories_above_and_below_grade(build_element, nodeSap)
+      if build_element.elements["#{nodeSap}:FloorsAboveGrade"]
+        @num_stories_above_grade = build_element.elements["#{nodeSap}:FloorsAboveGrade"].text.to_f
         if @num_stories_above_grade == 0
           @num_stories_above_grade = 1.0
         end
@@ -92,8 +93,8 @@ module BuildingSync
         @num_stories_above_grade = 1.0 # setDefaultValue
       end
 
-      if build_element.elements["#{@ns}:FloorsBelowGrade"]
-        @num_stories_below_grade = build_element.elements["#{@ns}:FloorsBelowGrade"].text.to_f
+      if build_element.elements["#{nodeSap}:FloorsBelowGrade"]
+        @num_stories_below_grade = build_element.elements["#{nodeSap}:FloorsBelowGrade"].text.to_f
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
@@ -101,9 +102,9 @@ module BuildingSync
       @num_stories = @num_stories_below_grade + @num_stories_above_grade
     end
 
-    def set_aspect_ratio(build_element)
-      if build_element.elements["#{@ns}:AspectRatio"]
-        @ns_to_ew_ratio = build_element.elements["#{@ns}:AspectRatio"].text.to_f
+    def set_aspect_ratio(build_element, nodeSap)
+      if build_element.elements["#{nodeSap}:AspectRatio"]
+        @ns_to_ew_ratio = build_element.elements["#{nodeSap}:AspectRatio"].text.to_f
       else
         @ns_to_ew_ratio = 0.0 # setDefaultValue
       end

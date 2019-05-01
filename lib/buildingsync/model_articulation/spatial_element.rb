@@ -35,13 +35,13 @@ module BuildingSync
       @ns = ns
     end
 
-    def set_floor_areas(build_element)
+    def set_floor_areas(build_element, nodeSap)
       # TM: is this a function that could be shared between building and subsection??
-      build_element.elements.each("/#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
-        floor_area = floor_area_element.elements["#{@ns}:FloorAreaValue"].text.to_f
+      build_element.elements.each("/#{nodeSap}:FloorAreas/#{nodeSap}:FloorArea") do |floor_area_element|
+        floor_area = floor_area_element.elements["#{nodeSap}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
 
-        floor_area_type = floor_area_element.elements["#{@ns}:FloorAreaType"].text
+        floor_area_type = floor_area_element.elements["#{nodeSap}:FloorAreaType"].text
         if floor_area_type == 'Gross'
           @total_floor_area = validate_positive_no('gross_floor_area', floor_area)
           @total_bldg_floor_area_si = OpenStudio.convert(@total_floor_area, 'ft^2', 'm^2').get
