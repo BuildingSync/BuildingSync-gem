@@ -1,6 +1,7 @@
 require_relative 'building_subsection'
 module BuildingSync
   class Building < SpecialElement
+    include OsLib_ModelGenerationBRICR
     # an array that contains all the building subsections
     @building_subsections = []
     @total_floor_area = nil # ft2 -> m2 -- also gross_floor_area

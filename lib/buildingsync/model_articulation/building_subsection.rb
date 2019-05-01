@@ -1,18 +1,20 @@
+require_relative '../Helpers/os_lib_model_generation_bricr'
 module BuildingSync
   class BuildingSubsection < SpecialElement
-    @type = nil
+
+    include OsLib_ModelGenerationBRICR
+    @bldg_type = nil
     @faction_area = nil
     @num_of_units = nil
     @occupancy_type = nil
-
     @system_type = nil
-    @space_types = nil
     @bar_division_method = nil
-    @subsection_element = nil
 
     # initialize
     def initialize(subSectionElement, standard_template, ns)
       @bldg_type = nil
+      @space_types = nil
+      @subsection_element = nil
       # code to initialize
       read_xml(subSectionElement, standard_template, ns)
     end
@@ -34,7 +36,7 @@ module BuildingSync
         @bldg_type = 'RetailStandalone'
         @bar_division_method = 'Multiple Space Types - Individual Stories Sliced'
         @system_type = 'PSZ-AC with gas coil heat'
-      elsif @occupancy_type  == 'Office'
+      elsif @occupancy_type == 'Office'
         @bar_division_method = 'Single Space Type - Core and Perimeter'
         if @total_floor_area > 0 && @total_floor_area < 20000
           @bldg_type = 'SmallOffice'
@@ -86,5 +88,6 @@ module BuildingSync
         space_types_hash[space_type] = { floor_area: final_floor_area }
       end
     end
+    attr_reader :bldg_type
   end
 end
