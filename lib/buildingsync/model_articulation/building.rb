@@ -7,8 +7,6 @@ module BuildingSync
     @total_floor_area = nil # ft2 -> m2 -- also gross_floor_area
     @heated_and_cooled_floor_area = nil
     @footprint_floor_area = nil
-
-    @num_stories = nil
     @num_stories_above_grade = nil
     @num_stories_below_grade = nil
     @ns_to_ew_ratio = nil
@@ -58,6 +56,10 @@ module BuildingSync
       end
       @width = Math.sqrt(footprint_si / @ns_to_ew_ratio)
       @length = footprint_si / width
+    end
+
+    def num_stories
+      return @num_stories_above_grade + @num_stories_below_grade
     end
 
     def set_standard_template_based_on_year(build_element, nodeSap)
