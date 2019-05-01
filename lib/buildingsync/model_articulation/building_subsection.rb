@@ -4,31 +4,32 @@ module BuildingSync
     @faction_area = nil
     @num_of_units = nil
     @occupancy_type = nil
-    @bldg_type = nil
+
     @system_type = nil
     @space_types = nil
     @bar_division_method = nil
     @subsection_element = nil
 
     # initialize
-    def initialize(subSectionElement, standard_template)
+    def initialize(subSectionElement, standard_template, ns)
+      @bldg_type = nil
       # code to initialize
-      read_xml(subSectionElement)
+      read_xml(subSectionElement, standard_template, ns)
     end
 
-    def read_xml(subSectionElement)
+    def read_xml(subSectionElement, standard_template, nodeSap)
       # floor areas
-      set_floor_areas(subSectionElement)
+      set_floor_areas(subSectionElement, nodeSap)
       # based on the occupancy type set building type, system type and bar division method
-      set_bldg_system_type_based_on_occupancy_type(subSectionElement)
+      set_bldg_system_type_based_on_occupancy_type(subSectionElement, nodeSap)
 
       @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
 
-      @subsection_element = REXML::Elements.new(subSectionElement)
+      @subsection_element = subSectionElement
     end
 
-    def set_bldg_system_type_based_on_occupancy_type(subSectionElement)
-      @occupancy_type = subSectionElement.elements["#{@ns}:OccupancyClassification"].text
+    def set_bldg_system_type_based_on_occupancy_type(subSectionElement, nodeSap)
+      @occupancy_type = subSectionElement.elements["#{nodeSap}:OccupancyClassification"].text
       if @occupancy_type == 'Retail'
         @bldg_type = 'RetailStandalone'
         @bar_division_method = 'Multiple Space Types - Individual Stories Sliced'

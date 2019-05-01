@@ -27,7 +27,7 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse a phase zero xml with n1 namespace' do
-    xml_path = File.join(File.dirname(__FILE__), '../files/phase0/building_151_n1.xml')
+    xml_path = File.join(File.dirname(__FILE__), '../files/building_151_n1.xml')
     expect(File.exist?(xml_path)).to be true
 
     out_path = File.join(File.dirname(__FILE__), '../output/phase0_building_151_n1/')

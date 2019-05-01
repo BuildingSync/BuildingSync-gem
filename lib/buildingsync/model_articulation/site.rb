@@ -5,19 +5,17 @@ module BuildingSync
     @buildings = []
 
     # initialize
-    def initialize(build_element)
+    def initialize(build_element, ns)
       # code to initialize
       # TM: just use the XML snippet to search for the buildings on the site
-      read_xml(build_element)
+      read_xml(build_element, ns)
     end
 
     # adding a site to the facility
-    def read_xml(build_element)
+    def read_xml(build_element, nodeSap)
       # code to create a building
-      build_element.elements.each("/#{@ns}:Buildings") do |buildings_element|
-        buildingId = buildings_element.elements["#{@ns}:Building"].text.to_f
-        next if buildingId.nil?
-        @buildings.push(Building.new(REXML::Elements.new(buildings_element)))
+      build_element.elements.each("#{nodeSap}:Buildings/#{nodeSap}:Building") do |buildings_element|
+        @buildings.push(Building.new(buildings_element, nodeSap))
       end
     end
 

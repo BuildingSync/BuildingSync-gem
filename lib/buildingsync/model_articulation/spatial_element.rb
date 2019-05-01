@@ -35,12 +35,12 @@ module BuildingSync
       @ns = ns
     end
 
-    def set_floor_areas(build_element)
-      build_element.elements.each("/#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
-        floor_area = floor_area_element.elements["#{@ns}:FloorAreaValue"].text.to_f
+    def set_floor_areas(build_element, nodeSap)
+      build_element.elements.each("/#{nodeSap}:FloorAreas/#{nodeSap}:FloorArea") do |floor_area_element|
+        floor_area = floor_area_element.elements["#{nodeSap}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
 
-        floor_area_type = floor_area_element.elements["#{@ns}:FloorAreaType"].text
+        floor_area_type = floor_area_element.elements["#{nodeSap}:FloorAreaType"].text
         if floor_area_type == 'Gross'
           @total_floor_area = OpenStudio.convert(validate_positive_no('gross_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Heated and Cooled'
