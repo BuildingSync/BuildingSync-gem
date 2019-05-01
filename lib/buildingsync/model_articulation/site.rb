@@ -22,7 +22,7 @@ module BuildingSync
 
     # set building form defaults for the first building
     def set_building_form_defaults
-      @buildings[0].set_building_form_defaults
+      @buildings[0].read_building_form_defaults
     end
 
     def check_building_faction

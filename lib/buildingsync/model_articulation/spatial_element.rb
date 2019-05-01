@@ -38,7 +38,7 @@ module BuildingSync
       @total_floor_area = nil
     end
 
-    def set_floor_areas(build_element, nodeSap)
+    def read_floor_areas(build_element, nodeSap)
       build_element.elements.each("#{nodeSap}:FloorAreas/#{nodeSap}:FloorArea") do |floor_area_element|
         floor_area = floor_area_element.elements["#{nodeSap}:FloorAreaValue"].text.to_f
         next if floor_area.nil?

@@ -44,7 +44,7 @@ module BuildingSync
       # 'party_wall_stories_south', 'party_wall_stories_east', 'party_wall_stories_west', 'single_floor_area' 0 =<= nil
 
       # TODO: we have not really defined a good logic what happens with multiple sites, versus multiple buildings, here we just take the first building on the first site
-      @sites[0].set_building_form_defaults
+      @sites[0].read_building_form_defaults
 
       # checking that the factions add up
       @sites.each do |site|

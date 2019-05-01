@@ -21,16 +21,16 @@ module BuildingSync
 
     def read_xml(subSectionElement, standard_template, nodeSap)
       # floor areas
-      set_floor_areas(subSectionElement, nodeSap)
+      read_floor_areas(subSectionElement, nodeSap)
       # based on the occupancy type set building type, system type and bar division method
-      set_bldg_system_type_based_on_occupancy_type(subSectionElement, nodeSap)
+      read_bldg_system_type_based_on_occupancy_type(subSectionElement, nodeSap)
 
       @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
 
       @subsection_element = subSectionElement
     end
 
-    def set_bldg_system_type_based_on_occupancy_type(subSectionElement, nodeSap)
+    def read_bldg_system_type_based_on_occupancy_type(subSectionElement, nodeSap)
       @occupancy_type = subSectionElement.elements["#{nodeSap}:OccupancyClassification"].text
       if @occupancy_type == 'Retail'
         @bldg_type = 'RetailStandalone'

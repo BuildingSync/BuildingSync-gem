@@ -31,38 +31,42 @@ module BuildingSync
 
     def read_xml(build_element, nodeSap)
       # floor areas
-      set_floor_areas(build_element, nodeSap)
+      read_floor_areas(build_element, nodeSap)
       # standard template
-      set_standard_template_based_on_year(build_element, nodeSap)
+      read_standard_template_based_on_year(build_element, nodeSap)
       # deal with stories above and below grade
-      set_stories_above_and_below_grade(build_element, nodeSap)
+      read_stories_above_and_below_grade(build_element, nodeSap)
       # aspect ratio
-      set_aspect_ratio(build_element, nodeSap)
+      read_aspect_ratio(build_element, nodeSap)
 
       build_element.elements.each("#{nodeSap}:Subsections/#{nodeSap}:Subsection") do |subsection_element|
         @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template, nodeSap))
       end
 
       # need to set those defaults after initializing the subsections
-      set_building_form_defaults
+      read_building_form_defaults
 
       # generate building name
-      generate_building_name
+      read_building_name
 
-      footprint_si = nil
-      # handle user-assigned single floor plate size condition
-      if @single_floor_area > 0.0
-        footprint_si = OpenStudio.convert(@single_floor_area, 'ft2', 'm2')
-        @total_floor_area = footprint_si * num_stories.to_f
-        puts 'INFO: User-defined single floor area was used for calculation of total building floor area'
-      else
-        footprint_si = @total_floor_area / num_stories.to_f
-      end
-      @width = Math.sqrt(footprint_si / @ns_to_ew_ratio)
-      @length = footprint_si / @width
+      read_width_and_length
     end
 
-    def set_standard_template_based_on_year(build_element, nodeSap)
+    def read_width_and_length
+      footprint = nil
+      # handle user-assigned single floor plate size condition
+      if @single_floor_area > 0.0
+        footprint = OpenStudio.convert(@single_floor_area, 'ft2', 'm2')
+        @total_floor_area = footprint * num_stories.to_f
+        puts 'INFO: User-defined single floor area was used for calculation of total building floor area'
+      else
+        footprint = @total_floor_area / num_stories.to_f
+      end
+      @width = Math.sqrt(footprint / @ns_to_ew_ratio)
+      @length = footprint / @width
+    end
+
+    def read_standard_template_based_on_year(build_element, nodeSap)
       built_year = build_element.elements["#{nodeSap}:YearOfConstruction"].text.to_f
 
       if build_element.elements["#{nodeSap}:YearOfLastMajorRemodel"]
@@ -85,7 +89,7 @@ module BuildingSync
       end
     end
 
-    def set_stories_above_and_below_grade(build_element, nodeSap)
+    def read_stories_above_and_below_grade(build_element, nodeSap)
       if build_element.elements["#{nodeSap}:FloorsAboveGrade"]
         @num_stories_above_grade = build_element.elements["#{nodeSap}:FloorsAboveGrade"].text.to_f
         if @num_stories_above_grade == 0
@@ -102,7 +106,7 @@ module BuildingSync
       end
     end
 
-    def set_aspect_ratio(build_element, nodeSap)
+    def read_aspect_ratio(build_element, nodeSap)
       if build_element.elements["#{nodeSap}:AspectRatio"]
         @ns_to_ew_ratio = build_element.elements["#{nodeSap}:AspectRatio"].text.to_f
       else
@@ -110,7 +114,7 @@ module BuildingSync
       end
     end
 
-    def set_building_form_defaults
+    def read_building_form_defaults
       # if aspect ratio, story height or wwr have argument value of 0 then use smart building type defaults
       building_form_defaults = building_form_defaults(@building_subsections[0].bldg_type)
       if @ns_to_ew_ratio == 0.0
@@ -142,7 +146,7 @@ module BuildingSync
       true
     end
 
-    def generate_building_name
+    def read_building_name
       name_array = [@standard_template]
       @building_subsections.each do |bld_tp|
         name_array << bld_tp.bldg_type
