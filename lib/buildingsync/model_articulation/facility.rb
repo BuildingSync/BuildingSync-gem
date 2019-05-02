@@ -103,14 +103,15 @@ module BuildingSync
       # remove non-resource objects not removed by removing the building
       # remove_non_resource_objects(runner, model)
 
+      party_walls_array = {}
       # populate bar hash with story information
       bar_hash[:stories] = {}
       building.num_stories.ceil.times do |i|
-      #  if party_walls_array.empty?
+        if party_walls_array.empty?
           party_walls = []
-      #   else
-      #     party_walls = party_walls_array[i]
-      #   end
+        else
+          party_walls = party_walls_array[i]
+        end
 
         # add below_partial_story
         if building.num_stories.ceil > building.num_stories && i == num_stories_round_up - 2
@@ -129,41 +130,37 @@ module BuildingSync
       # using the default value for story multiplier for now 'Basements Ground Mid Top'
 
       # store expected floor areas to check after bar made
-#      target_areas = {}
-#      bar_hash[:space_types].each do |k, v|
-#        target_areas[k] = v[:floor_area]
-#      end
+      target_areas = {}
+      bar_hash[:space_types].each do |k, v|
+        target_areas[k] = v[:floor_area]
+      end
 
       # check expected floor areas against actual
-#      model.getSpaceTypes.sort.each do |space_type|
-#        next if !target_areas.key? space_type
+      model.getSpaceTypes.sort.each do |space_type|
+        next if !target_areas.key? space_type
 
         # convert to IP
-#        actual_ip = OpenStudio.convert(space_type.floorArea, 'm^2', 'ft^2').get
-#        target_ip = OpenStudio.convert(target_areas[space_type], 'm^2', 'ft^2').get
+        actual_ip = OpenStudio.convert(space_type.floorArea, 'm^2', 'ft^2').get
+        target_ip = OpenStudio.convert(target_areas[space_type], 'm^2', 'ft^2').get
 
- #       if (space_type.floorArea - target_areas[space_type]).abs >= 1.0
-
-  #        if !args['bar_division_method'].include? 'Single Space Type'
-  #          runner.registerError("#{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)")
-  #          return false
-  #        else
-  #          # will see this if use Single Space type division method on multi-use building or single building type without whole building space type
-  #          runner.registerWarning("#{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)")
-  #        end
-
-  #      end
-  #    end
-
-
+        if (space_type.floorArea - target_areas[space_type]).abs >= 1.0
+          if !bar_hash[:bar_division_method].include? 'Single Space Type'
+            puts "ERROR: #{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)"
+            return false
+          else
+            # will see this if use Single Space type division method on multi-use building or single building type without whole building space type
+            puts "WARNING: #{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)"
+          end
+        end
+      end
 
       # test for excessive exterior roof area (indication of problem with intersection and or surface matching)
-#      ext_roof_area = model.getBuilding.exteriorSurfaceArea - model.getBuilding.exteriorWallArea
-#      expected_roof_area = args['total_bldg_floor_area'] / (args['num_stories_above_grade'] + args['num_stories_below_grade']).to_f
-#      if ext_roof_area > expected_roof_area && single_floor_area_si == 0.0 # only test if using whole-building area input
-#        runner.registerError('Roof area larger than expected, may indicate problem with inter-floor surface intersection or matching.')
-#        return false
-#      end
+      ext_roof_area = @model.getBuilding.exteriorSurfaceArea - @model.getBuilding.exteriorWallArea
+      expected_roof_area = building.total_floor_area / building.num_stories.to_f
+      if ext_roof_area > expected_roof_area && building.single_floor_area == 0.0 # only test if using whole-building area input
+        puts 'WARNING: Roof area larger than expected, may indicate problem with inter-floor surface intersection or matching.'
+        return false
+      end
 
       # report final condition of model
       puts "INFO: The building finished with #{@model.getSpaces.size} spaces."
