@@ -27,11 +27,11 @@ module BuildingSync
       read_xml(subSectionElement, standard_template, ns)
     end
 
-    def read_xml(subSectionElement, standard_template, nodeSap)
+    def read_xml(subSectionElement, standard_template, ns)
       # floor areas
-      read_floor_areas(subSectionElement, nodeSap)
+      read_floor_areas(subSectionElement, ns)
       # based on the occupancy type set building type, system type and bar division method
-      read_bldg_system_type_based_on_occupancy_type(subSectionElement, nodeSap)
+      read_bldg_system_type_based_on_occupancy_type(subSectionElement, ns)
 
       @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
 

@@ -20,10 +20,10 @@ module BuildingSync
     end
 
     # adding a site to the facility
-    def read_xml(facility_xml, nodeSap)
+    def read_xml(facility_xml, ns)
       # puts facility_xml.to_a
-      facility_xml.elements.each("#{nodeSap}:Sites/#{nodeSap}:Site") do |site_element|
-        @sites.push(Site.new(site_element, nodeSap))
+      facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
+        @sites.push(Site.new(site_element, ns))
       end
     end
 

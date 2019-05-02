@@ -32,9 +32,7 @@ module BuildingSync
   class SpecialElement
     include OpenStudio
     @total_floor_area = nil
-    def initialize(doc, ns)
-      @doc = doc
-      @ns = ns
+    def initialize
       @total_floor_area = nil
     end
 

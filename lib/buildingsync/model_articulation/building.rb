@@ -33,18 +33,18 @@ module BuildingSync
       return @num_stories_above_grade + @num_stories_below_grade
     end
 
-    def read_xml(build_element, nodeSap)
+    def read_xml(build_element, ns)
       # floor areas
-      read_floor_areas(build_element, nodeSap)
+      read_floor_areas(build_element, ns)
       # standard template
-      read_standard_template_based_on_year(build_element, nodeSap)
+      read_standard_template_based_on_year(build_element, ns)
       # deal with stories above and below grade
-      read_stories_above_and_below_grade(build_element, nodeSap)
+      read_stories_above_and_below_grade(build_element, ns)
       # aspect ratio
-      read_aspect_ratio(build_element, nodeSap)
+      read_aspect_ratio(build_element, ns)
 
-      build_element.elements.each("#{nodeSap}:Subsections/#{nodeSap}:Subsection") do |subsection_element|
-        @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template, nodeSap))
+      build_element.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |subsection_element|
+        @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template, ns))
       end
 
       # need to set those defaults after initializing the subsections
