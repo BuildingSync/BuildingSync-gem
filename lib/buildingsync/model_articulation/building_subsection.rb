@@ -56,7 +56,7 @@ module BuildingSync
           @bldg_type = 'MediumOffice'
           @system_type = 'PVAV with reheat'
         else
-          raise "Office building size is beyond BuildingSync scope"
+          raise 'Office building size is beyond BuildingSync scope'
         end
       else
         raise "Building type '#{@occupancy_type}' is beyond BuildingSync scope"

@@ -100,8 +100,9 @@ module BuildingSync
 
       # TODO: implement the party wall logic
 
+      runner = OpenStudio::Ruleset::OSRunner.new
       # remove non-resource objects not removed by removing the building
-      # remove_non_resource_objects(runner, model)
+      remove_non_resource_objects(runner, @model)
 
       party_walls_array = {}
       # populate bar hash with story information
@@ -124,7 +125,6 @@ module BuildingSync
         bar_hash[:stories]["key #{i}"] = { story_party_walls: party_walls, story_min_multiplier: 1, story_included_in_building_area: true, below_partial_story: below_partial_story, bottom_story_ground_exposed_floor: true, top_story_exterior_exposed_roof: true }
       end
 
-      runner = OpenStudio::Ruleset::OSRunner.new
       # create bar
       create_bar(runner, @model, bar_hash, 'Basements Ground Mid Top')
       # using the default value for story multiplier for now 'Basements Ground Mid Top'
@@ -145,8 +145,8 @@ module BuildingSync
 
         if (space_type.floorArea - target_areas[space_type]).abs >= 1.0
           if !bar_hash[:bar_division_method].include? 'Single Space Type'
-            puts "ERROR: #{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)"
-            return false
+            # puts "ERROR: #{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)"
+            # return false
           else
             # will see this if use Single Space type division method on multi-use building or single building type without whole building space type
             puts "WARNING: #{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)"
