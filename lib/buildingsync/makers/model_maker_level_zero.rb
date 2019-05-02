@@ -5,26 +5,30 @@ module BuildingSync
     def initialize(doc, ns)
       super
 
-      @facility = []
+      @facilities = []
     end
 
     def generate_baseline(dir)
       @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
-        @facility.push(Facility.new(facility_element, @ns))
+        @facilities.push(Facility.new(facility_element, @ns))
       end
 
-      if @facility.count == 0
+      if @facilities.count == 0
         puts 'Error: There are no facilities in your BuildingSync file.'
       else
-        puts "Info: #{@facility.count} facilities found in this BuildingSync file."
+        puts "Info: #{@facilities.count} facilities found in this BuildingSync file."
       end
 
-      # @facilities.each(&:generate_baseline_osm)
+      @facilities.each(&:generate_baseline_osm)
       write_osm(dir)
     end
 
     private
 
-    def write_osm(dir); end
+    def write_osm(dir)
+      @facilities.each do |facility|
+        facility.model.save("#{dir}/#{Test}.osm", true)
+      end
+    end
   end
 end

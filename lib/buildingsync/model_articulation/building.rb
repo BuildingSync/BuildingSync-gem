@@ -21,6 +21,8 @@ module BuildingSync
       @building_subsections = []
       @standard_template = nil
       @single_floor_area = 0.0
+      @building_rotation = 0.0
+      @name = nil
       # code to initialize
       read_xml(build_element, ns)
     end
@@ -136,13 +138,14 @@ module BuildingSync
       # check that sum of fractions for b,c, and d is less than 1.0 (so something is left for primary building type)
       building_fraction = 1.0
       @building_subsections.each do |subsection|
-        next if subsection.fraction.nil?
-        building_fraction -= subsection.fraction
+        next if subsection.fraction_area.nil?
+        building_fraction -= subsection.fraction_area
       end
       if building_fraction <= 0.0
         puts 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
         return false
       end
+      @building_subsections[0].fraction_area = building_fraction
       true
     end
 
@@ -154,8 +157,12 @@ module BuildingSync
       @name = name_array.join('|').to_s
     end
 
-    def create_space_types
-      @building_subsections.each.create_space_types
+    def create_space_types(model)
+      @building_subsections.each do |bldg_subsec|
+        bldg_subsec.create_space_types(model)
+      end
     end
+
+    attr_reader :building_rotation, :name
   end
 end

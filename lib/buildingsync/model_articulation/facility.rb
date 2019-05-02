@@ -3,11 +3,13 @@ module BuildingSync
   class Facility
     # an array that contains all the sites
     @sites = []
+    @model = nil
 
     # initialize
     def initialize(facility_xml, ns)
       # code to initialize
       @sites = []
+      @model = nil
       # reading the xml
       read_xml(facility_xml, ns)
     end
@@ -48,35 +50,29 @@ module BuildingSync
 
       # checking that the factions add up
       @sites.each do |site|
-        if site.check_building_faction is false
+        if site.check_building_faction == false
           return false
         end
       end
 
       # let's create our new empty model
-      model = OpenStudio::Model.new
+      @model = OpenStudio::Model::Model.new
 
       building = @sites[0].buildings[0]
       # set building rotation
-      initial_rotation = model.getBuilding.northAxis
-      if args['building_rotation'] != initial_rotation
-        model.getBuilding.setNorthAxis(building.building_rotation)
+      initial_rotation = @model.getBuilding.northAxis
+      if building.building_rotation != initial_rotation
+        @model.getBuilding.setNorthAxis(building.building_rotation)
         puts "INFO: Set Building Rotation to #{model.getBuilding.northAxis}"
       end
-      model.getBuilding.setName(building.name)
+      @model.getBuilding.setName(building.name)
 
-      building.create_space_types
+      building.create_space_types(@model)
 
       # TODO: do we need to do any other unit conversions? should we just convert all of them during xml parsing, is there some unti mechanism in BuildingSync?
 
-      # TODO: continue refactoring from here
-      # Make the standard applier
-      standard = Standard.build("#{args['template']}_#{args['bldg_type_a']}")
-
       # calculate length and width of bar
       # todo - update slicing to nicely handle aspect ratio less than 1
-
-
 
       # create envelope
       # populate bar_hash and create envelope with data from envelope_data_hash and user arguments
@@ -84,8 +80,8 @@ module BuildingSync
       bar_hash[:length] = building.length
       bar_hash[:width] =  building.width
       bar_hash[:num_stories_below_grade] = building.num_stories_below_grade
-      bar_hash[:num_stories_above_grade] =  building.num_stories_above_grade
-      bar_hash[:floor_height] =  building.floor_height_si
+      bar_hash[:num_stories_above_grade] = building.num_stories_above_grade
+      bar_hash[:floor_height] = building.floor_height_si
       # bar_hash[:center_of_footprint] = OpenStudio::Point3d.new(length* 0.5,width * 0.5,0.0)
       bar_hash[:center_of_footprint] = OpenStudio::Point3d.new(0, 0, 0)
       bar_hash[:bar_division_method] = 'Multiple Space Types - Individual Stories Sliced'
@@ -103,7 +99,7 @@ module BuildingSync
       # remove_non_resource_objects(runner, model)
 
       # create bar
-      create_bar(runner, model, bar_hash, 'Basements Ground Mid Top')
+      create_bar(runner, @model, bar_hash, 'Basements Ground Mid Top')
       # using the default value for story multiplier for now 'Basements Ground Mid Top'
 
       # store expected floor areas to check after bar made

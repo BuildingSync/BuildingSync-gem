@@ -21,18 +21,20 @@ module BuildingSync
     end
 
     # set building form defaults for the first building
-    def set_building_form_defaults
+    def read_building_form_defaults
       @buildings[0].read_building_form_defaults
     end
 
     def check_building_faction
-      @buildings.each.check_building_faction do |building|
+      @buildings.each do |building|
         if building.check_building_faction == false
           return false
         end
       end
       true
     end
+
+    attr_reader :buildings
   end
 end
 
