@@ -12,14 +12,17 @@ module BuildingSync
     @system_type = nil
     @bar_division_method = nil
     @standard = nil
+    @space_types = {}
+    @space_types_floor_area = {}
 
     # initialize
     def initialize(subSectionElement, standard_template, ns)
       @bldg_type = nil
-      @space_types = nil
       @subsection_element = nil
       @standard = nil
       @fraction_area = nil
+      @space_types = {}
+      @space_types_floor_area = {}
       # code to initialize
       read_xml(subSectionElement, standard_template, ns)
     end
@@ -61,8 +64,7 @@ module BuildingSync
     end
 
     # create space types
-    def create_space_types(model)
-
+    def create_space_types(model, total_bldg_floor_area)
       # create space types from subsection type
       puts "Info: Creating Space Types for #{@occupancy_type}."
       # mapping building_type name is needed for a few methods
@@ -91,16 +93,13 @@ module BuildingSync
       # store multiplier needed to adjust sum of ratios to equal 1.0
       @ratio_adjustment_multiplier = 1.0 / sum_of_ratios
 
-      @space_types.each do |space_type, hash|
-        p hash[:ratio]
-        p @ratio_adjustment_multiplier
-        p fraction_area
+      @space_types.each do |space_type_name, hash|
         ratio_of_bldg_total = hash[:ratio] * @ratio_adjustment_multiplier * fraction_area
         final_floor_area = ratio_of_bldg_total * total_bldg_floor_area # I think I can just pass ratio but passing in area is cleaner
-        space_types_hash[space_type] = { floor_area: final_floor_area }
+        @space_types_floor_area[hash[:space_type]] = {floor_area: final_floor_area }
       end
     end
-    attr_reader :bldg_type
+    attr_reader :bldg_type, :space_types_floor_area
     attr_accessor :fraction_area
   end
 end

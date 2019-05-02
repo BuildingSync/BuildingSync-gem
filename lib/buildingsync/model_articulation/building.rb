@@ -22,6 +22,8 @@ module BuildingSync
       @standard_template = nil
       @single_floor_area = 0.0
       @building_rotation = 0.0
+      @floor_height = 0.0
+      @wwr = 0.0
       @name = nil
       # code to initialize
       read_xml(build_element, ns)
@@ -159,10 +161,20 @@ module BuildingSync
 
     def create_space_types(model)
       @building_subsections.each do |bldg_subsec|
-        bldg_subsec.create_space_types(model)
+        bldg_subsec.create_space_types(model, @total_floor_area)
       end
     end
 
-    attr_reader :building_rotation, :name
+    def bldg_space_types_floor_area_hash
+      newHash = {}
+      @building_subsections.each do |bldg_subsec|
+        bldg_subsec.space_types_floor_area.each do |space_type, hash|
+          newHash[space_type] = hash
+        end
+      end
+      return newHash
+    end
+
+    attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr
   end
 end

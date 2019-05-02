@@ -27,7 +27,7 @@ module BuildingSync
 
     def write_osm(dir)
       @facilities.each do |facility|
-        facility.model.save("#{dir}/#{Test}.osm", true)
+        facility.model.save("#{dir}/in.osm", true)
       end
     end
   end
