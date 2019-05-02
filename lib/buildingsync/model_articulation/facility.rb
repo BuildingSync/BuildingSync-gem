@@ -28,7 +28,7 @@ module BuildingSync
     end
 
     # adding the typical HVAC system to the buildings in all sites of this facility
-    def add_typical_HVAC
+    def create_building_system
       # TODO: code to add typical HVAC systems
     end
 

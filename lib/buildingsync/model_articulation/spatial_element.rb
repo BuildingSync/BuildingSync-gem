@@ -69,35 +69,5 @@ module BuildingSync
     end
 
     def validate_fraction; end
-
-    def writeOSWs(dir)
-      FileUtils.mkdir_p(dir)
-    end
-
-    def failed_scenarios
-      return []
-    end
-
-    def saveXML(filename)
-      File.open(filename, 'w') do |file|
-        @doc.write(file)
-      end
-    end
-
-    def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
-      result = false
-      osw['steps'].each do |step|
-        if step['measure_dir_name'] == measure_dir_name
-          step['arguments'][argument_name] = argument_value
-          result = true
-        end
-      end
-
-      if !result
-        raise "Could not set '#{argument_name}' to '#{argument_value}' for measure '#{measure_dir_name}'"
-      end
-
-      return result
-    end
   end
 end
