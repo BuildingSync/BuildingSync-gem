@@ -5,19 +5,15 @@ module BuildingSync
 
     include OsLib_ModelGenerationBRICR
     include OpenstudioStandards
-    @bldg_type = nil
     @fraction_area = nil
     @num_of_units = nil
     @occupancy_type = nil
-    @system_type = nil
-    @bar_division_method = nil
     @standard = nil
     @space_types = {}
     @space_types_floor_area = {}
 
     # initialize
     def initialize(subSectionElement, standard_template, ns)
-      @bldg_type = nil
       @subsection_element = nil
       @standard = nil
       @fraction_area = nil
@@ -41,26 +37,9 @@ module BuildingSync
       @standard = Standard.build("#{standard_template}_#{@bldg_type}")
     end
 
-    def read_bldg_system_type_based_on_occupancy_type(subSectionElement, nodeSap)
-      @occupancy_type = subSectionElement.elements["#{nodeSap}:OccupancyClassification"].text
-      if @occupancy_type == 'Retail'
-        @bldg_type = 'RetailStandalone'
-        @bar_division_method = 'Multiple Space Types - Individual Stories Sliced'
-        @system_type = 'PSZ-AC with gas coil heat'
-      elsif @occupancy_type == 'Office'
-        @bar_division_method = 'Single Space Type - Core and Perimeter'
-        if @total_floor_area > 0 && @total_floor_area < 20000
-          @bldg_type = 'SmallOffice'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif @total_floor_area >= 20000 && @total_floor_area < 75000
-          @bldg_type = 'MediumOffice'
-          @system_type = 'PVAV with reheat'
-        else
-          raise 'Office building size is beyond BuildingSync scope'
-        end
-      else
-        raise "Building type '#{@occupancy_type}' is beyond BuildingSync scope"
-      end
+    def read_bldg_system_type_based_on_occupancy_type(subSectionElement, ns)
+      @occupancy_type = read_occupancy_type(subSectionElement, nil, ns)
+      set_bldg_and_system_type(@occupancy_type, @total_floor_area)
     end
 
     # create space types

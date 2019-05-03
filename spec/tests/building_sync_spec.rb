@@ -22,7 +22,7 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path)
+    translator = BuildingSync::Translator.new(xml_path, true)
     translator.write_osm(out_path)
   end
 
@@ -40,7 +40,7 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path)
+    translator = BuildingSync::Translator.new(xml_path, false)
     translator.write_osm(out_path)
   end
 
@@ -58,7 +58,7 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path)
+    translator = BuildingSync::Translator.new(xml_path, true)
     translator.write_osm(out_path)
   end
 
@@ -75,7 +75,7 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path)
+    translator = BuildingSync::Translator.new(xml_path, true)
     translator.writeOSWs(out_path)
 
     osw_files = []

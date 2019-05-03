@@ -31,17 +31,19 @@ module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpecialElement
     include OpenStudio
-    @total_floor_area = nil
     def initialize
       @total_floor_area = nil
+      @bldg_type = nil
+      @system_type = nil
+      @bar_division_method = nil
     end
 
-    def read_floor_areas(build_element, nodeSap)
-      build_element.elements.each("#{nodeSap}:FloorAreas/#{nodeSap}:FloorArea") do |floor_area_element|
-        floor_area = floor_area_element.elements["#{nodeSap}:FloorAreaValue"].text.to_f
+    def read_floor_areas(build_element, ns)
+      build_element.elements.each("#{ns}:FloorAreas/#{ns}:FloorArea") do |floor_area_element|
+        floor_area = floor_area_element.elements["#{ns}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
 
-        floor_area_type = floor_area_element.elements["#{nodeSap}:FloorAreaType"].text
+        floor_area_type = floor_area_element.elements["#{ns}:FloorAreaType"].text
         if floor_area_type == 'Gross'
           @total_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('gross_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Heated and Cooled'
@@ -51,6 +53,39 @@ module BuildingSync
         end
 
         raise 'Subsection does not define gross floor area' if @total_floor_area.nil?
+      end
+      @total_floor_area
+    end
+
+    def read_occupancy_type(xmlElement, occupancy_type, ns)
+      occ_element = xmlElement.elements["#{ns}:OccupancyClassification"]
+      if !occ_element.nil?
+        return occ_element.text
+      else
+        return occupancy_type
+      end
+    end
+
+    def set_bldg_and_system_type(occupancy_type, total_floor_area)
+      if !occupancy_type.nil?
+        if occupancy_type == 'Retail'
+          @bldg_type = 'RetailStandalone'
+          @bar_division_method = 'Multiple Space Types - Individual Stories Sliced'
+          @system_type = 'PSZ-AC with gas coil heat'
+        elsif occupancy_type == 'Office'
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          if total_floor_area > 0 && total_floor_area < 20000
+            @bldg_type = 'SmallOffice'
+            @system_type = 'PSZ-AC with gas coil heat'
+          elsif total_floor_area >= 20000 && total_floor_area < 75000
+            @bldg_type = 'MediumOffice'
+            @system_type = 'PVAV with reheat'
+          else
+            raise 'Office building size is beyond BuildingSync scope'
+          end
+        else
+          raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
+        end
       end
     end
 
@@ -69,6 +104,6 @@ module BuildingSync
     end
 
     def validate_fraction; end
-    attr_reader :total_floor_area
+    attr_reader :total_floor_area, :bldg_type
   end
 end

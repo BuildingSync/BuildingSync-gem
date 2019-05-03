@@ -1,6 +1,6 @@
 require_relative 'building'
 module BuildingSync
-  class Site
+  class Site < SpecialElement
     # an array that contains all the buildings
     @buildings = []
 
@@ -13,10 +13,14 @@ module BuildingSync
     end
 
     # adding a site to the facility
-    def read_xml(build_element, nodeSap)
+    def read_xml(build_element, ns)
+      # check occupancy type at the site level
+      @occupancy_type = read_occupancy_type(build_element, nil, ns)
+      # check floor areas at the site level
+      @total_floor_area = read_floor_areas(build_element, ns)
       # code to create a building
-      build_element.elements.each("#{nodeSap}:Buildings/#{nodeSap}:Building") do |buildings_element|
-        @buildings.push(Building.new(buildings_element, nodeSap))
+      build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
+        @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, ns))
       end
     end
 

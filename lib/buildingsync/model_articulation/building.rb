@@ -17,7 +17,7 @@ module BuildingSync
     @model = nil
 
     # initialize
-    def initialize(build_element, ns)
+    def initialize(build_element, occupancy_type, total_floor_area, ns)
       @building_subsections = []
       @standard_template = nil
       @single_floor_area = 0.0
@@ -32,15 +32,16 @@ module BuildingSync
       @party_wall_stories_west = 0
       @party_wall_stories_east = 0
       @party_wall_fraction = 0
+
       # code to initialize
-      read_xml(build_element, ns)
+      read_xml(build_element, occupancy_type, total_floor_area, ns)
     end
 
     def num_stories
       return @num_stories_above_grade + @num_stories_below_grade
     end
 
-    def read_xml(build_element, ns)
+    def read_xml(build_element, occupancy_type, total_floor_area, ns)
       # floor areas
       read_floor_areas(build_element, ns)
       # standard template
@@ -49,10 +50,18 @@ module BuildingSync
       read_stories_above_and_below_grade(build_element, ns)
       # aspect ratio
       read_aspect_ratio(build_element, ns)
+      # read occupancy
+      @occupancy_type = read_occupancy_type(build_element, occupancy_type, ns)
 
       build_element.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |subsection_element|
         @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template, ns))
       end
+
+      # floor areas
+      read_floor_areas(build_element, ns)
+
+      p @total_floor_area
+      set_bldg_and_system_type(@occupancy_type, total_floor_area)
 
       # need to set those defaults after initializing the subsections
       read_building_form_defaults
@@ -125,9 +134,19 @@ module BuildingSync
       end
     end
 
+    def get_bldg_type
+      # try to get the bldg type at teh building level, if it is nil then look at the first subsection
+      p @bldg_type
+      if @bldg_type.nil?
+        return @building_subsections[0].bldg_type
+      else
+        return @bldg_type
+      end
+    end
+
     def read_building_form_defaults
       # if aspect ratio, story height or wwr have argument value of 0 then use smart building type defaults
-      building_form_defaults = building_form_defaults(@building_subsections[0].bldg_type)
+      building_form_defaults = building_form_defaults(get_bldg_type)
       if @ns_to_ew_ratio == 0.0
         @ns_to_ew_ratio = building_form_defaults[:aspect_ratio]
         puts "Warning: 0.0 value for aspect ratio will be replaced with smart default for #{@building_subsections[0].bldg_type} of #{building_form_defaults[:aspect_ratio]}."
