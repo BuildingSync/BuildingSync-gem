@@ -8,7 +8,7 @@ RSpec.describe 'BuildingSync' do
     expect(BuildingSync::VERSION).not_to be_nil
   end
 
-  it 'should parse a phase zero xml' do
+  it 'should parse and write building_151.xml (phase zero)' do
     xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
 
     expect(File.exist?(xml_path)).to be true
@@ -26,11 +26,47 @@ RSpec.describe 'BuildingSync' do
     translator.write_osm(out_path)
   end
 
-  it 'should parse a phase zero xml with n1 namespace' do
-    xml_path = File.join(File.dirname(__FILE__), '../files/building_151_n1.xml')
+  it 'should parse and write DC GSA Headquarters.xml (phase zero)' do
+    xml_path = File.expand_path('../files/DC GSA Headquarters.xml', File.dirname(__FILE__))
+
     expect(File.exist?(xml_path)).to be true
 
-    out_path = File.join(File.dirname(__FILE__), '../output/phase0_building_151_n1/')
+    out_path = File.expand_path('../output/DC GSA Headquarters/', File.dirname(__FILE__))
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    translator = BuildingSync::Translator.new(xml_path)
+    translator.write_osm(out_path)
+  end
+
+  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero)' do
+    xml_path = File.expand_path('../files/BuildingSync Website Valid Schema.xml', File.dirname(__FILE__))
+
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path('../output/BuildingSync Website Valid Schema/', File.dirname(__FILE__))
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    translator = BuildingSync::Translator.new(xml_path)
+    translator.write_osm(out_path)
+  end
+
+  it 'should parse and write building_151.xml (phase zero) with n1 namespace' do
+    xml_path = File.expand_path('../files/building_151_n1.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path('../output/phase0_building_151_n1/', File.dirname(__FILE__))
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
     end

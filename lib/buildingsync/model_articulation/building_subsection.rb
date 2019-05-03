@@ -81,7 +81,7 @@ module BuildingSync
         # set color
         test = @standard.space_type_apply_rendering_color(space_type) # this uses openstudio-standards
         if !test
-          puts "Warning: Could not find color for #{@occupancy_type} #{space_type.name}"
+          puts "Warning: Could not find color for #{space_type.name}"
         end
         # extend hash to hold new space type object
         hash[:space_type] = space_type

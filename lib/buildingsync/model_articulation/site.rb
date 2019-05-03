@@ -20,21 +20,25 @@ module BuildingSync
       end
     end
 
-    # set building form defaults for the first building
-    def read_building_form_defaults
-      @buildings[0].read_building_form_defaults
-    end
-
-    def check_building_faction
-      @buildings.each do |building|
-        if building.check_building_faction == false
-          return false
-        end
+    def generate_baseline_osm
+      if @buildings.count == 0
+        puts 'Error: There is no building attached to this site in your BuildingSync file.'
+        raise 'Error: There is no building attached to this site in your BuildingSync file.'
+      else if @buildings.count > 1
+             puts "Error: There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file."
+             raise "Error: There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file."
+           else
+             puts "Info: There is/are #{@buildings.count} buildings in this site."
+           end
       end
-      true
+      @buildings.each(&:generate_baseline_osm)
     end
 
-    attr_reader :buildings
+    def write_osm(dir)
+      @buildings.each do |building|
+        building.write_osm(dir)
+      end
+    end
   end
 end
 

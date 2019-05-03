@@ -15,8 +15,13 @@ module BuildingSync
 
       if @facilities.count == 0
         puts 'Error: There are no facilities in your BuildingSync file.'
-      else
-        puts "Info: #{@facilities.count} facilities found in this BuildingSync file."
+        raise 'Error: There are no facilities in your BuildingSync file.'
+      else if @facilities.count > 1
+             puts "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
+             raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
+           else
+             puts "Info: #{@facilities.count} facilities found in this BuildingSync file."
+           end
       end
 
       @facilities.each(&:generate_baseline_osm)
@@ -27,7 +32,7 @@ module BuildingSync
 
     def write_osm(dir)
       @facilities.each do |facility|
-        facility.model.save("#{dir}/in.osm", true)
+        facility.write_osm(dir)
       end
     end
   end
