@@ -25,7 +25,7 @@ module BuildingSync
 
     def read_xml(subSectionElement, standard_template, ns)
       # floor areas
-      read_floor_areas(subSectionElement, ns)
+      read_floor_areas(subSectionElement, nil, ns)
       # based on the occupancy type set building type, system type and bar division method
       read_bldg_system_type_based_on_occupancy_type(subSectionElement, ns)
 

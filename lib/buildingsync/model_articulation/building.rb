@@ -58,7 +58,7 @@ module BuildingSync
       end
 
       # floor areas
-      read_floor_areas(build_element, ns)
+      read_floor_areas(build_element, total_floor_area, ns)
 
       set_bldg_and_system_type(@occupancy_type, total_floor_area)
 
