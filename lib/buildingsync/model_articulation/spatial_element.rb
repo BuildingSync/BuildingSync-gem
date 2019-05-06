@@ -38,7 +38,7 @@ module BuildingSync
       @bar_division_method = nil
     end
 
-    def read_floor_areas(build_element, ns)
+    def read_floor_areas(build_element, total_floor_area, ns)
       build_element.elements.each("#{ns}:FloorAreas/#{ns}:FloorArea") do |floor_area_element|
         floor_area = floor_area_element.elements["#{ns}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
@@ -52,7 +52,7 @@ module BuildingSync
           @footprint_floor_area = validate_positive_number_excluding_zero('@footprint_floor_area', floor_area)
         end
 
-        raise 'Subsection does not define gross floor area' if @total_floor_area.nil?
+        raise 'Subsection does not define gross floor area' if @total_floor_area.nil? && total_floor_area.nil?
       end
       @total_floor_area
     end

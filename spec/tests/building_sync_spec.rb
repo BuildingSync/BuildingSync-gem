@@ -62,6 +62,24 @@ RSpec.describe 'BuildingSync' do
     translator.write_osm(out_path)
   end
 
+  it 'should parse and write Golden Test File.xml (phase zero)' do
+    xml_path = File.expand_path('../files/Golden Test File.xml', File.dirname(__FILE__))
+
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path('../output/Golden Test File/', File.dirname(__FILE__))
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    translator = BuildingSync::Translator.new(xml_path, false)
+    translator.write_osm(out_path)
+  end
+
   it 'should parse and write building_151.xml (phase zero) with n1 namespace' do
     xml_path = File.expand_path('../files/building_151_n1.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true

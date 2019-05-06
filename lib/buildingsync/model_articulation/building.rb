@@ -43,7 +43,7 @@ module BuildingSync
 
     def read_xml(build_element, occupancy_type, total_floor_area, ns)
       # floor areas
-      read_floor_areas(build_element, ns)
+      read_floor_areas(build_element, total_floor_area, ns)
       # standard template
       read_standard_template_based_on_year(build_element, ns)
       # deal with stories above and below grade
@@ -60,7 +60,6 @@ module BuildingSync
       # floor areas
       read_floor_areas(build_element, ns)
 
-      p @total_floor_area
       set_bldg_and_system_type(@occupancy_type, total_floor_area)
 
       # need to set those defaults after initializing the subsections
