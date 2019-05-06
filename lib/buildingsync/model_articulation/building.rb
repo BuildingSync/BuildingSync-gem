@@ -2,19 +2,6 @@ require_relative 'building_subsection'
 module BuildingSync
   class Building < SpecialElement
     include OsLib_ModelGenerationBRICR
-    # an array that contains all the building subsections
-    @building_subsections = []
-    # @total_floor_area = nil # ft2 -> m2 -- also gross_floor_area
-    @heated_and_cooled_floor_area = nil
-    @footprint_floor_area = nil
-    @num_stories_above_grade = nil
-    @num_stories_below_grade = nil
-    @ns_to_ew_ratio = nil
-    @building_rotation = 0.0 # setDefaultValue
-    @floor_height = 0.0 # ft -> m -- setDefaultValue in ft
-    @wwr = 0.0 # setDefaultValue in fraction
-    @name = nil
-    @model = nil
 
     # initialize
     def initialize(build_element, occupancy_type, total_floor_area, ns)
@@ -54,13 +41,13 @@ module BuildingSync
       @occupancy_type = read_occupancy_type(build_element, occupancy_type, ns)
 
       build_element.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |subsection_element|
-        @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template, ns))
+        @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template, @occupancy_type, ns))
       end
 
       # floor areas
       read_floor_areas(build_element, total_floor_area, ns)
 
-      set_bldg_and_system_type(@occupancy_type, total_floor_area)
+      set_bldg_and_system_type(@occupancy_type, @total_floor_area)
 
       # need to set those defaults after initializing the subsections
       read_building_form_defaults
@@ -135,7 +122,6 @@ module BuildingSync
 
     def get_bldg_type
       # try to get the bldg type at teh building level, if it is nil then look at the first subsection
-      p @bldg_type
       if @bldg_type.nil?
         return @building_subsections[0].bldg_type
       else
@@ -148,16 +134,16 @@ module BuildingSync
       building_form_defaults = building_form_defaults(get_bldg_type)
       if @ns_to_ew_ratio == 0.0
         @ns_to_ew_ratio = building_form_defaults[:aspect_ratio]
-        puts "Warning: 0.0 value for aspect ratio will be replaced with smart default for #{@building_subsections[0].bldg_type} of #{building_form_defaults[:aspect_ratio]}."
+        puts "Warning: 0.0 value for aspect ratio will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:aspect_ratio]}."
       end
       if @floor_height == 0.0
         @floor_height = OpenStudio.convert(building_form_defaults[:typical_story], 'ft', 'm').get
-        puts "Warning: 0.0 value for floor height will be replaced with smart default for #{@building_subsections[0].bldg_type} of #{building_form_defaults[:typical_story]}."
+        puts "Warning: 0.0 value for floor height will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:typical_story]}."
       end
       # because of this can't set wwr to 0.0. If that is desired then we can change this to check for 1.0 instead of 0.0
       if @wwr == 0.0
         @wwr = building_form_defaults[:wwr]
-        puts "Warning: 0.0 value for window to wall ratio will be replaced with smart default for #{@building_subsections[0].bldg_type} of #{building_form_defaults[:wwr]}."
+        puts "Warning: 0.0 value for window to wall ratio will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:wwr]}."
       end
     end
 

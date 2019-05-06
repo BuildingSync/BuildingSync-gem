@@ -6,12 +6,11 @@ module BuildingSync
   class Facility
     include OsLib_ModelGenerationBRICR
     include OsLib_Geometry
-    # an array that contains all the sites
-    @sites = []
 
     # initialize
     def initialize(facility_xml, ns)
       # code to initialize
+      # an array that contains all the sites
       @sites = []
       # reading the xml
       read_xml(facility_xml, ns)

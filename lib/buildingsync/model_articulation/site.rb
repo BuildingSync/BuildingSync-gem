@@ -1,12 +1,11 @@
 require_relative 'building'
 module BuildingSync
   class Site < SpecialElement
-    # an array that contains all the buildings
-    @buildings = []
 
     # initialize
     def initialize(build_element, ns)
       # code to initialize
+      # an array that contains all the buildings
       @buildings = []
       # TM: just use the XML snippet to search for the buildings on the site
       read_xml(build_element, ns)

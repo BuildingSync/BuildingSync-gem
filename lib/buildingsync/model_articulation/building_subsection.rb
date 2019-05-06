@@ -2,32 +2,26 @@ require_relative '../Helpers/os_lib_model_generation_bricr'
 require 'openstudio-standards'
 module BuildingSync
   class BuildingSubsection < SpecialElement
-
     include OsLib_ModelGenerationBRICR
     include OpenstudioStandards
-    @fraction_area = nil
-    @num_of_units = nil
-    @occupancy_type = nil
-    @standard = nil
-    @space_types = {}
-    @space_types_floor_area = {}
 
     # initialize
-    def initialize(subSectionElement, standard_template, ns)
+    def initialize(subSectionElement, standard_template, occType, ns)
       @subsection_element = nil
       @standard = nil
       @fraction_area = nil
+      @bldg_type = {}
       @space_types = {}
       @space_types_floor_area = {}
       # code to initialize
-      read_xml(subSectionElement, standard_template, ns)
+      read_xml(subSectionElement, standard_template, occType, ns)
     end
 
-    def read_xml(subSectionElement, standard_template, ns)
+    def read_xml(subSectionElement, standard_template, occType, ns)
       # floor areas
       read_floor_areas(subSectionElement, nil, ns)
       # based on the occupancy type set building type, system type and bar division method
-      read_bldg_system_type_based_on_occupancy_type(subSectionElement, ns)
+      read_bldg_system_type_based_on_occupancy_type(subSectionElement, occType, ns)
 
       @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
 
@@ -37,8 +31,8 @@ module BuildingSync
       @standard = Standard.build("#{standard_template}_#{@bldg_type}")
     end
 
-    def read_bldg_system_type_based_on_occupancy_type(subSectionElement, ns)
-      @occupancy_type = read_occupancy_type(subSectionElement, nil, ns)
+    def read_bldg_system_type_based_on_occupancy_type(subSectionElement, occType, ns)
+      @occupancy_type = read_occupancy_type(subSectionElement, occType, ns)
       set_bldg_and_system_type(@occupancy_type, @total_floor_area)
     end
 

@@ -12,6 +12,13 @@ module BuildingSync
       @model_maker = nil
       @workflow_maker = nil
 
+      # Open a log for the library
+      logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{path}.log"))
+      logFile.setLogLevel(OpenStudio::Debug)
+
+      # log debug message
+      OpenStudio.logFree(OpenStudio::Error, "BuildingSync.Translator.initialize", "This is a test debug message")
+
       # parse the xml
       raise "File '#{path}' does not exist" unless File.exist?(path)
       File.open(path, 'r') do |file|

@@ -47,12 +47,24 @@ module BuildingSync
         if floor_area_type == 'Gross'
           @total_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('gross_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Heated and Cooled'
-          @heated_and_cooled_floor_area = validate_positive_number_excluding_zero('@heated_and_cooled_floor_area', floor_area)
+          @heated_and_cooled_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@heated_and_cooled_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Footprint'
-          @footprint_floor_area = validate_positive_number_excluding_zero('@footprint_floor_area', floor_area)
+          @footprint_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@footprint_floor_area', floor_area), 'ft^2', 'm^2').get
+        elsif floor_area_type == 'Conditioned'
+          @conditioned_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@@conditioned_floor_area', floor_area), 'ft^2', 'm^2').get
+        else
+          puts "Unsupported floor area type found: #{floor_area_type}"
         end
 
-        raise 'Subsection does not define gross floor area' if @total_floor_area.nil? && total_floor_area.nil?
+        if @total_floor_area.nil? && !@conditioned_floor_area.nil?
+          @total_floor_area = @conditioned_floor_area
+        else
+          if @total_floor_area.nil? && !@heated_and_cooled_floor_area.nil?
+            @total_floor_area = @heated_and_cooled_floor_area
+          end
+        end
+
+        raise 'Spatial element does not define gross floor area' if @total_floor_area.nil? && total_floor_area.nil?
       end
       @total_floor_area
     end
