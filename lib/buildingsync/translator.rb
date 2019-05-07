@@ -17,7 +17,7 @@ module BuildingSync
       logFile.setLogLevel(OpenStudio::Debug)
 
       # log debug message
-      OpenStudio.logFree(OpenStudio::Error, "BuildingSync.Translator.initialize", "This is a test debug message")
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', 'This is a test debug message')
 
       # parse the xml
       raise "File '#{path}' does not exist" unless File.exist?(path)
