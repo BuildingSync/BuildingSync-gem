@@ -1,4 +1,5 @@
-OpenStudio(R), Copyright (c) 2008-2018, Alliance for Sustainable Energy, LLC. All rights reserved.
+OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC. All rights reserved.
+BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted 
 provided that the following conditions are met:
@@ -14,8 +15,9 @@ or promote products derived from this software without specific prior written pe
 respective party.
 
 (4) Other than as required in clauses (1) and (2), distributions in any form of modifications or other 
-derivative works may not use the "OpenStudio" trademark, "OS", "os", or any other confusingly similar 
-designation without specific prior written permission from Alliance for Sustainable Energy, LLC.
+derivative works may not use the "OpenStudio" or "BuildingSync" trademarks, "OS", "os", "BSync" or any 
+other confusingly similar designation without specific prior written permission from Alliance for 
+Sustainable Energy, LLC.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
 WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 

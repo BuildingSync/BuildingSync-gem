@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>rotate_building</name>
   <uid>b2742307-bce7-4747-8f94-977718217305</uid>
-  <version_id>97a0e63a-48fb-4b5f-885e-47c96e9c3465</version_id>
-  <version_modified>20190508T153404Z</version_modified>
+  <version_id>f1f966c1-0228-4f2b-ad19-ea79e862d8bd</version_id>
+  <version_modified>20190508T155653Z</version_modified>
   <xml_checksum>49BEF039</xml_checksum>
   <class_name>RotateBuilding</class_name>
   <display_name>Rotate Building</display_name>
@@ -54,12 +54,6 @@
       <checksum>550314F1</checksum>
     </file>
     <file>
-      <filename>LICENSE.md</filename>
-      <filetype>md</filetype>
-      <usage_type>license</usage_type>
-      <checksum>9640B6CB</checksum>
-    </file>
-    <file>
       <filename>README.md.erb</filename>
       <filetype>erb</filetype>
       <usage_type>readmeerb</usage_type>
@@ -78,6 +72,12 @@
       <checksum>B256482B</checksum>
     </file>
     <file>
+      <filename>LICENSE.md</filename>
+      <filetype>md</filetype>
+      <usage_type>license</usage_type>
+      <checksum>36E05313</checksum>
+    </file>
+    <file>
       <version>
         <software_program>OpenStudio</software_program>
         <identifier>2.0.0</identifier>
@@ -86,13 +86,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>A935E3FE</checksum>
+      <checksum>E7A0DFE3</checksum>
     </file>
     <file>
       <filename>RotateBuilding_Test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>86155ABE</checksum>
+      <checksum>75E1ED81</checksum>
     </file>
   </files>
 </measure>
