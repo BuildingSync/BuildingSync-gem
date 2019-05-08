@@ -12,6 +12,7 @@ module BuildingSync
       # code to initialize
       # an array that contains all the sites
       @sites = []
+
       # reading the xml
       read_xml(facility_xml, ns)
     end
@@ -32,11 +33,11 @@ module BuildingSync
     # generating the OpenStudio model based on the imported BuildingSync Data
     def generate_baseline_osm
       if @sites.count == 0
-        puts 'Error: There are no sites attached to this facility in your BuildingSync file.'
-        raise 'Error: There are no sites attached to this facility in your BuildingSync file.'
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', 'There are no sites attached to this facility in your BuildingSync file.')
+        raise 'There are no sites attached to this facility in your BuildingSync file.'
       else if @sites.count > 1
-             puts "Error: There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file."
-             raise "Error: There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file."
+             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file.")
+             raise "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file."
            else
              puts "Info: There is/are #{@sites.count} sites in this facility."
            end

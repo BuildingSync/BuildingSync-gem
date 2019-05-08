@@ -22,8 +22,8 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path, true)
-    translator.write_osm(out_path)
+    translator = BuildingSync::Translator.new(xml_path, out_path, true)
+    translator.write_osm
   end
 
   it 'should parse and write DC GSA Headquarters.xml (phase zero)' do
@@ -40,7 +40,7 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path, false)
+    translator = BuildingSync::Translator.new(xml_path, out_path, false)
     translator.write_osm(out_path)
   end
 
@@ -58,8 +58,8 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path, true)
-    translator.write_osm(out_path)
+    translator = BuildingSync::Translator.new(xml_path, out_path, true)
+    translator.write_osm()
   end
 
   it 'should parse and write Golden Test File.xml (phase zero)' do
@@ -76,8 +76,8 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path, false)
-    translator.write_osm(out_path)
+    translator = BuildingSync::Translator.new(xml_path, out_path, false)
+    translator.write_osm()
   end
 
   it 'should parse and write building_151.xml (phase zero) with n1 namespace' do
@@ -93,8 +93,8 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path, true)
-    translator.writeOSWs(out_path)
+    translator = BuildingSync::Translator.new(xml_path, out_path, true)
+    translator.writeOSWs()
 
     osw_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }

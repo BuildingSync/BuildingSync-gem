@@ -64,7 +64,6 @@ module BuildingSync
       if @single_floor_area > 0.0
         footprint = OpenStudio.convert(@single_floor_area, 'ft2', 'm2')
         @total_floor_area = footprint * num_stories.to_f
-        puts 'INFO: User-defined single floor area was used for calculation of total building floor area'
       else
         footprint = @total_floor_area / num_stories.to_f
       end
@@ -134,16 +133,16 @@ module BuildingSync
       building_form_defaults = building_form_defaults(get_bldg_type)
       if @ns_to_ew_ratio == 0.0
         @ns_to_ew_ratio = building_form_defaults[:aspect_ratio]
-        puts "Warning: 0.0 value for aspect ratio will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:aspect_ratio]}."
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for aspect ratio will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:aspect_ratio]}.")
       end
       if @floor_height == 0.0
         @floor_height = OpenStudio.convert(building_form_defaults[:typical_story], 'ft', 'm').get
-        puts "Warning: 0.0 value for floor height will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:typical_story]}."
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for floor height will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:typical_story]}.")
       end
       # because of this can't set wwr to 0.0. If that is desired then we can change this to check for 1.0 instead of 0.0
       if @wwr == 0.0
         @wwr = building_form_defaults[:wwr]
-        puts "Warning: 0.0 value for window to wall ratio will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:wwr]}."
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for window to wall ratio will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:wwr]}.")
       end
     end
 
@@ -155,7 +154,7 @@ module BuildingSync
         building_fraction -= subsection.fraction_area
       end
       if building_fraction <= 0.0
-        puts 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction',  'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
         raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
       end
       @building_subsections[0].fraction_area = building_fraction
@@ -208,7 +207,7 @@ module BuildingSync
       initial_rotation = @model.getBuilding.northAxis
       if building_rotation != initial_rotation
         @model.getBuilding.setNorthAxis(building_rotation)
-        puts "INFO: Set Building Rotation to #{model.getBuilding.northAxis}"
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "Set Building Rotation to #{model.getBuilding.northAxis}")
       end
       @model.getBuilding.setName(name)
 
@@ -285,11 +284,11 @@ module BuildingSync
 
         if (space_type.floorArea - target_areas[space_type]).abs >= 1.0
           if !bar_hash[:bar_division_method].include? 'Single Space Type'
-            puts "ERROR: #{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)"
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "#{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)")
             return false
           else
             # will see this if use Single Space type division method on multi-use building or single building type without whole building space type
-            puts "WARNING: #{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)"
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', "WARNING: #{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)")
           end
         end
       end

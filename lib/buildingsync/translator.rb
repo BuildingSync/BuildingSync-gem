@@ -7,34 +7,40 @@ require_relative 'makers/workflow_maker_phase_zero'
 module BuildingSync
   class Translator
     # load the building sync file and chooses the correct workflow
-    def initialize(path, bWorkflow)
+    def initialize(xmlFilePath, outputDir, bWorkflow)
       @doc = nil
       @model_maker = nil
       @workflow_maker = nil
+      @outputDir = outputDir
 
       # Open a log for the library
-      logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{path}.log"))
+      logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{outputDir}/in.log"))
       logFile.setLogLevel(OpenStudio::Debug)
 
-      # log debug message
-      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', 'This is a test debug message')
-
       # parse the xml
-      raise "File '#{path}' does not exist" unless File.exist?(path)
-      File.open(path, 'r') do |file|
+      if !File.exist?(xmlFilePath)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xmlFilePath}' does not exist")
+        raise "File '#{xmlFilePath}' does not exist" unless File.exist?(xmlFilePath)
+      end
+
+      File.open(xmlFilePath, 'r') do |file|
         @doc = REXML::Document.new(file)
       end
 
       # test for the namespace
       @ns = 'auc'
-      @doc.root.namespaces.each_pair do |k,v|
+      @doc.root.namespaces.each_pair do |k, v|
         @ns = k if /bedes-auc/.match(v)
       end
 
       # validate the doc
       facilities = []
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") { |facility| facilities << facility }
-      raise 'BuildingSync file must have exactly 1 facility' if facilities.size != 1
+      # raise 'BuildingSync file must have exactly 1 facility' if facilities.size != 1
+      if facilities.size != 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', 'BuildingSync file must have exactly 1 facility')
+        raise 'BuildingSync file must have exactly 1 facility'
+      end
 
       # choose the correct model maker based on xml
       choose_model_maker
@@ -43,12 +49,12 @@ module BuildingSync
       choose_workflow_maker if bWorkflow
     end
 
-    def write_osm(dir)
-      @model_maker.generate_baseline(dir)
+    def write_osm
+      @model_maker.generate_baseline(@outputDir)
     end
 
-    def writeOSWs(dir)
-      @workflow_maker.writeOSWs(dir)
+    def writeOSWs
+      @workflow_maker.writeOSWs(@outputDir)
     end
 
     private
