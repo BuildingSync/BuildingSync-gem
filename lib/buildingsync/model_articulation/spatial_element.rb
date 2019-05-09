@@ -53,7 +53,7 @@ module BuildingSync
         elsif floor_area_type == 'Conditioned'
           @conditioned_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@@conditioned_floor_area', floor_area), 'ft^2', 'm^2').get
         else
-          puts "Unsupported floor area type found: #{floor_area_type}"
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.generate_baseline_osm', "Unsupported floor area type found: #{floor_area_type}")
         end
 
         if @total_floor_area.nil? && !@conditioned_floor_area.nil?

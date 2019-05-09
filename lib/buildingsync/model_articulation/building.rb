@@ -1,7 +1,12 @@
 require_relative 'building_subsection'
+require_relative '../Helpers/os_lib_helper_methods'
+require_relative '../Helpers/epw'
+require_relative '../Helpers/stat_file'
 module BuildingSync
   class Building < SpecialElement
     include OsLib_ModelGenerationBRICR
+    include OsLib_HelperMethods
+    include EnergyPlus
 
     # initialize
     def initialize(build_element, occupancy_type, total_floor_area, ns)
@@ -184,6 +189,175 @@ module BuildingSync
       return newHash
     end
 
+    def initialize_model
+      # let's create our new empty model
+      if @model.nil?
+        @model = OpenStudio::Model::Model.new
+      end
+    end
+
+    def set_weater_and_climate_zone(weather_file_name, climate_zone)
+      initialize_model
+      # create initial condition
+      if @model.getWeatherFile.city != ''
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "The initial weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects")
+      else
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "No weather file is set. The model has #{@model.getDesignDays.size} design day objects")
+      end
+
+      # find weather file
+      weather_file = nil
+      if climate_zone == "1A" || climate_zone == "1B"
+        weather_file = "CZ01RV2.epw"
+      elsif climate_zone == "2A" || climate_zone == "2B"
+        weather_file = "CZ02RV2.epw"
+      elsif climate_zone == "3A" || climate_zone == "3B" || climate_zone == "3C"
+        weather_file = "CZ03RV2.epw"
+      elsif climate_zone == "4A" || climate_zone == "4B" || climate_zone == "4C"
+        weather_file = "CZ04RV2.epw"
+      elsif climate_zone == "5A" || climate_zone == "5B" || climate_zone == "5C"
+        weather_file = "CZ05RV2.epw"
+      elsif climate_zone == "6A" || climate_zone == "6B"
+        weather_file = "CZ06RV2.epw"
+      elsif climate_zone == "7"
+        weather_file = "CZ07RV2.epw"
+      elsif climate_zone == "8"
+        weather_file = "CZ08RV2.epw"
+      end
+
+      # Parse the EPW manually because OpenStudio can't handle multiyear weather files (or DATA PERIODS with YEARS)
+      epw_file = OpenStudio::Weather::Epw.load(File.expand_path("../../../spec/weather/#{weather_file}", File.dirname(__FILE__)))
+
+      weather_file = @model.getWeatherFile
+      weather_file.setCity(epw_file.city)
+      weather_file.setStateProvinceRegion(epw_file.state)
+      weather_file.setCountry(epw_file.country)
+      weather_file.setDataSource(epw_file.data_type)
+      weather_file.setWMONumber(epw_file.wmo.to_s)
+      weather_file.setLatitude(epw_file.lat)
+      weather_file.setLongitude(epw_file.lon)
+      weather_file.setTimeZone(epw_file.gmt)
+      weather_file.setElevation(epw_file.elevation)
+      weather_file.setString(10, "file:///#{epw_file.filename}")
+
+      weather_name = "#{epw_file.city}_#{epw_file.state}_#{epw_file.country}"
+      weather_lat = epw_file.lat
+      weather_lon = epw_file.lon
+      weather_time = epw_file.gmt
+      weather_elev = epw_file.elevation
+
+      # Add or update site data
+      site = @model.getSite
+      site.setName(weather_name)
+      site.setLatitude(weather_lat)
+      site.setLongitude(weather_lon)
+      site.setTimeZone(weather_time)
+      site.setElevation(weather_elev)
+
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{epw_file.city}. State is #{epw_file.state}")
+
+      # Add SiteWaterMainsTemperature -- via parsing of STAT file.
+      stat_file = "#{File.join(File.dirname(epw_file.filename), File.basename(epw_file.filename, '.*'))}.stat"
+      unless File.exist? stat_file
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find STAT file by filename, looking in the directory')
+        stat_files = Dir["#{File.dirname(epw_file.filename)}/*.stat"]
+        if stat_files.size > 1
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'More than one stat file in the EPW directory')
+          return false
+        end
+        if stat_files.empty?
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Cound not find the stat file in the EPW directory')
+          return false
+        end
+
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Using STAT file: #{stat_files.first}")
+        stat_file = stat_files.first
+      end
+      unless stat_file
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find stat file')
+        return false
+      end
+
+      #stat_model = EnergyPlus::StatFile.new(stat_file)
+      #water_temp = @model.getSiteWaterMainsTemperature
+      #water_temp.setAnnualAverageOutdoorAirTemperature(stat_model.mean_dry_bulb)
+      #water_temp.setMaximumDifferenceInMonthlyAverageOutdoorAirTemperatures(stat_model.delta_dry_bulb)
+      #OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "mean dry bulb is #{stat_model.mean_dry_bulb}")
+
+      # Remove all the Design Day objects that are in the file
+      @model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each(&:remove)
+
+      # find the ddy files
+      ddy_file = "#{File.join(File.dirname(epw_file.filename), File.basename(epw_file.filename, '.*'))}.ddy"
+      unless File.exist? ddy_file
+        ddy_files = Dir["#{File.dirname(epw_file.filename)}/*.ddy"]
+        if ddy_files.size > 1
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'More than one ddy file in the EPW directory')
+          return false
+        end
+        if ddy_files.empty?
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'could not find the ddy file in the EPW directory')
+          return false
+        end
+
+        ddy_file = ddy_files.first
+      end
+
+      unless ddy_file
+        runner.registerError "Could not find DDY file for #{ddy_file}"
+        return error
+      end
+
+      ddy_model = OpenStudio::EnergyPlus.loadAndTranslateIdf(ddy_file).get
+      ddy_model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each do |d|
+        # grab only the ones that matter
+        ddy_list = /(Htg 99.6. Condns DB)|(Clg .4. Condns WB=>MDB)|(Clg .4% Condns DB=>MWB)/
+        if d.name.get =~ ddy_list
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Adding object #{d.name}")
+
+          # add the object to the existing model
+          @model.addObject(d.clone)
+        end
+      end
+
+      # Set climate zone
+      climateZones = @model.getClimateZones
+      if climate_zone == 'Lookup From Stat File'
+
+        # get climate zone from stat file
+        text = nil
+        File.open(stat_file) do |f|
+          text = f.read.force_encoding('iso-8859-1')
+        end
+
+        # Get Climate zone.
+        # - Climate type "3B" (ASHRAE Standard 196-2006 Climate Zone)**
+        # - Climate type "6A" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
+        regex = /Climate type \"(.*?)\" \(ASHRAE Standards?(.*)\)\*\*/
+        match_data = text.match(regex)
+        if match_data.nil?
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.set_weater_and_climate_zone', "Can't find ASHRAE climate zone in stat file.")
+        else
+          climate_zone = match_data[1].to_s.strip
+        end
+
+      end
+
+      # set climate zone
+      climateZones.clear
+      if climate_zone == "1A" || climate_zone == "1B" || climate_zone == "2A" || climate_zone == "2B" || climate_zone == "3A" || climate_zone == "3B" || climate_zone == "3C" || climate_zone == "4A" || climate_zone == "4B" || climate_zone == "4C" || climate_zone == "5A" || climate_zone == "5B" || climate_zone == "5C" || climate_zone == "6A" || climate_zone == "6B" || climate_zone == "7" || climate_zone == "8"
+        climateZones.setClimateZone('ASHRAE',climate_zone)
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
+      else
+        climate_zone = climate_zone.gsub('CEC','')
+        climateZones.setClimateZone('CEC',climate_zone)
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climate_zone}")
+      end
+
+      # add final condition
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
+    end
+
     def generate_baseline_osm
       # this is code refactored from the "create_bar_from_building_type_ratios" measure
       # first we check is there is any data at all in this facility, aka if there is a site in the list
@@ -200,14 +374,11 @@ module BuildingSync
       # checking that the factions add up
       check_building_faction
 
-      # let's create our new empty model
-      @model = OpenStudio::Model::Model.new
-
       # set building rotation
       initial_rotation = @model.getBuilding.northAxis
       if building_rotation != initial_rotation
         @model.getBuilding.setNorthAxis(building_rotation)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "Set Building Rotation to #{model.getBuilding.northAxis}")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "Set Building Rotation to #{@model.getBuilding.northAxis}")
       end
       @model.getBuilding.setName(name)
 
@@ -391,7 +562,7 @@ module BuildingSync
         length_area_remainder = target_party_wall_area - length_area
 
         # get rotation and best fit to adjust orientation for fraction party wall
-        rotation = args['building_rotation'] % 360.0 # should result in value between 0 and 360
+        rotation = @building_rotation % 360.0 # should result in value between 0 and 360
         card_dir_array = [0.0, 90.0, 180.0, 270.0, 360.0]
         # reverse array to properly handle 45, 135, 225, and 315
         best_fit = card_dir_array.reverse.min_by { |x| (x.to_f - rotation).abs }
