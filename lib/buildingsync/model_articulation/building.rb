@@ -196,6 +196,22 @@ module BuildingSync
       end
     end
 
+    def get_model
+      return @model
+    end
+
+    def get_building_template
+      return @standard_template
+    end
+
+    def get_system_type
+      if !@system_type.nil?
+        return @system_type
+      else
+        return @building_subsections[0].system_type
+      end
+    end
+
     def set_weater_and_climate_zone(weather_file_name, climate_zone)
       initialize_model
       # create initial condition

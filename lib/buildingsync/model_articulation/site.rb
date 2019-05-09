@@ -45,6 +45,18 @@ module BuildingSync
       end
     end
 
+    def get_model
+      return @buildings[0].get_model
+    end
+
+    def get_building_template
+      return @buildings[0].get_building_template
+    end
+
+    def get_system_type
+      return @buildings[0].get_system_type
+    end
+
     def generate_baseline_osm
       if @buildings.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')

@@ -116,6 +116,6 @@ module BuildingSync
     end
 
     def validate_fraction; end
-    attr_reader :total_floor_area, :bldg_type
+    attr_reader :total_floor_area, :bldg_type, :system_type
   end
 end

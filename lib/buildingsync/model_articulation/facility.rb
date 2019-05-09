@@ -1,6 +1,7 @@
 require_relative 'site'
 require_relative '../Helpers/os_lib_model_generation_bricr'
 require_relative '../Helpers/os_lib_geometry'
+require_relative '../Helpers/Model.hvac'
 
 module BuildingSync
   class Facility
@@ -38,50 +39,38 @@ module BuildingSync
            end
       end
       @sites.each(&:generate_baseline_osm)
+
+      create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, "Forced Air")
     end
 
-    def create_building_system
-      # lookup and replace argument values from upstream measures
-      if args['use_upstream_args'] == true
-        args.each do |arg,value|
-          next if arg == 'use_upstream_args' # this argument should not be changed
-          value_from_osw = OsLib_HelperMethods.check_upstream_measure_for_arg(runner, arg)
-          if !value_from_osw.empty?
-            runner.registerInfo("Replacing argument named #{arg} from current measure with a value of #{value_from_osw[:value]} from #{value_from_osw[:measure_name]}.")
-            new_val = value_from_osw[:value]
-            # todo - make code to handle non strings more robust. check_upstream_measure_for_arg coudl pass bakc the argument type
-            if arg == 'total_bldg_floor_area'
-              args[arg] = new_val.to_f
-            elsif arg == 'num_stories_above_grade'
-              args[arg] = new_val.to_f
-            elsif arg == 'zipcode'
-              args[arg] = new_val.to_i
-            else
-              args[arg] = new_val
-            end
-          end
-        end
-      end
+    def create_building_systems(model, template, system_type, hvac_delivery_type)
+      add_space_type_loads = true
+      add_constructions = true
+      add_elevators = false
+      add_exterior_lights = false
+      onsite_parking_fraction = 1.0
+      kitchen_makeup = "Adjacent"
+      exterior_lighting_zone = "3 - All Other Areas"
+      add_exhaust = true
+      add_swh = true
+      add_hvac = true
+      htg_src = "NaturalGas"
+      clg_src = "Electricity"
+      remove_objects = false
+      add_thermostat = true
 
-      # validate fraction parking
-      fraction = OsLib_HelperMethods.checkDoubleAndIntegerArguments(runner, user_arguments, 'min' => 0.0, 'max' => 1.0, 'min_eq_bool' => true, 'max_eq_bool' => true, 'arg_array' => ['onsite_parking_fraction'])
-      if !fraction then return false end
-
-      # report initial condition of model
       initial_objects = model.getModelObjects.size
-      runner.registerInitialCondition("The building started with #{initial_objects} objects.")
 
-      # open channel to log messages
-      OsLib_HelperMethods.setup_log_msgs(runner)
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
 
       # Make the standard applier
-      standard = Standard.build((args['template']).to_s)
+      standard = Standard.build(template)
 
       # add internal loads to space types
-      if args['add_space_type_loads']
+      if add_space_type_loads
 
         # remove internal loads
-        if args['remove_objects']
+        if remove_objects
           model.getSpaceLoads.each do |instance|
             next if instance.name.to_s.include?('Elevator') # most prototype building types model exterior elevators with name Elevator
             next if instance.to_InternalMass.is_initialized
@@ -96,7 +85,7 @@ module BuildingSync
           # Don't add infiltration here; will be added later in the script
           test = standard.space_type_apply_internal_loads(space_type, true, true, true, true, true, false)
           if test == false
-            runner.registerWarning("Could not add loads for #{space_type.name}. Not expected for #{args['template']}")
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "Could not add loads for #{space_type.name}. Not expected for #{template}")
             next
           end
 
@@ -104,9 +93,9 @@ module BuildingSync
           # the last bool test it to make thermostat schedules. They are now added in HVAC section instead of here
           standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
 
-          # extend space type name to include the args['template']. Consider this as well for load defs
-          space_type.setName("#{space_type.name} - #{args['template']}")
-          runner.registerInfo("Adding loads to space type named #{space_type.name}")
+          # extend space type name to include the template. Consider this as well for load defs
+          space_type.setName("#{space_type.name} - #{template}")
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding loads to space type named #{space_type.name}")
         end
 
         # warn if spaces in model without space type
@@ -116,7 +105,7 @@ module BuildingSync
           spaces_without_space_types << space
         end
         if !spaces_without_space_types.empty?
-          runner.registerWarning("#{spaces_without_space_types.size} spaces do not have space types assigned, and wont' receive internal loads from standards space type lookups.")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "#{spaces_without_space_types.size} spaces do not have space types assigned, and wont' receive internal loads from standards space type lookups.")
         end
       end
 
@@ -132,7 +121,7 @@ module BuildingSync
             building_types[bldg_type] += space_type.floorArea
           end
         else
-          runner.registerWarning("Can't identify building type for #{space_type.name}")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "Can't identify building type for #{space_type.name}")
         end
       end
       primary_bldg_type = building_types.key(building_types.values.max) # TODO: - this fails if no space types, or maybe just no space types with standards
@@ -140,10 +129,10 @@ module BuildingSync
       model.getBuilding.setStandardsBuildingType(primary_bldg_type)
 
       # make construction set and apply to building
-      if args['add_constructions']
+      if add_constructions
 
         # remove default construction sets
-        if args['remove_objects']
+        if remove_objects
           model.getDefaultConstructionSets.each(&:remove)
         end
 
@@ -159,9 +148,9 @@ module BuildingSync
           bldg_def_const_set = bldg_def_const_set.get
           if is_residential then bldg_def_const_set.setName("Res #{bldg_def_const_set.name}") end
           model.getBuilding.setDefaultConstructionSet(bldg_def_const_set)
-          runner.registerInfo("Adding default construction set named #{bldg_def_const_set.name}")
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding default construction set named #{bldg_def_const_set.name}")
         else
-          runner.registerError("Could not create default construction set for the building type #{lookup_building_type} in climate zone #{climate_zone}.")
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.create_building_system', "Could not create default construction set for the building type #{lookup_building_type} in climate zone #{climate_zone}.")
           return false
         end
 
@@ -175,7 +164,7 @@ module BuildingSync
         end
 
         # Modify the infiltration rates
-        if args['remove_objects']
+        if remove_objects
           model.getSpaceInfiltrationDesignFlowRates.each(&:remove)
         end
         standard.model_apply_infiltration_standard(model)
@@ -187,7 +176,7 @@ module BuildingSync
       end
 
       # add elevators (returns ElectricEquipment object)
-      if args['add_elevators']
+      if add_elevators
 
         # remove elevators as spaceLoads or exteriorLights
         model.getSpaceLoads.each do |instance|
@@ -201,57 +190,57 @@ module BuildingSync
 
         elevators = standard.model_add_elevators(model)
         if elevators.nil?
-          runner.registerInfo('No elevators added to the building.')
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', 'No elevators added to the building.')
         else
           elevator_def = elevators.electricEquipmentDefinition
           design_level = elevator_def.designLevel.get
-          runner.registerInfo("Adding #{elevators.multiplier.round(1)} elevators each with power of #{OpenStudio.toNeatString(design_level, 0, true)} (W), plus lights and fans.")
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{elevators.multiplier.round(1)} elevators each with power of #{OpenStudio.toNeatString(design_level, 0, true)} (W), plus lights and fans.")
         end
       end
 
       # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
-      if args['add_exterior_lights']
+      if add_exterior_lights
 
-        if args['remove_objects']
+        if remove_objects
           model.getExteriorLightss.each do |ext_light|
             next if ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name
             ext_light.remove
           end
         end
 
-        exterior_lights = standard.model_add_typical_exterior_lights(model, args['exterior_lighting_zone'].chars[0].to_i, args['onsite_parking_fraction'])
+        exterior_lights = standard.model_add_typical_exterior_lights(model, exterior_lighting_zone.chars[0].to_i, onsite_parking_fraction)
         exterior_lights.each do |k, v|
-          runner.registerInfo("Adding Exterior Lights named #{v.exteriorLightsDefinition.name} with design level of #{v.exteriorLightsDefinition.designLevel} * #{OpenStudio.toNeatString(v.multiplier, 0, true)}.")
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding Exterior Lights named #{v.exteriorLightsDefinition.name} with design level of #{v.exteriorLightsDefinition.designLevel} * #{OpenStudio.toNeatString(v.multiplier, 0, true)}.")
         end
       end
 
       # add_exhaust
-      if args['add_exhaust']
+      if add_exhaust
 
         # remove exhaust objects
-        if args['remove_objects']
+        if remove_objects
           model.getFanZoneExhausts.each(&:remove)
         end
 
-        zone_exhaust_fans = standard.model_add_exhaust(model, args['kitchen_makeup']) # second argument is strategy for finding makeup zones for exhaust zones
+        zone_exhaust_fans = standard.model_add_exhaust(model, kitchen_makeup) # second argument is strategy for finding makeup zones for exhaust zones
         zone_exhaust_fans.each do |k, v|
           max_flow_rate_ip = OpenStudio.convert(k.maximumFlowRate.get, 'm^3/s', 'cfm').get
           if v.key?(:zone_mixing)
             zone_mixing = v[:zone_mixing]
             mixing_source_zone_name = zone_mixing.sourceZone.get.name
             mixing_design_flow_rate_ip = OpenStudio.convert(zone_mixing.designFlowRate.get, 'm^3/s', 'cfm').get
-            runner.registerInfo("Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}, with #{OpenStudio.toNeatString(mixing_design_flow_rate_ip, 0, true)} (cfm) of makeup air from #{mixing_source_zone_name}")
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}, with #{OpenStudio.toNeatString(mixing_design_flow_rate_ip, 0, true)} (cfm) of makeup air from #{mixing_source_zone_name}")
           else
-            runner.registerInfo("Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}")
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}")
           end
         end
       end
 
       # add service water heating demand and supply
-      if args['add_swh']
+      if add_swh
 
         # remove water use equipment and water use connections
-        if args['remove_objects']
+        if remove_objects
           # TODO: - remove plant loops used for service water heating
           model.getWaterUseEquipments.each(&:remove)
           model.getWaterUseConnectionss.each(&:remove)
@@ -271,21 +260,21 @@ module BuildingSync
               next if !component.to_WaterUseConnections.is_initialized
               water_use_connections << component
             end
-            runner.registerInfo("Adding #{loop.name} to the building. It has #{water_use_connections.size} water use connections.")
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{loop.name} to the building. It has #{water_use_connections.size} water use connections.")
           end
         end
         if !midrise_swh_loops.empty?
-          runner.registerInfo("Adding #{midrise_swh_loops.size} MidriseApartment service water heating loops.")
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{midrise_swh_loops.size} MidriseApartment service water heating loops.")
         end
         if !stripmall_swh_loops.empty?
-          runner.registerInfo("Adding #{stripmall_swh_loops.size} RetailStripmall service water heating loops.")
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{stripmall_swh_loops.size} RetailStripmall service water heating loops.")
         end
       end
 
       # TODO: - when add methods below add bool to enable/disable them with default value to true
 
       # add daylight controls, need to perform a sizing run for 2010
-      if args['template'] == '90.1-2010'
+      if template == '90.1-2010'
         if standard.model_run_sizing_run(model, "#{Dir.pwd}/SRvt") == false
           return false
         end
@@ -294,13 +283,13 @@ module BuildingSync
 
       # TODO: - add refrigeration
       # remove refrigeration equipment
-      if args['remove_objects']
+      if remove_objects
         model.getRefrigerationSystems.each(&:remove)
       end
 
       # TODO: - add internal mass
       # remove internal mass
-      # if args['remove_objects']
+      # if remove_objects
       #  model.getSpaceLoads.each do |instance|
       #    next if not instance.to_InternalMass.is_initialized
       #    instance.remove
@@ -311,12 +300,11 @@ module BuildingSync
 
       # TODO: - fuel customization for cooking and laundry
       # works by switching some fraction of electric loads to gas if requested (assuming base load is electric)
-
       # add thermostats
-      if args['add_thermostat']
+      if add_thermostat
 
         # remove thermostats
-        if args['remove_objects']
+        if remove_objects
           model.getThermostatSetpointDualSetpoints.each(&:remove)
         end
 
@@ -329,7 +317,7 @@ module BuildingSync
           # identify thermal thermostat and apply to zones (apply_internal_load_schedules names )
           model.getThermostatSetpointDualSetpoints.each do |thermostat|
             next if !thermostat.name.to_s.include?(space_type.name.to_s)
-            runner.registerInfo("Assigning #{thermostat.name} to thermal zones with #{space_type.name} assigned.")
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Assigning #{thermostat.name} to thermal zones with #{space_type.name} assigned.")
             space_type.spaces.each do |space|
               next if !space.thermalZone.is_initialized
               space.thermalZone.get.setThermostatSetpointDualSetpoint(thermostat)
@@ -340,18 +328,18 @@ module BuildingSync
       end
 
       # add hvac system
-      if args['add_hvac']
+      if add_hvac
 
         # remove HVAC objects
-        if args['remove_objects']
+        if remove_objects
           standard.model_remove_prm_hvac(model)
         end
 
-        case args['system_type']
+        case system_type
         when 'Inferred'
 
           # Get the hvac delivery type enum
-          hvac_delivery = case args['hvac_delivery_type']
+          hvac_delivery = case hvac_delivery_type
                           when 'Forced Air'
                             'air'
                           when 'Hydronic'
@@ -365,13 +353,13 @@ module BuildingSync
           # For each group, infer the HVAC system type.
           sys_groups.each do |sys_group|
             # Infer the primary system type
-            # runner.registerInfo("template = #{args['template']}, climate_zone = #{climate_zone}, occ_type = #{sys_group['type']}, hvac_delivery = #{hvac_delivery}, htg_src = #{args['htg_src']}, clg_src = #{args['clg_src']}, area_ft2 = #{sys_group['area_ft2']}, num_stories = #{sys_group['stories']}")
+            # OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "template = #{template}, climate_zone = #{climate_zone}, occ_type = #{sys_group['type']}, hvac_delivery = #{hvac_delivery}, htg_src = #{htg_src}, clg_src = #{clg_src}, area_ft2 = #{sys_group['area_ft2']}, num_stories = #{sys_group['stories']}")
             sys_type, central_htg_fuel, zone_htg_fuel, clg_fuel = standard.model_typical_hvac_system_type(model,
                                                                                                           climate_zone,
                                                                                                           sys_group['type'],
                                                                                                           hvac_delivery,
-                                                                                                          args['htg_src'],
-                                                                                                          args['clg_src'],
+                                                                                                          htg_src,
+                                                                                                          clg_src,
                                                                                                           OpenStudio.convert(sys_group['area_ft2'], 'ft^2', 'm^2').get,
                                                                                                           sys_group['stories'])
 
@@ -411,7 +399,7 @@ module BuildingSync
           # Add the user specified HVAC system for each story.
           # Single-zone systems will get one per zone.
           story_groups.each do |zones|
-            model.add_cbecs_hvac_system(standard, args['system_type'], zones)
+            model.add_cbecs_hvac_system(standard, system_type, zones)
           end
 
         end
@@ -421,8 +409,8 @@ module BuildingSync
       # not clear yet if this is altering existing schedules, or additional inputs when schedules first requested
 
       # set hvac controls and efficiencies (this should be last model articulation element)
-      if args['add_hvac']
-        case args['system_type']
+      if add_hvac
+        case system_type
         when 'Ideal Air Loads'
 
         else
@@ -448,16 +436,16 @@ module BuildingSync
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)
-      if args['remove_objects']
+      if remove_objects
         model.purgeUnusedResourceObjects
         objects_after_cleanup = initial_objects - model.getModelObjects.size
         if objects_after_cleanup > 0
-          runner.registerInfo("Removing #{objects_after_cleanup} objects from model")
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Removing #{objects_after_cleanup} objects from model")
         end
       end
 
       # report final condition of model
-      runner.registerFinalCondition("The building finished with #{model.getModelObjects.size} objects.")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building finished with #{model.getModelObjects.size} objects.")
     end
 
     def write_osm(dir)
