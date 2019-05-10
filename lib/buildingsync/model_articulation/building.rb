@@ -39,7 +39,7 @@ require_relative '../helpers/os_lib_helper_methods'
 require_relative '../helpers/epw'
 require_relative '../helpers/stat_file'
 module BuildingSync
-  class Building < SpecialElement
+  class Building < SpatialElement
     include OsLib_ModelGenerationBRICR
     include OsLib_HelperMethods
     include EnergyPlus

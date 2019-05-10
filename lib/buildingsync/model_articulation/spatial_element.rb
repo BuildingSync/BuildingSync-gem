@@ -40,7 +40,7 @@ require 'json'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
-  class SpecialElement
+  class SpatialElement
     include OpenStudio
     def initialize
       @total_floor_area = nil

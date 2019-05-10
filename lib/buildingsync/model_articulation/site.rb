@@ -36,7 +36,7 @@
 # *******************************************************************************
 require_relative 'building'
 module BuildingSync
-  class Site < SpecialElement
+  class Site < SpatialElement
 
     # initialize
     def initialize(build_element, ns)
