@@ -35,9 +35,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'site'
-require_relative '../Helpers/os_lib_model_generation_bricr'
-require_relative '../Helpers/os_lib_geometry'
-require_relative '../Helpers/Model.hvac'
+require_relative '../helpers/os_lib_model_generation_bricr'
+require_relative '../helpers/os_lib_geometry'
+require_relative '../helpers/Model.hvac'
 
 module BuildingSync
   class Facility

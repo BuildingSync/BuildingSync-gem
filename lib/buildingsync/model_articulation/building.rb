@@ -35,9 +35,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_subsection'
-require_relative '../Helpers/os_lib_helper_methods'
-require_relative '../Helpers/epw'
-require_relative '../Helpers/stat_file'
+require_relative '../helpers/os_lib_helper_methods'
+require_relative '../helpers/epw'
+require_relative '../helpers/stat_file'
 module BuildingSync
   class Building < SpecialElement
     include OsLib_ModelGenerationBRICR
