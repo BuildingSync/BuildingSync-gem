@@ -35,47 +35,47 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-# try to load configuration, use defaults if doesn't exist
-begin
-  require_relative '../config'
-rescue LoadError, StandardError
-  module BuildingSync
-    # location of openstudio CLI
-    OPENSTUDIO_EXE = 'openstudio'.freeze
+require 'buildingsync/version'
+require 'openstudio/extension'
+require 'buildingsync/selection_tool'
 
-    # one or more measure paths
-    OPENSTUDIO_MEASURES = [].freeze
+module BuildingSync
+  # The BuildingSync class contains both the instance of the BuildingSync file (in XML) and the
+  # helper methods from the OpenStudio::Extension gem to support managing measures that are related
+  # to BuildingSync.
+  class BuildingSync < OpenStudio::Extension::Extension
+    def initialize
+      # Initialize the root directory for use in the extension class. This must be done, otherwise the
+      # root_dir will be the root_dir in the OpenStudio Extension Gem.
+      @root_dir = File.absolute_path(File.join(File.dirname(__FILE__), '..'))
+    end
 
-    # one or more file paths
-    OPENSTUDIO_FILES = [].freeze
+    # Read in an existing buildingsync file
+    #
+    # @param buildingsync_file [string]: path to BuildingSync XML
+    def self.from_file(buildingsync_file)
+      bsync = BuildingSync.new
+      bsync.read_from_xml(buildingsync_file)
+      return bsync
+    end
 
-    # max number of datapoints to run
-    MAX_DATAPOINTS = Float::INFINITY
-    # MAX_DATAPOINTS = 2
+    # read the XML from file
+    def read_from_xml(buildingsync_file)
+      return nil
+    end
 
-    # number of parallel jobs
-    NUM_PARALLEL = 7
+    # write OSW file
+    # This method will write a single OSW from the BuildingSync file. The OSW will not include any of the scenarios
+    # other than the baseline.
+    def to_osw
+      return nil
+    end
 
-    # do simulations
-    DO_SIMULATIONS = false
-  end
-end
-
-# for all testing
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'bundler/setup'
-require 'buildingsync/translator'
-
-RSpec.configure do |config|
-  # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = '.rspec_status'
-
-  # Disable RSpec exposing methods globally on `Module` and `main`
-  config.disable_monkey_patching!
-
-  config.expect_with :rspec do |c|
-    c.syntax = :expect
+    # write multiple OSW files
+    # This method will write out multiple OSW files from the BuildingSync file. The OSWs will be constructed based
+    # on the various scenarios that are in the BuildingSync file
+    def to_osws
+      return nil
+    end
   end
 end
