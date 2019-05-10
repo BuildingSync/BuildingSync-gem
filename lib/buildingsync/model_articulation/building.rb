@@ -484,12 +484,12 @@ module BuildingSync
       ext_roof_area = @model.getBuilding.exteriorSurfaceArea - @model.getBuilding.exteriorWallArea
       expected_roof_area = total_floor_area / num_stories.to_f
       if ext_roof_area > expected_roof_area && single_floor_area == 0.0 # only test if using whole-building area input
-        puts 'WARNING: Roof area larger than expected, may indicate problem with inter-floor surface intersection or matching.'
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', 'Roof area larger than expected, may indicate problem with inter-floor surface intersection or matching.')
         return false
       end
 
       # report final condition of model
-      puts "INFO: The building finished with #{@model.getSpaces.size} spaces."
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "The building finished with #{@model.getSpaces.size} spaces.")
 
       return true
     end

@@ -35,7 +35,7 @@ module BuildingSync
              OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file.")
              raise "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file."
            else
-             puts "Info: There is/are #{@sites.count} sites in this facility."
+             OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.generate_baseline_osm', "Info: There is/are #{@sites.count} sites in this facility.")
            end
       end
       @sites.each(&:generate_baseline_osm)
