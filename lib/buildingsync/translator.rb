@@ -43,7 +43,7 @@ require_relative 'makers/workflow_maker_phase_zero'
 module BuildingSync
   class Translator
     # load the building sync file and chooses the correct workflow
-    def initialize(xml_file_path, output_dir, bworkflow)
+    def initialize(xml_file_path, output_dir, include_workflow_generation)
       @doc = nil
       @model_maker = nil
       @workflow_maker = nil
@@ -82,7 +82,7 @@ module BuildingSync
       choose_model_maker
 
       # choose the correct workflow maker based on xml
-      choose_workflow_maker if bworkflow
+      choose_workflow_maker if include_workflow_generation
     end
 
     def write_osm
