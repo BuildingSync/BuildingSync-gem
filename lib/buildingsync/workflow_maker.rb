@@ -46,7 +46,7 @@ module BuildingSync
       @ns = ns
     end
 
-    def writeOSWs(dir)
+    def write_osws(dir)
       FileUtils.mkdir_p(dir)
     end
 

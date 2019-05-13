@@ -34,11 +34,11 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative '../helpers/os_lib_model_generation_bricr'
+require 'openstudio/extension/core/os_lib_model_generation'
 require 'openstudio-standards'
 module BuildingSync
   class BuildingSubsection < SpatialElement
-    include OsLib_ModelGenerationBRICR
+    include OsLib_ModelGeneration
     include OpenstudioStandards
 
     # initialize
