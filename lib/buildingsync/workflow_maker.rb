@@ -50,13 +50,13 @@ module BuildingSync
       FileUtils.mkdir_p(dir)
     end
 
-    def gatherResults(dir); end
+    def gather_results(dir); end
 
     def failed_scenarios
       return []
     end
 
-    def saveXML(filename)
+    def save_xml(filename)
       File.open(filename, 'w') do |file|
         @doc.write(file)
       end

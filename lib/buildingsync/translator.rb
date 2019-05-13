@@ -43,23 +43,23 @@ require_relative 'makers/workflow_maker_phase_zero'
 module BuildingSync
   class Translator
     # load the building sync file and chooses the correct workflow
-    def initialize(xmlFilePath, outputDir, bWorkflow)
+    def initialize(xml_file_path, output_dir, bworkflow)
       @doc = nil
       @model_maker = nil
       @workflow_maker = nil
-      @outputDir = outputDir
+      @output_dir = output_dir
 
       # Open a log for the library
-      logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{outputDir}/in.log"))
+      logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
       logFile.setLogLevel(OpenStudio::Debug)
 
       # parse the xml
-      if !File.exist?(xmlFilePath)
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xmlFilePath}' does not exist")
-        raise "File '#{xmlFilePath}' does not exist" unless File.exist?(xmlFilePath)
+      if !File.exist?(xml_file_path)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not exist")
+        raise "File '#{xml_file_path}' does not exist" unless File.exist?(xml_file_path)
       end
 
-      File.open(xmlFilePath, 'r') do |file|
+      File.open(xml_file_path, 'r') do |file|
         @doc = REXML::Document.new(file)
       end
 
@@ -82,15 +82,15 @@ module BuildingSync
       choose_model_maker
 
       # choose the correct workflow maker based on xml
-      choose_workflow_maker if bWorkflow
+      choose_workflow_maker if bworkflow
     end
 
     def write_osm
-      @model_maker.generate_baseline(@outputDir)
+      @model_maker.generate_baseline(@output_dir)
     end
 
     def writeOSWs
-      @workflow_maker.writeOSWs(@outputDir)
+      @workflow_maker.writeOSWs(@output_dir)
     end
 
     private

@@ -45,7 +45,7 @@ module BuildingSync
       # generate the baseline open studio model
     end
 
-    def writeOSWs(dir)
+    def write_osws(dir)
       # create the OSWs for the scenarios
     end
   end

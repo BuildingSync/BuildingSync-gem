@@ -80,8 +80,8 @@ module BuildingSync
       @total_floor_area
     end
 
-    def read_occupancy_type(xmlElement, occupancy_type, ns)
-      occ_element = xmlElement.elements["#{ns}:OccupancyClassification"]
+    def read_occupancy_type(xml_element, occupancy_type, ns)
+      occ_element = xml_element.elements["#{ns}:OccupancyClassification"]
       if !occ_element.nil?
         return occ_element.text
       else

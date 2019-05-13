@@ -150,8 +150,8 @@ RSpec.describe 'BuildingSync' do
         num_sims += 1
       end
 
-      translator.gatherResults(out_path)
-      translator.saveXML(File.join(out_path, 'results.xml'))
+      translator.gather_results(out_path)
+      translator.save_xml(File.join(out_path, 'results.xml'))
 
       expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
     end

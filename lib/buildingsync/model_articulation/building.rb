@@ -112,11 +112,11 @@ module BuildingSync
       @length = footprint / @width
     end
 
-    def read_standard_template_based_on_year(build_element, nodeSap)
-      built_year = build_element.elements["#{nodeSap}:YearOfConstruction"].text.to_f
+    def read_standard_template_based_on_year(build_element, nodesap)
+      built_year = build_element.elements["#{nodesap}:YearOfConstruction"].text.to_f
 
-      if build_element.elements["#{nodeSap}:YearOfLastMajorRemodel"]
-        major_remodel_year = build_element.elements["#{nodeSap}:YearOfLastMajorRemodel"].text.to_f
+      if build_element.elements["#{nodesap}:YearOfLastMajorRemodel"]
+        major_remodel_year = build_element.elements["#{nodesap}:YearOfLastMajorRemodel"].text.to_f
         built_year = major_remodel_year if major_remodel_year > built_year
       end
 
@@ -135,9 +135,9 @@ module BuildingSync
       end
     end
 
-    def read_stories_above_and_below_grade(build_element, nodeSap)
-      if build_element.elements["#{nodeSap}:FloorsAboveGrade"]
-        @num_stories_above_grade = build_element.elements["#{nodeSap}:FloorsAboveGrade"].text.to_f
+    def read_stories_above_and_below_grade(build_element, nodesap)
+      if build_element.elements["#{nodesap}:FloorsAboveGrade"]
+        @num_stories_above_grade = build_element.elements["#{nodesap}:FloorsAboveGrade"].text.to_f
         if @num_stories_above_grade == 0
           @num_stories_above_grade = 1.0
         end
@@ -145,16 +145,16 @@ module BuildingSync
         @num_stories_above_grade = 1.0 # setDefaultValue
       end
 
-      if build_element.elements["#{nodeSap}:FloorsBelowGrade"]
-        @num_stories_below_grade = build_element.elements["#{nodeSap}:FloorsBelowGrade"].text.to_f
+      if build_element.elements["#{nodesap}:FloorsBelowGrade"]
+        @num_stories_below_grade = build_element.elements["#{nodesap}:FloorsBelowGrade"].text.to_f
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
     end
 
-    def read_aspect_ratio(build_element, nodeSap)
-      if build_element.elements["#{nodeSap}:AspectRatio"]
-        @ns_to_ew_ratio = build_element.elements["#{nodeSap}:AspectRatio"].text.to_f
+    def read_aspect_ratio(build_element, nodesap)
+      if build_element.elements["#{nodesap}:AspectRatio"]
+        @ns_to_ew_ratio = build_element.elements["#{nodesap}:AspectRatio"].text.to_f
       else
         @ns_to_ew_ratio = 0.0 # setDefaultValue
       end
@@ -216,13 +216,13 @@ module BuildingSync
     end
 
     def bldg_space_types_floor_area_hash
-      newHash = {}
+      new_hash = {}
       @building_subsections.each do |bldg_subsec|
         bldg_subsec.space_types_floor_area.each do |space_type, hash|
-          newHash[space_type] = hash
+          new_hash[space_type] = hash
         end
       end
-      return newHash
+      return new_hash
     end
 
     def initialize_model
@@ -330,11 +330,11 @@ module BuildingSync
         return false
       end
 
-      #stat_model = EnergyPlus::StatFile.new(stat_file)
-      #water_temp = @model.getSiteWaterMainsTemperature
-      #water_temp.setAnnualAverageOutdoorAirTemperature(stat_model.mean_dry_bulb)
-      #water_temp.setMaximumDifferenceInMonthlyAverageOutdoorAirTemperatures(stat_model.delta_dry_bulb)
-      #OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "mean dry bulb is #{stat_model.mean_dry_bulb}")
+      # stat_model = EnergyPlus::StatFile.new(stat_file)
+      # water_temp = @model.getSiteWaterMainsTemperature
+      # water_temp.setAnnualAverageOutdoorAirTemperature(stat_model.mean_dry_bulb)
+      # water_temp.setMaximumDifferenceInMonthlyAverageOutdoorAirTemperatures(stat_model.delta_dry_bulb)
+      # OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "mean dry bulb is #{stat_model.mean_dry_bulb}")
 
       # Remove all the Design Day objects that are in the file
       @model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each(&:remove)
