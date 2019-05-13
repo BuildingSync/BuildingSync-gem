@@ -1,28 +1,19 @@
 module BuildingSync
 
-  #ENV['GEM_HOME'] = 'C:/bricr/gems'
-  #ENV['GEM_PATH'] = 'C:/bricr/gems'
-  
   # location of openstudio CLI
   if /mswin/.match(RUBY_PLATFORM) || /mingw/.match(RUBY_PLATFORM)
-    OPENSTUDIO_EXE = 'C:/openstudio-2.6.0/bin/openstudio.exe'
+    OPENSTUDIO_EXE = 'C:/openstudio-2.7.0/bin/openstudio.exe'
   else
     OPENSTUDIO_EXE = '/usr/local/bin/openstudio'
   end
-
-  # one or more measure paths
-  OPENSTUDIO_MEASURES = [
-      File.realpath("./measures", File.dirname(__FILE__)),
-      File.realpath("./../openstudio-measures/nrel_published",
-      File.dirname(__FILE__)),
-      File.realpath("./../openstudio-measures/nrel_dev", File.dirname(__FILE__))
-  ]
 
   # one or more file paths
   OPENSTUDIO_FILES = [
       File.realpath("./weather",
       File.dirname(__FILE__))
   ]
+
+  # todo: move those constants into the extension-gem
 
   # max number of datapoints to run
   MAX_DATAPOINTS = Float::INFINITY
@@ -48,16 +39,4 @@ module BuildingSync
   
   # collect results
   DO_GET_RESULTS = false
-  
-  # configuration for SEED
-  ENV['BRICR_SEED_HOST'] = 'YOUR_SEED_HOST'
-  ENV['BRICR_SEED_USERNAME'] = 'YOUR_SEED_USERNAME'
-  ENV['BRICR_SEED_API_KEY'] = 'YOUR_SEED_API_KEY'
-  
-  # url for bricr-sim
-  BRICR_SIM_URL = nil
-  #BRICR_SIM_URL = 'http://192.168.99.100:81/api/bricr'
-
-  OPENSTUDIO_EXE = 'C:/openstudio-2.7.0/bin/OpenStudio.exe'
-
 end

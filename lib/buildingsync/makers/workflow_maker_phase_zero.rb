@@ -59,9 +59,6 @@ module BuildingSync
 
       @facility = {}
       @subsections = []
-
-      # configure the workflow based on properties in the xml
-      configure_for_doc(@workflow)
     end
 
     def configure_for_scenario(osw, scenario)
