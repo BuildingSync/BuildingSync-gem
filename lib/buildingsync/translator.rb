@@ -89,8 +89,8 @@ module BuildingSync
       @model_maker.generate_baseline(@output_dir)
     end
 
-    def writeOSWs
-      @workflow_maker.writeOSWs(@output_dir)
+    def write_osws
+      @workflow_maker.write_osws(@output_dir)
     end
 
     private

@@ -61,10 +61,10 @@ module BuildingSync
       @subsections = []
 
       # configure the workflow based on properties in the xml
-      configureForDoc(@workflow)
+      configure_for_doc(@workflow)
     end
 
-    def configureForDoc(osw)
+    def configure_for_doc(osw)
 
       # get the facility floor areas
       @facility['gross_floor_area'] = nil
@@ -95,17 +95,17 @@ module BuildingSync
         end
 
         if built_year < 1978
-          @facility['template'] = "CBES Pre-1978"
+          @facility['template'] = 'CBES Pre-1978'
         elsif built_year >= 1978 && built_year < 1992
-          @facility['template'] = "CBES T24 1978"
+          @facility['template'] = 'CBES T24 1978'
         elsif built_year >= 1992 && built_year < 2001
-          @facility['template'] = "CBES T24 1992"
+          @facility['template'] = 'CBES T24 1992'
         elsif built_year >= 2001 && built_year < 2005
-          @facility['template'] = "CBES T24 2001"
+          @facility['template'] = 'CBES T24 2001'
         elsif built_year >= 2005 && built_year < 2008
-          @facility['template'] = "CBES T24 2005"
+          @facility['template'] = 'CBES T24 2005'
         else
-          @facility['template'] = "CBES T24 2008"
+          @facility['template'] = 'CBES T24 2008'
         end
 
       end
@@ -146,7 +146,7 @@ module BuildingSync
 
         subsections = []
         facility_element.elements.each("#{@ns}:Subsections/#{@ns}:Subsection") do |subsection_element|
-          subsection = {'gross_floor_area' => nil, 'heated_and_cooled_floor_area' => nil, 'footprint_floor_area' => nil, 'occupancy_type' => nil, 'bldg_type' => nil, 'bar_division_method' => nil, 'system_type' => nil}
+          subsection = { 'gross_floor_area' => nil, 'heated_and_cooled_floor_area' => nil, 'footprint_floor_area' => nil, 'occupancy_type' => nil, 'bldg_type' => nil, 'bar_division_method' => nil, 'system_type' => nil }
 
           subsection_element.elements.each("#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
 
@@ -163,7 +163,7 @@ module BuildingSync
             end
           end
 
-          #puts subsection_element
+          # puts subsection_element
           subsection['occupancy_type'] = subsection_element.elements["#{@ns}:OccupancyClassification"].text
           if subsection['occupancy_type'] == 'Retail'
             subsection['bldg_type'] = 'RetailStandalone'
@@ -178,28 +178,28 @@ module BuildingSync
               subsection['bldg_type'] = 'MediumOffice'
               subsection['system_type'] = 'PVAV with reheat'
             else
-              raise "Office building size is beyond BRICR scope"
+              raise 'Office building size is beyond BRICR scope'
             end
           else
             raise "Building type '#{subsection['occupancy_type']}' is beyond BRICR scope"
           end
 
-          raise "Subsection does not define gross floor area" if subsection['gross_floor_area'].nil?
+          raise 'Subsection does not define gross floor area' if subsection['gross_floor_area'].nil?
 
           subsections << subsection
         end
 
         # sort subsections from largest to smallest
-        @subsections = subsections.sort{|x,y| y['gross_floor_area'] <=> x['gross_floor_area']}
+        @subsections = subsections.sort { |x, y| y['gross_floor_area'] <=> x['gross_floor_area'] }
 
-        raise "No subsections defined" if @subsections.empty?
+        raise 'No subsections defined' if @subsections.empty?
 
         subsection_total_gross_area = 0
-        @subsections.each {|ss| subsection_total_gross_area += ss['gross_floor_area']}
+        @subsections.each { |ss| subsection_total_gross_area += ss['gross_floor_area'] }
 
-        raise "Zero total subsection gross area" if subsection_total_gross_area < 1.0
+        raise 'Zero total subsection gross area' if subsection_total_gross_area < 1.0
 
-        @subsections.each {|ss| ss['fract_bldg_area'] = ss['gross_floor_area'] / subsection_total_gross_area}
+        @subsections.each { |ss| ss['fract_bldg_area'] = ss['gross_floor_area'] / subsection_total_gross_area }
 
         @facility['bar_division_method'] = @subsections[0]['bar_division_method']
         @facility['system_type'] = @subsections[0]['system_type']
@@ -244,12 +244,12 @@ module BuildingSync
       # Calibration
       set_measure_argument(osw, 'calibrate_baseline_model', 'template', @facility['template'])
       set_measure_argument(osw, 'calibrate_baseline_model', 'bldg_type', @facility['bldg_type'])
-      if defined?(BRICR::DO_MODEL_CALIBRATION) and BRICR::DO_MODEL_CALIBRATION
+      if defined?(BRICR::DO_MODEL_CALIBRATION) && BRICR::DO_MODEL_CALIBRATION
         set_measure_argument(osw, 'calibrate_baseline_model', '__SKIP__', false)
       end
     end
 
-    def configureForScenario(osw, scenario)
+    def configure_for_scenario(osw, scenario)
       measure_ids = []
       scenario.elements.each("#{@ns}:ScenarioType/#{@ns}:PackageOfMeasures/#{@ns}:MeasureIDs/#{@ns}:MeasureID") do |measure_id|
         measure_ids << measure_id.attributes['IDref']
@@ -261,28 +261,28 @@ module BuildingSync
           measure_category = measure.elements["#{@ns}:SystemCategoryAffected"].text
 
           # Lighting
-          if measure_category == "Lighting"
+          if measure_category == 'Lighting'
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:LightingImprovements/#{@ns}:MeasureName"].text
             # Lighting / LightingImprovements / Retrofit with light emitting diode technologies
-            if measure_name == "Retrofit with light emitting diode technologies"
+            if measure_name == 'Retrofit with light emitting diode technologies'
               num_measures += 1
               set_measure_argument(osw, 'SetLightingLoadsByLPD', '__SKIP__', false)
               set_measure_argument(osw, 'SetLightingLoadsByLPD', 'lpd', 0.6)
             end
             # Lighting / LightingImprovements / Add daylight controls
-            if measure_name == "Add daylight controls"
+            if measure_name == 'Add daylight controls'
               num_measures += 1
               set_measure_argument(osw, 'AddDaylightSensors', '__SKIP__', false)
-              if @facility['bldg_type'] == "SmallOffice"
+              if @facility['bldg_type'] == 'SmallOffice'
                 set_measure_argument(osw, 'AddDaylightSensors', 'space_type', "Office WholeBuilding - Sm Office - #{@facility['template']}")
-              elsif @facility['bldg_type'] == "MediumOffice"
+              elsif @facility['bldg_type'] == 'MediumOffice'
                 set_measure_argument(osw, 'AddDaylightSensors', 'space_type', "Office WholeBuilding - Md Office - #{@facility['template']}")
-              elsif @facility['bldg_type'] == "RetailStandalone"
+              elsif @facility['bldg_type'] == 'RetailStandalone'
                 set_measure_argument(osw, 'AddDaylightSensors', 'space_type', "Retail Retail - #{@facility['template']}")
               end
             end
             # Lighting / LightingImprovements / Add occupancy sensors
-            if measure_name == "Add occupancy sensors"
+            if measure_name == 'Add occupancy sensors'
               num_measures += 1
               set_measure_argument(osw, 'ReduceLightingLoadsByPercentage', '__SKIP__', false)
               set_measure_argument(osw, 'ReduceLightingLoadsByPercentage', 'lighting_power_reduction_percent', 5)
@@ -290,16 +290,16 @@ module BuildingSync
           end
 
           # Plug Load
-          if measure_category == "Plug Load"
+          if measure_category == 'Plug Load'
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:PlugLoadReductions/#{@ns}:MeasureName"].text
             # Plug Load / PlugLoadReductions / Replace with ENERGY STAR rated
-            if measure_name == "Replace with ENERGY STAR rated"
+            if measure_name == 'Replace with ENERGY STAR rated'
               num_measures += 1
               set_measure_argument(osw, 'tenant_star_internal_loads', '__SKIP__', false)
               set_measure_argument(osw, 'tenant_star_internal_loads', 'epd', 0.6) # W/ft^2
             end
             # Plug Load / PlugLoadReductions / Install plug load controls
-            if measure_name == "Install plug load controls"
+            if measure_name == 'Install plug load controls'
               num_measures += 1
               set_measure_argument(osw, 'ReduceElectricEquipmentLoadsByPercentage', '__SKIP__', false)
               set_measure_argument(osw, 'ReduceElectricEquipmentLoadsByPercentage', 'elecequip_power_reduction_percent', 20.0)
@@ -307,10 +307,10 @@ module BuildingSync
           end
 
           # Refrigeration
-          if measure_category == "Refrigeration"
+          if measure_category == 'Refrigeration'
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:Refrigeration/#{@ns}:MeasureName"].text
             # Refrigeration / Refrigeration / Replace ice/refrigeration equipment with high efficiency units
-            if measure_name == "Replace ice/refrigeration equipment with high efficiency units"
+            if measure_name == 'Replace ice/refrigeration equipment with high efficiency units'
               num_measures += 1
               set_measure_argument(osw, 'ReduceElectricEquipmentLoadsByPercentage', '__SKIP__', false)
               set_measure_argument(osw, 'ReduceElectricEquipmentLoadsByPercentage', 'elecequip_power_reduction_percent', 5)
@@ -318,22 +318,22 @@ module BuildingSync
           end
 
           # Wall
-          if measure_category == "Wall"
+          if measure_category == 'Wall'
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BuildingEnvelopeModifications/#{@ns}:MeasureName"].text
             # Wall / BuildingEnvelopeModifications / Air seal envelope
-            if measure_name == "Air seal envelope"
+            if measure_name == 'Air seal envelope'
               num_measures += 1
               set_measure_argument(osw, 'ReduceSpaceInfiltrationByPercentage', '__SKIP__', false)
               set_measure_argument(osw, 'ReduceSpaceInfiltrationByPercentage', 'space_infiltration_reduction_percent', 30.0)
             end
             # Wall / BuildingEnvelopeModifications / Increase wall insulation
-            if  measure_name == "Increase wall insulation"
+            if  measure_name == 'Increase wall insulation'
               num_measures += 1
               set_measure_argument(osw, 'IncreaseInsulationRValueForExteriorWalls', '__SKIP__', false)
               set_measure_argument(osw, 'IncreaseInsulationRValueForExteriorWalls', 'r_value', 25) # R-value
             end
             # Wall / BuildingEnvelopeModifications / Insulate thermal bypasses
-            if  measure_name == "Insulate thermal bypasses"
+            if  measure_name == 'Insulate thermal bypasses'
               num_measures += 1
               set_measure_argument(osw, 'IncreaseInsulationRValueForExteriorWallsByPercentage', '__SKIP__', false)
               set_measure_argument(osw, 'IncreaseInsulationRValueForExteriorWallsByPercentage', 'r_value', 20) # R-value increase percentage
@@ -341,10 +341,10 @@ module BuildingSync
           end
 
           # Roof
-          if measure_category == "Roof"
+          if measure_category == 'Roof'
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BuildingEnvelopeModifications/#{@ns}:MeasureName"].text
             # Roof / BuildingEnvelopeModifications / Increase roof insulation
-            if measure_name == "Increase roof insulation"
+            if measure_name == 'Increase roof insulation'
               num_measures += 1
               set_measure_argument(osw, 'IncreaseInsulationRValueForRoofs', '__SKIP__', false)
               set_measure_argument(osw, 'IncreaseInsulationRValueForRoofs', 'r_value', 30) # R-value
@@ -352,10 +352,10 @@ module BuildingSync
           end
 
           # Ceiling
-          if measure_category == "Ceiling"
+          if measure_category == 'Ceiling'
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BuildingEnvelopeModifications/#{@ns}:MeasureName"].text
             # Ceiling / BuildingEnvelopeModifications / Increase ceiling insulation
-            if measure_name == "Increase ceiling insulation"
+            if measure_name == 'Increase ceiling insulation'
               num_measures += 1
               set_measure_argument(osw, 'IncreaseInsulationRValueForRoofsByPercentage', '__SKIP__', false)
               set_measure_argument(osw, 'IncreaseInsulationRValueForRoofsByPercentage', 'r_value', 20) # R-value increase percentage
@@ -363,11 +363,11 @@ module BuildingSync
           end
 
           # Fenestration
-          if measure_category == "Fenestration"
+          if measure_category == 'Fenestration'
             # Fenestration / BuildingEnvelopeModifications
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BuildingEnvelopeModifications/#{@ns}:MeasureName"].text
             # Fenestration / BuildingEnvelopeModifications / Replace windows
-            if measure_name == "Replace windows"
+            if measure_name == 'Replace windows'
               num_measures += 1
               set_measure_argument(osw, 'replace_simple_glazing', '__SKIP__', false)
               set_measure_argument(osw, 'replace_simple_glazing', 'u_value', 1.65) # W/Km2
@@ -376,7 +376,7 @@ module BuildingSync
             end
 
             # Fenestration / BuildingEnvelopeModifications / Add window films
-            if measure_name == "Add window films"
+            if measure_name == 'Add window films'
               num_measures += 1
               set_measure_argument(osw, 'improve_simple_glazing_by_percentage', '__SKIP__', false)
               set_measure_argument(osw, 'improve_simple_glazing_by_percentage', 'u_value_improvement_percent', 10)
@@ -385,14 +385,14 @@ module BuildingSync
           end
 
           # Heating System
-          if measure_category == "Heating System"
+          if measure_category == 'Heating System'
             # Heating System / OtherHVAC
             if defined? (measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text)
               measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
               # Heating System / OtherHVAC / Replace burner
-              if measure_name == "Replace burner"
+              if measure_name == 'Replace burner'
                 # furnace system
-                if @facility['system_type'] == "PSZ-AC with gas coil heat"
+                if @facility['system_type'] == 'PSZ-AC with gas coil heat'
                   num_measures += 1
                   set_measure_argument(osw, 'SetGasBurnerEfficiency', '__SKIP__', false)
                   set_measure_argument(osw, 'SetGasBurnerEfficiency', 'eff', 0.93)
@@ -407,9 +407,9 @@ module BuildingSync
             if defined? (measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BoilerPlantImprovements/#{@ns}:MeasureName"].text)
               measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BoilerPlantImprovements/#{@ns}:MeasureName"].text
               # Heating System / BoilerPlantImprovements / Replace boiler
-              if measure_name == "Replace boiler"
+              if measure_name == 'Replace boiler'
                 # Boiler system for medium office
-                if @facility['system_type'] == "PVAV with reheat"
+                if @facility['system_type'] == 'PVAV with reheat'
                   num_measures += 1
                   set_measure_argument(osw, 'set_boiler_thermal_efficiency', '__SKIP__', false)
                   set_measure_argument(osw, 'set_boiler_thermal_efficiency', 'input_option_manual', true)
@@ -423,16 +423,16 @@ module BuildingSync
           end
 
           # Cooling System
-          if measure_category == "Cooling System"
+          if measure_category == 'Cooling System'
             # Cooling System / OtherHVAC
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
             # Cooling System / OtherHVAC / Replace package units
-            if measure_name == "Replace package units"
-              if @facility['system_type'] == "PSZ-AC with gas coil heat"
+            if measure_name == 'Replace package units'
+              if @facility['system_type'] == 'PSZ-AC with gas coil heat'
                 num_measures += 1
                 set_measure_argument(osw, 'SetCOPforSingleSpeedDXCoolingUnits', '__SKIP__', false)
                 set_measure_argument(osw, 'SetCOPforSingleSpeedDXCoolingUnits', 'cop', 4.1)
-              elsif @facility['system_type'] == "PVAV with reheat"
+              elsif @facility['system_type'] == 'PVAV with reheat'
                 num_measures += 1
                 set_measure_argument(osw, 'SetCOPforTwoSpeedDXCoolingUnits', '__SKIP__', false)
                 set_measure_argument(osw, 'SetCOPforTwoSpeedDXCoolingUnits', 'cop_high', 4.1)
@@ -442,7 +442,7 @@ module BuildingSync
           end
 
           # Other HVAC
-          if measure_category == "Other HVAC"
+          if measure_category == 'Other HVAC'
 
             # Other HVAC / OtherHVAC
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
@@ -458,14 +458,14 @@ module BuildingSync
             end
 
             # Other HVAC / OtherHVAC / Replace HVAC system type to VRF
-            if measure_name == "Replace HVAC system type to VRF"
+            if measure_name == 'Replace HVAC system type to VRF'
               num_measures += 1
               set_measure_argument(osw, 'vr_fwith_doas', '__SKIP__', false)
-              if @facility['bldg_type'] == "SmallOffice"
+              if @facility['bldg_type'] == 'SmallOffice'
                 set_measure_argument(osw, 'vr_fwith_doas', "Office WholeBuilding - Sm Office - #{@facility['template']}", true)
-              elsif @facility['bldg_type'] == "MediumOffice"
+              elsif @facility['bldg_type'] == 'MediumOffice'
                 set_measure_argument(osw, 'vr_fwith_doas', "Office WholeBuilding - Md Office - #{@facility['template']}", true)
-              elsif @facility['bldg_type'] == "RetailStandalone"
+              elsif @facility['bldg_type'] == 'RetailStandalone'
                 set_measure_argument(osw, 'vr_fwith_doas', "Retail Retail - #{@facility['template']}", true)
                 set_measure_argument(osw, 'vr_fwith_doas', "Retail Point_of_Sale - #{@facility['template']}", true)
                 set_measure_argument(osw, 'vr_fwith_doas', "Retail Entry - #{@facility['template']}", true)
@@ -477,14 +477,14 @@ module BuildingSync
             end
 
             # Other HVAC / OtherHVAC / Replace HVAC with GSHP and DOAS
-            if measure_name == "Replace HVAC with GSHP and DOAS" || measure_name == "Replace AC and heating units with ground coupled heat pump systems"
+            if measure_name == 'Replace HVAC with GSHP and DOAS' || measure_name == 'Replace AC and heating units with ground coupled heat pump systems'
               num_measures += 1
               set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', '__SKIP__', false)
-              if @facility['bldg_type'] == "SmallOffice"
+              if @facility['bldg_type'] == 'SmallOffice'
                 set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Office WholeBuilding - Sm Office - #{@facility['template']}", true)
-              elsif @facility['bldg_type'] == "MediumOffice"
+              elsif @facility['bldg_type'] == 'MediumOffice'
                 set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Office WholeBuilding - Md Office - #{@facility['template']}", true)
-              elsif @facility['bldg_type'] == "RetailStandalone"
+              elsif @facility['bldg_type'] == 'RetailStandalone'
                 set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Retail - #{@facility['template']}", true)
                 set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Point_of_Sale - #{@facility['template']}", true)
                 set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Entry - #{@facility['template']}", true)
@@ -493,7 +493,7 @@ module BuildingSync
             end
 
             # Other HVAC / OtherHVAC / Replace HVAC system type to PZHP
-            if measure_name == "Replace HVAC system type to PZHP"
+            if measure_name == 'Replace HVAC system type to PZHP'
               num_measures += 1
               set_measure_argument(osw, 'add_apszhp_to_each_zone', '__SKIP__', false)
               set_measure_argument(osw, 'add_apszhp_to_each_zone', 'delete_existing', true)
@@ -501,15 +501,15 @@ module BuildingSync
               set_measure_argument(osw, 'add_apszhp_to_each_zone', 'cop_heating', 3.1)
               set_measure_argument(osw, 'add_apszhp_to_each_zone', 'has_electric_coil', true)
               set_measure_argument(osw, 'add_apszhp_to_each_zone', 'has_dcv', false)
-              set_measure_argument(osw, 'add_apszhp_to_each_zone', 'fan_type', "Constant Volume (default)") # Options: "Constant Volume (default)", "Variable Volume (VFD)"
+              set_measure_argument(osw, 'add_apszhp_to_each_zone', 'fan_type', 'Constant Volume (default)') # Options: "Constant Volume (default)", "Variable Volume (VFD)"
               set_measure_argument(osw, 'add_apszhp_to_each_zone', 'fan_pressure_rise', 0)
-              set_measure_argument(osw, 'add_apszhp_to_each_zone', 'filter_type', "By Space Type")
-              if @facility['bldg_type'] == "SmallOffice"
+              set_measure_argument(osw, 'add_apszhp_to_each_zone', 'filter_type', 'By Space Type')
+              if @facility['bldg_type'] == 'SmallOffice'
                 set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Office WholeBuilding - Sm Office - #{@facility['template']}")
-              elsif @facility['bldg_type'] == "MediumOffice"
-                set_measure_argument(osw, 'create_typical_building_from_model', 'system_type', "PSZ-AC with gas coil heat")
+              elsif @facility['bldg_type'] == 'MediumOffice'
+                set_measure_argument(osw, 'create_typical_building_from_model', 'system_type', 'PSZ-AC with gas coil heat')
                 set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Office WholeBuilding - Md Office - #{@facility['template']}")
-              elsif @facility['bldg_type'] == "RetailStandalone"
+              elsif @facility['bldg_type'] == 'RetailStandalone'
                 set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Retail - #{@facility['template']}")
                 set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Point_of_Sale - #{@facility['template']}")
                 set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Entry - #{@facility['template']}")
@@ -519,11 +519,11 @@ module BuildingSync
           end
 
           # General Controls and Operations
-          if measure_category == "General Controls and Operations"
+          if measure_category == 'General Controls and Operations'
             # General Controls and Operations / OtherHVAC
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
             # General Controls and Operations / OtherHVAC / Upgrade operating protocols, calibration, and/or sequencing
-            if measure_name == "Upgrade operating protocols, calibration, and/or sequencing"
+            if measure_name == 'Upgrade operating protocols, calibration, and/or sequencing'
               num_measures += 1
               set_measure_argument(osw, 'AdjustThermostatSetpointsByDegrees', '__SKIP__', false)
               set_measure_argument(osw, 'AdjustThermostatSetpointsByDegrees', 'cooling_adjustment', 1.0)
@@ -532,11 +532,11 @@ module BuildingSync
           end
 
           # Fan
-          if measure_category == "Fan"
+          if measure_category == 'Fan'
             # Fan / ElectricMotorsAndDrives
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherElectricMotorsAndDrives/#{@ns}:MeasureName"].text
             # Fan / ElectricMotorsAndDrives / Replace with higher efficiency
-            if measure_name == "Replace with higher efficiency"
+            if measure_name == 'Replace with higher efficiency'
               num_measures += 1
               set_measure_argument(osw, 'ReplaceFanTotalEfficiency', '__SKIP__', false)
               set_measure_argument(osw, 'ReplaceFanTotalEfficiency', 'motor_eff', 80.0) # New efficiency
@@ -544,11 +544,11 @@ module BuildingSync
           end
 
           # Air Distribution
-          if measure_category == "Air Distribution"
+          if measure_category == 'Air Distribution'
             # Air Distribution / OtherHVAC
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
             # Air Distribution / OtherHVAC / Improve ventilation fans
-            if measure_name == "Improve ventilation fans"
+            if measure_name == 'Improve ventilation fans'
               num_measures += 1
               set_measure_argument(osw, 'ImproveFanTotalEfficiencybyPercentage', '__SKIP__', false)
               set_measure_argument(osw, 'ImproveFanTotalEfficiencybyPercentage', 'motor_eff', 10) # Efficiency improvement
@@ -557,28 +557,28 @@ module BuildingSync
             # Air Distribution / OtherHVAC
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
             # Air Distribution / OtherHVAC / Install demand control ventilation
-            if measure_name == "Install demand control ventilation"
+            if measure_name == 'Install demand control ventilation'
               num_measures += 1
               set_measure_argument(osw, 'EnableDemandControlledVentilation', '__SKIP__', false)
-              set_measure_argument(osw, 'EnableDemandControlledVentilation', 'dcv_type', "EnableDCV")
+              set_measure_argument(osw, 'EnableDemandControlledVentilation', 'dcv_type', 'EnableDCV')
             end
 
             # Air Distribution / OtherHVAC
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
             # Air Distribution / OtherHVAC / Add or repair economizer
-            if measure_name == "Add or repair economizer"
+            if measure_name == 'Add or repair economizer'
               num_measures += 1
               set_measure_argument(osw, 'EnableEconomizerControl', '__SKIP__', false)
-              set_measure_argument(osw, 'EnableEconomizerControl', 'economizer_type', "FixedDryBulb")
+              set_measure_argument(osw, 'EnableEconomizerControl', 'economizer_type', 'FixedDryBulb')
             end
           end
 
           # Heat Recovery
-          if measure_category == "Heat Recovery"
+          if measure_category == 'Heat Recovery'
             # Heat Recovery / OtherHVAC
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
             # Heat Recovery / OtherHVAC / Add energy recovery
-            if measure_name == "Add energy recovery"
+            if measure_name == 'Add energy recovery'
               num_measures += 1
               set_measure_argument(osw, 'add_energy_recovery_ventilator', '__SKIP__', false)
               set_measure_argument(osw, 'add_energy_recovery_ventilator', 'sensible_eff_at_100_heating', 0)
@@ -593,26 +593,26 @@ module BuildingSync
           end
 
           # Domestic Hot Water
-          if measure_category == "Domestic Hot Water"
+          if measure_category == 'Domestic Hot Water'
             # Domestic Hot Water / ChilledWaterHotWaterAndSteamDistributionSystems
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:ChilledWaterHotWaterAndSteamDistributionSystems/#{@ns}:MeasureName"].text
             # Domestic Hot Water / ChilledWaterHotWaterAndSteamDistributionSystems / Replace or upgrade water heater
-            if measure_name == "Replace or upgrade water heater"
+            if measure_name == 'Replace or upgrade water heater'
               num_measures += 1
               set_measure_argument(osw, 'set_water_heater_efficiency_heat_lossand_peak_water_flow_rate', '__SKIP__', false)
-              set_measure_argument(osw, 'set_water_heater_efficiency_heat_lossand_peak_water_flow_rate', 'heater_fuel_type_widget', "NaturalGas")
+              set_measure_argument(osw, 'set_water_heater_efficiency_heat_lossand_peak_water_flow_rate', 'heater_fuel_type_widget', 'NaturalGas')
               set_measure_argument(osw, 'set_water_heater_efficiency_heat_lossand_peak_water_flow_rate', 'heater_thermal_efficiency', 0.88)
             end
 
             # Domestic Hot Water / ChilledWaterHotWaterAndSteamDistributionSystems / Add pipe insulation
-            if measure_name == "Add pipe insulation"
+            if measure_name == 'Add pipe insulation'
               num_measures += 1
               set_measure_argument(osw, 'set_water_heater_efficiency_heat_lossand_peak_water_flow_rate', '__SKIP__', false)
               set_measure_argument(osw, 'set_water_heater_efficiency_heat_lossand_peak_water_flow_rate', 'onoff_cycle_loss_coefficient_to_ambient_temperature', 0.25)
             end
 
             # Domestic Hot Water / ChilledWaterHotWaterAndSteamDistributionSystems / Add recirculating pumps
-            if measure_name == "Add recirculating pumps"
+            if measure_name == 'Add recirculating pumps'
               num_measures += 1
               set_measure_argument(osw, 'set_water_heater_efficiency_heat_lossand_peak_water_flow_rate', '__SKIP__', false)
               set_measure_argument(osw, 'set_water_heater_efficiency_heat_lossand_peak_water_flow_rate', 'onoff_cycle_loss_coefficient_to_ambient_temperature', 0.1)
@@ -620,11 +620,11 @@ module BuildingSync
           end
 
           # Water Use
-          if measure_category == "Water Use"
+          if measure_category == 'Water Use'
             # Domestic Hot Water / WaterAndSewerConservationSystems
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:WaterAndSewerConservationSystems/#{@ns}:MeasureName"].text
             # Domestic Hot Water / WaterAndSewerConservationSystems / Install low-flow faucets and showerheads
-            if measure_name == "Install low-flow faucets and showerheads"
+            if measure_name == 'Install low-flow faucets and showerheads'
               num_measures += 1
               set_measure_argument(osw, 'reduce_water_use_by_percentage', '__SKIP__', false)
               set_measure_argument(osw, 'reduce_water_use_by_percentage', 'water_use_reduction_percent', 50)
@@ -639,10 +639,10 @@ module BuildingSync
       end
     end
 
-    def writeOSWs(dir)
+    def write_osws(dir)
       super
 
-      #ensure there is a 'Baseline' scenario
+      # ensure there is a 'Baseline' scenario
       found_baseline = false
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
@@ -683,7 +683,7 @@ module BuildingSync
       end
 
       if !found_baseline
-        puts "Cannot find or create Baseline scenario"
+        puts 'Cannot find or create Baseline scenario'
         exit
       end
 
@@ -691,14 +691,14 @@ module BuildingSync
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) and BRICR::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
+        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) && BRICR::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         # deep clone
         osw = JSON.load(JSON.generate(@workflow))
 
         # configure the workflow based on measures in this scenario
         begin
-          configureForScenario(osw, scenario)
+          configure_for_scenario(osw, scenario)
 
           # dir for the osw
           osw_dir = File.join(dir, scenario_name)
@@ -716,7 +716,7 @@ module BuildingSync
       end
     end
 
-    def getMeasureResult(result, measure_dir_name, result_name)
+    def get_measure_result(result, measure_dir_name, result_name)
       result[:steps].each do |step|
         if step[:measure_dir_name] == measure_dir_name
           if step[:result] && step[:result][:step_values]
@@ -732,7 +732,7 @@ module BuildingSync
       return nil
     end
 
-    def gatherResults(dir)
+    def gather_results(dir)
       super
 
       results = {}
@@ -741,24 +741,24 @@ module BuildingSync
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) and BRICR::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
+        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) && BRICR::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         # dir for the osw
         osw_dir = File.join(dir, scenario_name)
 
         # cleanup large files
         path = File.join(osw_dir, 'eplusout.sql')
-        FileUtils.rm_f(path) if File.exists?(path)
+        FileUtils.rm_f(path) if File.exist?(path)
 
         path = File.join(osw_dir, 'data_point.zip')
-        FileUtils.rm_f(path) if File.exists?(path)
+        FileUtils.rm_f(path) if File.exist?(path)
 
         path = File.join(osw_dir, 'eplusout.eso')
-        FileUtils.rm_f(path) if File.exists?(path)
+        FileUtils.rm_f(path) if File.exist?(path)
 
         # find the osw
         path = File.join(osw_dir, 'out.osw')
-        if !File.exists?(path)
+        if !File.exist?(path)
           puts "Cannot load results for scenario #{scenario_name}"
           next
         end
@@ -774,7 +774,7 @@ module BuildingSync
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) and BRICR::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
+        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) && BRICR::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
 
@@ -840,15 +840,15 @@ module BuildingSync
         user_defined_fields.add_element(user_defined_field)
 
         # Check out.osw "openstudio_results" for output variables
-        total_site_energy = getMeasureResult(result, 'openstudio_results', 'total_site_energy') # in kBtu/year
-        total_site_energy = total_site_energy / 1000.0 if total_site_energy # kBtu/year -> MMBtu/year
-        baseline_total_site_energy = getMeasureResult(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
-        baseline_total_site_energy = baseline_total_site_energy / 1000.0 if baseline_total_site_energy # kBtu/year -> MMBtu/year
-        fuel_electricity = getMeasureResult(result, 'openstudio_results', 'fuel_electricity') # in kBtu/year
-        #fuel_electricity = fuel_electricity * 0.2930710702 # kBtu/year -> kWh
-        fuel_natural_gas = getMeasureResult(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu/year
-        annual_utility_cost = getMeasureResult(result, 'openstudio_results', 'annual_utility_cost') # in $
-        baseline_annual_utility_cost = getMeasureResult(baseline, 'openstudio_results', 'annual_utility_cost') # in $
+        total_site_energy = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu/year
+        total_site_energy /= 1000.0 if total_site_energy # kBtu/year -> MMBtu/year
+        baseline_total_site_energy = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
+        baseline_total_site_energy /= 1000.0 if baseline_total_site_energy # kBtu/year -> MMBtu/year
+        fuel_electricity = get_measure_result(result, 'openstudio_results', 'fuel_electricity') # in kBtu/year
+        # fuel_electricity = fuel_electricity * 0.2930710702 # kBtu/year -> kWh
+        fuel_natural_gas = get_measure_result(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu/year
+        annual_utility_cost = get_measure_result(result, 'openstudio_results', 'annual_utility_cost') # in $
+        baseline_annual_utility_cost = get_measure_result(baseline, 'openstudio_results', 'annual_utility_cost') # in $
 
         total_site_energy_savings = 0
         total_energy_cost_savings = 0
@@ -861,15 +861,15 @@ module BuildingSync
         annual_savings_energy_cost = REXML::Element.new("#{@ns}:AnnualSavingsCost")
 
         # DLM: these are not valid BuildingSync fields
-        #annual_site_energy = REXML::Element.new("#{@ns}:AnnualSiteEnergy")
-        #annual_electricity = REXML::Element.new("#{@ns}:AnnualElectricity")
-        #annual_natural_gas = REXML::Element.new("#{@ns}:AnnualNaturalGas")
+        # annual_site_energy = REXML::Element.new("#{@ns}:AnnualSiteEnergy")
+        # annual_electricity = REXML::Element.new("#{@ns}:AnnualElectricity")
+        # annual_natural_gas = REXML::Element.new("#{@ns}:AnnualNaturalGas")
 
         annual_savings_site_energy.text = total_site_energy_savings
         annual_savings_energy_cost.text = total_energy_cost_savings.to_i # BuildingSync wants an integer, might be a BuildingSync bug
-        #annual_site_energy.text = total_site_energy
-        #annual_electricity.text = fuel_electricity
-        #annual_natural_gas.text = fuel_natural_gas
+        # annual_site_energy.text = total_site_energy
+        # annual_electricity.text = fuel_electricity
+        # annual_natural_gas.text = fuel_natural_gas
 
         user_defined_field = REXML::Element.new("#{@ns}:UserDefinedField")
         field_name = REXML::Element.new("#{@ns}:FieldName")
@@ -900,9 +900,9 @@ module BuildingSync
 
         package_of_measures.add_element(annual_savings_site_energy)
         package_of_measures.add_element(annual_savings_energy_cost)
-        #package_of_measures.add_element(annual_site_energy)
-        #package_of_measures.add_element(annual_electricity)
-        #package_of_measures.add_element(annual_natural_gas)
+        # package_of_measures.add_element(annual_site_energy)
+        # package_of_measures.add_element(annual_electricity)
+        # package_of_measures.add_element(annual_natural_gas)
 
         scenario.elements.delete("#{@ns}:UserDefinedFields")
         scenario.add_element(user_defined_fields)

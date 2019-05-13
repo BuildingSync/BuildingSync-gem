@@ -130,7 +130,7 @@ RSpec.describe 'BuildingSync' do
     expect(File.exist?(out_path)).to be true
 
     translator = BuildingSync::Translator.new(xml_path, out_path, true)
-    translator.writeOSWs
+    translator.write_osws
 
     osw_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
