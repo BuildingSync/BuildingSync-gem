@@ -133,6 +133,7 @@ module BuildingSync
       else
         @standard_template = "CBES T24 2008"
       end
+      # todo: extent this to include ASHRAE climate zones
     end
 
     def read_stories_above_and_below_grade(build_element, nodesap)
