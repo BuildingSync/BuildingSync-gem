@@ -36,8 +36,8 @@
 # *******************************************************************************
 require_relative 'building_subsection'
 require 'openstudio/extension/core/os_lib_helper_methods'
-require_relative '../helpers/epw'
-require_relative '../helpers/stat_file'
+require 'measures/changebuildinglocation/resources/epw'
+require 'measures/changebuildinglocation/resources/stat_file'
 module BuildingSync
   class Building < SpatialElement
     include OsLib_ModelGenerationBRICR
@@ -331,11 +331,11 @@ module BuildingSync
         return false
       end
 
-      # stat_model = EnergyPlus::StatFile.new(stat_file)
-      # water_temp = @model.getSiteWaterMainsTemperature
-      # water_temp.setAnnualAverageOutdoorAirTemperature(stat_model.mean_dry_bulb)
-      # water_temp.setMaximumDifferenceInMonthlyAverageOutdoorAirTemperatures(stat_model.delta_dry_bulb)
-      # OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "mean dry bulb is #{stat_model.mean_dry_bulb}")
+      stat_model = ::EnergyPlus::StatFile.new(stat_file)
+      water_temp = @model.getSiteWaterMainsTemperature
+      water_temp.setAnnualAverageOutdoorAirTemperature(stat_model.mean_dry_bulb)
+      water_temp.setMaximumDifferenceInMonthlyAverageOutdoorAirTemperatures(stat_model.delta_dry_bulb)
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "mean dry bulb is #{stat_model.mean_dry_bulb}")
 
       # Remove all the Design Day objects that are in the file
       @model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each(&:remove)
