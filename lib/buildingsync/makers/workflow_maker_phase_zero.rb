@@ -38,6 +38,7 @@ require_relative '../workflow_maker'
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class PhaseZeroWorkflowMaker < WorkflowMaker
+    @@facility = nil
     def initialize(doc, ns)
       super
 
@@ -46,6 +47,7 @@ module BuildingSync
 
       # log failed scenarios
       @failed_scenarios = []
+      @scenario_types = nil
 
       # select base osw for standalone, small office, medium office
       base_osw = 'phase_zero_base.osw'
@@ -56,9 +58,6 @@ module BuildingSync
       File.open(workflow_path, 'r') do |file|
         @workflow = JSON.parse(file.read)
       end
-
-      @facility = {}
-      @subsections = []
     end
 
     def configure_for_scenario(osw, scenario)
@@ -85,12 +84,12 @@ module BuildingSync
             if measure_name == 'Add daylight controls'
               num_measures += 1
               set_measure_argument(osw, 'AddDaylightSensors', '__SKIP__', false)
-              if @facility['bldg_type'] == 'SmallOffice'
-                set_measure_argument(osw, 'AddDaylightSensors', 'space_type', "Office WholeBuilding - Sm Office - #{@facility['template']}")
-              elsif @facility['bldg_type'] == 'MediumOffice'
-                set_measure_argument(osw, 'AddDaylightSensors', 'space_type', "Office WholeBuilding - Md Office - #{@facility['template']}")
-              elsif @facility['bldg_type'] == 'RetailStandalone'
-                set_measure_argument(osw, 'AddDaylightSensors', 'space_type', "Retail Retail - #{@facility['template']}")
+              if @@facility['bldg_type'] == 'SmallOffice'
+                set_measure_argument(osw, 'AddDaylightSensors', 'space_type', "Office WholeBuilding - Sm Office - #{@@facility['template']}")
+              elsif @@facility['bldg_type'] == 'MediumOffice'
+                set_measure_argument(osw, 'AddDaylightSensors', 'space_type', "Office WholeBuilding - Md Office - #{@@facility['template']}")
+              elsif @@facility['bldg_type'] == 'RetailStandalone'
+                set_measure_argument(osw, 'AddDaylightSensors', 'space_type', "Retail Retail - #{@@facility['template']}")
               end
             end
             # Lighting / LightingImprovements / Add occupancy sensors
@@ -204,7 +203,7 @@ module BuildingSync
               # Heating System / OtherHVAC / Replace burner
               if measure_name == 'Replace burner'
                 # furnace system
-                if @facility['system_type'] == 'PSZ-AC with gas coil heat'
+                if @@facility['system_type'] == 'PSZ-AC with gas coil heat'
                   num_measures += 1
                   set_measure_argument(osw, 'SetGasBurnerEfficiency', '__SKIP__', false)
                   set_measure_argument(osw, 'SetGasBurnerEfficiency', 'eff', 0.93)
@@ -221,7 +220,7 @@ module BuildingSync
               # Heating System / BoilerPlantImprovements / Replace boiler
               if measure_name == 'Replace boiler'
                 # Boiler system for medium office
-                if @facility['system_type'] == 'PVAV with reheat'
+                if @@facility['system_type'] == 'PVAV with reheat'
                   num_measures += 1
                   set_measure_argument(osw, 'set_boiler_thermal_efficiency', '__SKIP__', false)
                   set_measure_argument(osw, 'set_boiler_thermal_efficiency', 'input_option_manual', true)
@@ -240,11 +239,11 @@ module BuildingSync
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
             # Cooling System / OtherHVAC / Replace package units
             if measure_name == 'Replace package units'
-              if @facility['system_type'] == 'PSZ-AC with gas coil heat'
+              if @@facility['system_type'] == 'PSZ-AC with gas coil heat'
                 num_measures += 1
                 set_measure_argument(osw, 'SetCOPforSingleSpeedDXCoolingUnits', '__SKIP__', false)
                 set_measure_argument(osw, 'SetCOPforSingleSpeedDXCoolingUnits', 'cop', 4.1)
-              elsif @facility['system_type'] == 'PVAV with reheat'
+              elsif @@facility['system_type'] == 'PVAV with reheat'
                 num_measures += 1
                 set_measure_argument(osw, 'SetCOPforTwoSpeedDXCoolingUnits', '__SKIP__', false)
                 set_measure_argument(osw, 'SetCOPforTwoSpeedDXCoolingUnits', 'cop_high', 4.1)
@@ -273,15 +272,15 @@ module BuildingSync
             if measure_name == 'Replace HVAC system type to VRF'
               num_measures += 1
               set_measure_argument(osw, 'vr_fwith_doas', '__SKIP__', false)
-              if @facility['bldg_type'] == 'SmallOffice'
-                set_measure_argument(osw, 'vr_fwith_doas', "Office WholeBuilding - Sm Office - #{@facility['template']}", true)
-              elsif @facility['bldg_type'] == 'MediumOffice'
-                set_measure_argument(osw, 'vr_fwith_doas', "Office WholeBuilding - Md Office - #{@facility['template']}", true)
-              elsif @facility['bldg_type'] == 'RetailStandalone'
-                set_measure_argument(osw, 'vr_fwith_doas', "Retail Retail - #{@facility['template']}", true)
-                set_measure_argument(osw, 'vr_fwith_doas', "Retail Point_of_Sale - #{@facility['template']}", true)
-                set_measure_argument(osw, 'vr_fwith_doas', "Retail Entry - #{@facility['template']}", true)
-                set_measure_argument(osw, 'vr_fwith_doas', "Retail Back_Space - #{@facility['template']}", true)
+              if @@facility['bldg_type'] == 'SmallOffice'
+                set_measure_argument(osw, 'vr_fwith_doas', "Office WholeBuilding - Sm Office - #{@@facility['template']}", true)
+              elsif @@facility['bldg_type'] == 'MediumOffice'
+                set_measure_argument(osw, 'vr_fwith_doas', "Office WholeBuilding - Md Office - #{@@facility['template']}", true)
+              elsif @@facility['bldg_type'] == 'RetailStandalone'
+                set_measure_argument(osw, 'vr_fwith_doas', "Retail Retail - #{@@facility['template']}", true)
+                set_measure_argument(osw, 'vr_fwith_doas', "Retail Point_of_Sale - #{@@facility['template']}", true)
+                set_measure_argument(osw, 'vr_fwith_doas', "Retail Entry - #{@@facility['template']}", true)
+                set_measure_argument(osw, 'vr_fwith_doas', "Retail Back_Space - #{@@facility['template']}", true)
               end
               set_measure_argument(osw, 'vr_fwith_doas', 'vrfCoolCOP', 6.0)
               set_measure_argument(osw, 'vr_fwith_doas', 'vrfHeatCOP', 6.0)
@@ -292,15 +291,15 @@ module BuildingSync
             if measure_name == 'Replace HVAC with GSHP and DOAS' || measure_name == 'Replace AC and heating units with ground coupled heat pump systems'
               num_measures += 1
               set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', '__SKIP__', false)
-              if @facility['bldg_type'] == 'SmallOffice'
-                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Office WholeBuilding - Sm Office - #{@facility['template']}", true)
-              elsif @facility['bldg_type'] == 'MediumOffice'
-                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Office WholeBuilding - Md Office - #{@facility['template']}", true)
-              elsif @facility['bldg_type'] == 'RetailStandalone'
-                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Retail - #{@facility['template']}", true)
-                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Point_of_Sale - #{@facility['template']}", true)
-                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Entry - #{@facility['template']}", true)
-                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Back_Space - #{@facility['template']}", true)
+              if @@facility['bldg_type'] == 'SmallOffice'
+                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Office WholeBuilding - Sm Office - #{@@facility['template']}", true)
+              elsif @@facility['bldg_type'] == 'MediumOffice'
+                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Office WholeBuilding - Md Office - #{@@facility['template']}", true)
+              elsif @@facility['bldg_type'] == 'RetailStandalone'
+                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Retail - #{@@facility['template']}", true)
+                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Point_of_Sale - #{@@facility['template']}", true)
+                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Entry - #{@@facility['template']}", true)
+                set_measure_argument(osw, 'replace_hvac_with_gshp_and_doas', "Retail Back_Space - #{@@facility['template']}", true)
               end
             end
 
@@ -316,16 +315,16 @@ module BuildingSync
               set_measure_argument(osw, 'add_apszhp_to_each_zone', 'fan_type', 'Constant Volume (default)') # Options: "Constant Volume (default)", "Variable Volume (VFD)"
               set_measure_argument(osw, 'add_apszhp_to_each_zone', 'fan_pressure_rise', 0)
               set_measure_argument(osw, 'add_apszhp_to_each_zone', 'filter_type', 'By Space Type')
-              if @facility['bldg_type'] == 'SmallOffice'
-                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Office WholeBuilding - Sm Office - #{@facility['template']}")
-              elsif @facility['bldg_type'] == 'MediumOffice'
+              if @@facility['bldg_type'] == 'SmallOffice'
+                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Office WholeBuilding - Sm Office - #{@@facility['template']}")
+              elsif @@facility['bldg_type'] == 'MediumOffice'
                 set_measure_argument(osw, 'create_typical_building_from_model', 'system_type', 'PSZ-AC with gas coil heat')
-                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Office WholeBuilding - Md Office - #{@facility['template']}")
-              elsif @facility['bldg_type'] == 'RetailStandalone'
-                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Retail - #{@facility['template']}")
-                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Point_of_Sale - #{@facility['template']}")
-                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Entry - #{@facility['template']}")
-                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Back_Space - #{@facility['template']}")
+                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Office WholeBuilding - Md Office - #{@@facility['template']}")
+              elsif @@facility['bldg_type'] == 'RetailStandalone'
+                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Retail - #{@@facility['template']}")
+                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Point_of_Sale - #{@@facility['template']}")
+                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Entry - #{@@facility['template']}")
+                set_measure_argument(osw, 'add_apszhp_to_each_zone', 'space_type', "Retail Back_Space - #{@@facility['template']}")
               end
             end
           end
@@ -501,7 +500,7 @@ module BuildingSync
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) && BRICR::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
+        next if defined?(BUILDINGSYNC::SIMULATE_BASELINE_ONLY) && BUILDINGSYNC::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         # deep clone
         osw = JSON.load(JSON.generate(@workflow))

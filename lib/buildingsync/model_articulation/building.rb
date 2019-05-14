@@ -163,7 +163,7 @@ module BuildingSync
       end
     end
 
-    def get_bldg_type
+    def get_building_type
       # try to get the bldg type at teh building level, if it is nil then look at the first subsection
       if @bldg_type.nil?
         return @building_subsections[0].bldg_type
@@ -174,19 +174,19 @@ module BuildingSync
 
     def read_building_form_defaults
       # if aspect ratio, story height or wwr have argument value of 0 then use smart building type defaults
-      building_form_defaults = building_form_defaults(get_bldg_type)
+      building_form_defaults = building_form_defaults(get_building_type)
       if @ns_to_ew_ratio == 0.0
         @ns_to_ew_ratio = building_form_defaults[:aspect_ratio]
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for aspect ratio will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:aspect_ratio]}.")
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for aspect ratio will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:aspect_ratio]}.")
       end
       if @floor_height == 0.0
         @floor_height = OpenStudio.convert(building_form_defaults[:typical_story], 'ft', 'm').get
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for floor height will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:typical_story]}.")
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for floor height will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:typical_story]}.")
       end
       # because of this can't set wwr to 0.0. If that is desired then we can change this to check for 1.0 instead of 0.0
       if @wwr == 0.0
         @wwr = building_form_defaults[:wwr]
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for window to wall ratio will be replaced with smart default for #{get_bldg_type} of #{building_form_defaults[:wwr]}.")
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for window to wall ratio will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:wwr]}.")
       end
     end
 
@@ -672,202 +672,8 @@ module BuildingSync
       party_walls_array
     end
 
-    def calibrate_baseline_model(template, bldg_type, skip)
-      @@calibrate_factors = JSON.parse(File.read(File.dirname(__FILE__) + '/resources/calibrate_factors.json'))
-      pd_change_rate = @@calibrate_factors[template][bldg_type]['lpd_change_rate']
-      epd_change_rate = @@calibrate_factors[template][bldg_type]['epd_change_rate']
-      occupancy_change_rate = @@calibrate_factors[template][bldg_type]['occupancy_change_rate']
-      cop_change_rate = @@calibrate_factors[template][bldg_type]['cop_change_rate']
-      heating_efficiency_change_rate = @@calibrate_factors[template][bldg_type]['heating_efficiency_change_rate']
-
-      # report initial condition
-      building = @model.getBuilding
-      initial_lpd = building.lightingPowerPerFloorArea # W/m^2
-      initial_epd = building.electricEquipmentPowerPerFloorArea # W/m^2
-      initial_occupancy = building.peoplePerFloorArea # people/m^2
-
-      p "lpd_change_rate: #{lpd_change_rate.to_s}"
-      p "epd_change_rate: #{epd_change_rate.to_s}"
-      p "occupancy_change_rate: #{occupancy_change_rate.to_s}"
-      p "cop_change_rate: #{cop_change_rate.to_s}"
-      p "heating_efficiency_change_rate: #{heating_efficiency_change_rate.to_s}"
-      p "initial_lpd: #{initial_lpd.round(3).to_s}"
-      p "initial_epd: #{initial_epd.round(3).to_s}"
-      p "initial_occupancy: #{initial_occupancy.round(3).to_s}"
-
-      space_types = @model.getSpaceTypes
-      # loop through space types
-      space_types.each do |space_type|
-        # Update lighting power density
-        space_type.lights.each do |light|
-          light_def = light.lightsDefinition
-          unless light_def.lightingLevel.empty?
-            light_def.setLightingLevel((1 + lpd_change_rate) * light_def.lightingLevel.get)
-          end
-
-          unless light_def.wattsperSpaceFloorArea .empty?
-            light_def.setWattsperSpaceFloorArea((1 + lpd_change_rate) * light_def.wattsperSpaceFloorArea.get)
-          end
-
-          unless light_def.wattsperPerson.empty?
-            light_def.setWattsperPerson((1 + lpd_change_rate) * light_def.wattsperPerson.get)
-          end
-        end
-
-        # Update the equipment power density
-        space_type.electricEquipment.each do |equip|
-          equip_def = equip.electricEquipmentDefinition
-          unless equip_def.designLevel.empty?
-            equip_def.setDesignLevel((1 + epd_change_rate) * equip_def.designLevel.get)
-          end
-
-          unless equip_def.wattsperSpaceFloorArea .empty?
-            equip_def.setWattsperSpaceFloorArea((1 + epd_change_rate) * equip_def.wattsperSpaceFloorArea.get)
-          end
-
-          unless equip_def.wattsperPerson.empty?
-            equip_def.setWattsperPerson((1 + epd_change_rate) * equip_def.wattsperPerson.get)
-          end
-        end
-
-        # Update the occupancy density
-        space_type.people.each do |people|
-          people_def = people.peopleDefinition
-          unless people_def.numberofPeople.empty?
-            people_def.setNumberofPeople((1 + occupancy_change_rate) * people_def.numberofPeople.get)
-          end
-
-          unless people_def.peopleperSpaceFloorArea.empty?
-            people_def.setPeopleperSpaceFloorArea((1 + occupancy_change_rate) * people_def.peopleperSpaceFloorArea.get)
-          end
-
-          unless people_def.spaceFloorAreaperPerson.empty?
-            people_def.setSpaceFloorAreaperPerson(people_def.spaceFloorAreaperPerson.get/(1 + occupancy_change_rate))
-          end
-        end
-      end
-
-      # Update HVAC systems
-      air_loops = @model.getAirLoopHVACs
-      plant_loops = @model.getPlantLoops
-
-      initial_cop_value = nil
-      after_cop_value = nil
-      double_after_cop = nil
-
-      initial_eff_value = nil
-      after_eff_value = nil
-
-      # loop through air loops
-      air_loops.each do |air_loop|
-        find_cooling = false
-        find_heating = false
-
-        # find single speed dx units on loop
-        air_loop.supplyComponents.each do |supply_component|
-          hvac_component = supply_component.to_CoilCoolingDXSingleSpeed
-          unless hvac_component.empty?
-            hvac_component = hvac_component.get
-
-            # change and report high speed cop
-            initial_cop = hvac_component.ratedCOP
-            if initial_cop.empty?
-              raise "Fail to find the Rated COP for single speed dx unit '#{hvac_component.name}' on air loop '#{air_loop.name}'"
-            else
-              initial_cop_value = initial_cop.get
-              after_cop_value = initial_cop_value * (1 + cop_change_rate)
-              double_after_cop = OpenStudio::OptionalDouble.new(after_cop_value)
-              hvac_component.setRatedCOP(after_cop_value)
-              find_cooling = true
-              raise "Fail to find the cooling system for air lop '#{air_loop.name}'" unless find_cooling
-            end
-          end
-
-          hvac_component = supply_component.to_CoilCoolingDXTwoSpeed
-          unless hvac_component.empty?
-            hvac_component = hvac_component.get
-
-            # change and report high speed cop
-            initial_cop = hvac_component.ratedHighSpeedCOP
-            if initial_cop.empty?
-              raise "Fail to find the Rated High Speed COP for two speed dx unit '#{hvac_component.name}' on air loop '#{air_loop.name}'"
-            else
-              initial_cop_value = initial_cop.get
-              after_cop_value = initial_cop_value * (1 + cop_change_rate)
-              double_after_cop = OpenStudio::OptionalDouble.new(after_cop_value)
-              hvac_component.setRatedHighSpeedCOP(after_cop_value)
-            end
-
-            # change and report low speed cop
-            initial_cop = hvac_component.ratedLowSpeedCOP
-            if initial_cop.empty?
-              raise "Fail to find the Rated Low Speed COP for two speed dx unit '#{hvac_component.name}' on air loop '#{air_loop.name}'"
-            else
-              initial_cop_value = initial_cop.get
-              after_cop_value = initial_cop_value * (1 + cop_change_rate)
-              double_after_cop = OpenStudio::OptionalDouble.new(after_cop_value)
-              hvac_component.setRatedLowSpeedCOP(after_cop_value)
-            end
-
-            find_cooling = true
-            raise "Fail to find the cooling system for air lop '#{air_loop.name}'" unless find_cooling
-          end
-
-          hvac_component = supply_component.to_CoilHeatingGas
-          unless hvac_component.empty?
-            hvac_component = hvac_component.get
-            initial_eff_value = hvac_component.gasBurnerEfficiency
-            after_eff_value = initial_eff_value * (1 + heating_efficiency_change_rate)
-            # check for reasonableness
-            if after_eff_value <= 0 or after_eff_value > 0.99
-              raise "Wrong after heating efficiency found: initial (#{initial_eff_value}), change rate (#{heating_efficiency_change_rate}), after (#{after_eff_value})."
-            end
-            hvac_component.setGasBurnerEfficiency(after_eff_value)
-            find_heating = true
-            raise "Fail to find the heating system for air lop '#{air_loop.name}'" unless find_heating
-          end
-        end
-      end
-
-      # loop through plant loops
-      plant_loops.each do |plant_loop|
-        find_heating = false
-        # find boiler on plat loop
-        plant_loop.supplyComponents.each do |supply_component|
-          hvac_component = supply_component.to_BoilerHotWater
-          unless hvac_component.empty?
-            hvac_component = hvac_component.get
-            initial_eff_value = hvac_component.nominalThermalEfficiency
-            after_eff_value = initial_eff_value * (1 + heating_efficiency_change_rate)
-            # check for reasonableness
-            if after_eff_value <= 0 or after_eff_value > 0.99
-              raise "Wrong after heating efficiency found: initial (#{initial_eff_value}), change rate (#{heating_efficiency_change_rate}), after (#{after_eff_value})."
-            end
-            hvac_component.setNominalThermalEfficiency(after_eff_value)
-            find_heating = true
-            raise "Fail to find the heating system for air lop '#{air_loop.name}'" unless find_heating
-          end
-        end
-      end
-
-      p "initial_cop: #{initial_cop_value.round(3).to_s}"
-      p "after_cop: #{after_cop_value.round(3).to_s}"
-      p "initial_eff: #{initial_eff_value.round(3).to_s}"
-      p "after_eff: #{after_eff_value.round(3).to_s}"
-
-      # report final condition
-      after_lpd = building.lightingPowerPerFloorArea
-      after_epd = building.electricEquipmentPowerPerFloorArea
-      after_occupancy = building.peoplePerFloorArea # people/m^2
-
-      p "after_lpd: #{after_lpd.round(3).to_s}"
-      p "after_epd: #{after_epd.round(3).to_s}"
-      p "after_occupancy: #{after_occupancy.round(3).to_s}"
-    end
-
     def write_osm(dir)
       @model.save("#{dir}/in.osm", true)
-      p 'Model saved successfully'
     end
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr

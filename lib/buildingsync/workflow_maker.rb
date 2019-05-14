@@ -37,15 +37,11 @@
 
 require 'fileutils'
 require 'json'
+require_relative 'model_maker'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
-  class WorkflowMaker
-    def initialize(doc, ns)
-      @doc = doc
-      @ns = ns
-    end
-
+  class WorkflowMaker < ModelMaker
     def write_osws(dir)
       FileUtils.mkdir_p(dir)
     end

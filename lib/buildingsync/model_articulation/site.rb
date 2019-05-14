@@ -93,6 +93,10 @@ module BuildingSync
       return @buildings[0].get_system_type
     end
 
+    def get_building_type
+      return @buildings[0].get_building_type
+    end
+
     def generate_baseline_osm
       if @buildings.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
@@ -112,7 +116,14 @@ module BuildingSync
       @buildings.each do |building|
         building.write_osm(dir)
       end
+      scenario_types = {}
+      scenario_types['system_type'] = get_system_type
+      scenario_types['bldg_type'] = get_building_type
+      scenario_types['template'] = get_building_template
+      return scenario_types
     end
   end
+
+
 end
 

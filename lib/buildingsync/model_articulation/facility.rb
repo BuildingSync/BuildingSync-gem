@@ -485,9 +485,11 @@ module BuildingSync
     end
 
     def write_osm(dir)
+      scenario_types = {}
       @sites.each do |site|
-        site.write_osm(dir)
+        scenario_types = site.write_osm(dir)
       end
+      return scenario_types
     end
   end
 end

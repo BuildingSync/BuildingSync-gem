@@ -35,9 +35,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative '../model_articulation/facility'
-require_relative '../model_maker'
+require_relative 'workflow_maker_phase_zero'
 module BuildingSync
-  class ModelMakerLevelZero < ModelMaker
+  class ModelMakerLevelZero < PhaseZeroWorkflowMaker
     def initialize(doc, ns)
       super
 
@@ -59,14 +59,14 @@ module BuildingSync
       end
 
       @facilities.each(&:generate_baseline_osm)
-      write_osm(dir)
+      return write_osm(dir)
     end
 
     private
 
     def write_osm(dir)
       @facilities.each do |facility|
-        facility.write_osm(dir)
+        @@facility = facility.write_osm(dir)
       end
     end
   end

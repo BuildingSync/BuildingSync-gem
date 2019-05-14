@@ -48,6 +48,7 @@ module BuildingSync
       @model_maker = nil
       @workflow_maker = nil
       @output_dir = output_dir
+      @scenario_types = nil
 
       # Open a log for the library
       logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
@@ -80,9 +81,6 @@ module BuildingSync
 
       # choose the correct model maker based on xml
       choose_model_maker
-
-      # choose the correct workflow maker based on xml
-      choose_workflow_maker if include_workflow_generation
     end
 
     def write_osm
@@ -90,7 +88,7 @@ module BuildingSync
     end
 
     def write_osws
-      @workflow_maker.write_osws(@output_dir)
+       @model_maker.write_osws(@output_dir)
     end
 
     private
@@ -98,11 +96,6 @@ module BuildingSync
     def choose_model_maker
       # for now there is only one model maker
       @model_maker = ModelMakerLevelZero.new(@doc, @ns)
-    end
-
-    def choose_workflow_maker
-      # for now there is only one workflow maker
-      @workflow_maker = PhaseZeroWorkflowMaker.new(@doc, @ns)
     end
   end
 end
