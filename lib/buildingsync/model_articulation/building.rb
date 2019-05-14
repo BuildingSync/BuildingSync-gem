@@ -36,6 +36,7 @@
 # *******************************************************************************
 require_relative 'building_subsection'
 require 'openstudio/extension/core/os_lib_helper_methods'
+require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require_relative '../helpers/epw'
 require_relative '../helpers/stat_file'
 module BuildingSync

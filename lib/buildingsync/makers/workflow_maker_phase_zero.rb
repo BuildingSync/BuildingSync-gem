@@ -446,9 +446,7 @@ module BuildingSync
       end
 
       # ensure that we didn't miss any measures by accident
-      if num_measures != measure_ids.size
-        raise "#{measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{measure_ids}"
-      end
+      raise "#{measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{measure_ids}" if num_measures != measure_ids.size
     end
 
     def write_osws(dir)
