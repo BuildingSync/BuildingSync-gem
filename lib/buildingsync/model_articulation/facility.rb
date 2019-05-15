@@ -35,6 +35,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'site'
+require_relative 'internal_loads_system'
+require_relative 'envelope_system'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio/extension/core/os_lib_geometry'
 require_relative '../helpers/Model.hvac'
@@ -102,47 +104,11 @@ module BuildingSync
       # Make the standard applier
       standard = Standard.build(template)
 
+      internalLoadSystem = nil
       # add internal loads to space types
       if add_space_type_loads
-
-        # remove internal loads
-        if remove_objects
-          model.getSpaceLoads.each do |instance|
-            next if instance.name.to_s.include?('Elevator') # most prototype building types model exterior elevators with name Elevator
-            next if instance.to_InternalMass.is_initialized
-            next if instance.to_WaterUseEquipment.is_initialized
-            instance.remove
-          end
-          model.getDesignSpecificationOutdoorAirs.each(&:remove)
-          model.getDefaultScheduleSets.each(&:remove)
-        end
-
-        model.getSpaceTypes.each do |space_type|
-          # Don't add infiltration here; will be added later in the script
-          test = standard.space_type_apply_internal_loads(space_type, true, true, true, true, true, false)
-          if test == false
-            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "Could not add loads for #{space_type.name}. Not expected for #{template}")
-            next
-          end
-
-          # apply internal load schedules
-          # the last bool test it to make thermostat schedules. They are now added in HVAC section instead of here
-          standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
-
-          # extend space type name to include the template. Consider this as well for load defs
-          space_type.setName("#{space_type.name} - #{template}")
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding loads to space type named #{space_type.name}")
-        end
-
-        # warn if spaces in model without space type
-        spaces_without_space_types = []
-        model.getSpaces.each do |space|
-          next if space.spaceType.is_initialized
-          spaces_without_space_types << space
-        end
-        if !spaces_without_space_types.empty?
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "#{spaces_without_space_types.size} spaces do not have space types assigned, and wont' receive internal loads from standards space type lookups.")
-        end
+        internalLoadSystem = InternalLoadsSystem.new
+        internalLoadSystem.create(model, standard, template, remove_objects)
       end
 
       # identify primary building type (used for construction, and ideally HVAC as well)
@@ -164,51 +130,11 @@ module BuildingSync
       lookup_building_type = standard.model_get_lookup_name(primary_bldg_type) # Used for some lookups in the standards gem
       model.getBuilding.setStandardsBuildingType(primary_bldg_type)
 
+      envelopeSystem = nil
       # make construction set and apply to building
       if add_constructions
-
-        # remove default construction sets
-        if remove_objects
-          model.getDefaultConstructionSets.each(&:remove)
-        end
-
-        # TODO: - allow building type and space type specific constructions set selection.
-        if ['SmallHotel', 'LargeHotel', 'MidriseApartment', 'HighriseApartment'].include?(primary_bldg_type)
-          is_residential = 'Yes'
-        else
-          is_residential = 'No'
-        end
-        climate_zone = standard.model_get_building_climate_zone_and_building_type(model)['climate_zone']
-        bldg_def_const_set = standard.model_add_construction_set(model, climate_zone, lookup_building_type, nil, is_residential)
-        if bldg_def_const_set.is_initialized
-          bldg_def_const_set = bldg_def_const_set.get
-          if is_residential then bldg_def_const_set.setName("Res #{bldg_def_const_set.name}") end
-          model.getBuilding.setDefaultConstructionSet(bldg_def_const_set)
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding default construction set named #{bldg_def_const_set.name}")
-        else
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.create_building_system', "Could not create default construction set for the building type #{lookup_building_type} in climate zone #{climate_zone}.")
-          return false
-        end
-
-        # address any adiabatic surfaces that don't have hard assigned constructions
-        model.getSurfaces.each do |surface|
-          next if surface.outsideBoundaryCondition != 'Adiabatic'
-          next if surface.construction.is_initialized
-          surface.setAdjacentSurface(surface)
-          surface.setConstruction(surface.construction.get)
-          surface.setOutsideBoundaryCondition('Adiabatic')
-        end
-
-        # Modify the infiltration rates
-        if remove_objects
-          model.getSpaceInfiltrationDesignFlowRates.each(&:remove)
-        end
-        standard.model_apply_infiltration_standard(model)
-        standard.model_modify_infiltration_coefficients(model, primary_bldg_type, climate_zone)
-
-        # set ground temperatures from DOE prototype buildings
-        standard.model_add_ground_temperatures(model, primary_bldg_type, climate_zone)
-
+        envelopeSystem = EnvelopeSystem.new
+        envelopeSystem.create(model, standard, primary_bldg_type, lookup_building_type, remove_objects)
       end
 
       # add elevators (returns ElectricEquipment object)
