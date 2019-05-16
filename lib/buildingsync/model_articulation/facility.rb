@@ -35,7 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'site'
-require_relative 'internal_loads_system'
+require_relative 'loads_system'
 require_relative 'envelope_system'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio/extension/core/os_lib_geometry'
@@ -101,14 +101,14 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
 
+      internalLoadSystem = LoadsSystem.new
+
       # Make the standard applier
       standard = Standard.build(template)
 
-      internalLoadSystem = nil
       # add internal loads to space types
       if add_space_type_loads
-        internalLoadSystem = InternalLoadsSystem.new
-        internalLoadSystem.create(model, standard, template, remove_objects)
+        internalLoadSystem.add_internal_loads(model, standard, template, remove_objects)
       end
 
       # identify primary building type (used for construction, and ideally HVAC as well)
@@ -139,41 +139,12 @@ module BuildingSync
 
       # add elevators (returns ElectricEquipment object)
       if add_elevators
-
-        # remove elevators as spaceLoads or exteriorLights
-        model.getSpaceLoads.each do |instance|
-          next if !instance.name.to_s.include?('Elevator') # most prototype building types model exterior elevators with name Elevator
-          instance.remove
-        end
-        model.getExteriorLightss.each do |ext_light|
-          next if !ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name
-          ext_light.remove
-        end
-
-        elevators = standard.model_add_elevators(model)
-        if elevators.nil?
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', 'No elevators added to the building.')
-        else
-          elevator_def = elevators.electricEquipmentDefinition
-          design_level = elevator_def.designLevel.get
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{elevators.multiplier.round(1)} elevators each with power of #{OpenStudio.toNeatString(design_level, 0, true)} (W), plus lights and fans.")
-        end
+        internalLoadSystem.add_elevator(model, standard)
       end
 
       # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
       if add_exterior_lights
-
-        if remove_objects
-          model.getExteriorLightss.each do |ext_light|
-            next if ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name
-            ext_light.remove
-          end
-        end
-
-        exterior_lights = standard.model_add_typical_exterior_lights(model, exterior_lighting_zone.chars[0].to_i, onsite_parking_fraction)
-        exterior_lights.each do |k, v|
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding Exterior Lights named #{v.exteriorLightsDefinition.name} with design level of #{v.exteriorLightsDefinition.designLevel} * #{OpenStudio.toNeatString(v.multiplier, 0, true)}.")
-        end
+        internalLoadSystem.add_exterior_lights(model, standard, remove_objects)
       end
 
       # add_exhaust
