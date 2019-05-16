@@ -63,11 +63,11 @@ module BuildingSync
 
       selection_tool = BuildingSync::SelectionTool.new
       if !selection_tool.validate_schema(xml_file_path)
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not validate against the BuildingSync schema")
-        raise "File '#{xml_file_path}' does not validate against the BuildingSync schema"
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
+        raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
       else
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is validate against the BuildingSync schema")
-        puts "File '#{xml_file_path}' is validate against the BuildingSync schema"
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
+        puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
       end
 
       File.open(xml_file_path, 'r') do |file|

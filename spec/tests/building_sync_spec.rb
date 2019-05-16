@@ -44,7 +44,7 @@ RSpec.describe 'BuildingSync' do
     expect(BuildingSync::VERSION).not_to be_nil
   end
 
-  it 'should parse and write building_151.xml (phase zero)' do
+  it 'should parse and write building_151.xml (phase zero) with auc namespace' do
     xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
 
     expect(File.exist?(xml_path)).to be true
