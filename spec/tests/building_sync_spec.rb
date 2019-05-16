@@ -157,6 +157,17 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
+  it 'Should validate valid XML file against BuildingSync schema' do
+    selection_tool = BuildingSync.SelectionTool.new
+    expect(selection_tool.validate).to be true
+  end
+
+  it 'Should not validate invalid XML file against BuildingSync schema' do
+    selection_tool = BuildingSync.SelectionTool.new
+    # use try catch to verify the failure!!
+    expect(selection_tool.validate).to be false
+  end
+
   it 'Should validate XML files against the BuildingSync schema' do
     xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true

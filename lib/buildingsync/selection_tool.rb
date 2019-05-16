@@ -61,5 +61,10 @@ module BuildingSync
 
       return (response.code == '200')
     end
+
+    def get_ASHRAE_211_Level
+      return 0
+      # or 1 or 2 or 3
+    end
   end
 end

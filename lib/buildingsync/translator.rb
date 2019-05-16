@@ -98,7 +98,7 @@ module BuildingSync
     end
 
     def write_osws
-       @model_maker.write_osws(@output_dir)
+      @model_maker.write_osws(@output_dir)
     end
 
     private
