@@ -41,3 +41,5 @@ gem "ci_reporter_rspec", "~> 1.0"
 gem "rubocop", "~> 0.54.0"
 
 gem "rubocop-checkstyle_formatter", "~> 0.4.0"
+
+gem "multipart-post", "2.1.1"

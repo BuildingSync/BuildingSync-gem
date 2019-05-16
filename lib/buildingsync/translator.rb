@@ -39,6 +39,7 @@ require 'rexml/document'
 require_relative 'model_articulation/spatial_element'
 require_relative 'makers/model_maker_level_zero'
 require_relative 'makers/workflow_maker_phase_zero'
+require_relative 'selection_tool'
 
 module BuildingSync
   class Translator
@@ -58,6 +59,15 @@ module BuildingSync
       if !File.exist?(xml_file_path)
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not exist")
         raise "File '#{xml_file_path}' does not exist" unless File.exist?(xml_file_path)
+      end
+
+      selection_tool = BuildingSync::SelectionTool.new
+      if !selection_tool.validate_schema(xml_file_path)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not validate against the BuildingSync schema")
+        raise "File '#{xml_file_path}' does not validate against the BuildingSync schema"
+      else
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is validate against the BuildingSync schema")
+        puts "File '#{xml_file_path}' is validate against the BuildingSync schema"
       end
 
       File.open(xml_file_path, 'r') do |file|

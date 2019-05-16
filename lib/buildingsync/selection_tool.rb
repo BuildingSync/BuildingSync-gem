@@ -1,6 +1,6 @@
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. 
+# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,9 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'uri'
+require 'net/http'
+require 'net/http/post/multipart'
 
 module BuildingSync
   # Class for communicating with SelectionTool
@@ -41,7 +44,22 @@ module BuildingSync
     # See documentation here: https://github.com/buildingsync/selection-tool#validator
     # Use core Net::HTTPS
     def initialize
-      return nil
+      # return nil
+    end
+
+    def validate_schema(xml_path)
+      url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
+
+      params = { 'schema_version' => '1.0.0' }
+      params[:file] = UploadIO.new(xml_path, 'text/xml', File.basename(xml_path))
+
+      request = Net::HTTP::Post::Multipart.new(url.path, params)
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      response = http.request(request)
+
+      return (response.code == '200')
     end
   end
 end

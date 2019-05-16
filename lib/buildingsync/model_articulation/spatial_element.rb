@@ -90,14 +90,14 @@ module BuildingSync
     end
 
     def set_bldg_and_system_type(occupancy_type, total_floor_area)
-      if !occupancy_type.nil?
+      if !occupancy_type.nil? && !total_floor_area.nil?
         if occupancy_type == 'Retail'
           @bldg_type = 'RetailStandalone'
           @bar_division_method = 'Multiple Space Types - Individual Stories Sliced'
           @system_type = 'PSZ-AC with gas coil heat'
         elsif occupancy_type == 'Office'
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          if total_floor_area > 0 && total_floor_area < 20000
+          if (total_floor_area > 0) && (total_floor_area < 20000)
             @bldg_type = 'SmallOffice'
             @system_type = 'PSZ-AC with gas coil heat'
           elsif total_floor_area >= 20000 && total_floor_area < 75000
