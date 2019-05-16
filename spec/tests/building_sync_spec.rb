@@ -116,7 +116,7 @@ RSpec.describe 'BuildingSync' do
     translator.write_osm
   end
 
-  it 'should parse and write building_151.xml (phase zero) with n1 namespace' do
+  it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace' do
     xml_path = File.expand_path('../files/building_151_n1.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -155,5 +155,33 @@ RSpec.describe 'BuildingSync' do
 
       expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
     end
+  end
+
+  it 'Should validate XML files against the BuildingSync schema' do
+    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    require 'uri'
+    require 'net/http'
+    require 'net/http/post/multipart'
+
+    url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
+
+    # new
+    params = { "schema_version" => "1.0.0" }
+    params[:file] = UploadIO.new(xml_path, "text/xml", File.basename(xml_path))
+
+    request = Net::HTTP::Post::Multipart.new(url.path, params)
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    response = http.request(request)
+    puts(response.read_body)
+    puts(response.code)
+    hash_response = JSON.parse(response.read_body)
+    expect(response.code).to eq('200')
+    expect(hash_response).to have_key("schema_version")
+    expect(hash_response).to have_key("validation_results")
+
   end
 end
