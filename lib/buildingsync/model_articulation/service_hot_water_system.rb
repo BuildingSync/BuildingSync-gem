@@ -1,3 +1,4 @@
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
@@ -35,35 +36,43 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 module BuildingSync
-  class HVACSystem < BuildingSystem
+  class ServiceHotWaterSystem < BuildingSystem
 
     # initialize
-    def initialize
+    def initialize()
       # code to initialize
     end
 
-    # create system
-    def create
-      # creating the typical HVAC systems
-    end
-
-    def add_exhaust(model, standard, kitchen_makeup, remove_objects)
-      # remove exhaust objects
+    def add(model, standard, remove_objects)
+      # remove water use equipment and water use connections
       if remove_objects
-        model.getFanZoneExhausts.each(&:remove)
+        # TODO: - remove plant loops used for service water heating
+        model.getWaterUseEquipments.each(&:remove)
+        model.getWaterUseConnectionss.each(&:remove)
       end
 
-      zone_exhaust_fans = standard.model_add_exhaust(model, kitchen_makeup) # second argument is strategy for finding makeup zones for exhaust zones
-      zone_exhaust_fans.each do |k, v|
-        max_flow_rate_ip = OpenStudio.convert(k.maximumFlowRate.get, 'm^3/s', 'cfm').get
-        if v.key?(:zone_mixing)
-          zone_mixing = v[:zone_mixing]
-          mixing_source_zone_name = zone_mixing.sourceZone.get.name
-          mixing_design_flow_rate_ip = OpenStudio.convert(zone_mixing.designFlowRate.get, 'm^3/s', 'cfm').get
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}, with #{OpenStudio.toNeatString(mixing_design_flow_rate_ip, 0, true)} (cfm) of makeup air from #{mixing_source_zone_name}")
+      typical_swh = standard.model_add_typical_swh(model)
+      midrise_swh_loops = []
+      stripmall_swh_loops = []
+      typical_swh.each do |loop|
+        if loop.name.get.include?('MidriseApartment')
+          midrise_swh_loops << loop
+        elsif loop.name.get.include?('RetailStripmall')
+          stripmall_swh_loops << loop
         else
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}")
+          water_use_connections = []
+          loop.demandComponents.each do |component|
+            next if !component.to_WaterUseConnections.is_initialized
+            water_use_connections << component
+          end
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{loop.name} to the building. It has #{water_use_connections.size} water use connections.")
         end
+      end
+      if !midrise_swh_loops.empty?
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{midrise_swh_loops.size} MidriseApartment service water heating loops.")
+      end
+      if !stripmall_swh_loops.empty?
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{stripmall_swh_loops.size} RetailStripmall service water heating loops.")
       end
     end
   end

@@ -37,6 +37,8 @@
 require_relative 'site'
 require_relative 'loads_system'
 require_relative 'envelope_system'
+require_relative 'hvac_system'
+require_relative 'service_hot_water_system'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio/extension/core/os_lib_geometry'
 require_relative '../helpers/Model.hvac'
@@ -78,7 +80,7 @@ module BuildingSync
       end
       @sites.each(&:generate_baseline_osm)
 
-      create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, "Forced Air")
+      create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, 'Forced Air')
     end
 
     def create_building_systems(model, template, system_type, hvac_delivery_type)
@@ -87,13 +89,12 @@ module BuildingSync
       add_elevators = false
       add_exterior_lights = false
       onsite_parking_fraction = 1.0
-      kitchen_makeup = "Adjacent"
-      exterior_lighting_zone = "3 - All Other Areas"
+      exterior_lighting_zone = '3 - All Other Areas'
       add_exhaust = true
       add_swh = true
       add_hvac = true
-      htg_src = "NaturalGas"
-      clg_src = "Electricity"
+      htg_src = 'NaturalGas'
+      clg_src = 'Electricity'
       remove_objects = false
       add_thermostat = true
 
@@ -102,6 +103,7 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
 
       internalLoadSystem = LoadsSystem.new
+      hvacSystem = HVACSystem.new
 
       # Make the standard applier
       standard = Standard.build(template)
@@ -149,65 +151,20 @@ module BuildingSync
 
       # add_exhaust
       if add_exhaust
-
-        # remove exhaust objects
-        if remove_objects
-          model.getFanZoneExhausts.each(&:remove)
-        end
-
-        zone_exhaust_fans = standard.model_add_exhaust(model, kitchen_makeup) # second argument is strategy for finding makeup zones for exhaust zones
-        zone_exhaust_fans.each do |k, v|
-          max_flow_rate_ip = OpenStudio.convert(k.maximumFlowRate.get, 'm^3/s', 'cfm').get
-          if v.key?(:zone_mixing)
-            zone_mixing = v[:zone_mixing]
-            mixing_source_zone_name = zone_mixing.sourceZone.get.name
-            mixing_design_flow_rate_ip = OpenStudio.convert(zone_mixing.designFlowRate.get, 'm^3/s', 'cfm').get
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}, with #{OpenStudio.toNeatString(mixing_design_flow_rate_ip, 0, true)} (cfm) of makeup air from #{mixing_source_zone_name}")
-          else
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}")
-          end
-        end
+        hvacSystem.add_exhaust(model, standard, 'Adjacent', remove_objects)
       end
 
       # add service water heating demand and supply
       if add_swh
-
-        # remove water use equipment and water use connections
-        if remove_objects
-          # TODO: - remove plant loops used for service water heating
-          model.getWaterUseEquipments.each(&:remove)
-          model.getWaterUseConnectionss.each(&:remove)
-        end
-
-        typical_swh = standard.model_add_typical_swh(model)
-        midrise_swh_loops = []
-        stripmall_swh_loops = []
-        typical_swh.each do |loop|
-          if loop.name.get.include?('MidriseApartment')
-            midrise_swh_loops << loop
-          elsif loop.name.get.include?('RetailStripmall')
-            stripmall_swh_loops << loop
-          else
-            water_use_connections = []
-            loop.demandComponents.each do |component|
-              next if !component.to_WaterUseConnections.is_initialized
-              water_use_connections << component
-            end
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{loop.name} to the building. It has #{water_use_connections.size} water use connections.")
-          end
-        end
-        if !midrise_swh_loops.empty?
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{midrise_swh_loops.size} MidriseApartment service water heating loops.")
-        end
-        if !stripmall_swh_loops.empty?
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{stripmall_swh_loops.size} RetailStripmall service water heating loops.")
-        end
+        serviceHotWaterSystem = ServiceHotWaterSystem.new
+        serviceHotWaterSystem.add(model, standard, remove_objects)
       end
 
-      # TODO: - when add methods below add bool to enable/disable them with default value to true
-
       # add daylight controls, need to perform a sizing run for 2010
+      p 'template'
+      p template
       if template == '90.1-2010'
+        p 'we should not get here'
         if standard.model_run_sizing_run(model, "#{Dir.pwd}/SRvt") == false
           return false
         end

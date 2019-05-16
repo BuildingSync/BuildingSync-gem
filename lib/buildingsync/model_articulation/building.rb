@@ -164,7 +164,7 @@ module BuildingSync
     end
 
     def get_building_type
-      # try to get the bldg type at teh building level, if it is nil then look at the first subsection
+      # try to get the bldg type at the building level, if it is nil then look at the first subsection
       if @bldg_type.nil?
         return @building_subsections[0].bldg_type
       else
