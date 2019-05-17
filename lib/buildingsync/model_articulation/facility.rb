@@ -102,7 +102,7 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
 
-      internalLoadSystem = LoadsSystem.new
+      load_system = LoadsSystem.new
       hvacSystem = HVACSystem.new
 
       # Make the standard applier
@@ -110,7 +110,7 @@ module BuildingSync
 
       # add internal loads to space types
       if add_space_type_loads
-        internalLoadSystem.add_internal_loads(model, standard, template, remove_objects)
+        load_system.add_internal_loads(model, standard, template, remove_objects)
       end
 
       # identify primary building type (used for construction, and ideally HVAC as well)
@@ -141,12 +141,12 @@ module BuildingSync
 
       # add elevators (returns ElectricEquipment object)
       if add_elevators
-        internalLoadSystem.add_elevator(model, standard)
+        load_system.add_elevator(model, standard)
       end
 
       # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
       if add_exterior_lights
-        internalLoadSystem.add_exterior_lights(model, standard, remove_objects)
+        load_system.add_exterior_lights(model, standard, remove_objects)
       end
 
       # add_exhaust
@@ -160,7 +160,7 @@ module BuildingSync
         serviceHotWaterSystem.add(model, standard, remove_objects)
       end
 
-      load_system.add_daylighting_controls(model, standard)
+      load_system.add_daylighting_controls(model, standard, template)
 
       # TODO: - add refrigeration
       # remove refrigeration equipment
