@@ -43,7 +43,8 @@ module BuildingSync
       # code to initialize
       # an array that contains all the buildings
       @buildings = []
-      @climate_zone = nil
+      @climate_zone_ashrae = nil
+      @climate_zone_ca_t24 = nil
       @weather_file_name = nil
       # TM: just use the XML snippet to search for the buildings on the site
       read_xml(build_element, ns)
@@ -67,9 +68,14 @@ module BuildingSync
 
     def read_climate_zone(build_element, ns)
       if build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE"]
-        @climate_zone = build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text
+        @climate_zone_ashrae = build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text
       else
-        @climate_zone = nil
+        @climate_zone_ashrae = nil
+      end
+      if build_element.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24"]
+        @climate_zone_ca_t24 = build_element.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text
+      else
+        @climate_zone_ca_t24 = nil
       end
     end
 
@@ -107,7 +113,12 @@ module BuildingSync
            end
       end
       @buildings.each do |building|
-        building.set_weater_and_climate_zone(@weather_file_name, @climate_zone)
+        climate_zone = @climate_zone_ashrae
+        # for now we use the california climate zone if it is available
+        if !@climate_zone_ca_t24.nil?
+          climate_zone = @climate_zone_ca_t24
+        end
+        building.set_weater_and_climate_zone(@weather_file_name, climate_zone)
         building.generate_baseline_osm
       end
     end

@@ -266,7 +266,7 @@ module BuildingSync
         weather_file = "CZ01RV2.epw"
       elsif climate_zone == "2A" || climate_zone == "2B"
         weather_file = "CZ02RV2.epw"
-      elsif climate_zone == "3A" || climate_zone == "3B" || climate_zone == "3C"
+      elsif climate_zone == "3A" || climate_zone == "3B" || climate_zone == "3C" || climate_zone == "Climate Zone 3"
         weather_file = "CZ03RV2.epw"
       elsif climate_zone == "4A" || climate_zone == "4B" || climate_zone == "4C"
         weather_file = "CZ04RV2.epw"
@@ -278,6 +278,8 @@ module BuildingSync
         weather_file = "CZ07RV2.epw"
       elsif climate_zone == "8"
         weather_file = "CZ08RV2.epw"
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', "Could not find a weather file for climate zone: #{climate_zone}")
       end
 
       # Parse the EPW manually because OpenStudio can't handle multiyear weather files (or DATA PERIODS with YEARS)
@@ -401,11 +403,12 @@ module BuildingSync
       # set climate zone
       climateZones.clear
       if climate_zone == "1A" || climate_zone == "1B" || climate_zone == "2A" || climate_zone == "2B" || climate_zone == "3A" || climate_zone == "3B" || climate_zone == "3C" || climate_zone == "4A" || climate_zone == "4B" || climate_zone == "4C" || climate_zone == "5A" || climate_zone == "5B" || climate_zone == "5C" || climate_zone == "6A" || climate_zone == "6B" || climate_zone == "7" || climate_zone == "8"
-        climateZones.setClimateZone('ASHRAE',climate_zone)
+        climateZones.setClimateZone('ASHRAE', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
       else
-        climate_zone = climate_zone.gsub('CEC','')
-        climateZones.setClimateZone('CEC',climate_zone)
+        climate_zone = climate_zone.gsub('CEC', '').strip
+        climate_zone = climate_zone.gsub('Climate Zone', '').strip
+        climateZones.setClimateZone('CEC', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climate_zone}")
       end
 
