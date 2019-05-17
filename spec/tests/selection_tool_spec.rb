@@ -34,47 +34,33 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require 'uri'
-require 'net/http'
-require 'net/http/post/multipart'
+require_relative './../spec_helper'
 
-module BuildingSync
-  # Class for communicating with SelectionTool
-  class SelectionTool
-    # See documentation here: https://github.com/buildingsync/selection-tool#validator
-    # Use core Net::HTTPS
-    def initialize
-      # return nil
-    end
+require 'fileutils'
+require 'parallel'
 
-    def validate_schema(xml_path)
-      hash_response = get_json_data_from_schema(xml_path)
-      if !hash_response['validation_results']['schema']['valid']
-        hash_response['validation_results']['schema']['errors'].each do |error|
-          puts error['message']
-        end
+RSpec.describe 'SelectionTool' do
+  it 'Should validate valid XML file against BuildingSync schema' do
+    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    selection_tool = BuildingSync::SelectionTool.new
+    expect(selection_tool.validate_schema(xml_path)).to be true
+  end
+
+  it 'Should not validate invalid XML file against BuildingSync schema' do
+    xml_path = File.expand_path('../files/InvalidFile.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    selection_tool = BuildingSync::SelectionTool.new
+    hash_response = selection_tool.get_json_data_from_schema(xml_path)
+    if !hash_response['validation_results']['schema']['valid']
+      p "#{xml_path} is not valid file against BuildingSync schema"
+      hash_response['validation_results']['schema']['errors'].each do |error|
+        puts error['message']
       end
-      return hash_response['validation_results']['schema']['valid']
     end
+    expect(hash_response['validation_results']['schema']['valid']).to be false
 
-    def get_json_data_from_schema(xml_path)
-      url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
-
-      params = { 'schema_version' => '1.0.0' }
-      params[:file] = UploadIO.new(xml_path, 'text/xml', File.basename(xml_path))
-
-      request = Net::HTTP::Post::Multipart.new(url.path, params)
-      http = Net::HTTP.new(url.host, url.port)
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      response = http.request(request)
-
-      return JSON.parse(response.read_body)
-    end
-
-    def get_ASHRAE_211_Level
-      return 0
-      # or 1 or 2 or 3
-    end
   end
 end
