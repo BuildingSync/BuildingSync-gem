@@ -188,7 +188,7 @@ module BuildingSync
 
       # add hvac system
       if add_hvac
-        hvacSystem.add_hvac(model, standard, remove_objects)
+        hvacSystem.add_hvac(model, standard, system_type, remove_objects)
       end
 
       # TODO: - hours of operation customization (initially using existing measure downstream of this one)
@@ -196,7 +196,7 @@ module BuildingSync
 
       # set hvac controls and efficiencies (this should be last model articulation element)
       if add_hvac
-        hvacSystem.apply_sizing_and_assumptions(model, standard)
+        hvacSystem.apply_sizing_and_assumptions(model, standard, system_type)
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)

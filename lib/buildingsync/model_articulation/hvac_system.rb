@@ -92,7 +92,7 @@ module BuildingSync
       end
     end
 
-    def add_hvac(model, standard, remove_objects)
+    def add_hvac(model, standard, system_type, remove_objects)
       # remove HVAC objects
       if remove_objects
         standard.model_remove_prm_hvac(model)
@@ -168,7 +168,7 @@ module BuildingSync
       end
     end
 
-    def apply_sizing_and_assumptions(model, standard)
+    def apply_sizing_and_assumptions(model, standard, system_type)
       case system_type
       when 'Ideal Air Loads'
 
