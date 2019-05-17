@@ -118,5 +118,15 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{elevators.multiplier.round(1)} elevators each with power of #{OpenStudio.toNeatString(design_level, 0, true)} (W), plus lights and fans.")
       end
     end
+
+    def add_daylighting_controls(model, standard, template)
+      # add daylight controls, need to perform a sizing run for 2010
+      if template == '90.1-2010'
+        if standard.model_run_sizing_run(model, "#{Dir.pwd}/SRvt") == false
+          return false
+        end
+      end
+      standard.model_add_daylighting_controls(model)
+    end
   end
 end

@@ -37,6 +37,8 @@
 require_relative 'site'
 require_relative 'loads_system'
 require_relative 'envelope_system'
+require_relative 'hvac_system'
+require_relative 'service_hot_water_system'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio/extension/core/os_lib_geometry'
 require_relative '../helpers/Model.hvac'
@@ -78,7 +80,7 @@ module BuildingSync
       end
       @sites.each(&:generate_baseline_osm)
 
-      create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, "Forced Air")
+      create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, 'Forced Air')
     end
 
     def create_building_systems(model, template, system_type, hvac_delivery_type)
@@ -87,13 +89,12 @@ module BuildingSync
       add_elevators = false
       add_exterior_lights = false
       onsite_parking_fraction = 1.0
-      kitchen_makeup = "Adjacent"
-      exterior_lighting_zone = "3 - All Other Areas"
+      exterior_lighting_zone = '3 - All Other Areas'
       add_exhaust = true
       add_swh = true
       add_hvac = true
-      htg_src = "NaturalGas"
-      clg_src = "Electricity"
+      htg_src = 'NaturalGas'
+      clg_src = 'Electricity'
       remove_objects = false
       add_thermostat = true
 
@@ -101,14 +102,15 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
 
-      internalLoadSystem = LoadsSystem.new
+      load_system = LoadsSystem.new
+      hvacSystem = HVACSystem.new
 
       # Make the standard applier
       standard = Standard.build(template)
 
       # add internal loads to space types
       if add_space_type_loads
-        internalLoadSystem.add_internal_loads(model, standard, template, remove_objects)
+        load_system.add_internal_loads(model, standard, template, remove_objects)
       end
 
       # identify primary building type (used for construction, and ideally HVAC as well)
@@ -139,80 +141,26 @@ module BuildingSync
 
       # add elevators (returns ElectricEquipment object)
       if add_elevators
-        internalLoadSystem.add_elevator(model, standard)
+        load_system.add_elevator(model, standard)
       end
 
       # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
       if add_exterior_lights
-        internalLoadSystem.add_exterior_lights(model, standard, remove_objects)
+        load_system.add_exterior_lights(model, standard, remove_objects)
       end
 
       # add_exhaust
       if add_exhaust
-
-        # remove exhaust objects
-        if remove_objects
-          model.getFanZoneExhausts.each(&:remove)
-        end
-
-        zone_exhaust_fans = standard.model_add_exhaust(model, kitchen_makeup) # second argument is strategy for finding makeup zones for exhaust zones
-        zone_exhaust_fans.each do |k, v|
-          max_flow_rate_ip = OpenStudio.convert(k.maximumFlowRate.get, 'm^3/s', 'cfm').get
-          if v.key?(:zone_mixing)
-            zone_mixing = v[:zone_mixing]
-            mixing_source_zone_name = zone_mixing.sourceZone.get.name
-            mixing_design_flow_rate_ip = OpenStudio.convert(zone_mixing.designFlowRate.get, 'm^3/s', 'cfm').get
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}, with #{OpenStudio.toNeatString(mixing_design_flow_rate_ip, 0, true)} (cfm) of makeup air from #{mixing_source_zone_name}")
-          else
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}")
-          end
-        end
+        hvacSystem.add_exhaust(model, standard, 'Adjacent', remove_objects)
       end
 
       # add service water heating demand and supply
       if add_swh
-
-        # remove water use equipment and water use connections
-        if remove_objects
-          # TODO: - remove plant loops used for service water heating
-          model.getWaterUseEquipments.each(&:remove)
-          model.getWaterUseConnectionss.each(&:remove)
-        end
-
-        typical_swh = standard.model_add_typical_swh(model)
-        midrise_swh_loops = []
-        stripmall_swh_loops = []
-        typical_swh.each do |loop|
-          if loop.name.get.include?('MidriseApartment')
-            midrise_swh_loops << loop
-          elsif loop.name.get.include?('RetailStripmall')
-            stripmall_swh_loops << loop
-          else
-            water_use_connections = []
-            loop.demandComponents.each do |component|
-              next if !component.to_WaterUseConnections.is_initialized
-              water_use_connections << component
-            end
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{loop.name} to the building. It has #{water_use_connections.size} water use connections.")
-          end
-        end
-        if !midrise_swh_loops.empty?
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{midrise_swh_loops.size} MidriseApartment service water heating loops.")
-        end
-        if !stripmall_swh_loops.empty?
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{stripmall_swh_loops.size} RetailStripmall service water heating loops.")
-        end
+        serviceHotWaterSystem = ServiceHotWaterSystem.new
+        serviceHotWaterSystem.add(model, standard, remove_objects)
       end
 
-      # TODO: - when add methods below add bool to enable/disable them with default value to true
-
-      # add daylight controls, need to perform a sizing run for 2010
-      if template == '90.1-2010'
-        if standard.model_run_sizing_run(model, "#{Dir.pwd}/SRvt") == false
-          return false
-        end
-      end
-      standard.model_add_daylighting_controls(model)
+      load_system.add_daylighting_controls(model, standard, template)
 
       # TODO: - add refrigeration
       # remove refrigeration equipment
@@ -235,107 +183,12 @@ module BuildingSync
       # works by switching some fraction of electric loads to gas if requested (assuming base load is electric)
       # add thermostats
       if add_thermostat
-
-        # remove thermostats
-        if remove_objects
-          model.getThermostatSetpointDualSetpoints.each(&:remove)
-        end
-
-        model.getSpaceTypes.each do |space_type|
-          # create thermostat schedules
-          # apply internal load schedules
-          # the last bool test it to make thermostat schedules. They are added to the model but not assigned
-          standard.space_type_apply_internal_load_schedules(space_type, false, false, false, false, false, false, true)
-
-          # identify thermal thermostat and apply to zones (apply_internal_load_schedules names )
-          model.getThermostatSetpointDualSetpoints.each do |thermostat|
-            next if !thermostat.name.to_s.include?(space_type.name.to_s)
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Assigning #{thermostat.name} to thermal zones with #{space_type.name} assigned.")
-            space_type.spaces.each do |space|
-              next if !space.thermalZone.is_initialized
-              space.thermalZone.get.setThermostatSetpointDualSetpoint(thermostat)
-            end
-            next
-          end
-        end
+        hvacSystem.add_thermostats(model, standard, remove_objects)
       end
 
       # add hvac system
       if add_hvac
-
-        # remove HVAC objects
-        if remove_objects
-          standard.model_remove_prm_hvac(model)
-        end
-
-        case system_type
-        when 'Inferred'
-
-          # Get the hvac delivery type enum
-          hvac_delivery = case hvac_delivery_type
-                          when 'Forced Air'
-                            'air'
-                          when 'Hydronic'
-                            'hydronic'
-                          end
-
-          # Group the zones by occupancy type.  Only split out
-          # non-dominant groups if their total area exceeds the limit.
-          sys_groups = standard.model_group_zones_by_type(model, OpenStudio.convert(20_000, 'ft^2', 'm^2').get)
-
-          # For each group, infer the HVAC system type.
-          sys_groups.each do |sys_group|
-            # Infer the primary system type
-            # OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "template = #{template}, climate_zone = #{climate_zone}, occ_type = #{sys_group['type']}, hvac_delivery = #{hvac_delivery}, htg_src = #{htg_src}, clg_src = #{clg_src}, area_ft2 = #{sys_group['area_ft2']}, num_stories = #{sys_group['stories']}")
-            sys_type, central_htg_fuel, zone_htg_fuel, clg_fuel = standard.model_typical_hvac_system_type(model,
-                                                                                                          climate_zone,
-                                                                                                          sys_group['type'],
-                                                                                                          hvac_delivery,
-                                                                                                          htg_src,
-                                                                                                          clg_src,
-                                                                                                          OpenStudio.convert(sys_group['area_ft2'], 'ft^2', 'm^2').get,
-                                                                                                          sys_group['stories'])
-
-            # Infer the secondary system type for multizone systems
-            sec_sys_type = case sys_type
-                           when 'PVAV Reheat', 'VAV Reheat'
-                             'PSZ-AC'
-                           when 'PVAV PFP Boxes', 'VAV PFP Boxes'
-                             'PSZ-HP'
-                           else
-                             sys_type # same as primary system type
-                           end
-
-            # Group zones by story
-            story_zone_lists = standard.model_group_zones_by_story(model, sys_group['zones'])
-
-            # On each story, add the primary system to the primary zones
-            # and add the secondary system to any zones that are different.
-            story_zone_lists.each do |story_group|
-              # Differentiate primary and secondary zones, based on
-              # operating hours and internal loads (same as 90.1 PRM)
-              pri_sec_zone_lists = standard.model_differentiate_primary_secondary_thermal_zones(model, story_group)
-              # Add the primary system to the primary zones
-              standard.model_add_hvac_system(model, sys_type, central_htg_fuel, zone_htg_fuel, clg_fuel, pri_sec_zone_lists['primary'])
-              # Add the secondary system to the secondary zones (if any)
-              if !pri_sec_zone_lists['secondary'].empty?
-                standard.model_add_hvac_system(model, sec_sys_type, central_htg_fuel, zone_htg_fuel, clg_fuel, pri_sec_zone_lists['secondary'])
-              end
-            end
-          end
-
-        else
-
-          # Group the zones by story
-          story_groups = standard.model_group_zones_by_story(model, model.getThermalZones)
-
-          # Add the user specified HVAC system for each story.
-          # Single-zone systems will get one per zone.
-          story_groups.each do |zones|
-            model.add_cbecs_hvac_system(standard, system_type, zones)
-          end
-
-        end
+        hvacSystem.add_hvac(model, standard, system_type, remove_objects)
       end
 
       # TODO: - hours of operation customization (initially using existing measure downstream of this one)
@@ -343,29 +196,7 @@ module BuildingSync
 
       # set hvac controls and efficiencies (this should be last model articulation element)
       if add_hvac
-        case system_type
-        when 'Ideal Air Loads'
-
-        else
-          # Set the heating and cooling sizing parameters
-          standard.model_apply_prm_sizing_parameters(model)
-
-          # Perform a sizing run
-          if standard.model_run_sizing_run(model, "#{Dir.pwd}/SR1") == false
-            return false
-          end
-
-          # If there are any multizone systems, reset damper positions
-          # to achieve a 60% ventilation effectiveness minimum for the system
-          # following the ventilation rate procedure from 62.1
-          standard.model_apply_multizone_vav_outdoor_air_sizing(model)
-
-          # Apply the prototype HVAC assumptions
-          standard.model_apply_prototype_hvac_assumptions(model, primary_bldg_type, climate_zone)
-
-          # Apply the HVAC efficiency standard
-          standard.model_apply_hvac_efficiency_standard(model, climate_zone)
-        end
+        hvacSystem.apply_sizing_and_assumptions(model, standard, system_type)
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)
