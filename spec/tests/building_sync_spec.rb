@@ -45,78 +45,24 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write building_151.xml (phase zero) with auc namespace' do
-    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
+    create_osw_file('building_151.xml')
 
-    expect(File.exist?(xml_path)).to be true
-
-    out_path = File.expand_path('../output/phase0_building_151/', File.dirname(__FILE__))
-    if File.exist?(out_path)
-      FileUtils.rm_rf(out_path)
-    end
-    expect(File.exist?(out_path)).not_to be true
-
-    FileUtils.mkdir_p(out_path)
-    expect(File.exist?(out_path)).to be true
-
-    translator = BuildingSync::Translator.new(xml_path, out_path, true)
-    translator.write_osm
   end
 
   it 'should parse and write DC GSA Headquarters.xml (phase zero)' do
-    xml_path = File.expand_path('../files/DC GSA Headquarters.xml', File.dirname(__FILE__))
-
-    expect(File.exist?(xml_path)).to be true
-
-    out_path = File.expand_path('../output/DC GSA Headquarters/', File.dirname(__FILE__))
-    if File.exist?(out_path)
-      FileUtils.rm_rf(out_path)
-    end
-    expect(File.exist?(out_path)).not_to be true
-
-    FileUtils.mkdir_p(out_path)
-    expect(File.exist?(out_path)).to be true
-
-    translator = BuildingSync::Translator.new(xml_path, out_path, false)
-    translator.write_osm
+    create_osw_file('DC GSA Headquarters.xml')
   end
 
   it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero)' do
-    xml_path = File.expand_path('../files/BuildingSync Website Valid Schema.xml', File.dirname(__FILE__))
-
-    expect(File.exist?(xml_path)).to be true
-
-    out_path = File.expand_path('../output/BuildingSync Website Valid Schema/', File.dirname(__FILE__))
-    if File.exist?(out_path)
-      FileUtils.rm_rf(out_path)
-    end
-    expect(File.exist?(out_path)).not_to be true
-
-    FileUtils.mkdir_p(out_path)
-    expect(File.exist?(out_path)).to be true
-
-    translator = BuildingSync::Translator.new(xml_path, out_path, true)
-    translator.write_osm
+    create_osw_file('BuildingSync Website Valid Schema.xml')
   end
 
   it 'should parse and write Golden Test File.xml (phase zero)' do
-    xml_path = File.expand_path('../files/Golden Test File.xml', File.dirname(__FILE__))
-
-    expect(File.exist?(xml_path)).to be true
-
-    out_path = File.expand_path('../output/Golden Test File/', File.dirname(__FILE__))
-    if File.exist?(out_path)
-      FileUtils.rm_rf(out_path)
-    end
-    expect(File.exist?(out_path)).not_to be true
-
-    FileUtils.mkdir_p(out_path)
-    expect(File.exist?(out_path)).to be true
-
-    translator = BuildingSync::Translator.new(xml_path, out_path, false)
-    translator.write_osm
+    create_osw_file('Golden Test File.xml')
   end
 
   it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace' do
+    # create_osw_file('building_151_n1.xml')
     xml_path = File.expand_path('../files/building_151_n1.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -155,5 +101,23 @@ RSpec.describe 'BuildingSync' do
 
       expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
     end
+  end
+
+  def create_osw_file(file_name)
+    xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path("../output/phase0_#{file_name}/", File.dirname(__FILE__))
+
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    translator = BuildingSync::Translator.new(xml_path, out_path, true)
+    translator.write_osm
   end
 end
