@@ -41,26 +41,37 @@ require 'parallel'
 
 RSpec.describe 'SelectionTool' do
   it 'Should validate valid XML file against BuildingSync schema' do
-    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
+    xml_path = File.expand_path('../files/Example – Valid Schema Invalid UseCase.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
-    selection_tool = BuildingSync::SelectionTool.new
-    expect(selection_tool.validate_schema(xml_path)).to be true
+    selection_tool = BuildingSync::SelectionTool.new(xml_path)
+    expect(selection_tool.validate_schema).to be true
+
+    expect(selection_tool.validate_use_case).to be true
   end
 
   it 'Should not validate invalid XML file against BuildingSync schema' do
-    xml_path = File.expand_path('../files/InvalidFile.xml', File.dirname(__FILE__))
+    xml_path = File.expand_path('../files/Example – Valid Schema Invalid UseCase.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
-    selection_tool = BuildingSync::SelectionTool.new
-    hash_response = selection_tool.get_json_data_from_schema(xml_path)
+    selection_tool = BuildingSync::SelectionTool.new(xml_path)
+    hash_response = selection_tool.get_json_data_from_schema
+
     if !hash_response['validation_results']['schema']['valid']
       p "#{xml_path} is not valid file against BuildingSync schema"
       hash_response['validation_results']['schema']['errors'].each do |error|
         puts error['message']
       end
     end
+
+    if !hash_response['validation_results']['schema']['valid']
+      hash_response['validation_results']['schema']['errors'].each do |error|
+        p "#{error['path']} => #{error['message']}"
+      end
+    end
+
     expect(hash_response['validation_results']['schema']['valid']).to be false
 
+    expect(hash_response['validation_results']['use_cases']['BRICR']['valid']).to be false
   end
 end

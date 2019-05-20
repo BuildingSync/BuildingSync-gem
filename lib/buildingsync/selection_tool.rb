@@ -43,21 +43,8 @@ module BuildingSync
   class SelectionTool
     # See documentation here: https://github.com/buildingsync/selection-tool#validator
     # Use core Net::HTTPS
-    def initialize
-      # return nil
-    end
-
-    def validate_schema(xml_path)
-      hash_response = get_json_data_from_schema(xml_path)
-      if !hash_response['validation_results']['schema']['valid']
-        hash_response['validation_results']['schema']['errors'].each do |error|
-          puts error['message']
-        end
-      end
-      return hash_response['validation_results']['schema']['valid']
-    end
-
-    def get_json_data_from_schema(xml_path)
+    def initialize(xml_path)
+      @hash_response = nil
       url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
 
       params = { 'schema_version' => '1.0.0' }
@@ -69,7 +56,32 @@ module BuildingSync
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       response = http.request(request)
 
-      return JSON.parse(response.read_body)
+      @hash_response = JSON.parse(response.read_body)
+      p @hash_response
+
+    end
+
+    def validate_use_case
+
+      if !@hash_response['validation_results']['use_cases']['BRICR']['valid']
+        @hash_response['validation_results']['use_cases']['BRICR']['errors'].each do |error|
+          puts error['message']
+        end
+      end
+      return @hash_response['validation_results']['use_cases']['BRICR']['valid']
+    end
+
+    def validate_schema
+      if !@hash_response['validation_results']['schema']['valid']
+        @hash_response['validation_results']['schema']['errors'].each do |error|
+          p "#{error['path']} => #{error['message']}"
+        end
+      end
+      return @hash_response['validation_results']['schema']['valid']
+    end
+
+    def get_json_data_from_schema
+      return @hash_response
     end
 
     def get_ASHRAE_211_Level

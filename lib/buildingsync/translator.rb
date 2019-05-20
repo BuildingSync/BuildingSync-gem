@@ -61,8 +61,8 @@ module BuildingSync
         raise "File '#{xml_file_path}' does not exist" unless File.exist?(xml_file_path)
       end
 
-      selection_tool = BuildingSync::SelectionTool.new
-      if !selection_tool.validate_schema(xml_file_path)
+      selection_tool = BuildingSync::SelectionTool.new(xml_file_path)
+      if !selection_tool.validate_schema
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
         raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
       else
