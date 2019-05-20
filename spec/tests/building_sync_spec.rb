@@ -49,7 +49,7 @@ RSpec.describe 'BuildingSync' do
 
     expect(File.exist?(xml_path)).to be true
 
-    out_path = File.expand_path('../output/phase0_building_151/', File.dirname(__FILE__))
+    out_path = File.expand_path('../output/building_151/', File.dirname(__FILE__))
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
     end
@@ -60,6 +60,12 @@ RSpec.describe 'BuildingSync' do
 
     translator = BuildingSync::Translator.new(xml_path, out_path, true)
     translator.write_osm
+
+    osm_path = "#{out_path}/in.osm"
+    p osm_path
+    expect(File.exist?(osm_path)).to be true
+
+    run_simulation(osm_path, "R:/NREL/BuildingSync-gem/spec/weather/CZ01RV2.epw")
   end
 
   it 'should parse and write DC GSA Headquarters.xml (phase zero)' do
@@ -155,5 +161,31 @@ RSpec.describe 'BuildingSync' do
 
       expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
     end
+  end
+
+  def run_simulation(osm_name, epw_name)
+    workflow = OpenStudio::WorkflowJSON.new
+    workflow.setSeedFile(osm_name)
+    workflow.setWeatherFile(epw_name)
+    #workflow.setRootDirectory('R:/NREL/BuildingSync-gem/spec/output')
+    #workflow.setRunDirectory('R:/NREL/BuildingSync-gem/spec/output')
+    p epw_name
+    osw_path = osm_name.gsub('.osm', '.osw')
+    p osw_path
+    workflow.saveAs(File.absolute_path(osw_path.to_s))
+
+    p workflow.absoluteRunDir.to_s
+    p workflow.absoluteRootDir.to_s
+
+    cli_path = OpenStudio.getOpenStudioCLI
+    cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
+    # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_path}\""
+    puts cmd
+
+    # Run the sizing run
+    OpenstudioStandards.run_command(cmd)
+
+    #result = system(cmd)
+    #expect(result).to be true
   end
 end
