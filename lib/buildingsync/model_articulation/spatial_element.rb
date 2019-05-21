@@ -49,7 +49,7 @@ module BuildingSync
       @bar_division_method = nil
     end
 
-    def read_floor_areas(build_element, total_floor_area, ns)
+    def read_floor_areas(build_element, parent_total_floor_area, ns)
       build_element.elements.each("#{ns}:FloorAreas/#{ns}:FloorArea") do |floor_area_element|
         floor_area = floor_area_element.elements["#{ns}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
@@ -64,7 +64,7 @@ module BuildingSync
         elsif floor_area_type == 'Conditioned'
           @conditioned_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@@conditioned_floor_area', floor_area), 'ft^2', 'm^2').get
         else
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.generate_baseline_osm', "Unsupported floor area type found: #{floor_area_type}")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.SpatialElement.generate_baseline_osm', "Unsupported floor area type found: #{floor_area_type}")
         end
 
         if @total_floor_area.nil? && !@conditioned_floor_area.nil?
@@ -75,9 +75,13 @@ module BuildingSync
           end
         end
 
-        raise 'Spatial element does not define gross floor area' if @total_floor_area.nil? && total_floor_area.nil?
+        raise 'Spatial element does not define gross floor area' if @total_floor_area.nil? && parent_total_floor_area.nil?
       end
-      @total_floor_area
+      if @total_floor_area.nil?
+        return parent_total_floor_area
+      else
+        return @total_floor_area
+      end
     end
 
     def read_occupancy_type(xml_element, occupancy_type, ns)
@@ -108,6 +112,12 @@ module BuildingSync
           end
         else
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
+        end
+      else
+        if occupancy_type.nil?
+          raise "Building type '#{occupancy_type}' is nil"
+        else
+          raise "Building total floor area '#{total_floor_area}' is nil"
         end
       end
     end

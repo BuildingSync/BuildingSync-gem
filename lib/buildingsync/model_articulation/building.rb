@@ -47,7 +47,7 @@ module BuildingSync
     include EnergyPlus
 
     # initialize
-    def initialize(build_element, occupancy_type, total_floor_area, ns)
+    def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
       @building_subsections = []
       @standard_template = nil
       @single_floor_area = 0.0
@@ -64,16 +64,16 @@ module BuildingSync
       @party_wall_fraction = 0
 
       # code to initialize
-      read_xml(build_element, occupancy_type, total_floor_area, ns)
+      read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
     end
 
     def num_stories
       return @num_stories_above_grade + @num_stories_below_grade
     end
 
-    def read_xml(build_element, occupancy_type, total_floor_area, ns)
+    def read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
       # floor areas
-      read_floor_areas(build_element, total_floor_area, ns)
+      read_floor_areas(build_element, site_total_floor_area, ns)
       # standard template
       read_standard_template_based_on_year(build_element, ns)
       # deal with stories above and below grade
@@ -81,14 +81,14 @@ module BuildingSync
       # aspect ratio
       read_aspect_ratio(build_element, ns)
       # read occupancy
-      @occupancy_type = read_occupancy_type(build_element, occupancy_type, ns)
+      @occupancy_type = read_occupancy_type(build_element, site_occupancy_type, ns)
 
       build_element.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |subsection_element|
-        @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template, @occupancy_type, ns))
+        @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template, @occupancy_type, @total_floor_area, ns))
       end
 
       # floor areas
-      read_floor_areas(build_element, total_floor_area, ns)
+      @total_floor_area = read_floor_areas(build_element, site_total_floor_area, ns)
 
       set_bldg_and_system_type(@occupancy_type, @total_floor_area)
 
@@ -114,11 +114,11 @@ module BuildingSync
       @length = footprint / @width
     end
 
-    def read_standard_template_based_on_year(build_element, nodesap)
-      built_year = build_element.elements["#{nodesap}:YearOfConstruction"].text.to_f
+    def read_standard_template_based_on_year(build_element, ns)
+      built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_f
 
-      if build_element.elements["#{nodesap}:YearOfLastMajorRemodel"]
-        major_remodel_year = build_element.elements["#{nodesap}:YearOfLastMajorRemodel"].text.to_f
+      if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
+        major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_f
         built_year = major_remodel_year if major_remodel_year > built_year
       end
 
@@ -181,7 +181,7 @@ module BuildingSync
       end
       if @floor_height == 0.0
         @floor_height = OpenStudio.convert(building_form_defaults[:typical_story], 'ft', 'm').get
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for floor height will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:typical_story]}.")
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for floor height will be replaced with smart default for #{get_building_type}of #{building_form_defaults[:typical_story]}.")
       end
       # because of this can't set wwr to 0.0. If that is desired then we can change this to check for 1.0 instead of 0.0
       if @wwr == 0.0
@@ -463,8 +463,6 @@ module BuildingSync
       bar_hash[:building_wwr_s] = wwr
       bar_hash[:building_wwr_e] = wwr
       bar_hash[:building_wwr_w] = wwr
-
-      # TODO: implement the party wall logic
 
       runner = OpenStudio::Ruleset::OSRunner.new
       # remove non-resource objects not removed by removing the building

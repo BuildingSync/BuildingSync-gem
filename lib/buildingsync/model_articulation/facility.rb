@@ -107,6 +107,7 @@ module BuildingSync
 
       # Make the standard applier
       standard = Standard.build(template)
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Building Standard with template: #{template}.")
 
       # add internal loads to space types
       if add_space_type_loads

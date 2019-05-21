@@ -64,6 +64,14 @@ module BuildingSync
       build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
         @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, ns))
       end
+      if @buildings.count == 0
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
+        raise 'Error: There is no building attached to this site in your BuildingSync file.'
+      else if @buildings.count > 1
+             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
+             raise "Error: There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file."
+           end
+      end
     end
 
     def read_climate_zone(build_element, ns)
@@ -100,18 +108,14 @@ module BuildingSync
     end
 
     def get_building_type
-      return @buildings[0].get_building_type
+      if @bldg_type.nil?
+        return @buildings[0].get_building_type(@bldg_type)
+      else
+        return @bldg_type
+      end
     end
 
     def generate_baseline_osm
-      if @buildings.count == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
-        raise 'Error: There is no building attached to this site in your BuildingSync file.'
-      else if @buildings.count > 1
-             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
-             raise "Error: There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file."
-           end
-      end
       @buildings.each do |building|
         climate_zone = @climate_zone_ashrae
         # for now we use the california climate zone if it is available
