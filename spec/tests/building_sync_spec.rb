@@ -45,21 +45,21 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write building_151.xml (phase zero) with auc namespace' do
-    create_osw_file('building_151.xml')
-	
-	run_simulation(osm_path, "R:/NREL/BuildingSync-gem/spec/weather/CZ01RV2.epw")
+    test_baseline_creation('building_151.xml')
+
+      # run_simulation(osm_path, "R:/NREL/BuildingSync-gem/spec/weather/CZ01RV2.epw")
   end
 
   it 'should parse and write DC GSA Headquarters.xml (phase zero)' do
-    create_osw_file('DC GSA Headquarters.xml')
+    test_baseline_creation('DC GSA Headquarters.xml')
   end
 
   it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero)' do
-    create_osw_file('BuildingSync Website Valid Schema.xml')
+    test_baseline_creation('BuildingSync Website Valid Schema.xml')
   end
 
   it 'should parse and write Golden Test File.xml (phase zero)' do
-    create_osw_file('Golden Test File.xml')
+    test_baseline_creation('Golden Test File.xml')
   end
 
   it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace' do
@@ -130,11 +130,11 @@ RSpec.describe 'BuildingSync' do
     #expect(result).to be true
   end
 
-  def create_osw_file(file_name)
+  def test_baseline_creation(file_name)
     xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
-    out_path = File.expand_path("../output/phase0_#{file_name}/", File.dirname(__FILE__))
+    out_path = File.expand_path("../output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
 
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
@@ -146,5 +146,6 @@ RSpec.describe 'BuildingSync' do
 
     translator = BuildingSync::Translator.new(xml_path, out_path, true)
     translator.write_osm
+    expect(File.exist?("#{out_path}/in.osm")).to be true
   end
 end
