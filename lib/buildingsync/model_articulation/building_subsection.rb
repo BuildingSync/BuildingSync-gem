@@ -70,7 +70,7 @@ module BuildingSync
 
     def read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
       @occupancy_type = read_occupancy_type(subsection_element, occ_type, ns)
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area)
+      set_bldg_and_system_type(@occupancy_type, @total_floor_area, true)
     end
 
     # create space types

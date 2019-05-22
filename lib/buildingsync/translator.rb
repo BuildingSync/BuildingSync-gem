@@ -44,12 +44,13 @@ require_relative 'selection_tool'
 module BuildingSync
   class Translator
     # load the building sync file and chooses the correct workflow
-    def initialize(xml_file_path, output_dir, include_workflow_generation)
+    def initialize(xml_file_path, output_dir, standard_to_be_used = 'CaliforniaT24')
       @doc = nil
       @model_maker = nil
       @workflow_maker = nil
       @output_dir = output_dir
       @scenario_types = nil
+      @standard_to_be_used = standard_to_be_used
 
       # Open a log for the library
       logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
@@ -94,7 +95,7 @@ module BuildingSync
     end
 
     def write_osm
-      @model_maker.generate_baseline(@output_dir)
+      @model_maker.generate_baseline(@output_dir, @standard_to_be_used)
     end
 
     def write_osws

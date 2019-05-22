@@ -109,13 +109,13 @@ module BuildingSync
 
     def get_building_type
       if @bldg_type.nil?
-        return @buildings[0].get_building_type(@bldg_type)
+        return @buildings[0].get_building_type
       else
         return @bldg_type
       end
     end
 
-    def generate_baseline_osm
+    def generate_baseline_osm(standard_to_be_used)
       @buildings.each do |building|
         climate_zone = @climate_zone_ashrae
         # for now we use the california climate zone if it is available
@@ -123,7 +123,7 @@ module BuildingSync
           climate_zone = @climate_zone_ca_t24
         end
         building.set_weater_and_climate_zone(@weather_file_name, climate_zone)
-        building.generate_baseline_osm
+        building.generate_baseline_osm(standard_to_be_used)
       end
     end
 

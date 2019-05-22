@@ -93,7 +93,7 @@ module BuildingSync
       end
     end
 
-    def set_bldg_and_system_type(occupancy_type, total_floor_area)
+    def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
       if !occupancy_type.nil? && !total_floor_area.nil?
         if occupancy_type == 'Retail'
           @bldg_type = 'RetailStandalone'
@@ -113,10 +113,10 @@ module BuildingSync
         else
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
         end
-      else
-        if occupancy_type.nil?
+      elsif raise_exception
+        if occupancy_type.nil? && !total_floor_area.nil?
           raise "Building type '#{occupancy_type}' is nil"
-        else
+        elsif !occupancy_type.nil? && total_floor_area.nil?
           raise "Building total floor area '#{total_floor_area}' is nil"
         end
       end

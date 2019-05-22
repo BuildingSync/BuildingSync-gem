@@ -90,7 +90,7 @@ module BuildingSync
       # floor areas
       @total_floor_area = read_floor_areas(build_element, site_total_floor_area, ns)
 
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area)
+      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
 
       # need to set those defaults after initializing the subsections
       read_building_form_defaults
@@ -416,7 +416,7 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
     end
 
-    def generate_baseline_osm
+    def generate_baseline_osm(standard_to_be_used)
       # this is code refactored from the "create_bar_from_building_type_ratios" measure
       # first we check is there is any data at all in this facility, aka if there is a site in the list
       # TODO: the original measure contains value range checks, should we implement them here or while importing data??

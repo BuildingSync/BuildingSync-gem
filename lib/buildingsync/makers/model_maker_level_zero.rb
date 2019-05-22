@@ -44,7 +44,7 @@ module BuildingSync
       @facilities = []
     end
 
-    def generate_baseline(dir)
+    def generate_baseline(dir, standard_to_be_used)
       @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
         @facilities.push(Facility.new(facility_element, @ns))
       end
@@ -58,16 +58,14 @@ module BuildingSync
            end
       end
 
-      @facilities.each(&:generate_baseline_osm)
+      @facilities[0].generate_baseline_osm(standard_to_be_used)
       return write_osm(dir)
     end
 
     private
 
     def write_osm(dir)
-      @facilities.each do |facility|
-        @@facility = facility.write_osm(dir)
-      end
+      @@facility = @facilities[0].write_osm(dir)
     end
   end
 end
