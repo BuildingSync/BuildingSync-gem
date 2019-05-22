@@ -44,10 +44,14 @@ RSpec.describe 'BuildingSync' do
     expect(BuildingSync::VERSION).not_to be_nil
   end
 
-  it 'should parse and write building_151.xml (phase zero) with auc namespace' do
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24' do
     test_baseline_creation('building_151.xml')
 
       # run_simulation(osm_path, "R:/NREL/BuildingSync-gem/spec/weather/CZ01RV2.epw")
+  end
+
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1' do
+    test_baseline_creation('building_151.xml', ASHRAE90_1)
   end
 
   it 'should parse and write DC GSA Headquarters.xml (phase zero)' do
@@ -76,7 +80,7 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path, out_path, true)
+    translator = BuildingSync::Translator.new(xml_path, out_path)
     translator.write_osws
 
     osw_files = []
@@ -130,7 +134,7 @@ RSpec.describe 'BuildingSync' do
     #expect(result).to be true
   end
 
-  def test_baseline_creation(file_name)
+  def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24)
     xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -144,7 +148,7 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path, out_path, true)
+    translator = BuildingSync::Translator.new(xml_path, out_path, standard_to_be_used)
     translator.write_osm
     expect(File.exist?("#{out_path}/in.osm")).to be true
   end

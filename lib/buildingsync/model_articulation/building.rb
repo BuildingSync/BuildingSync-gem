@@ -47,7 +47,7 @@ module BuildingSync
     include EnergyPlus
 
     # initialize
-    def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
+    def initialize(build_element, site_occupancy_type, site_total_floor_area, standard_to_be_used, ns)
       @building_subsections = []
       @standard_template = nil
       @single_floor_area = 0.0
@@ -64,18 +64,18 @@ module BuildingSync
       @party_wall_fraction = 0
 
       # code to initialize
-      read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
+      read_xml(build_element, site_occupancy_type, site_total_floor_area, standard_to_be_used, ns)
     end
 
     def num_stories
       return @num_stories_above_grade + @num_stories_below_grade
     end
 
-    def read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
+    def read_xml(build_element, site_occupancy_type, site_total_floor_area, standard_to_be_used, ns)
       # floor areas
       read_floor_areas(build_element, site_total_floor_area, ns)
       # standard template
-      read_standard_template_based_on_year(build_element, ns)
+      read_standard_template_based_on_year(build_element, ns, standard_to_be_used)
       # deal with stories above and below grade
       read_stories_above_and_below_grade(build_element, ns)
       # aspect ratio
@@ -114,7 +114,7 @@ module BuildingSync
       @length = footprint / @width
     end
 
-    def read_standard_template_based_on_year(build_element, ns)
+    def read_standard_template_based_on_year(build_element, ns, standard_to_be_used)
       built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_f
 
       if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
@@ -122,20 +122,39 @@ module BuildingSync
         built_year = major_remodel_year if major_remodel_year > built_year
       end
 
-      if built_year < 1978
-        @standard_template = "CBES Pre-1978"
-      elsif built_year >= 1978 && built_year < 1992
-        @standard_template = "CBES T24 1978"
-      elsif built_year >= 1992 && built_year < 2001
-        @standard_template = "CBES T24 1992"
-      elsif built_year >= 2001 && built_year < 2005
-        @standard_template = "CBES T24 2001"
-      elsif built_year >= 2005 && built_year < 2008
-        @standard_template = "CBES T24 2005"
+      if standard_to_be_used == CA_TITLE24
+        if built_year < 1978
+          @standard_template = "CBES Pre-1978"
+        elsif built_year >= 1978 && built_year < 1992
+          @standard_template = "CBES T24 1978"
+        elsif built_year >= 1992 && built_year < 2001
+          @standard_template = "CBES T24 1992"
+        elsif built_year >= 2001 && built_year < 2005
+          @standard_template = "CBES T24 2001"
+        elsif built_year >= 2005 && built_year < 2008
+          @standard_template = "CBES T24 2005"
+        else
+          @standard_template = "CBES T24 2008"
+        end
+      elsif standard_to_be_used == ASHRAE90_1
+        if built_year < 1980
+          @standard_template = 'DOE Ref Pre-1980'
+        elsif built_year >= 1980 && built_year < 2004
+          @standard_template = 'DOE Ref 1980-2004'
+        elsif built_year >= 2004 && built_year < 2007
+          @standard_template = '90.1-2004'
+        elsif built_year >= 2007 && built_year < 2010
+          @standard_template = '90.1-2007'
+        elsif built_year >= 2010 && built_year < 2013
+          @standard_template = '90.1-2010'
+        elsif built_year >= 2013
+          @standard_template = '90.1-2013'
+        end
+        # TODO: add ASHRAE 2016 once it is available
       else
-        @standard_template = "CBES T24 2008"
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_standard_template_based_on_year', "Unknown standard_to_be_used #{standard_to_be_used}.")
       end
-      # todo: extent this to include ASHRAE climate zones
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.read_standard_template_based_on_year', "Using the follwing standard for default values #{@standard_template}.")
     end
 
     def read_stories_above_and_below_grade(build_element, nodesap)
@@ -251,7 +270,7 @@ module BuildingSync
       end
     end
 
-    def set_weater_and_climate_zone(weather_file_name, climate_zone)
+    def set_weater_and_climate_zone(weather_file_name, standard_to_be_used, climate_zone)
       initialize_model
       # create initial condition
       if @model.getWeatherFile.city != ''
@@ -402,10 +421,10 @@ module BuildingSync
 
       # set climate zone
       climateZones.clear
-      if climate_zone == "1A" || climate_zone == "1B" || climate_zone == "2A" || climate_zone == "2B" || climate_zone == "3A" || climate_zone == "3B" || climate_zone == "3C" || climate_zone == "4A" || climate_zone == "4B" || climate_zone == "4C" || climate_zone == "5A" || climate_zone == "5B" || climate_zone == "5C" || climate_zone == "6A" || climate_zone == "6B" || climate_zone == "7" || climate_zone == "8"
+      if standard_to_be_used == ASHRAE90_1
         climateZones.setClimateZone('ASHRAE', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
-      else
+      elsif standard_to_be_used == CA_TITLE24
         climate_zone = climate_zone.gsub('CEC', '').strip
         climate_zone = climate_zone.gsub('Climate Zone', '').strip
         climateZones.setClimateZone('CEC', climate_zone)

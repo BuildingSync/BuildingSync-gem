@@ -39,7 +39,7 @@ module BuildingSync
   class Site < SpatialElement
 
     # initialize
-    def initialize(build_element, ns)
+    def initialize(build_element, standard_to_be_used, ns)
       # code to initialize
       # an array that contains all the buildings
       @buildings = []
@@ -47,11 +47,11 @@ module BuildingSync
       @climate_zone_ca_t24 = nil
       @weather_file_name = nil
       # TM: just use the XML snippet to search for the buildings on the site
-      read_xml(build_element, ns)
+      read_xml(build_element, standard_to_be_used, ns)
     end
 
     # adding a site to the facility
-    def read_xml(build_element, ns)
+    def read_xml(build_element, standard_to_be_used, ns)
       # check occupancy type at the site level
       @occupancy_type = read_occupancy_type(build_element, nil, ns)
       # check floor areas at the site level
@@ -62,7 +62,7 @@ module BuildingSync
       read_weather_file_name(build_element, ns)
       # code to create a building
       build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
-        @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, ns))
+        @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, standard_to_be_used, ns))
       end
       if @buildings.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
@@ -119,10 +119,10 @@ module BuildingSync
       @buildings.each do |building|
         climate_zone = @climate_zone_ashrae
         # for now we use the california climate zone if it is available
-        if !@climate_zone_ca_t24.nil?
+        if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
           climate_zone = @climate_zone_ca_t24
         end
-        building.set_weater_and_climate_zone(@weather_file_name, climate_zone)
+        building.set_weater_and_climate_zone(@weather_file_name, standard_to_be_used, climate_zone)
         building.generate_baseline_osm(standard_to_be_used)
       end
     end

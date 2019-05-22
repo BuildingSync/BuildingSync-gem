@@ -49,20 +49,20 @@ module BuildingSync
     include OsLib_Geometry
 
     # initialize
-    def initialize(facility_xml, ns)
+    def initialize(facility_xml, standard_to_be_used, ns)
       # code to initialize
       # an array that contains all the sites
       @sites = []
 
       # reading the xml
-      read_xml(facility_xml, ns)
+      read_xml(facility_xml, standard_to_be_used, ns)
     end
 
     # adding a site to the facility
-    def read_xml(facility_xml, ns)
+    def read_xml(facility_xml, standard_to_be_used, ns)
       # puts facility_xml.to_a
       facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-        @sites.push(Site.new(site_element, ns))
+        @sites.push(Site.new(site_element, standard_to_be_used, ns))
       end
     end
 

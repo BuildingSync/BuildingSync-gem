@@ -46,7 +46,7 @@ module BuildingSync
 
     def generate_baseline(dir, standard_to_be_used)
       @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
-        @facilities.push(Facility.new(facility_element, @ns))
+        @facilities.push(Facility.new(facility_element, standard_to_be_used, @ns))
       end
 
       if @facilities.count == 0

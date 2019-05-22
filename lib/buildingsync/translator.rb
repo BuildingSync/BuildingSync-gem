@@ -41,10 +41,13 @@ require_relative 'makers/model_maker_level_zero'
 require_relative 'makers/workflow_maker_phase_zero'
 require_relative 'selection_tool'
 
+ASHRAE90_1 = 'ASHRAE90.1'
+CA_TITLE24 = 'CaliforniaTitle24'
+
 module BuildingSync
   class Translator
     # load the building sync file and chooses the correct workflow
-    def initialize(xml_file_path, output_dir, standard_to_be_used = 'CaliforniaT24')
+    def initialize(xml_file_path, output_dir, standard_to_be_used = ASHRAE90_1)
       @doc = nil
       @model_maker = nil
       @workflow_maker = nil
