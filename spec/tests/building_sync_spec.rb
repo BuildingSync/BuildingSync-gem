@@ -108,8 +108,8 @@ RSpec.describe 'BuildingSync' do
     workflow = OpenStudio::WorkflowJSON.new
     workflow.setSeedFile(osm_name)
     workflow.setWeatherFile(epw_name)
-    #workflow.setRootDirectory('R:/NREL/BuildingSync-gem/spec/output')
-    #workflow.setRunDirectory('R:/NREL/BuildingSync-gem/spec/output')
+    # workflow.setRootDirectory('R:/NREL/BuildingSync-gem/spec/output')
+    # workflow.setRunDirectory('R:/NREL/BuildingSync-gem/spec/output')
     p epw_name
     osw_path = osm_name.gsub('.osm', '.osw')
     p osw_path
@@ -126,8 +126,8 @@ RSpec.describe 'BuildingSync' do
     # Run the sizing run
     OpenstudioStandards.run_command(cmd)
 
-    #result = system(cmd)
-    #expect(result).to be true
+    # result = system(cmd)
+    # expect(result).to be true
   end
 
   def test_baseline_creation(file_name)
@@ -146,6 +146,7 @@ RSpec.describe 'BuildingSync' do
 
     translator = BuildingSync::Translator.new(xml_path, out_path, true)
     translator.write_osm
+
     expect(File.exist?("#{out_path}/in.osm")).to be true
   end
 end
