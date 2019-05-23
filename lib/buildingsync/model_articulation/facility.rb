@@ -80,10 +80,10 @@ module BuildingSync
       end
       @sites[0].generate_baseline_osm(standard_to_be_used)
 
-      create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, 'Forced Air')
+      create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, @sites[0].get_climate_zone, 'Forced Air')
     end
 
-    def create_building_systems(model, template, system_type, hvac_delivery_type)
+    def create_building_systems(model, template, system_type, climate_zone, hvac_delivery_type)
       add_space_type_loads = true
       add_constructions = true
       add_elevators = false
@@ -197,7 +197,7 @@ module BuildingSync
 
       # set hvac controls and efficiencies (this should be last model articulation element)
       if add_hvac
-        hvacSystem.apply_sizing_and_assumptions(model, standard, system_type)
+        hvacSystem.apply_sizing_and_assumptions(model, standard, primary_bldg_type, system_type, climate_zone)
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)

@@ -43,6 +43,7 @@ module BuildingSync
       # code to initialize
       # an array that contains all the buildings
       @buildings = []
+      @climate_zone = nil
       @climate_zone_ashrae = nil
       @climate_zone_ca_t24 = nil
       @weather_file_name = nil
@@ -115,14 +116,18 @@ module BuildingSync
       end
     end
 
+    def get_climate_zone
+      return @climate_zone
+    end
+
     def generate_baseline_osm(standard_to_be_used)
       @buildings.each do |building|
-        climate_zone = @climate_zone_ashrae
+        @climate_zone = @climate_zone_ashrae
         # for now we use the california climate zone if it is available
         if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
-          climate_zone = @climate_zone_ca_t24
+          @climate_zone = @climate_zone_ca_t24
         end
-        building.set_weater_and_climate_zone(@weather_file_name, standard_to_be_used, climate_zone)
+        building.set_weater_and_climate_zone(@climate_zone, standard_to_be_used)
         building.generate_baseline_osm(standard_to_be_used)
       end
     end
@@ -138,7 +143,5 @@ module BuildingSync
       return scenario_types
     end
   end
-
-
 end
 

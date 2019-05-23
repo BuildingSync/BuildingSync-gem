@@ -270,7 +270,7 @@ module BuildingSync
       end
     end
 
-    def set_weater_and_climate_zone(weather_file_name, standard_to_be_used, climate_zone)
+    def set_weater_and_climate_zone(climate_zone, standard_to_be_used)
       initialize_model
       # create initial condition
       if @model.getWeatherFile.city != ''

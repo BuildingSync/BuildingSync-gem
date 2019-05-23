@@ -168,7 +168,7 @@ module BuildingSync
       end
     end
 
-    def apply_sizing_and_assumptions(model, standard, system_type)
+    def apply_sizing_and_assumptions(model, standard, primary_bldg_type, system_type, climate_zone)
       case system_type
       when 'Ideal Air Loads'
 
