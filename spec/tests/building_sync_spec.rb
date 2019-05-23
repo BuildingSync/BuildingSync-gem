@@ -45,9 +45,9 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24' do
-    test_baseline_creation('building_151.xml')
+    osm_path = test_baseline_creation('building_151.xml')
 
-      # run_simulation(osm_path, "R:/NREL/BuildingSync-gem/spec/weather/CZ01RV2.epw")
+    run_simulation(osm_path, "R:/NREL/BuildingSync-gem/spec/weather/CZ01RV2.epw")
   end
 
   it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1' do
@@ -112,15 +112,8 @@ RSpec.describe 'BuildingSync' do
     workflow = OpenStudio::WorkflowJSON.new
     workflow.setSeedFile(osm_name)
     workflow.setWeatherFile(epw_name)
-    # workflow.setRootDirectory('R:/NREL/BuildingSync-gem/spec/output')
-    # workflow.setRunDirectory('R:/NREL/BuildingSync-gem/spec/output')
-    p epw_name
     osw_path = osm_name.gsub('.osm', '.osw')
-    p osw_path
     workflow.saveAs(File.absolute_path(osw_path.to_s))
-
-    p workflow.absoluteRunDir.to_s
-    p workflow.absoluteRootDir.to_s
 
     cli_path = OpenStudio.getOpenStudioCLI
     cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
@@ -130,8 +123,7 @@ RSpec.describe 'BuildingSync' do
     # Run the sizing run
     OpenstudioStandards.run_command(cmd)
 
-    # result = system(cmd)
-    # expect(result).to be true
+    expect(File.exist?(osm_name.gsub('in.osm', 'run/eplusout.sql'))).to be true
   end
 
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24)
@@ -152,5 +144,6 @@ RSpec.describe 'BuildingSync' do
     translator.write_osm
 
     expect(File.exist?("#{out_path}/in.osm")).to be true
+    return "#{out_path}/in.osm"
   end
 end
