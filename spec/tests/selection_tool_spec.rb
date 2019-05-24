@@ -57,7 +57,6 @@ RSpec.describe 'SelectionTool' do
     if selection_tool.validate_schema
       expect(selection_tool.validate_use_case).to be true
     end
-
   end
 
   it 'Should not validate invalid XML file against BuildingSync schema' do
@@ -78,6 +77,5 @@ RSpec.describe 'SelectionTool' do
     if selection_tool.validate_schema
       expect(selection_tool.validate_use_case).to be false
     end
-
   end
 end
