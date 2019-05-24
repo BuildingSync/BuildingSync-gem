@@ -1,5 +1,6 @@
 ---
 sudo: false
+dist: xenial
 language: ruby
 rvm:
   - 2.2.4
@@ -13,7 +14,7 @@ install:
 before_script:
   - curl -sLO https://raw.githubusercontent.com/NREL/OpenStudio-server/develop/docker/deployment/scripts/install_openstudio.sh
   - chmod +x install_openstudio.sh
-  - sudo ./install_openstudio.sh $OPENSTUDIO_VERSION $OPENSTUDIO_SHA  
+  - sudo ./install_openstudio.sh $OPENSTUDIO_VERSION $OPENSTUDIO_SHA
 script:
   - rspec spec/tests/selection_tool_spec.rb
 #  - bundle exec rake
