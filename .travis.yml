@@ -7,7 +7,6 @@ rvm:
 before_install: 
   - gem install bundler -v '1.17'
   - gem install bundler -v '~> 1.17'
-  - sudo rm /usr/local/bin/docker-compose
 install: 
   - bundle install
 script:
