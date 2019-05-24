@@ -10,9 +10,9 @@ before_install:
 install: 
   - bundle install
 script:
+  - sudo find / -name "studio.*"
   - ls
   - rspec spec/tests/selection_tool_spec.rb
-  - sudo find / -name "studio.*"
 #  - bundle exec rake 
 #  - bundle exec rake openstudio:test_with_openstudio
 #  - bundle exec rake   
