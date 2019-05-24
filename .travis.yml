@@ -7,10 +7,10 @@ rvm:
 before_install: 
   - gem install bundler -v '1.17'
   - gem install bundler -v '~> 1.17'
+  - sudo rm /usr/local/bin/docker-compose
 install: 
   - bundle install
 script:
-  - sudo rm /usr/local/bin/openstudio
   - ls
   - rspec spec/tests/selection_tool_spec.rb
 #  - bundle exec rake 
