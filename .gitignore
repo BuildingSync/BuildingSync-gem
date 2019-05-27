@@ -10,6 +10,7 @@
 /spec/reports/
 /tmp/
 /spec/output/
+/SR1
 
 # rspec failure tracking
 .rspec_status
@@ -21,3 +22,4 @@
 # measures tests
 lib/measures/.rubocop.yml
 lib/measures/test_results/*
+

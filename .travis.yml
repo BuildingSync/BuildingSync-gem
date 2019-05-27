@@ -9,8 +9,8 @@ matrix:
     - env: OPENSTUDIO_VERSION=2.8.0 && OPENSTUDIO_SHA=55665635f0 && RUBYLIB=/usr/local/openstudio-2.8.0/Ruby:/usr/Ruby
 before_install:
   - gem install bundler -v '~> 1.17'
-  - gem 'openstudio-common-measures', github: 'NREL/openstudio-common-measures-gem', branch: 'develop'
   - sudo rm /usr/local/bin/docker-compose
+  - wget https://github.com/NREL/openstudio-common-measures-gem.git
 install: 
   - bundle install
 before_script:
@@ -18,7 +18,7 @@ before_script:
   - chmod +x install_openstudio.sh
   - sudo ./install_openstudio.sh $OPENSTUDIO_VERSION $OPENSTUDIO_SHA
 script:
-  - rspec spec/tests/selection_tool_spec.rb
+  - bundle exec rspec spec/tests/selection_tool_spec.rb
 #  - bundle exec rake
 #  - bundle exec rake openstudio:test_with_openstudio
 #  - bundle exec rake

@@ -24,10 +24,13 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'bundler', '~> 1.14'
   spec.add_development_dependency 'rake', '12.3.1'
-  spec.add_development_dependency 'rspec', '3.7.0'
+  spec.add_development_dependency 'rspec', '3.8.0'
   spec.add_development_dependency 'rubocop', '~> 0.54.0'
+  spec.add_development_dependency 'ci_reporter_rspec', '~> 1.0'
+  spec.add_development_dependency 'rubocop-checkstyle_formatter', '~> 0.4.0'
 
   spec.add_dependency 'openstudio-extension', '~> 0.1.0'
   spec.add_dependency 'openstudio-model-articulation', '~> 0.0.1'
   spec.add_dependency 'openstudio_measure_tester', '~> 0.1.0'
+  spec.add_dependency 'multipart-post', '2.1.1'
 end

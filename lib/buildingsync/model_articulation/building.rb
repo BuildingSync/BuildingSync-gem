@@ -37,8 +37,8 @@
 require_relative 'building_subsection'
 require 'openstudio/extension/core/os_lib_helper_methods'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
-require 'measures/changebuildinglocation/resources/epw'
-require 'measures/changebuildinglocation/resources/stat_file'
+require 'measures/ChangeBuildingLocation/resources/epw'
+require 'measures/ChangeBuildingLocation/resources/stat_file'
 
 module BuildingSync
   class Building < SpatialElement
