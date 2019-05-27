@@ -2,7 +2,7 @@ module BuildingSync
 
   # location of openstudio CLI
   if /mswin/.match(RUBY_PLATFORM) || /mingw/.match(RUBY_PLATFORM)
-    OPENSTUDIO_EXE = 'C:/openstudio-2.7.0/bin/openstudio.exe'
+    OPENSTUDIO_EXE = 'C:/openstudio-2.8.0/bin/openstudio.exe'
   else
     OPENSTUDIO_EXE = '/usr/local/bin/openstudio'
   end
@@ -12,6 +12,14 @@ module BuildingSync
       File.realpath("./weather",
       File.dirname(__FILE__))
   ]
+
+  # one or more measure paths
+    OPENSTUDIO_MEASURES = [
+        File.realpath("./measures", File.dirname(__FILE__)),
+        File.realpath("./../openstudio-measures/nrel_published",
+        File.dirname(__FILE__)),
+        File.realpath("./../openstudio-measures/nrel_dev", File.dirname(__FILE__))
+    ]
 
   # todo: move those constants into the extension-gem
 

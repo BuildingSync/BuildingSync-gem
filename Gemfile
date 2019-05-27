@@ -24,6 +24,13 @@ else
   gem 'openstudio-common-measures', github: 'NREL/openstudio-common-measures-gem', branch: 'develop'
 end
 
+if File.exist?('../openstudio-standards-gem')
+  gem 'openstudio-standards', '0.2.9'
+  # gem 'openstudio-standards', path: '../openstudio-standards'
+else
+  gem 'openstudio-standards', '0.2.9'
+end
+
 gem 'openstudio_measure_tester', '= 0.1.7' # This includes the dependencies for running unit tests, coverage, and rubocop
 # gem 'openstudio_measure_tester', :github => 'NREL/OpenStudio-measure-tester-gem', :ref => '273d1f1a5c739312688ea605ef4a5b6e7325332c'
 

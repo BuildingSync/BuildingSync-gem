@@ -65,13 +65,17 @@ module BuildingSync
         raise "File '#{xml_file_path}' does not exist" unless File.exist?(xml_file_path)
       end
 
-      selection_tool = BuildingSync::SelectionTool.new(xml_file_path)
-      if !selection_tool.validate_schema
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
-        raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
-      else
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
-        puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
+      # we wil try to validate the file, but if it fails, we will not cancel the process, but log an error
+      begin
+        selection_tool = BuildingSync::SelectionTool.new(xml_file_path)
+        if !selection_tool.validate_schema
+          raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
+        else
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
+          puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
+        end
+      rescue
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
       end
 
       File.open(xml_file_path, 'r') do |file|
