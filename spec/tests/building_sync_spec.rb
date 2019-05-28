@@ -61,7 +61,7 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write DC GSA Headquarters.xml (phase zero)' do
-    test_baseline_creation('DC GSA Headquarters.xml')
+    test_baseline_creation('DC GSA Headquarters.xml', "R:/NREL/BuildingSync-gem/spec/weather/CZ01RV2.epw")
   end
 
   it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero)' do
@@ -147,7 +147,7 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
-  def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24)
+  def test_baseline_creation(file_name, epw_file_path = nil, standard_to_be_used = CA_TITLE24)
     xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -161,7 +161,7 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path, out_path, standard_to_be_used)
+    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
     translator.write_osm
 
     puts "Looking for the following OSM file: #{out_path}/in.osm"
@@ -169,7 +169,7 @@ RSpec.describe 'BuildingSync' do
     return "#{out_path}/in.osm"
   end
 
-  def test_baseline_and_scenario_creation(file_name, standard_to_be_used = CA_TITLE24)
+  def test_baseline_and_scenario_creation(file_name, epw_file_path = nil, standard_to_be_used = CA_TITLE24)
     xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -183,7 +183,7 @@ RSpec.describe 'BuildingSync' do
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
-    translator = BuildingSync::Translator.new(xml_path, out_path, standard_to_be_used)
+    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
     translator.write_osm
 
     expect(File.exist?("#{out_path}/in.osm")).to be true

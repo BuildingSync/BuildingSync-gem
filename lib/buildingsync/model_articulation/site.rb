@@ -120,14 +120,14 @@ module BuildingSync
       return @climate_zone
     end
 
-    def generate_baseline_osm(standard_to_be_used)
+    def generate_baseline_osm(epw_file_path, standard_to_be_used)
       @buildings.each do |building|
         @climate_zone = @climate_zone_ashrae
         # for now we use the california climate zone if it is available
         if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
           @climate_zone = @climate_zone_ca_t24
         end
-        building.set_weater_and_climate_zone(@climate_zone, standard_to_be_used)
+        building.set_weater_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used)
         building.generate_baseline_osm(standard_to_be_used)
       end
     end

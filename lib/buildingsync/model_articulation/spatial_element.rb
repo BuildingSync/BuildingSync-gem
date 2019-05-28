@@ -94,6 +94,9 @@ module BuildingSync
     end
 
     def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
+      ' DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb'
+      ' SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient'
+      ' Hospital, SmallHotel, LargeHotel, QuickServiceRestaurant, FullServiceRestaurant, MidriseApartment, HighriseApartment, Warehouse'
       if !occupancy_type.nil? && !total_floor_area.nil?
         if occupancy_type == 'Retail'
           @bldg_type = 'RetailStandalone'
@@ -108,8 +111,61 @@ module BuildingSync
             @bldg_type = 'MediumOffice'
             @system_type = 'PVAV with reheat'
           else
-            raise 'Office building size is beyond BuildingSync scope'
+            @bldg_type = 'LargeOffice'
+            @system_type = 'VAV with reheat'
           end
+        elsif occupancy_type == 'StripMall'
+          @bldg_type = 'RetailStripmall'
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'PrimarySchool'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'SecondarySchool'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'Outpatient'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'Hospital'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'SmallHotel'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'LargeHotel'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'QuickServiceRestaurant'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'FullServiceRestaurant'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'MidriseApartment'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'HighriseApartment'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'Warehouse'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
+        elsif occupancy_type == 'SuperMarket'
+          @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
         else
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
         end
@@ -134,6 +190,43 @@ module BuildingSync
         puts "Error: parameter #{name} must be positive or zero."
       end
       return value
+    end
+
+    # create space types
+    def create_space_types(model, total_bldg_floor_area)
+      # create space types from subsection type
+      # mapping building_type name is needed for a few methods
+      building_type = @standard.model_get_lookup_name(@occupancy_type)
+      # create space_type_map from array
+      sum_of_ratios = 0.0
+      @space_types.each do |space_type_name, hash|
+        # create space type
+        space_type = OpenStudio::Model::SpaceType.new(model)
+        space_type.setStandardsBuildingType(@occupancy_type)
+        space_type.setStandardsSpaceType(space_type_name)
+        space_type.setName("#{@occupancy_type} #{space_type_name}")
+
+        # set color
+        test = @standard.space_type_apply_rendering_color(space_type) # this uses openstudio-standards
+        if !test
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm',"Warning: Could not find color for #{space_type.name}")
+        end
+        # extend hash to hold new space type object
+        hash[:space_type] = space_type
+
+        # add to sum_of_ratios counter for adjustment multiplier
+        sum_of_ratios += hash[:ratio]
+      end
+
+      # store multiplier needed to adjust sum of ratios to equal 1.0
+      @ratio_adjustment_multiplier = 1.0 / sum_of_ratios
+
+      @space_types.each do |space_type_name, hash|
+        ratio_of_bldg_total = hash[:ratio] * @ratio_adjustment_multiplier * fraction_area
+        final_floor_area = ratio_of_bldg_total * total_bldg_floor_area # I think I can just pass ratio but passing in area is cleaner
+        @space_types_floor_area[hash[:space_type]] = {floor_area: final_floor_area }
+      end
+      return @space_types_floor_area
     end
 
     def validate_fraction; end
