@@ -60,7 +60,7 @@ RSpec.describe 'SelectionTool' do
   end
 
   it 'Should not validate invalid XML file against BuildingSync schema' do
-    xml_path = File.expand_path('../files/InvalidFile.xml', File.dirname(__FILE__))
+    xml_path = File.expand_path('../files/Example - Invalid Schema.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
     selection_tool = BuildingSync::SelectionTool.new(xml_path)
