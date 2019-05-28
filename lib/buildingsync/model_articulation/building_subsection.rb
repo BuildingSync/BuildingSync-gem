@@ -1,6 +1,6 @@
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. 
+# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,48 +34,46 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'openstudio/model_articulation/os_lib_model_generation_bricr'
+require 'openstudio-standards'
+module BuildingSync
+  class BuildingSubsection < SpatialElement
+    include OsLib_ModelGenerationBRICR
+    include OpenstudioStandards
 
-# try to load configuration, use defaults if doesn't exist
-begin
-  require_relative '../config'
-rescue LoadError, StandardError
-  module BuildingSync
-    # location of openstudio CLI
-    OPENSTUDIO_EXE = 'openstudio'.freeze
+    # initialize
+    def initialize(subsection_element, standard_template, occ_type, bldg_total_floor_area, ns)
+      @subsection_element = nil
+      @standard = nil
+      @fraction_area = nil
+      @bldg_type = {}
+      @space_types = {}
+      @space_types_floor_area = {}
+      # code to initialize
+      read_xml(subsection_element, standard_template, occ_type, bldg_total_floor_area, ns)
+    end
 
-    # one or more measure paths
-    OPENSTUDIO_MEASURES = [].freeze
+    def read_xml(subsection_element, standard_template, occ_type, bldg_total_floor_area, ns)
+      # floor areas
+      @total_floor_area = read_floor_areas(subsection_element, bldg_total_floor_area, ns)
+      # based on the occupancy type set building type, system type and bar division method
+      read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
 
-    # one or more file paths
-    OPENSTUDIO_FILES = [].freeze
+      @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
 
-    # max number of datapoints to run
-    MAX_DATAPOINTS = Float::INFINITY
-    # MAX_DATAPOINTS = 2
+      @subsection_element = subsection_element
 
-    # number of parallel jobs
-    NUM_PARALLEL = 7
+      # Make the standard applier
+      @standard = Standard.build("#{standard_template}_#{@bldg_type}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSubsection.read_xml', "Building Standard with template: #{standard_template}_#{@bldg_type}")
+    end
 
-    # do simulations
-    DO_SIMULATIONS = false
-  end
-end
+    def read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
+      @occupancy_type = read_occupancy_type(subsection_element, occ_type, ns)
+      set_bldg_and_system_type(@occupancy_type, @total_floor_area, true)
+    end
 
-# for all testing
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'bundler/setup'
-require 'buildingsync/translator'
-
-RSpec.configure do |config|
-  # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = '.rspec_status'
-
-  # Disable RSpec exposing methods globally on `Module` and `main`
-  config.disable_monkey_patching!
-
-  config.expect_with :rspec do |c|
-    c.syntax = :expect
+    attr_reader :bldg_type, :space_types_floor_area
+    attr_accessor :fraction_area
   end
 end

@@ -1,6 +1,7 @@
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. 
+# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,48 +35,45 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+module BuildingSync
+  class ServiceHotWaterSystem < BuildingSystem
 
-# try to load configuration, use defaults if doesn't exist
-begin
-  require_relative '../config'
-rescue LoadError, StandardError
-  module BuildingSync
-    # location of openstudio CLI
-    OPENSTUDIO_EXE = 'openstudio'.freeze
+    # initialize
+    def initialize()
+      # code to initialize
+    end
 
-    # one or more measure paths
-    OPENSTUDIO_MEASURES = [].freeze
+    def add(model, standard, remove_objects)
+      # remove water use equipment and water use connections
+      if remove_objects
+        # TODO: - remove plant loops used for service water heating
+        model.getWaterUseEquipments.each(&:remove)
+        model.getWaterUseConnectionss.each(&:remove)
+      end
 
-    # one or more file paths
-    OPENSTUDIO_FILES = [].freeze
-
-    # max number of datapoints to run
-    MAX_DATAPOINTS = Float::INFINITY
-    # MAX_DATAPOINTS = 2
-
-    # number of parallel jobs
-    NUM_PARALLEL = 7
-
-    # do simulations
-    DO_SIMULATIONS = false
-  end
-end
-
-# for all testing
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'bundler/setup'
-require 'buildingsync/translator'
-
-RSpec.configure do |config|
-  # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = '.rspec_status'
-
-  # Disable RSpec exposing methods globally on `Module` and `main`
-  config.disable_monkey_patching!
-
-  config.expect_with :rspec do |c|
-    c.syntax = :expect
+      typical_swh = standard.model_add_typical_swh(model)
+      midrise_swh_loops = []
+      stripmall_swh_loops = []
+      typical_swh.each do |loop|
+        if loop.name.get.include?('MidriseApartment')
+          midrise_swh_loops << loop
+        elsif loop.name.get.include?('RetailStripmall')
+          stripmall_swh_loops << loop
+        else
+          water_use_connections = []
+          loop.demandComponents.each do |component|
+            next if !component.to_WaterUseConnections.is_initialized
+            water_use_connections << component
+          end
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{loop.name} to the building. It has #{water_use_connections.size} water use connections.")
+        end
+      end
+      if !midrise_swh_loops.empty?
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{midrise_swh_loops.size} MidriseApartment service water heating loops.")
+      end
+      if !stripmall_swh_loops.empty?
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{stripmall_swh_loops.size} RetailStripmall service water heating loops.")
+      end
+    end
   end
 end

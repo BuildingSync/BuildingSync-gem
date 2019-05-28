@@ -1,6 +1,6 @@
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. 
+# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,48 +34,19 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+module BuildingSync
+  class ModelMakerLevelOne < ModelMaker
+    # load the building sync file and chooses the correct workflow
+    def initialize(path)
+      # init
+    end
 
-# try to load configuration, use defaults if doesn't exist
-begin
-  require_relative '../config'
-rescue LoadError, StandardError
-  module BuildingSync
-    # location of openstudio CLI
-    OPENSTUDIO_EXE = 'openstudio'.freeze
+    def generate_baseline(dir)
+      # generate the baseline open studio model
+    end
 
-    # one or more measure paths
-    OPENSTUDIO_MEASURES = [].freeze
-
-    # one or more file paths
-    OPENSTUDIO_FILES = [].freeze
-
-    # max number of datapoints to run
-    MAX_DATAPOINTS = Float::INFINITY
-    # MAX_DATAPOINTS = 2
-
-    # number of parallel jobs
-    NUM_PARALLEL = 7
-
-    # do simulations
-    DO_SIMULATIONS = false
-  end
-end
-
-# for all testing
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'bundler/setup'
-require 'buildingsync/translator'
-
-RSpec.configure do |config|
-  # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = '.rspec_status'
-
-  # Disable RSpec exposing methods globally on `Module` and `main`
-  config.disable_monkey_patching!
-
-  config.expect_with :rspec do |c|
-    c.syntax = :expect
+    def write_osws(dir)
+      # create the OSWs for the scenarios
+    end
   end
 end

@@ -1,6 +1,6 @@
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. 
+# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,48 +34,48 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative './../spec_helper'
 
-# try to load configuration, use defaults if doesn't exist
-begin
-  require_relative '../config'
-rescue LoadError, StandardError
-  module BuildingSync
-    # location of openstudio CLI
-    OPENSTUDIO_EXE = 'openstudio'.freeze
+require 'fileutils'
+require 'parallel'
 
-    # one or more measure paths
-    OPENSTUDIO_MEASURES = [].freeze
+RSpec.describe 'SelectionTool' do
+  it 'Should validate valid XML file against BuildingSync schema' do
+    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
 
-    # one or more file paths
-    OPENSTUDIO_FILES = [].freeze
-
-    # max number of datapoints to run
-    MAX_DATAPOINTS = Float::INFINITY
-    # MAX_DATAPOINTS = 2
-
-    # number of parallel jobs
-    NUM_PARALLEL = 7
-
-    # do simulations
-    DO_SIMULATIONS = false
+    selection_tool = BuildingSync::SelectionTool.new(xml_path)
+    expect(selection_tool.validate_schema).to be true
   end
-end
 
-# for all testing
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+  it 'Should validate valid XML file against BuildingSync Use-Cases' do
+    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
 
-require 'bundler/setup'
-require 'buildingsync/translator'
+    selection_tool = BuildingSync::SelectionTool.new(xml_path)
 
-RSpec.configure do |config|
-  # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = '.rspec_status'
+    if selection_tool.validate_schema
+      expect(selection_tool.validate_use_case).to be true
+    end
+  end
 
-  # Disable RSpec exposing methods globally on `Module` and `main`
-  config.disable_monkey_patching!
+  it 'Should not validate invalid XML file against BuildingSync schema' do
+    xml_path = File.expand_path('../files/InvalidFile.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
 
-  config.expect_with :rspec do |c|
-    c.syntax = :expect
+    selection_tool = BuildingSync::SelectionTool.new(xml_path)
+
+    expect(selection_tool.validate_schema).to be false
+  end
+
+  it 'Should not validate valid XML file against BuildingSync Use-Cases' do
+    xml_path = File.expand_path('../files/Example – Valid Schema Invalid UseCase.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    selection_tool = BuildingSync::SelectionTool.new(xml_path)
+
+    if selection_tool.validate_schema
+      expect(selection_tool.validate_use_case).to be false
+    end
   end
 end

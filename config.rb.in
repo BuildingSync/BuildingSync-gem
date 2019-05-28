@@ -1,0 +1,50 @@
+module BuildingSync
+
+  # location of openstudio CLI
+  if /mswin/.match(RUBY_PLATFORM) || /mingw/.match(RUBY_PLATFORM)
+    OPENSTUDIO_EXE = 'C:/openstudio-2.8.0/bin/openstudio.exe'
+  else
+    OPENSTUDIO_EXE = '/usr/local/bin/openstudio'
+  end
+
+  # one or more file paths
+  OPENSTUDIO_FILES = [
+      File.realpath("./weather",
+      File.dirname(__FILE__))
+  ]
+
+  # one or more measure paths
+    OPENSTUDIO_MEASURES = [
+        File.realpath("./measures", File.dirname(__FILE__)),
+        File.realpath("./../openstudio-measures/nrel_published",
+        File.dirname(__FILE__)),
+        File.realpath("./../openstudio-measures/nrel_dev", File.dirname(__FILE__))
+    ]
+
+  # todo: move those constants into the extension-gem
+
+  # max number of datapoints to run
+  MAX_DATAPOINTS = Float::INFINITY
+  #MAX_DATAPOINTS = 2
+
+  # number of parallel jobs per BuildingSync file
+  NUM_PARALLEL = 4
+
+  # number of parallel BuildingSync files to run
+  NUM_BUILDINGS_PARALLEL = 2
+
+  # do simulations
+  DO_SIMULATIONS = false
+  
+  # specify the output folder for the simulation runs
+  #SIMULATION_OUTPUT_FOLDER = "D:/BRICR_OUTPUT/"
+
+  # specify to run the baseline simulation only or not
+  SIMULATE_BASELINE_ONLY = false
+
+  # specify to include the model calibration or not
+  DO_MODEL_CALIBRATION = false
+  
+  # collect results
+  DO_GET_RESULTS = false
+end

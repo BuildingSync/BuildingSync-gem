@@ -11,6 +11,7 @@ install:
   - bundle install
 script:
   - ls
+  - rspec spec/tests/selection_tool_spec.rb
 #  - bundle exec rake 
 #  - bundle exec rake openstudio:test_with_openstudio
 #  - bundle exec rake   

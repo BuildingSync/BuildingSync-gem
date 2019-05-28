@@ -1,6 +1,6 @@
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. 
+# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,47 +35,43 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-# try to load configuration, use defaults if doesn't exist
-begin
-  require_relative '../config'
-rescue LoadError, StandardError
-  module BuildingSync
-    # location of openstudio CLI
-    OPENSTUDIO_EXE = 'openstudio'.freeze
+require 'fileutils'
+require 'json'
+require_relative 'model_maker'
 
-    # one or more measure paths
-    OPENSTUDIO_MEASURES = [].freeze
+module BuildingSync
+  # base class for objects that will configure workflows based on building sync files
+  class WorkflowMaker < ModelMaker
+    def write_osws(dir)
+      FileUtils.mkdir_p(dir)
+    end
 
-    # one or more file paths
-    OPENSTUDIO_FILES = [].freeze
+    def gather_results(dir); end
 
-    # max number of datapoints to run
-    MAX_DATAPOINTS = Float::INFINITY
-    # MAX_DATAPOINTS = 2
+    def failed_scenarios
+      return []
+    end
 
-    # number of parallel jobs
-    NUM_PARALLEL = 7
+    def save_xml(filename)
+      File.open(filename, 'w') do |file|
+        @doc.write(file)
+      end
+    end
 
-    # do simulations
-    DO_SIMULATIONS = false
-  end
-end
+    def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
+      result = false
+      osw['steps'].each do |step|
+        if step['measure_dir_name'] == measure_dir_name
+          step['arguments'][argument_name] = argument_value
+          result = true
+        end
+      end
 
-# for all testing
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+      if !result
+        raise "Could not set '#{argument_name}' to '#{argument_value}' for measure '#{measure_dir_name}'"
+      end
 
-require 'bundler/setup'
-require 'buildingsync/translator'
-
-RSpec.configure do |config|
-  # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = '.rspec_status'
-
-  # Disable RSpec exposing methods globally on `Module` and `main`
-  config.disable_monkey_patching!
-
-  config.expect_with :rspec do |c|
-    c.syntax = :expect
+      return result
+    end
   end
 end

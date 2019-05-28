@@ -1,6 +1,6 @@
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. 
+# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,48 +34,38 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative '../model_articulation/facility'
+require_relative 'workflow_maker_phase_zero'
+module BuildingSync
+  class ModelMakerLevelZero < PhaseZeroWorkflowMaker
+    def initialize(doc, ns)
+      super
 
-# try to load configuration, use defaults if doesn't exist
-begin
-  require_relative '../config'
-rescue LoadError, StandardError
-  module BuildingSync
-    # location of openstudio CLI
-    OPENSTUDIO_EXE = 'openstudio'.freeze
+      @facilities = []
+    end
 
-    # one or more measure paths
-    OPENSTUDIO_MEASURES = [].freeze
+    def generate_baseline(dir, epw_file_path, standard_to_be_used)
+      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
+        @facilities.push(Facility.new(facility_element, standard_to_be_used, @ns))
+      end
 
-    # one or more file paths
-    OPENSTUDIO_FILES = [].freeze
+      if @facilities.count == 0
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', 'There are no facilities in your BuildingSync file.')
+        raise 'Error: There are no facilities in your BuildingSync file.'
+      else if @facilities.count > 1
+             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
+             raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
+           end
+      end
 
-    # max number of datapoints to run
-    MAX_DATAPOINTS = Float::INFINITY
-    # MAX_DATAPOINTS = 2
+      @facilities[0].generate_baseline_osm(epw_file_path, standard_to_be_used)
+      return write_osm(dir)
+    end
 
-    # number of parallel jobs
-    NUM_PARALLEL = 7
+    private
 
-    # do simulations
-    DO_SIMULATIONS = false
-  end
-end
-
-# for all testing
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'bundler/setup'
-require 'buildingsync/translator'
-
-RSpec.configure do |config|
-  # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = '.rspec_status'
-
-  # Disable RSpec exposing methods globally on `Module` and `main`
-  config.disable_monkey_patching!
-
-  config.expect_with :rspec do |c|
-    c.syntax = :expect
+    def write_osm(dir)
+      @@facility = @facilities[0].write_osm(dir)
+    end
   end
 end
