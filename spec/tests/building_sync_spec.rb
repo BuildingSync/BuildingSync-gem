@@ -47,25 +47,25 @@ RSpec.describe 'BuildingSync' do
   it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and baseline simulation' do
     osm_path = test_baseline_creation('building_151.xml')
 
-    run_baseline_simulation(osm_path, "R:/NREL/BuildingSync-gem/spec/weather/CZ01RV2.epw")
+    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
   end
 
   it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and all simulations' do
     osw_paths = test_baseline_and_scenario_creation('building_151.xml')
     run_scenario_simulations(osw_paths)
-    #run_simulation(osm_path, "R:/NREL/BuildingSync-gem/spec/weather/CZ01RV2.epw")
+    # run_simulation(osm_path, "CZ01RV2.epw")
   end
 
   it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1' do
-    test_baseline_creation('building_151.xml', ASHRAE90_1)
+    test_baseline_creation('building_151.xml', 'CZ01RV2.epw', ASHRAE90_1)
   end
 
   it 'should parse and write DC GSA Headquarters.xml (phase zero)' do
-    test_baseline_creation('DC GSA Headquarters.xml', "R:/NREL/BuildingSync-gem/spec/weather/CZ01RV2.epw")
+    test_baseline_creation('DC GSA Headquarters.xml', 'CZ01RV2.epw')
   end
 
   it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero)' do
-    test_baseline_creation('BuildingSync Website Valid Schema.xml')
+    test_baseline_creation('BuildingSync Website Valid Schema.xml', 'CZ01RV2.epw')
   end
 
   it 'should parse and write Golden Test File.xml (phase zero)' do
@@ -147,7 +147,7 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
-  def test_baseline_creation(file_name, epw_file_path = nil, standard_to_be_used = CA_TITLE24)
+  def test_baseline_creation(file_name, epw_file_name = nil, standard_to_be_used = CA_TITLE24)
     xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -160,6 +160,11 @@ RSpec.describe 'BuildingSync' do
 
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
+
+    epw_file_path = nil
+    if !epw_file_name.nil?
+      epw_file_path = File.expand_path("../weather/#{epw_file_name}", File.dirname(__FILE__))
+    end
 
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
     translator.write_osm

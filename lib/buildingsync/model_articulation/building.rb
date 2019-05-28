@@ -37,6 +37,7 @@
 require_relative 'building_subsection'
 require 'openstudio/extension/core/os_lib_helper_methods'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
+require 'openstudio/common_measures'
 require 'measures/changebuildinglocation/resources/epw'
 require 'measures/changebuildinglocation/resources/stat_file'
 
@@ -235,7 +236,7 @@ module BuildingSync
 
     def create_bldg_space_types(model)
       @building_subsections.each do |bldg_subsec|
-        bldg_subsec.create_space_types(model, @total_floor_area)
+        bldg_subsec.create_space_types(model, @total_floor_area, @standard_template, @bldg_type)
       end
     end
 
@@ -248,7 +249,7 @@ module BuildingSync
       end
       if @building_subsections.count == 0
         space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
-        space_types_floor_area = create_space_types(@model, @total_floor_area)
+        space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @bldg_type)
         space_types_floor_area.each do |space_type, hash|
           new_hash[space_type] = hash
         end
@@ -288,6 +289,8 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "No weather file is set. The model has #{@model.getDesignDays.size} design day objects")
       end
 
+      puts 'epw_file_path'
+      puts epw_file_path
       # find weather file
       if epw_file_path.nil?
         epw_file_name = nil

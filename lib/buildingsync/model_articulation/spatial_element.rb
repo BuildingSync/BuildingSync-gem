@@ -193,9 +193,12 @@ module BuildingSync
     end
 
     # create space types
-    def create_space_types(model, total_bldg_floor_area)
+    def create_space_types(model, total_bldg_floor_area, standard_template, bldg_type)
       # create space types from subsection type
       # mapping building_type name is needed for a few methods
+      if @standard.nil?
+        @standard = Standard.build("#{standard_template}_#{bldg_type}")
+      end
       building_type = @standard.model_get_lookup_name(@occupancy_type)
       # create space_type_map from array
       sum_of_ratios = 0.0
