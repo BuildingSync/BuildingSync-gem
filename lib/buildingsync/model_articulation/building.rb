@@ -37,7 +37,6 @@
 require_relative 'building_subsection'
 require 'openstudio/extension/core/os_lib_helper_methods'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
-require 'openstudio/common_measures'
 require 'measures/ChangeBuildingLocation/resources/epw'
 require 'measures/ChangeBuildingLocation/resources/stat_file'
 
