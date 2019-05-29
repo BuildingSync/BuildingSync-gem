@@ -40,49 +40,36 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  it 'should have a version' do
-    expect(BuildingSync::VERSION).not_to be_nil
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for Title24' do
+    test_baseline_creation('building_151.xml', CA_TITLE24)
   end
 
-  it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace' do
-    # create_osw_file('building_151_n1.xml')
-    xml_path = File.expand_path('../files/building_151_n1.xml', File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1' do
+    test_baseline_creation('building_151.xml', ASHRAE90_1)
+  end
 
-    out_path = File.expand_path('../output/phase0_building_151_n1/', File.dirname(__FILE__))
-    if File.exist?(out_path)
-      FileUtils.rm_rf(out_path)
-    end
-    expect(File.exist?(out_path)).not_to be true
+  it 'should parse and write DC GSA Headquarters.xml (phase zero) with Title 24' do
+    test_baseline_creation('DC GSA Headquarters.xml', CA_TITLE24)
+  end
 
-    FileUtils.mkdir_p(out_path)
-    expect(File.exist?(out_path)).to be true
+  it 'should parse and write DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1' do
+    test_baseline_creation('DC GSA Headquarters.xml', ASHRAE90_1)
+  end
 
-    translator = BuildingSync::Translator.new(xml_path, out_path)
-    translator.write_osws
+  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with Title 24' do
+    test_baseline_creation('BuildingSync Website Valid Schema.xml', CA_TITLE24, 'CZ01RV2.epw')
+  end
 
-    osw_files = []
-    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
+  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with ASHRAE 90.1' do
+    test_baseline_creation('BuildingSync Website Valid Schema.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  end
 
-    expect(osw_files.size).to eq 30
+  it 'should parse and write Golden Test File.xml (phase zero) with Title 24' do
+    test_baseline_creation('Golden Test File.xml', CA_TITLE24)
+  end
 
-    if BuildingSync::DO_SIMULATIONS
-      num_sims = 0
-      Parallel.each(osw_files, in_threads: [BuildingSync::NUM_PARALLEL, BuildingSync::MAX_DATAPOINTS].min) do |osw|
-        break if num_sims > BuildingSync::MAX_DATAPOINTS
-
-        cmd = "\"#{BuildingSync::OPENSTUDIO_EXE}\" run -w \"#{osw}\""
-        puts "Running cmd: #{cmd}"
-        result = system(cmd)
-        expect(result).to be true
-
-        num_sims += 1
-      end
-
-      translator.gather_results(out_path)
-      translator.save_xml(File.join(out_path, 'results.xml'))
-
-      expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
-    end
+  it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1' do
+    test_baseline_creation('Golden Test File.xml', ASHRAE90_1)
   end
 end
+

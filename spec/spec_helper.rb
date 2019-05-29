@@ -78,4 +78,92 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  def run_baseline_simulation(osm_name, epw_name)
+    workflow = OpenStudio::WorkflowJSON.new
+    workflow.setSeedFile(osm_name)
+    workflow.setWeatherFile(epw_name)
+    osw_path = osm_name.gsub('.osm', '.osw')
+    workflow.saveAs(File.absolute_path(osw_path.to_s))
+
+    cli_path = OpenStudio.getOpenStudioCLI
+    cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
+    # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_path}\""
+    puts cmd
+
+    # Run the sizing run
+    OpenstudioStandards.run_command(cmd)
+
+    expect(File.exist?(osm_name.gsub('in.osm', 'run/eplusout.sql'))).to be true
+  end
+
+  def run_scenario_simulations(osw_files)
+    cli_path = OpenStudio.getOpenStudioCLI
+
+    osw_files.each do |osw_file|
+      cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
+      # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
+      puts cmd
+
+      # Run the sizing run
+      OpenstudioStandards.run_command(cmd)
+
+      expect(File.exist?(osw_file.gsub('in.osw', 'eplusout.sql'))).to be true
+    end
+  end
+
+  def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+    xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
+
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    epw_file_path = nil
+    if !epw_file_name.nil?
+      epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
+    end
+
+    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
+    translator.write_osm
+
+    puts "Looking for the following OSM file: #{out_path}/in.osm"
+    expect(File.exist?("#{out_path}/in.osm")).to be true
+    return "#{out_path}/in.osm"
+  end
+
+  def test_baseline_and_scenario_creation(file_name, epw_file_path = nil, standard_to_be_used = CA_TITLE24)
+    xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
+
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
+    translator.write_osm
+
+    expect(File.exist?("#{out_path}/in.osm")).to be true
+
+    translator.write_osws
+
+    osw_files = []
+    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
+    expect(osw_files.size).to eq 30
+
+    return osw_files
+  end
 end
