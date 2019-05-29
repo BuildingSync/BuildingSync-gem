@@ -212,15 +212,17 @@ module BuildingSync
     def check_building_faction
       # check that sum of fractions for b,c, and d is less than 1.0 (so something is left for primary building type)
       building_fraction = 1.0
-      @building_subsections.each do |subsection|
-        next if subsection.fraction_area.nil?
-        building_fraction -= subsection.fraction_area
+      if @building_subsections.count > 0
+        @building_subsections.each do |subsection|
+          next if subsection.fraction_area.nil?
+          building_fraction -= subsection.fraction_area
+        end
+        if building_fraction <= 0.0
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction',  'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
+          raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
+        end
+        @building_subsections[0].fraction_area = building_fraction
       end
-      if building_fraction <= 0.0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction',  'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
-        raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
-      end
-      @building_subsections[0].fraction_area = building_fraction
     end
 
     def read_building_name
@@ -231,9 +233,9 @@ module BuildingSync
       @name = name_array.join('|').to_s
     end
 
-    def create_space_types(model)
+    def create_bldg_space_types(model)
       @building_subsections.each do |bldg_subsec|
-        bldg_subsec.create_space_types(model, @total_floor_area)
+        bldg_subsec.create_space_types(model, @total_floor_area, @standard_template, @bldg_type)
       end
     end
 
@@ -241,6 +243,13 @@ module BuildingSync
       new_hash = {}
       @building_subsections.each do |bldg_subsec|
         bldg_subsec.space_types_floor_area.each do |space_type, hash|
+          new_hash[space_type] = hash
+        end
+      end
+      if @building_subsections.count == 0
+        space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
+        space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @bldg_type)
+        space_types_floor_area.each do |space_type, hash|
           new_hash[space_type] = hash
         end
       end
@@ -270,7 +279,7 @@ module BuildingSync
       end
     end
 
-    def set_weater_and_climate_zone(climate_zone, standard_to_be_used)
+    def set_weater_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used)
       initialize_model
       # create initial condition
       if @model.getWeatherFile.city != ''
@@ -279,30 +288,36 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "No weather file is set. The model has #{@model.getDesignDays.size} design day objects")
       end
 
+      puts 'epw_file_path'
+      puts epw_file_path
       # find weather file
-      weather_file = nil
-      if climate_zone == "1A" || climate_zone == "1B"
-        weather_file = "CZ01RV2.epw"
-      elsif climate_zone == "2A" || climate_zone == "2B"
-        weather_file = "CZ02RV2.epw"
-      elsif climate_zone == "3A" || climate_zone == "3B" || climate_zone == "3C" || climate_zone == "Climate Zone 3"
-        weather_file = "CZ03RV2.epw"
-      elsif climate_zone == "4A" || climate_zone == "4B" || climate_zone == "4C"
-        weather_file = "CZ04RV2.epw"
-      elsif climate_zone == "5A" || climate_zone == "5B" || climate_zone == "5C"
-        weather_file = "CZ05RV2.epw"
-      elsif climate_zone == "6A" || climate_zone == "6B"
-        weather_file = "CZ06RV2.epw"
-      elsif climate_zone == "7"
-        weather_file = "CZ07RV2.epw"
-      elsif climate_zone == "8"
-        weather_file = "CZ08RV2.epw"
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', "Could not find a weather file for climate zone: #{climate_zone}")
+      if epw_file_path.nil?
+        epw_file_name = nil
+        'todo: find better way to get a weather file based on a climate zone'
+        if climate_zone == "1A" || climate_zone == "1B"
+          epw_file_name = "CZ01RV2.epw"
+        elsif climate_zone == "2A" || climate_zone == "2B"
+          epw_file_name = "CZ02RV2.epw"
+        elsif climate_zone == "3A" || climate_zone == "3B" || climate_zone == "3C" || climate_zone == "Climate Zone 3"
+          epw_file_name = "CZ03RV2.epw"
+        elsif climate_zone == "4A" || climate_zone == "4B" || climate_zone == "4C"
+          epw_file_name = "CZ04RV2.epw"
+        elsif climate_zone == "5A" || climate_zone == "5B" || climate_zone == "5C"
+          epw_file_name = "CZ05RV2.epw"
+        elsif climate_zone == "6A" || climate_zone == "6B"
+          epw_file_name = "CZ06RV2.epw"
+        elsif climate_zone == "7"
+          epw_file_name = "CZ07RV2.epw"
+        elsif climate_zone == "8"
+          epw_file_name = "CZ08RV2.epw"
+        else
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', "Could not find a weather file for climate zone: #{climate_zone}")
+        end
+        epw_file_path = File.expand_path("../../../spec/weather/#{epw_file_name}", File.dirname(__FILE__))
       end
 
       # Parse the EPW manually because OpenStudio can't handle multiyear weather files (or DATA PERIODS with YEARS)
-      epw_file = OpenStudio::Weather::Epw.load(File.expand_path("../../../spec/weather/#{weather_file}", File.dirname(__FILE__)))
+      epw_file = OpenStudio::Weather::Epw.load(epw_file_path)
 
       weather_file = @model.getWeatherFile
       weather_file.setCity(epw_file.city)
@@ -398,7 +413,7 @@ module BuildingSync
 
       # Set climate zone
       climateZones = @model.getClimateZones
-      if climate_zone == 'Lookup From Stat File'
+      if climate_zone.nil?
 
         # get climate zone from stat file
         text = nil
@@ -459,7 +474,7 @@ module BuildingSync
       end
       @model.getBuilding.setName(name)
 
-      create_space_types(@model)
+      create_bldg_space_types(@model)
 
       # calculate length and width of bar
       # todo - update slicing to nicely handle aspect ratio less than 1
@@ -516,6 +531,8 @@ module BuildingSync
         target_areas[k] = v[:floor_area]
       end
 
+      puts bar_hash
+      puts target_areas
       # create bar
       create_bar(runner, @model, bar_hash, 'Basements Ground Mid Top')
       # using the default value for story multiplier for now 'Basements Ground Mid Top'

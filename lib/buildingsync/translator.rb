@@ -47,17 +47,18 @@ CA_TITLE24 = 'CaliforniaTitle24'
 module BuildingSync
   class Translator
     # load the building sync file and chooses the correct workflow
-    def initialize(xml_file_path, output_dir, standard_to_be_used = ASHRAE90_1)
+    def initialize(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
       @doc = nil
       @model_maker = nil
       @workflow_maker = nil
       @output_dir = output_dir
       @scenario_types = nil
       @standard_to_be_used = standard_to_be_used
+      @epw_path = epw_file_path
 
       # Open a log for the library
       logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
-      logFile.setLogLevel(OpenStudio::Debug)
+      logFile.setLogLevel(OpenStudio::Info)
 
       # parse the xml
       if !File.exist?(xml_file_path)
@@ -65,13 +66,17 @@ module BuildingSync
         raise "File '#{xml_file_path}' does not exist" unless File.exist?(xml_file_path)
       end
 
-      selection_tool = BuildingSync::SelectionTool.new(xml_file_path)
-      if !selection_tool.validate_schema
+      # we wil try to validate the file, but if it fails, we will not cancel the process, but log an error
+      begin
+        selection_tool = BuildingSync::SelectionTool.new(xml_file_path)
+        if !selection_tool.validate_schema
+          raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
+        else
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
+          puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
+        end
+      rescue
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
-        raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
-      else
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
-        puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
       end
 
       File.open(xml_file_path, 'r') do |file|
@@ -98,7 +103,7 @@ module BuildingSync
     end
 
     def write_osm
-      @model_maker.generate_baseline(@output_dir, @standard_to_be_used)
+      @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used)
     end
 
     def write_osws

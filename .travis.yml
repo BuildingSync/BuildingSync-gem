@@ -10,7 +10,6 @@ matrix:
 before_install:
   - gem install bundler -v '~> 1.17'
   - sudo rm /usr/local/bin/docker-compose
-  - wget https://github.com/NREL/openstudio-common-measures-gem.git
 install: 
   - bundle install
 before_script:

@@ -67,7 +67,7 @@ module BuildingSync
     end
 
     # generating the OpenStudio model based on the imported BuildingSync Data
-    def generate_baseline_osm(standard_to_be_used)
+    def generate_baseline_osm(epw_file_path, standard_to_be_used)
       if @sites.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', 'There are no sites attached to this facility in your BuildingSync file.')
         raise 'There are no sites attached to this facility in your BuildingSync file.'
@@ -78,7 +78,7 @@ module BuildingSync
              OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.generate_baseline_osm', "Info: There is/are #{@sites.count} sites in this facility.")
            end
       end
-      @sites[0].generate_baseline_osm(standard_to_be_used)
+      @sites[0].generate_baseline_osm(epw_file_path, standard_to_be_used)
 
       create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, @sites[0].get_climate_zone, 'Forced Air')
     end
