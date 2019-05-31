@@ -47,8 +47,6 @@ module BuildingSync
       @standard = nil
       @fraction_area = nil
       @bldg_type = {}
-      @space_types = {}
-      @space_types_floor_area = {}
       # code to initialize
       read_xml(subsection_element, standard_template, occ_type, bldg_total_floor_area, ns)
     end
@@ -58,8 +56,6 @@ module BuildingSync
       @total_floor_area = read_floor_areas(subsection_element, bldg_total_floor_area, ns)
       # based on the occupancy type set building type, system type and bar division method
       read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
-
-      @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
 
       @subsection_element = subsection_element
 

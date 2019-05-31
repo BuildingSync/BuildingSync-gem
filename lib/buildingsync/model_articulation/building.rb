@@ -63,6 +63,7 @@ module BuildingSync
       @party_wall_stories_east = 0
       @party_wall_fraction = 0
 
+      @fraction_area = 1.0
       # code to initialize
       read_xml(build_element, site_occupancy_type, site_total_floor_area, standard_to_be_used, ns)
     end
@@ -253,14 +254,18 @@ module BuildingSync
 
     def bldg_space_types_floor_area_hash
       new_hash = {}
-      @building_subsections.each do |bldg_subsec|
-        bldg_subsec.space_types_floor_area.each do |space_type, hash|
-          new_hash[space_type] = hash
+      if @building_subsections.count > 0
+        @building_subsections.each do |bldg_subsec|
+          bldg_subsec.space_types_floor_area.each do |space_type, hash|
+            new_hash[space_type] = hash
+          end
         end
-      end
-      if @building_subsections.count == 0
+        # if we have no subsections we need to do the same just for the building
+      elsif @building_subsections.count == 0
         space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
+        puts " Space types: #{space_types} selected for building type: #{@bldg_type} and standard template: #{@standard_template}"
         space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @bldg_type)
+        puts "space_types_floor_area: #{space_types_floor_area}"
         space_types_floor_area.each do |space_type, hash|
           new_hash[space_type] = hash
         end
@@ -300,12 +305,10 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "No weather file is set. The model has #{@model.getDesignDays.size} design day objects")
       end
 
-      puts 'epw_file_path'
-      puts epw_file_path
       # find weather file
       if epw_file_path.nil?
         epw_file_name = nil
-        'todo: find better way to get a weather file based on a climate zone'
+        ' todo: find better way to get a weather file based on a climate zone'
         if climate_zone == '1A' || climate_zone == '1B'
           epw_file_name = 'CZ01RV2.epw'
         elsif climate_zone == '2A' || climate_zone == '2B'
@@ -543,8 +546,8 @@ module BuildingSync
         target_areas[k] = v[:floor_area]
       end
 
-      puts bar_hash
-      puts target_areas
+      puts "bar_hash: #{bar_hash}"
+      puts "target_areas: #{target_areas}"
       # create bar
       create_bar(runner, @model, bar_hash, 'Basements Ground Mid Top')
       # using the default value for story multiplier for now 'Basements Ground Mid Top'

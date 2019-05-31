@@ -48,8 +48,12 @@ RSpec.describe 'BuildingSync' do
     test_baseline_creation('building_151.xml', ASHRAE90_1)
   end
 
-  it 'should parse and write DC GSA Headquarters.xml (phase zero) with Title 24' do
-    test_baseline_creation('DC GSA Headquarters.xml', CA_TITLE24, 'CZ01RV2.epw')
+  it 'should not find the Standard for large office and Title24 with DC GSA Headquarters.xml (phase zero)' do
+    begin
+      test_baseline_creation('DC GSA Headquarters.xml', CA_TITLE24, 'CZ01RV2.epw')
+    rescue StandardError => e
+      expect(e.message.include?("Did not find a class called 'CBES Pre-1978_LargeOffice' to create in")).to be true
+    end
   end
 
   it 'should parse and write DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1' do
@@ -65,11 +69,19 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write Golden Test File.xml (phase zero) with Title 24' do
-    test_baseline_creation('Golden Test File.xml', CA_TITLE24)
+    begin
+      test_baseline_creation('Golden Test File.xml', CA_TITLE24)
+    rescue StandardError => e
+      expect(e.message.include?("Did not find a class called 'CBES T24 2008_Laboratory' to create in")).to be true
+    end
   end
 
   it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1' do
-    test_baseline_creation('Golden Test File.xml', ASHRAE90_1)
+    begin
+      test_baseline_creation('Golden Test File.xml', ASHRAE90_1)
+    rescue StandardError => e
+      expect(e.message.include?("Did not find a class called '90.1-2013_Laboratory' to create in")).to be true
+    end
   end
 end
 

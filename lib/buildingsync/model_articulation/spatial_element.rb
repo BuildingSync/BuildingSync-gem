@@ -47,6 +47,9 @@ module BuildingSync
       @bldg_type = nil
       @system_type = nil
       @bar_division_method = nil
+      @space_types = {}
+      @fraction_area = nil
+      @space_types_floor_area = nil
     end
 
     def read_floor_areas(build_element, parent_total_floor_area, ns)
@@ -166,6 +169,10 @@ module BuildingSync
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
           @system_type = 'tbd'
+        elsif occupancy_type == 'Laboratory-Testing'
+          @bldg_type = 'Laboratory'
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
         else
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
         end
@@ -194,12 +201,21 @@ module BuildingSync
 
     # create space types
     def create_space_types(model, total_bldg_floor_area, standard_template, bldg_type)
+
       # create space types from subsection type
-      # mapping building_type name is needed for a few methods
+      # mapping lookup_name name is needed for a few methods
       if @standard.nil?
         @standard = Standard.build("#{standard_template}_#{bldg_type}")
       end
-      building_type = @standard.model_get_lookup_name(@occupancy_type)
+      lookup_name = @standard.model_get_lookup_name(@occupancy_type)
+      puts " Building type: #{lookup_name} selected for occupancy type: #{@occupancy_type}"
+
+      if @bldg_type.nil?
+        set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false)
+      end
+
+      @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
+      puts " Space types: #{@space_types} selected for building type: #{@bldg_type} and standard template: #{standard_template}"
       # create space_type_map from array
       sum_of_ratios = 0.0
       @space_types.each do |space_type_name, hash|
@@ -224,10 +240,11 @@ module BuildingSync
       # store multiplier needed to adjust sum of ratios to equal 1.0
       @ratio_adjustment_multiplier = 1.0 / sum_of_ratios
 
+      @space_types_floor_area = {}
       @space_types.each do |space_type_name, hash|
-        ratio_of_bldg_total = hash[:ratio] * @ratio_adjustment_multiplier * fraction_area
+        ratio_of_bldg_total = hash[:ratio] * @ratio_adjustment_multiplier * @fraction_area
         final_floor_area = ratio_of_bldg_total * total_bldg_floor_area # I think I can just pass ratio but passing in area is cleaner
-        @space_types_floor_area[hash[:space_type]] = {floor_area: final_floor_area }
+        @space_types_floor_area[hash[:space_type]] = { floor_area: final_floor_area }
       end
       return @space_types_floor_area
     end

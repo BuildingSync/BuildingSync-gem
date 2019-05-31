@@ -40,14 +40,32 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and baseline simulation' do
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and perform a baseline simulation' do
     osm_path = test_baseline_creation('building_151.xml', CA_TITLE24)
 
     run_baseline_simulation(osm_path, 'CZ01RV2.epw')
   end
 
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1 and baseline simulation' do
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1 and perform a baseline simulation' do
     osm_path = test_baseline_creation('building_151.xml', ASHRAE90_1)
+
+    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+    osm_path = test_baseline_creation('DC GSA Headquarters.xml', ASHRAE90_1, 'CZ01RV2.epw')
+
+    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with Title 24 and perform a baseline simulation' do
+    osm_path = test_baseline_creation('BuildingSync Website Valid Schema.xml', CA_TITLE24, 'CZ01RV2.epw')
+
+    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+    osm_path = test_baseline_creation('BuildingSync Website Valid Schema.xml', ASHRAE90_1, 'CZ01RV2.epw')
 
     run_baseline_simulation(osm_path, 'CZ01RV2.epw')
   end
