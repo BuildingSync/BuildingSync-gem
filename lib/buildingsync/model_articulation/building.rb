@@ -102,6 +102,7 @@ module BuildingSync
     end
 
     def read_width_and_length
+
       footprint = nil
       # handle user-assigned single floor plate size condition
       if @single_floor_area > 0.0
@@ -115,6 +116,12 @@ module BuildingSync
     end
 
     def read_standard_template_based_on_year(build_element, ns, standard_to_be_used)
+
+      if !build_element.elements["#{ns}:YearOfConstruction"]
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_standard_template_based_on_year', 'Year of Construction is blank in your BuildingSync file.')
+        raise 'Error : Year of Construction is blank in your BuildingSync file.'
+      end
+
       built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_f
 
       if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
@@ -124,17 +131,17 @@ module BuildingSync
 
       if standard_to_be_used == CA_TITLE24
         if built_year < 1978
-          @standard_template = "CBES Pre-1978"
+          @standard_template = 'CBES Pre-1978'
         elsif built_year >= 1978 && built_year < 1992
-          @standard_template = "CBES T24 1978"
+          @standard_template = 'CBES T24 1978'
         elsif built_year >= 1992 && built_year < 2001
-          @standard_template = "CBES T24 1992"
+          @standard_template = 'CBES T24 1992'
         elsif built_year >= 2001 && built_year < 2005
-          @standard_template = "CBES T24 2001"
+          @standard_template = 'CBES T24 2001'
         elsif built_year >= 2005 && built_year < 2008
-          @standard_template = "CBES T24 2005"
+          @standard_template = 'CBES T24 2005'
         else
-          @standard_template = "CBES T24 2008"
+          @standard_template = 'CBES T24 2008'
         end
       elsif standard_to_be_used == ASHRAE90_1
         if built_year < 1980
@@ -157,9 +164,9 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.read_standard_template_based_on_year', "Using the follwing standard for default values #{@standard_template}.")
     end
 
-    def read_stories_above_and_below_grade(build_element, nodesap)
-      if build_element.elements["#{nodesap}:FloorsAboveGrade"]
-        @num_stories_above_grade = build_element.elements["#{nodesap}:FloorsAboveGrade"].text.to_f
+    def read_stories_above_and_below_grade(build_element, ns)
+      if build_element.elements["#{ns}:FloorsAboveGrade"]
+        @num_stories_above_grade = build_element.elements["#{ns}:FloorsAboveGrade"].text.to_f
         if @num_stories_above_grade == 0
           @num_stories_above_grade = 1.0
         end
@@ -167,8 +174,8 @@ module BuildingSync
         @num_stories_above_grade = 1.0 # setDefaultValue
       end
 
-      if build_element.elements["#{nodesap}:FloorsBelowGrade"]
-        @num_stories_below_grade = build_element.elements["#{nodesap}:FloorsBelowGrade"].text.to_f
+      if build_element.elements["#{ns}:FloorsBelowGrade"]
+        @num_stories_below_grade = build_element.elements["#{ns}:FloorsBelowGrade"].text.to_f
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
@@ -185,7 +192,12 @@ module BuildingSync
     def get_building_type
       # try to get the bldg type at the building level, if it is nil then look at the first subsection
       if @bldg_type.nil?
-        return @building_subsections[0].bldg_type
+        if @building_subsections.count == 0
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_building_type', 'There is no occupancy type attached to this building in your BuildingSync file.')
+          raise 'Error: There is no occupancy type attached to this building in your BuildingSync file.'
+        else
+          return @building_subsections[0].bldg_type
+        end
       else
         return @bldg_type
       end
@@ -218,7 +230,7 @@ module BuildingSync
           building_fraction -= subsection.fraction_area
         end
         if building_fraction <= 0.0
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction',  'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
         end
         @building_subsections[0].fraction_area = building_fraction
@@ -294,22 +306,22 @@ module BuildingSync
       if epw_file_path.nil?
         epw_file_name = nil
         'todo: find better way to get a weather file based on a climate zone'
-        if climate_zone == "1A" || climate_zone == "1B"
-          epw_file_name = "CZ01RV2.epw"
-        elsif climate_zone == "2A" || climate_zone == "2B"
-          epw_file_name = "CZ02RV2.epw"
-        elsif climate_zone == "3A" || climate_zone == "3B" || climate_zone == "3C" || climate_zone == "Climate Zone 3"
-          epw_file_name = "CZ03RV2.epw"
-        elsif climate_zone == "4A" || climate_zone == "4B" || climate_zone == "4C"
-          epw_file_name = "CZ04RV2.epw"
-        elsif climate_zone == "5A" || climate_zone == "5B" || climate_zone == "5C"
-          epw_file_name = "CZ05RV2.epw"
-        elsif climate_zone == "6A" || climate_zone == "6B"
-          epw_file_name = "CZ06RV2.epw"
-        elsif climate_zone == "7"
-          epw_file_name = "CZ07RV2.epw"
-        elsif climate_zone == "8"
-          epw_file_name = "CZ08RV2.epw"
+        if climate_zone == '1A' || climate_zone == '1B'
+          epw_file_name = 'CZ01RV2.epw'
+        elsif climate_zone == '2A' || climate_zone == '2B'
+          epw_file_name = 'CZ02RV2.epw'
+        elsif climate_zone == '3A' || climate_zone == '3B' || climate_zone == '3C' || climate_zone == 'Climate Zone 3'
+          epw_file_name = 'CZ03RV2.epw'
+        elsif climate_zone == '4A' || climate_zone == '4B' || climate_zone == '4C'
+          epw_file_name = 'CZ04RV2.epw'
+        elsif climate_zone == '5A' || climate_zone == '5B' || climate_zone == '5C'
+          epw_file_name = 'CZ05RV2.epw'
+        elsif climate_zone == '6A' || climate_zone == '6B'
+          epw_file_name = 'CZ06RV2.epw'
+        elsif climate_zone == '7'
+          epw_file_name = 'CZ07RV2.epw'
+        elsif climate_zone == '8'
+          epw_file_name = 'CZ08RV2.epw'
         else
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', "Could not find a weather file for climate zone: #{climate_zone}")
         end
