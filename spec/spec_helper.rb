@@ -121,7 +121,7 @@ RSpec.configure do |config|
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
     end
-    expect(File.exist?(out_path)).not_to be true
+    # expect(File.exist?(out_path)).not_to be true
 
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true

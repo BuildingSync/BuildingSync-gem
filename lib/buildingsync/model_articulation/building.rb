@@ -35,6 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_subsection'
+require 'date'
 require 'openstudio/extension/core/os_lib_helper_methods'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'measures/ChangeBuildingLocation/resources/epw'
@@ -460,6 +461,11 @@ module BuildingSync
         climateZones.setClimateZone('CEC', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climate_zone}")
       end
+
+      # setting the current year, so we do not get these annoying log messages:
+      # [openstudio.model.YearDescription] <1> 'UseWeatherFile' is not yet a supported option for YearDescription
+      yearDescription = @model.getYearDescription
+      yearDescription.setCalendarYear(::Date.today.year)
 
       # add final condition
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")

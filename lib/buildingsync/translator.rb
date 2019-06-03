@@ -56,6 +56,8 @@ module BuildingSync
       @standard_to_be_used = standard_to_be_used
       @epw_path = epw_file_path
 
+      # to further reduce the log messages we can change the log level with this command
+      # OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Error)
       # Open a log for the library
       logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
       logFile.setLogLevel(OpenStudio::Info)
