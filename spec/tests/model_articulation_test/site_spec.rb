@@ -37,6 +37,36 @@
 
 RSpec.describe 'SiteSpec' do
 
+  it 'Should generate meaningful error when passing empty XML data' do
+
+  end
+
+  it 'Should create an instance of the site class with minimal XML snippet' do
+
+  end
+
+  it 'Should return the correct building template' do
+    # get_building_template
+  end
+
+  it 'Should return the correct system type' do
+    # get_system_type
+  end
+
+  it 'Should return the correct building type' do
+    # get_building_type
+  end
+
+  it 'Should return the correct climate zone' do
+    # get_climate_zone
+  end
+
+  it 'Should write the same OSM file as previously generated' do
+    # call generate_baseline_osm
+    # call write_osm
+    # compare this osm file with a file that was previously generated.
+  end
+
   it 'Should validate XML site data' do
     run_site_spec('building_151_site_withOutBuilding', 'auc')
   end
