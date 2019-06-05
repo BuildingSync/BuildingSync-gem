@@ -299,40 +299,93 @@ module BuildingSync
 
     def set_weater_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
       initialize_model
-      # create initial condition
-      if @model.getWeatherFile.city != ''
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "The initial weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects")
+
+      # here we check if there is an valid EPW file, if there is we use that file otehrwise everything will be generated from climate zone
+      if !epw_file_path.nil? && File.exist?(epw_file_path)
+        set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
+        puts 'using the EPW file'
       else
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "No weather file is set. The model has #{@model.getDesignDays.size} design day objects")
+        set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
+        puts 'using the climate zone'
       end
 
-      # find weather file
-      if epw_file_path.nil?
-        epw_file_name = nil
-        ' todo: find better way to get a weather file based on a climate zone'
-        if climate_zone == '1A' || climate_zone == '1B'
-          epw_file_name = 'CZ01RV2.epw'
-        elsif climate_zone == '2A' || climate_zone == '2B'
-          epw_file_name = 'CZ02RV2.epw'
-        elsif climate_zone == '3A' || climate_zone == '3B' || climate_zone == '3C' || climate_zone == 'Climate Zone 3'
-          epw_file_name = 'CZ03RV2.epw'
-        elsif climate_zone == '4A' || climate_zone == '4B' || climate_zone == '4C'
-          epw_file_name = 'CZ04RV2.epw'
-        elsif climate_zone == '5A' || climate_zone == '5B' || climate_zone == '5C'
-          epw_file_name = 'CZ05RV2.epw'
-        elsif climate_zone == '6A' || climate_zone == '6B'
-          epw_file_name = 'CZ06RV2.epw'
-        elsif climate_zone == '7'
-          epw_file_name = 'CZ07RV2.epw'
-        elsif climate_zone == '8'
-          epw_file_name = 'CZ08RV2.epw'
-        else
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', "Could not find a weather file for climate zone: #{climate_zone}")
+      # setting the current year, so we do not get these annoying log messages:
+      # [openstudio.model.YearDescription] <1> 'UseWeatherFile' is not yet a supported option for YearDescription
+      yearDescription = @model.getYearDescription
+      yearDescription.setCalendarYear(::Date.today.year)
+
+      # add final condition
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
+    end
+
+    def set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
+
+      climate_zone_standard_string = climate_zone
+      puts "climate zone: #{climate_zone}"
+      if standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
+        climate_zone_standard_string = "CEC T24-CEC#{climate_zone.gsub('Climate Zone', '').strip}"
+      elsif standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
+        climate_zone_standard_string = "ASHRAE 169-2006-#{climate_zone.gsub('Climate Zone', '').strip}"
+      elsif climate_zone.nil?
+        climate_zone_standard_string = ''
+      end
+
+      puts $open_studio_standards
+      if !$open_studio_standards.nil? && !$open_studio_standards.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weater_and_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
+      end
+
+      # overwrite latitude and longitude if available
+      if !latitude.nil? || !longitude.nil?
+        site = @model.getSite
+        if !latitude.nil?
+          site.setLatitude(latitude.to_f)
         end
-        epw_file_path = File.expand_path("../../../spec/weather/#{epw_file_name}", File.dirname(__FILE__))
+        if !longitude.nil?
+          site.setLongitude(longitude.to_f)
+        end
       end
 
-      # Parse the EPW manually because OpenStudio can't handle multiyear weather files (or DATA PERIODS with YEARS)
+      weather_file = @model.getWeatherFile
+
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{weather_file.city}. State is #{weather_file.stateProvinceRegion}")
+
+      # Set climate zone
+      climateZones = @model.getClimateZones
+      if climate_zone.nil?
+        # get climate zone from stat file
+        text = nil
+        File.open(stat_file) do |f|
+          text = f.read.force_encoding('iso-8859-1')
+        end
+
+        # Get Climate zone.
+        # - Climate type "3B" (ASHRAE Standard 196-2006 Climate Zone)**
+        # - Climate type "6A" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
+        regex = /Climate type \"(.*?)\" \(ASHRAE Standards?(.*)\)\*\*/
+        match_data = text.match(regex)
+        if match_data.nil?
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.set_weater_and_climate_zone', "Can't find ASHRAE climate zone in stat file.")
+        else
+          climate_zone = match_data[1].to_s.strip
+        end
+
+      end
+
+      # set climate zone
+      climateZones.clear
+      if standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
+        climateZones.setClimateZone('ASHRAE', climate_zone)
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
+      elsif standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
+        climate_zone = climate_zone.gsub('CEC', '').strip
+        climate_zone = climate_zone.gsub('Climate Zone', '').strip
+        climateZones.setClimateZone('CEC', climate_zone)
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climate_zone}")
+        end
+    end
+
+    def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
       epw_file = OpenStudio::Weather::Epw.load(epw_file_path)
 
       weather_lat = epw_file.lat
@@ -468,14 +521,6 @@ module BuildingSync
         climateZones.setClimateZone('CEC', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climate_zone}")
       end
-
-      # setting the current year, so we do not get these annoying log messages:
-      # [openstudio.model.YearDescription] <1> 'UseWeatherFile' is not yet a supported option for YearDescription
-      yearDescription = @model.getYearDescription
-      yearDescription.setCalendarYear(::Date.today.year)
-
-      # add final condition
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
     end
 
     def generate_baseline_osm(standard_to_be_used)

@@ -204,10 +204,10 @@ module BuildingSync
 
       # create space types from subsection type
       # mapping lookup_name name is needed for a few methods
-      if @standard.nil?
-        @standard = Standard.build("#{standard_template}_#{bldg_type}")
+      if $open_studio_standards.nil?
+        $open_studio_standards = Standard.build("#{standard_template}_#{bldg_type}")
       end
-      lookup_name = @standard.model_get_lookup_name(@occupancy_type)
+      lookup_name = $open_studio_standards.model_get_lookup_name(@occupancy_type)
       puts " Building type: #{lookup_name} selected for occupancy type: #{@occupancy_type}"
 
       if @bldg_type.nil?
@@ -226,7 +226,7 @@ module BuildingSync
         space_type.setName("#{@occupancy_type} #{space_type_name}")
 
         # set color
-        test = @standard.space_type_apply_rendering_color(space_type) # this uses openstudio-standards
+        test = $open_studio_standards.space_type_apply_rendering_color(space_type) # this uses openstudio-standards
         if !test
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm',"Warning: Could not find color for #{space_type.name}")
         end
