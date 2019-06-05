@@ -47,6 +47,9 @@ module BuildingSync
       @climate_zone_ashrae = nil
       @climate_zone_ca_t24 = nil
       @weather_file_name = nil
+      @weather_station_id = nil
+      @latitude = nil
+      @longitude = nil
       # TM: just use the XML snippet to search for the buildings on the site
       read_xml(build_element, standard_to_be_used, ns)
     end
@@ -61,6 +64,8 @@ module BuildingSync
       read_climate_zone(build_element, ns)
       # read in the weather station name
       read_weather_file_name(build_element, ns)
+      # read latitude and longitude
+      read_latitude_and_longitude(build_element, ns)
       # code to create a building
       build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
         @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, standard_to_be_used, ns))
@@ -93,6 +98,24 @@ module BuildingSync
         @weather_file_name = build_element.elements["#{ns}:WeatherStationName"].text
       else
         @weather_file_name = nil
+      end
+      if build_element.elements["#{ns}:WeatherDataStationID"]
+        @weather_station_id = build_element.elements["#{ns}:WeatherDataStationID"].text
+      else
+        @weather_station_id = nil
+      end
+    end
+
+    def read_latitude_and_longitude(build_element, ns)
+      if build_element.elements["#{ns}:Latitude"]
+        @latitude = build_element.elements["#{ns}:Latitude"].text
+      else
+        @latitude = nil
+      end
+      if build_element.elements["#{ns}:Longitude"]
+        @longitude = build_element.elements["#{ns}:Longitude"].text
+      else
+        @longitude = nil
       end
     end
 
@@ -131,7 +154,7 @@ module BuildingSync
         if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
           @climate_zone = @climate_zone_ca_t24
         end
-        building.set_weater_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used)
+        building.set_weater_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude)
         building.generate_baseline_osm(standard_to_be_used)
       end
     end

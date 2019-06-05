@@ -45,6 +45,8 @@ ASHRAE90_1 = 'ASHRAE90.1'
 CA_TITLE24 = 'CaliforniaTitle24'
 
 module BuildingSync
+  $open_studio_standards = nil
+
   class Translator
     # load the building sync file and chooses the correct workflow
     def initialize(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
