@@ -120,6 +120,10 @@ module BuildingSync
       return @climate_zone
     end
 
+    def get_building_objects
+      return @buildings
+    end
+
     def generate_baseline_osm(epw_file_path, standard_to_be_used)
       @buildings.each do |building|
         @climate_zone = @climate_zone_ashrae
