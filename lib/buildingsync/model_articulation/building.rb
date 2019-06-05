@@ -297,7 +297,7 @@ module BuildingSync
       end
     end
 
-    def set_weater_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used)
+    def set_weater_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
       initialize_model
       # create initial condition
       if @model.getWeatherFile.city != ''
@@ -335,21 +335,28 @@ module BuildingSync
       # Parse the EPW manually because OpenStudio can't handle multiyear weather files (or DATA PERIODS with YEARS)
       epw_file = OpenStudio::Weather::Epw.load(epw_file_path)
 
+      weather_lat = epw_file.lat
+      if !latitude.nil?
+        weather_lat = latitude.to_f
+      end
+      weather_lon = epw_file.lon
+      if !longitude.nil?
+        weather_lon = longitude.to_f
+      end
+
       weather_file = @model.getWeatherFile
       weather_file.setCity(epw_file.city)
       weather_file.setStateProvinceRegion(epw_file.state)
       weather_file.setCountry(epw_file.country)
       weather_file.setDataSource(epw_file.data_type)
       weather_file.setWMONumber(epw_file.wmo.to_s)
-      weather_file.setLatitude(epw_file.lat)
-      weather_file.setLongitude(epw_file.lon)
+      weather_file.setLatitude(weather_lat)
+      weather_file.setLongitude(weather_lon)
       weather_file.setTimeZone(epw_file.gmt)
       weather_file.setElevation(epw_file.elevation)
       weather_file.setString(10, "file:///#{epw_file.filename}")
 
       weather_name = "#{epw_file.city}_#{epw_file.state}_#{epw_file.country}"
-      weather_lat = epw_file.lat
-      weather_lon = epw_file.lon
       weather_time = epw_file.gmt
       weather_elev = epw_file.elevation
 
