@@ -67,6 +67,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'bundler/setup'
 require 'buildingsync/translator'
+require 'buildingsync/extension'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -98,13 +99,17 @@ RSpec.configure do |config|
   end
 
   def run_scenario_simulations(osw_files)
+    num_parallel = 15
+
     cli_path = OpenStudio.getOpenStudioCLI
 
-    osw_files.each do |osw_file|
+    counter = 1
+    Parallel.each(osw_files, in_threads: num_parallel) do |osw_file|
+
       cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
       # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
-      puts cmd
-
+      puts "#{counter}) #{cmd}"
+      counter += 1
       # Run the sizing run
       OpenstudioStandards.run_command(cmd)
 

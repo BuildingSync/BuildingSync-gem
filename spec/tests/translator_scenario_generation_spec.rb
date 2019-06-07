@@ -43,4 +43,6 @@ RSpec.describe 'BuildingSync' do
   it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and all simulations' do
     test_baseline_and_scenario_creation('building_151.xml')
   end
+
+  # todo: add more testcases for testing
 end

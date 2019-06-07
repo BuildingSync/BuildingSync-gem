@@ -35,6 +35,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative '../workflow_maker'
+require 'openstudio/common_measures'
+require 'openstudio/model_articulation'
+
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class PhaseZeroWorkflowMaker < WorkflowMaker
@@ -52,11 +55,15 @@ module BuildingSync
       # select base osw for standalone, small office, medium office
       base_osw = 'phase_zero_base.osw'
 
+      common_measures_instance = OpenStudio::CommonMeasures::Extension.new
+      model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+
       workflow_path = File.join(File.dirname(__FILE__), base_osw)
       raise "File '#{workflow_path}' does not exist" unless File.exist?(workflow_path)
 
       File.open(workflow_path, 'r') do |file|
         @workflow = JSON.parse(file.read)
+        set_measure_paths(@workflow, [common_measures_instance.measures_dir, model_articulation_instance.measures_dir])
       end
     end
 

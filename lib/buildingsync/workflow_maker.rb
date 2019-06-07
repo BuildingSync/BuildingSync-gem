@@ -58,6 +58,14 @@ module BuildingSync
       end
     end
 
+    def set_measure_path(osw, measures_dir)
+      osw['measure_paths'] = [measures_dir]
+    end
+
+    def set_measure_paths(osw, measures_dir_array)
+      osw['measure_paths'] = measures_dir_array
+    end
+
     def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
       result = false
       osw['steps'].each do |step|
