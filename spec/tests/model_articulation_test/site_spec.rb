@@ -34,37 +34,37 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative '../../../lib/buildingsync/model_articulation/site'
+
 RSpec.describe 'SiteSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
     begin
-    generate_baseline('building_151_Blank', 'auc')
+      generate_baseline('building_151_Blank', 'auc')
     rescue StandardError => e
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
     end
   end
 
   it 'Should create an instance of the site class with minimal XML snippet' do
-    site = create_minimum_site
+    site =  create_minimum_site('Retail', '1954', 'Gross', '69452')
   end
 
   it 'Should return the correct building template' do
-    site = create_minimum_site
+    site =  create_minimum_site('Retail', '1954', 'Gross', '69452')
     expect(site.get_building_template == 'DOE Ref Pre-1980').to be true
   end
 
   it 'Should return the correct system type' do
-    site = create_minimum_site
+    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
     expect(site.get_system_type == 'PSZ-AC with gas coil heat').to be true
   end
 
   it 'Should return the correct building type' do
-    site = create_minimum_site
+    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
     expect(site.get_building_type == 'RetailStandalone').to be true
   end
 
   it 'Should return the correct climate zone' do
-    site = create_minimum_site
+    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
     expect(site.get_climate_zone.nil?).to be true
   end
 
@@ -78,13 +78,12 @@ RSpec.describe 'SiteSpec' do
     sites = []
     @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
     expect(File.exist?(@xml_path)).to be true
-
     @doc = create_xml_file_object(@xml_path)
-
+    # @doc = create_blank_xml_file(ns)
     facility_xml = create_facility_object(@doc, ns)
 
     facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-      # sites.push(BuildingSync::Site.new(site_element, CA_TITLE24, ns))
+      sites.push(BuildingSync::Site.new(site_element, CA_TITLE24, ns))
     end
     return sites
   end
@@ -105,41 +104,41 @@ RSpec.describe 'SiteSpec' do
     return doc
   end
 
-  def create_minimum_snippet
+  def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
     xml_path = File.expand_path('../../files/building_151_Blank.xml', File.dirname(__FILE__))
     ns = 'auc'
     doc = create_xml_file_object(xml_path)
     site_element = doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
 
     occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
-    occupancy_classification_element.text = 'Retail'
+    occupancy_classification_element.text = occupancy_classification
     site_element.add_element(occupancy_classification_element)
 
-    building_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building"]
+    building_element = site_element.elements["#{ns}:Buildings/#{ns}:Building"]
 
     year_of_construction_element = REXML::Element.new("#{ns}:YearOfConstruction")
-    year_of_construction_element.text = '1954'
+    year_of_construction_element.text = year_of_const
     building_element.add_element(year_of_construction_element)
 
     floor_areas_element = REXML::Element.new("#{ns}:FloorAreas")
     floor_area_element = REXML::Element.new("#{ns}:FloorArea")
     floor_area_type_element = REXML::Element.new("#{ns}:FloorAreaType")
-    floor_area_type_element.text = 'Gross'
+    floor_area_type_element.text = floor_area_type
     floor_area_value_element = REXML::Element.new("#{ns}:FloorAreaValue")
-    floor_area_value_element.text = '69452'
+    floor_area_value_element.text = floor_area_value
 
     floor_area_element.add_element(floor_area_type_element)
     floor_area_element.add_element(floor_area_value_element)
     floor_areas_element.add_element(floor_area_element)
     building_element.add_element(floor_areas_element)
 
-    #doc.write(File.open(xml_path, 'w'), 2)
+    # doc.write(File.open(xml_path, 'w'), 2)
 
     return doc
   end
 
-  def create_minimum_site
-    xml_snippet = create_minimum_snippet
+  def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
     ns = 'auc'
     site_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
     if !site_element.nil?
@@ -147,5 +146,34 @@ RSpec.describe 'SiteSpec' do
     else
       expect(site_element.nil?).to be false
     end
+  end
+
+  def create_blank_xml_file(ns)
+    xml = Builder::XmlMarkup.new(indent: 2)
+    xml.instruct! :xml, encoding: 'ASCII'
+
+    building_sync_element = REXML::Element.new("#{ns}:BuildingSync")
+    facilities_element = REXML::Element.new("#{ns}:Facilities")
+    facility_element = REXML::Element.new("#{ns}:Facility")
+    sites_element = REXML::Element.new("#{ns}:Sites")
+    site_element = REXML::Element.new("#{ns}:Site")
+    buildings_element =REXML::Element.new("#{ns}:Buildings")
+    building_element = REXML::Element.new("#{ns}:Building")
+    subsections_element = REXML::Element.new("#{ns}:Subsections")
+    subsection_element = REXML::Element.new("#{ns}:Subsection")
+
+    subsections_element.add_element(subsection_element)
+    building_element.add_element(subsections_element)
+    buildings_element.add_element(building_element)
+    site_element.add_element(buildings_element)
+    sites_element.add_element(site_element)
+    facility_element.add_element(sites_element)
+    facilities_element.add_element(facility_element)
+    building_sync_element.add_element(facilities_element)
+
+    return building_sync_element
+
+    xml_path = File.expand_path('../../files/building_151_Blank1.xml', File.dirname(__FILE__))
+    doc.write(File.open(xml_path, 'w'), 2)
   end
 end
