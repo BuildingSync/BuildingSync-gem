@@ -10,25 +10,9 @@
                 <auc:Subsection ID='Default_Subsection'>
                 </auc:Subsection>
               </auc:Subsections>
-              <auc:YearOfConstruction>
-                1954
-              </auc:YearOfConstruction>
-              <auc:FloorAreas>
-                <auc:FloorArea>
-                  <auc:FloorAreaType>
-                    Gross
-                  </auc:FloorAreaType>
-                  <auc:FloorAreaValue>
-                    69452
-                  </auc:FloorAreaValue>
-                </auc:FloorArea>
-              </auc:FloorAreas>
             </auc:Building>
-          </auc:Buildings>
-          <auc:OccupancyClassification>
-            Retail
-          </auc:OccupancyClassification>
-        </auc:Site>
+			</auc:Buildings>
+			</auc:Site>
       </auc:Sites>
     </auc:Facility>
   </auc:Facilities>
