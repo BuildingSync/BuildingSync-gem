@@ -78,9 +78,8 @@ RSpec.describe 'SiteSpec' do
     sites = []
     @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
     expect(File.exist?(@xml_path)).to be true
-
     @doc = create_xml_file_object(@xml_path)
-
+    # @doc = create_blank_xml_file(ns)
     facility_xml = create_facility_object(@doc, ns)
 
     facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
@@ -147,5 +146,34 @@ RSpec.describe 'SiteSpec' do
     else
       expect(site_element.nil?).to be false
     end
+  end
+
+  def create_blank_xml_file(ns)
+    xml = Builder::XmlMarkup.new(indent: 2)
+    xml.instruct! :xml, encoding: 'ASCII'
+
+    building_sync_element = REXML::Element.new("#{ns}:BuildingSync")
+    facilities_element = REXML::Element.new("#{ns}:Facilities")
+    facility_element = REXML::Element.new("#{ns}:Facility")
+    sites_element = REXML::Element.new("#{ns}:Sites")
+    site_element = REXML::Element.new("#{ns}:Site")
+    buildings_element =REXML::Element.new("#{ns}:Buildings")
+    building_element = REXML::Element.new("#{ns}:Building")
+    subsections_element = REXML::Element.new("#{ns}:Subsections")
+    subsection_element = REXML::Element.new("#{ns}:Subsection")
+
+    subsections_element.add_element(subsection_element)
+    building_element.add_element(subsections_element)
+    buildings_element.add_element(building_element)
+    site_element.add_element(buildings_element)
+    sites_element.add_element(site_element)
+    facility_element.add_element(sites_element)
+    facilities_element.add_element(facility_element)
+    building_sync_element.add_element(facilities_element)
+
+    return building_sync_element
+
+    xml_path = File.expand_path('../../files/building_151_Blank1.xml', File.dirname(__FILE__))
+    doc.write(File.open(xml_path, 'w'), 2)
   end
 end
