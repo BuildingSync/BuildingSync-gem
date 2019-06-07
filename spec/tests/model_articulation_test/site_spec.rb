@@ -37,18 +37,40 @@
 require_relative '../../../lib/buildingsync/model_articulation/site'
 RSpec.describe 'SiteSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
+    @ns = 'auc'
     begin
-      @sites = generate_baseline('building_151_Blank', 'auc')
+    @sites = generate_baseline('building_151_Blank', 'auc')
     rescue StandardError => e
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
     end
   end
 
   it 'Should create an instance of the site class with minimal XML snippet' do
-    set_minimal_xml_snippet('building_151_Blank')
-    generate_baseline('building_151_Blank', 'auc')
+    site_element = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site"]
 
-    p @sites[0].get_building_template
+    occupancy_classification_element = REXML::Element.new("#{@ns}:OccupancyClassification")
+    occupancy_classification_element.text = 'Retail'
+    site_element.add_element(occupancy_classification_element)
+
+    building_element = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building"]
+
+    year_of_construction_element = REXML::Element.new("#{@ns}:YearOfConstruction")
+    year_of_construction_element.text = '1954'
+    building_element.add_element(year_of_construction_element)
+
+    floor_areas_element = REXML::Element.new("#{@ns}:FloorAreas")
+    floor_area_element = REXML::Element.new("#{@ns}:FloorArea")
+    floor_area_type_element = REXML::Element.new("#{@ns}:FloorAreaType")
+    floor_area_type_element.text = 'Gross'
+    floor_area_value_element = REXML::Element.new("#{@ns}:FloorAreaValue")
+    floor_area_value_element.text = '69452'
+
+    floor_area_element.add_element(floor_area_type_element)
+    floor_area_element.add_element(floor_area_value_element)
+    floor_areas_element.add_element(floor_area_element)
+    building_element.add_element(floor_areas_element)
+
+    @doc.write(File.open(@xml_path, 'w'), 2)
   end
 
   it 'Should return the correct building template' do
@@ -81,9 +103,9 @@ RSpec.describe 'SiteSpec' do
     @doc = create_xml_file_object(@xml_path)
 
     facility_xml = create_facility_object(@doc, ns)
-p facility_xml
+
     facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-       sites.push(BuildingSync::Site.new(site_element, CA_TITLE24, ns))
+      # sites.push(BuildingSync::Site.new(site_element, CA_TITLE24, ns))
     end
     return sites
   end
@@ -102,37 +124,5 @@ p facility_xml
       doc = REXML::Document.new(file)
     end
     return doc
-  end
-
-  def set_minimal_xml_snippet(file_name)
-    p file_name
-    @ns = 'auc'
-    xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
-    doc = create_xml_file_object(xml_path)
-    site_element = doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site"]
-
-    occupancy_classification_element = REXML::Element.new("#{@ns}:OccupancyClassification")
-    occupancy_classification_element.text = 'Retail'
-    site_element.add_element(occupancy_classification_element)
-
-    building_element = doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building"]
-
-    year_of_construction_element = REXML::Element.new("#{@ns}:YearOfConstruction")
-    year_of_construction_element.text = '1954'
-    building_element.add_element(year_of_construction_element)
-
-    floor_areas_element = REXML::Element.new("#{@ns}:FloorAreas")
-    floor_area_element = REXML::Element.new("#{@ns}:FloorArea")
-    floor_area_type_element = REXML::Element.new("#{@ns}:FloorAreaType")
-    floor_area_type_element.text = 'Gross'
-    floor_area_value_element = REXML::Element.new("#{@ns}:FloorAreaValue")
-    floor_area_value_element.text = '69452'
-
-    floor_area_element.add_element(floor_area_type_element)
-    floor_area_element.add_element(floor_area_value_element)
-    floor_areas_element.add_element(floor_area_element)
-    building_element.add_element(floor_areas_element)
-
-    doc.write(File.open(xml_path, 'w'), 2)
   end
 end
