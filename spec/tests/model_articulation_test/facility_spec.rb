@@ -1,3 +1,4 @@
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
@@ -34,6 +35,8 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'builder'
+require 'rexml/document'
 
 RSpec.describe 'SiteSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
@@ -44,56 +47,21 @@ RSpec.describe 'SiteSpec' do
     end
   end
 
-  it 'Should create an instance of the site class with minimal XML snippet' do
-    site =  create_minimum_site('Retail', '1954', 'Gross', '69452')
-  end
-
-  it 'Should return the correct building template' do
-    site =  create_minimum_site('Retail', '1954', 'Gross', '69452')
-    expect(site.get_building_template == 'DOE Ref Pre-1980').to be true
-  end
-
-  it 'Should return the correct system type' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
-    expect(site.get_system_type == 'PSZ-AC with gas coil heat').to be true
-  end
-
-  it 'Should return the correct building type' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
-    expect(site.get_building_type == 'RetailStandalone').to be true
-  end
-
-  it 'Should return the correct climate zone' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
-    expect(site.get_climate_zone.nil?).to be true
-  end
-
-  it 'Should write the same OSM file as previously generated' do
-    # call generate_baseline_osm
-    # call write_osm
-    # compare this osm file with a file that was previously generated.
+  it 'Should create an instance of the facility class with minimal XML snippet' do
+    create_minimum_facility('Retail', '1954', 'Gross', '69452')
   end
 
   def generate_baseline(file_name, ns)
-    sites = []
+    facilities = []
     @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
     expect(File.exist?(@xml_path)).to be true
     @doc = create_xml_file_object(@xml_path)
     # @doc = create_blank_xml_file(ns)
-    facility_xml = create_facility_object(@doc, ns)
 
-    facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-      sites.push(BuildingSync::Site.new(site_element, CA_TITLE24, ns))
+    @doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_element|
+      facilities.push(BuildingSync::Facility.new(facility_element, CA_TITLE24, ns))
     end
-    return sites
-  end
-
-  def create_facility_object(doc, ns)
-    facilities = []
-    doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_xml|
-      facilities.push(facility_xml)
-    end
-    return facilities[0]
+    return facilities
   end
 
   def create_xml_file_object(xml_file_path)
@@ -137,43 +105,38 @@ RSpec.describe 'SiteSpec' do
     return doc
   end
 
-  def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+  def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
     xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
     ns = 'auc'
-    site_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
-    if !site_element.nil?
-      return BuildingSync::Site.new(site_element, ASHRAE90_1, 'auc')
+    facility_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"]
+    if !facility_element.nil?
+      return BuildingSync::Facility.new(facility_element, ASHRAE90_1, 'auc')
     else
-      expect(site_element.nil?).to be false
+      expect(facility_element.nil?).to be false
     end
   end
 
-  def create_blank_xml_file(ns)
+  def create_blank_xml_file1()
     xml = Builder::XmlMarkup.new(indent: 2)
     xml.instruct! :xml, encoding: 'ASCII'
-
-    building_sync_element = REXML::Element.new("#{ns}:BuildingSync")
-    facilities_element = REXML::Element.new("#{ns}:Facilities")
-    facility_element = REXML::Element.new("#{ns}:Facility")
-    sites_element = REXML::Element.new("#{ns}:Sites")
-    site_element = REXML::Element.new("#{ns}:Site")
-    buildings_element =REXML::Element.new("#{ns}:Buildings")
-    building_element = REXML::Element.new("#{ns}:Building")
-    subsections_element = REXML::Element.new("#{ns}:Subsections")
-    subsection_element = REXML::Element.new("#{ns}:Subsection")
-
-    subsections_element.add_element(subsection_element)
-    building_element.add_element(subsections_element)
-    buildings_element.add_element(building_element)
-    site_element.add_element(buildings_element)
-    sites_element.add_element(site_element)
-    facility_element.add_element(sites_element)
-    facilities_element.add_element(facility_element)
-    building_sync_element.add_element(facilities_element)
-
-    return building_sync_element
-
-    xml_path = File.expand_path('../../files/building_151_Blank1.xml', File.dirname(__FILE__))
-    doc.write(File.open(xml_path, 'w'), 2)
+    xml.tag!('auc:BuildingSync') do |buildsync|
+      buildsync.tag!('auc:Facilities') do |faclts|
+        faclts.tag!('auc:Facility') do |faclt|
+          faclt.tag!('auc:Sites') do |sites|
+            sites.tag!('auc:Site') do |site|
+              site.tag!('auc:Buildings') do |builds|
+                builds.tag!('auc:Building') do |build|
+                  build.tag!('auc:Subsections') do |subsects|
+                    subsects.tag!('auc:Subsection') do |subsect|
+                      subsect.Perimeter 1325
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
   end
 end
