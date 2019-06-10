@@ -98,7 +98,7 @@ module BuildingSync
       read_building_form_defaults
 
       # generate building name
-      read_building_name
+      read_building_name(build_element, ns)
 
       read_width_and_length
     end
@@ -208,16 +208,16 @@ module BuildingSync
     def read_building_form_defaults
       # if aspect ratio, story height or wwr have argument value of 0 then use smart building type defaults
       building_form_defaults = building_form_defaults(get_building_type)
-      if @ns_to_ew_ratio == 0.0
+      if @ns_to_ew_ratio == 0.0 && !building_form_defaults.nil?
         @ns_to_ew_ratio = building_form_defaults[:aspect_ratio]
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for aspect ratio will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:aspect_ratio]}.")
       end
-      if @floor_height == 0.0
+      if @floor_height == 0.0 && !building_form_defaults.nil?
         @floor_height = OpenStudio.convert(building_form_defaults[:typical_story], 'ft', 'm').get
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for floor height will be replaced with smart default for #{get_building_type}of #{building_form_defaults[:typical_story]}.")
       end
       # because of this can't set wwr to 0.0. If that is desired then we can change this to check for 1.0 instead of 0.0
-      if @wwr == 0.0
+      if @wwr == 0.0 && !building_form_defaults.nil?
         @wwr = building_form_defaults[:wwr]
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for window to wall ratio will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:wwr]}.")
       end
@@ -239,10 +239,14 @@ module BuildingSync
       end
     end
 
-    def read_building_name
+    def read_building_name(building_element, ns)
       name_array = [@standard_template]
       @building_subsections.each do |bld_tp|
         name_array << bld_tp.bldg_type
+      end
+      name_element = building_element.elements["#{ns}:PremisesName"]
+      if !name_element.nil?
+        name_array << name_element.text
       end
       @name = name_array.join('|').to_s
     end
@@ -561,8 +565,8 @@ module BuildingSync
       bar_hash = {}
       bar_hash[:length] = length
       bar_hash[:width] =  width
-      bar_hash[:num_stories_below_grade] = num_stories_below_grade
-      bar_hash[:num_stories_above_grade] = num_stories_above_grade
+      bar_hash[:num_stories_below_grade] = num_stories_below_grade.to_i
+      bar_hash[:num_stories_above_grade] = num_stories_above_grade.to_i
       bar_hash[:floor_height] = floor_height
       # bar_hash[:center_of_footprint] = OpenStudio::Point3d.new(length* 0.5,width * 0.5,0.0)
       bar_hash[:center_of_footprint] = OpenStudio::Point3d.new(0, 0, 0)
@@ -610,6 +614,8 @@ module BuildingSync
 
       puts "bar_hash: #{bar_hash}"
       puts "target_areas: #{target_areas}"
+      puts "bar_hash[:num_stories_below_grade]: #{bar_hash[:num_stories_below_grade]}"
+      puts "bar_hash[:num_stories_above_grade]: #{bar_hash[:num_stories_above_grade]}"
       # create bar
       create_bar(runner, @model, bar_hash, 'Basements Ground Mid Top')
       # using the default value for story multiplier for now 'Basements Ground Mid Top'
@@ -636,7 +642,7 @@ module BuildingSync
       # test for excessive exterior roof area (indication of problem with intersection and or surface matching)
       ext_roof_area = @model.getBuilding.exteriorSurfaceArea - @model.getBuilding.exteriorWallArea
       expected_roof_area = total_floor_area / num_stories.to_f
-      if ext_roof_area > expected_roof_area && single_floor_area == 0.0 # only test if using whole-building area input
+      if ext_roof_area > expected_roof_area && @single_floor_area == 0.0 # only test if using whole-building area input
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', 'Roof area larger than expected, may indicate problem with inter-floor surface intersection or matching.')
         return false
       end

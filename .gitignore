@@ -11,6 +11,7 @@
 /tmp/
 /spec/output/
 /SR1
+/SRvt
 
 # rspec failure tracking
 .rspec_status

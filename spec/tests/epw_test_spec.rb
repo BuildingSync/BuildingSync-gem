@@ -34,46 +34,16 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative './../spec_helper'
-
-require 'fileutils'
-require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for Title24' do
-    test_baseline_creation('building_151.xml', CA_TITLE24)
-  end
-
-  it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace for Title24' do
-    test_baseline_creation('building_151_n1.xml', CA_TITLE24)
-  end
-
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1' do
-    test_baseline_creation('building_151.xml', ASHRAE90_1)
-  end
-
-  it 'should not find the Standard for large office and Title24 with DC GSA Headquarters.xml (phase zero)' do
-    begin
-      test_baseline_creation('DC GSA Headquarters.xml', CA_TITLE24, 'CZ01RV2.epw')
-    rescue StandardError => e
-      expect(e.message.include?("Did not find a class called 'CBES Pre-1978_LargeOffice' to create in")).to be true
-    end
-  end
-
-  it 'should parse and write DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1' do
-    test_baseline_creation('DC GSA Headquarters.xml', ASHRAE90_1, 'CZ01RV2.epw')
-  end
-
-  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with Title 24' do
-    test_baseline_creation('BuildingSync Website Valid Schema.xml', CA_TITLE24, 'CZ01RV2.epw')
-  end
-
-  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with ASHRAE 90.1' do
-    test_baseline_creation('BuildingSync Website Valid Schema.xml', ASHRAE90_1, 'CZ01RV2.epw')
-  end
-
-  it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1' do
-    test_baseline_creation('Golden Test File.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  it 'should support an absolute path of EPW' do
+    standard_template = '90.1-2004'
+    bldg_type = 'SmallOffice'
+    climate_zone_standard_string = 'ASHRAE 169-2006-4'
+    open_studio_standards = Standard.build("#{standard_template}_#{bldg_type}")
+    model = OpenStudio::Model::Model.new
+    epw_file_name = 'CZ01RV2.epw'
+    epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
+    open_studio_standards.model_add_design_days_and_weather_file(model, climate_zone_standard_string, epw_file_path)
   end
 end
-
