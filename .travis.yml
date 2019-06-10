@@ -21,6 +21,8 @@ script:
   - bundle exec rspec spec/tests/model_articulation_test/site_spec.rb
   - bundle exec rspec spec/tests/translator_baseline_generation_spec.rb
   - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb
+  - bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
+  - bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb
 #  - bundle exec rake
 #  - bundle exec rake openstudio:test_with_openstudio
 #  - bundle exec rake

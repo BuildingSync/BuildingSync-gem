@@ -300,10 +300,14 @@ module BuildingSync
     def set_weater_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
       initialize_model
 
-      # here we check if there is an valid EPW file, if there is we use that file otehrwise everything will be generated from climate zone
+      puts "epw_file_path: #{epw_file_path}"
+      # here we check if there is an valid EPW file, if there is we use that file otherwise everything will be generated from climate zone
       if !epw_file_path.nil? && File.exist?(epw_file_path)
         set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
         puts 'using the EPW file'
+      elsif climate_zone.nil?
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'The epw file and the climate zone are nil.')
+        raise 'Error: BuildingSync.Facility.set_weater_and_climate_zone: The epw file and the climate zone are nil.'
       else
         set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
         puts 'using the climate zone'
