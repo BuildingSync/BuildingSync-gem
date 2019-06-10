@@ -71,16 +71,16 @@ module BuildingSync
       if @sites.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', 'There are no sites attached to this facility in your BuildingSync file.')
         raise 'There are no sites attached to this facility in your BuildingSync file.'
-      else if @sites.count > 1
-             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file.")
-             raise "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file."
-           else
-             OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.generate_baseline_osm', "Info: There is/are #{@sites.count} sites in this facility.")
-           end
+      elsif @sites.count > 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file.")
+        raise "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file."
+      else
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.generate_baseline_osm', "Info: There is/are #{@sites.count} sites in this facility.")
       end
       @sites[0].generate_baseline_osm(epw_file_path, standard_to_be_used)
 
       create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, @sites[0].get_climate_zone, 'Forced Air')
+      return true
     end
 
     def create_building_systems(model, template, system_type, climate_zone, hvac_delivery_type)

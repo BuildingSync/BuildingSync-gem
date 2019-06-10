@@ -36,7 +36,6 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'builder'
-require 'rexml/document'
 
 RSpec.describe 'SiteSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
@@ -49,6 +48,12 @@ RSpec.describe 'SiteSpec' do
 
   it 'Should create an instance of the facility class with minimal XML snippet' do
     create_minimum_facility('Retail', '1954', 'Gross', '69452')
+  end
+
+  it 'Should return the boolean value for creating osm file correctly or not.' do
+    facility = create_minimum_facility('Retail', '1954', 'Gross', '69452')
+    epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
+    expect(facility.generate_baseline_osm(epw_file_path, ASHRAE90_1)).to be true
   end
 
   def generate_baseline(file_name, ns)
