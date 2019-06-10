@@ -53,10 +53,6 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse the Golden Test File.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
-    begin
-      test_baseline_and_scenario_creation('Golden Test File.xml', 30, ASHRAE90_1)
-    rescue StandardError => e
-      expect(e.message.include?("Did not find a class called '90.1-2013_Laboratory' to create in")).to be true
-    end
+    test_baseline_and_scenario_creation('Golden Test File.xml', 1, ASHRAE90_1, 'CZ01RV2.epw')
   end
 end
