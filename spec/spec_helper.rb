@@ -99,7 +99,7 @@ RSpec.configure do |config|
   end
 
   def run_scenario_simulations(osw_files)
-    num_parallel = 15
+    num_parallel = 10
 
     cli_path = OpenStudio.getOpenStudioCLI
 
@@ -144,7 +144,7 @@ RSpec.configure do |config|
     return "#{out_path}/in.osm"
   end
 
-  def test_baseline_and_scenario_creation(file_name, epw_file_path = nil, standard_to_be_used = CA_TITLE24)
+  def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -158,6 +158,11 @@ RSpec.configure do |config|
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
+    epw_file_path = nil
+    if !epw_file_name.nil?
+      epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
+    end
+
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
     translator.write_osm
 
@@ -167,7 +172,7 @@ RSpec.configure do |config|
 
     osw_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
-    expect(osw_files.size).to eq 30
+    expect(osw_files.size).to eq expected_number_of_measures
 
     return osw_files
   end

@@ -40,9 +40,23 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and all simulations' do
-    test_baseline_and_scenario_creation('building_151.xml')
+  it 'should parse the building_151.xml (phase zero) with auc namespace for CA Title 24 and generate baseline and scenarios' do
+    test_baseline_and_scenario_creation('building_151.xml', 30)
   end
 
-  # todo: add more testcases for testing
+  it 'should parse the DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
+    test_baseline_and_scenario_creation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with CA Title 24 and generate baseline and scenarios' do
+    test_baseline_and_scenario_creation('BuildingSync Website Valid Schema.xml', 30, CA_TITLE24, 'CZ01RV2.epw')
+  end
+
+  it 'should parse the Golden Test File.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
+    begin
+      test_baseline_and_scenario_creation('Golden Test File.xml', 30, ASHRAE90_1)
+    rescue StandardError => e
+      expect(e.message.include?("Did not find a class called '90.1-2013_Laboratory' to create in")).to be true
+    end
+  end
 end

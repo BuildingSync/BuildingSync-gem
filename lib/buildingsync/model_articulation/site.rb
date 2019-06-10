@@ -43,6 +43,7 @@ module BuildingSync
       # code to initialize
       # an array that contains all the buildings
       @buildings = []
+      @largest_building = nil
       @climate_zone = nil
       @climate_zone_ashrae = nil
       @climate_zone_ca_t24 = nil
@@ -73,10 +74,6 @@ module BuildingSync
       if @buildings.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
         raise 'Error: There is no building attached to this site in your BuildingSync file.'
-      else if @buildings.count > 1
-             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
-             raise "Error: There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file."
-           end
       end
     end
 
@@ -120,20 +117,20 @@ module BuildingSync
     end
 
     def get_model
-      return @buildings[0].get_model
+      return get_largest_building.get_model
     end
 
     def get_building_template
-      return @buildings[0].get_building_template
+      return get_largest_building.get_building_template
     end
 
     def get_system_type
-      return @buildings[0].get_system_type
+      return get_largest_building.get_system_type
     end
 
     def get_building_type
       if @bldg_type.nil?
-        return @buildings[0].get_building_type
+        return get_largest_building.get_building_type
       else
         return @bldg_type
       end
@@ -147,22 +144,43 @@ module BuildingSync
       return @buildings
     end
 
-    def generate_baseline_osm(epw_file_path, standard_to_be_used)
-      @buildings.each do |building|
-        @climate_zone = @climate_zone_ashrae
-        # for now we use the california climate zone if it is available
-        if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
-          @climate_zone = @climate_zone_ca_t24
+    def get_largest_building
+      if !@largest_building.nil?
+        return @largest_building
+      else
+        if @buildings.count == 1
+          return @buildings[0]
+        elsif @buildings.count > 1
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
+          @largest_building = nil
+          largest_floor_area = -Float::INFINITY
+          @buildings.each do |building|
+            if largest_floor_area < building.total_floor_area
+              largest_floor_area = building.total_floor_area
+              @largest_building = building
+            end
+          end
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Site.generate_baseline_osm', "The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) was selected.")
+          puts "BuildingSync.Site.generate_baseline_osm: The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) m^2 was selected."
+          return @largest_building
         end
-        building.set_weater_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude)
-        building.generate_baseline_osm(standard_to_be_used)
       end
     end
 
-    def write_osm(dir)
-      @buildings.each do |building|
-        building.write_osm(dir)
+    def generate_baseline_osm(epw_file_path, standard_to_be_used)
+      building = get_largest_building
+      @climate_zone = @climate_zone_ashrae
+      # for now we use the california climate zone if it is available
+      if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
+        @climate_zone = @climate_zone_ca_t24
       end
+      building.set_weater_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude)
+      building.generate_baseline_osm(standard_to_be_used)
+    end
+
+    def write_osm(dir)
+      building = get_largest_building
+      building.write_osm(dir)
       scenario_types = {}
       scenario_types['system_type'] = get_system_type
       scenario_types['bldg_type'] = get_building_type

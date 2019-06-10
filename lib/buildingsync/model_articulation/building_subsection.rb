@@ -59,8 +59,12 @@ module BuildingSync
       @subsection_element = subsection_element
 
       # Make the standard applier
-      $open_studio_standards = Standard.build("#{standard_template}_#{@bldg_type}")
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSubsection.read_xml', "Building Standard with template: #{standard_template}_#{@bldg_type}")
+      begin
+        $open_studio_standards = Standard.build("#{standard_template}_#{@bldg_type}")
+      rescue StandardError => e
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.BuildingSubsection.read_xml', e.message)
+      end
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSubsection.read_xml', "Building Standard with template: #{standard_template}_#{@bldg_type}") if !$open_studio_standards.nil?
     end
 
     def read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)

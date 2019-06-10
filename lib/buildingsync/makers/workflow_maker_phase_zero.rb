@@ -78,6 +78,7 @@ module BuildingSync
         @doc.elements.each("//#{@ns}:Measure[@ID='#{measure_id}']") do |measure|
           measure_category = measure.elements["#{@ns}:SystemCategoryAffected"].text
 
+          current_num_measure = num_measures
           # Lighting
           if measure_category == 'Lighting'
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:LightingImprovements/#{@ns}:MeasureName"].text
@@ -263,7 +264,7 @@ module BuildingSync
           if measure_category == 'Other HVAC'
 
             # Other HVAC / OtherHVAC
-            measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
+            measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:*/#{@ns}:MeasureName"].text
 
             # DLM: somme measures don't have a direct BuildingSync equivalent, use UserDefinedField 'OpenStudioMeasureName' for now
             if measure_name == 'Other'
@@ -364,7 +365,7 @@ module BuildingSync
           # Air Distribution
           if measure_category == 'Air Distribution'
             # Air Distribution / OtherHVAC
-            measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
+            measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:*/#{@ns}:MeasureName"].text
             # Air Distribution / OtherHVAC / Improve ventilation fans
             if measure_name == 'Improve ventilation fans'
               num_measures += 1
@@ -373,7 +374,6 @@ module BuildingSync
             end
 
             # Air Distribution / OtherHVAC
-            measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
             # Air Distribution / OtherHVAC / Install demand control ventilation
             if measure_name == 'Install demand control ventilation'
               num_measures += 1
@@ -382,7 +382,6 @@ module BuildingSync
             end
 
             # Air Distribution / OtherHVAC
-            measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
             # Air Distribution / OtherHVAC / Add or repair economizer
             if measure_name == 'Add or repair economizer'
               num_measures += 1
@@ -448,11 +447,17 @@ module BuildingSync
               set_measure_argument(osw, 'reduce_water_use_by_percentage', 'water_use_reduction_percent', 50)
             end
           end
+
+          if current_num_measure == num_measures
+            measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:*/#{@ns}:MeasureName"].text
+            measure_long_description = measure.elements["#{@ns}:LongDescription"].text
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_for_scenario', "Measure with name: #{measure_name} and Description: #{measure_long_description} could not be processed!")
+          end
         end
       end
 
       # ensure that we didn't miss any measures by accident
-      raise "#{measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{measure_ids}" if num_measures != measure_ids.size
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_for_scenario', "#{measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{measure_ids}") if num_measures != measure_ids.size
     end
 
     def write_osws(dir)
