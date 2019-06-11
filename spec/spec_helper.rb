@@ -99,7 +99,7 @@ RSpec.configure do |config|
   end
 
   def run_scenario_simulations(osw_files)
-    num_parallel = 8
+    num_parallel = 6
 
     cli_path = OpenStudio.getOpenStudioCLI
 
