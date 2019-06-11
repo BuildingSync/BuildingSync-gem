@@ -18,6 +18,13 @@ before_script:
   - sudo ./install_openstudio.sh $OPENSTUDIO_VERSION $OPENSTUDIO_SHA
 script:
   - bundle exec rspec spec/tests/selection_tool_spec.rb
+  - bundle exec rspec spec/tests/model_articulation_test/building_spec.rb
+  - bundle exec rspec spec/tests/model_articulation_test/building_subsection_spec.rb
+  - bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb
+  - bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb
+  - bundle exec rspec spec/tests/model_articulation_test/hvac_system_spec.rb
+  - bundle exec rspec spec/tests/model_articulation_test/loads_system_spec.rb
+  - bundle exec rspec spec/tests/model_articulation_test/service_hot_water_system_spec.rb
   - bundle exec rspec spec/tests/model_articulation_test/site_spec.rb
   - bundle exec rspec spec/tests/translator_baseline_generation_spec.rb
   - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb

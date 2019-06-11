@@ -97,6 +97,7 @@ module BuildingSync
       exterior_lights.each do |k, v|
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding Exterior Lights named #{v.exteriorLightsDefinition.name} with design level of #{v.exteriorLightsDefinition.designLevel} * #{OpenStudio.toNeatString(v.multiplier, 0, true)}.")
       end
+      return true
     end
 
     def add_elevator(model, standard)

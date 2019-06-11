@@ -176,4 +176,56 @@ RSpec.configure do |config|
 
     return osw_files
   end
+
+  def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    ns = 'auc'
+    site_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
+    if !site_element.nil?
+      return BuildingSync::Site.new(site_element, ASHRAE90_1, 'auc')
+    else
+      expect(site_element.nil?).to be false
+    end
+  end
+
+  def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    xml_path = File.expand_path('./files/building_151_Blank.xml', File.dirname(__FILE__))
+    ns = 'auc'
+    doc = create_xml_file_object(xml_path)
+    site_element = doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
+
+    occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
+    occupancy_classification_element.text = occupancy_classification
+    site_element.add_element(occupancy_classification_element)
+
+    building_element = site_element.elements["#{ns}:Buildings/#{ns}:Building"]
+
+    year_of_construction_element = REXML::Element.new("#{ns}:YearOfConstruction")
+    year_of_construction_element.text = year_of_const
+    building_element.add_element(year_of_construction_element)
+
+    floor_areas_element = REXML::Element.new("#{ns}:FloorAreas")
+    floor_area_element = REXML::Element.new("#{ns}:FloorArea")
+    floor_area_type_element = REXML::Element.new("#{ns}:FloorAreaType")
+    floor_area_type_element.text = floor_area_type
+    floor_area_value_element = REXML::Element.new("#{ns}:FloorAreaValue")
+    floor_area_value_element.text = floor_area_value
+
+    floor_area_element.add_element(floor_area_type_element)
+    floor_area_element.add_element(floor_area_value_element)
+    floor_areas_element.add_element(floor_area_element)
+    building_element.add_element(floor_areas_element)
+
+    # doc.write(File.open(xml_path, 'w'), 2)
+
+    return doc
+  end
+
+  def create_xml_file_object(xml_file_path)
+    doc = nil
+    File.open(xml_file_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+    end
+    return doc
+  end
 end
