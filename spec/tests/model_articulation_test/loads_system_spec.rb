@@ -42,4 +42,27 @@ RSpec.describe 'LoadSystemSpec' do
     load_system = BuildingSync::LoadsSystem.new
     expect(load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', false)).to be true
   end
+
+  it 'Should add exterior lights successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref Pre-1980')
+    load_system = BuildingSync::LoadsSystem.new
+    expect(load_system.add_exterior_lights(model, standard, 1.0, '3 - All Other Areas', false)).to be true
+  end
+
+  it 'should add elevator successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref Pre-1980')
+    load_system = BuildingSync::LoadsSystem.new
+
+    expect(load_system.add_elevator(model, standard)).to be true
+  end
+
+  it 'Should add daylighting controls successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref Pre-1980')
+    load_system = BuildingSync::LoadsSystem.new
+
+    expect(load_system.add_daylighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
+  end
 end

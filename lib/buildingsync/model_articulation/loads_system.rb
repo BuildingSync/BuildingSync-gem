@@ -118,6 +118,7 @@ module BuildingSync
         design_level = elevator_def.designLevel.get
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{elevators.multiplier.round(1)} elevators each with power of #{OpenStudio.toNeatString(design_level, 0, true)} (W), plus lights and fans.")
       end
+      return true
     end
 
     def add_daylighting_controls(model, standard, template)
@@ -128,6 +129,7 @@ module BuildingSync
         end
       end
       standard.model_add_daylighting_controls(model)
+      return true
     end
   end
 end

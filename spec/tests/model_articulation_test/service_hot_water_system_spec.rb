@@ -1,4 +1,3 @@
-
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
@@ -35,46 +34,13 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-module BuildingSync
-  class ServiceHotWaterSystem < BuildingSystem
 
-    # initialize
-    def initialize()
-      # code to initialize
-    end
+RSpec.describe 'ServiceHotWaterSystemSpec' do
+  it 'Should add succeffully Service hot water system' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref Pre-1980')
+    serviceHotWaterSystem = BuildingSync::ServiceHotWaterSystem.new
 
-    def add(model, standard, remove_objects)
-      # remove water use equipment and water use connections
-      if remove_objects
-        # TODO: - remove plant loops used for service water heating
-        model.getWaterUseEquipments.each(&:remove)
-        model.getWaterUseConnectionss.each(&:remove)
-      end
-
-      typical_swh = standard.model_add_typical_swh(model)
-      midrise_swh_loops = []
-      stripmall_swh_loops = []
-      typical_swh.each do |loop|
-        if loop.name.get.include?('MidriseApartment')
-          midrise_swh_loops << loop
-        elsif loop.name.get.include?('RetailStripmall')
-          stripmall_swh_loops << loop
-        else
-          water_use_connections = []
-          loop.demandComponents.each do |component|
-            next if !component.to_WaterUseConnections.is_initialized
-            water_use_connections << component
-          end
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{loop.name} to the building. It has #{water_use_connections.size} water use connections.")
-        end
-      end
-      if !midrise_swh_loops.empty?
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{midrise_swh_loops.size} MidriseApartment service water heating loops.")
-      end
-      if !stripmall_swh_loops.empty?
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{stripmall_swh_loops.size} RetailStripmall service water heating loops.")
-      end
-      return true
-    end
+    expect(serviceHotWaterSystem.add(model, standard, false)).to be true
   end
 end
