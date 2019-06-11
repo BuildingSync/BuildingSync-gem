@@ -103,7 +103,7 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
 
       load_system = LoadsSystem.new
-      hvacSystem = HVACSystem.new
+      hvac_system = HVACSystem.new
 
       # Make the standard applier
       standard = Standard.build(template)
@@ -152,7 +152,7 @@ module BuildingSync
 
       # add_exhaust
       if add_exhaust
-        hvacSystem.add_exhaust(model, standard, 'Adjacent', remove_objects)
+        hvac_system.add_exhaust(model, standard, 'Adjacent', remove_objects)
       end
 
       # add service water heating demand and supply
@@ -184,12 +184,12 @@ module BuildingSync
       # works by switching some fraction of electric loads to gas if requested (assuming base load is electric)
       # add thermostats
       if add_thermostat
-        hvacSystem.add_thermostats(model, standard, remove_objects)
+        hvac_system.add_thermostats(model, standard, remove_objects)
       end
 
       # add hvac system
       if add_hvac
-        hvacSystem.add_hvac(model, standard, system_type, remove_objects)
+        hvac_system.add_hvac(model, standard, system_type, remove_objects)
       end
 
       # TODO: - hours of operation customization (initially using existing measure downstream of this one)
@@ -197,7 +197,7 @@ module BuildingSync
 
       # set hvac controls and efficiencies (this should be last model articulation element)
       if add_hvac
-        hvacSystem.apply_sizing_and_assumptions(model, standard, primary_bldg_type, system_type, climate_zone)
+        hvac_system.apply_sizing_and_assumptions(model, standard, primary_bldg_type, system_type, climate_zone)
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)

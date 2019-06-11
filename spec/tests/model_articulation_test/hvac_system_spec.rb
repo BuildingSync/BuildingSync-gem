@@ -34,9 +34,36 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-module BuildingSync
-  class BuildingSystem
-    # TODO: - Do we need this class to share functionality of the system
+
+RSpec.describe 'HVACSystemSpec' do
+  it 'Should add a Exhaust in HVAC system successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref 1980-2004')
+    hvac_system = BuildingSync::HVACSystem.new
+
+    expect(hvac_system.add_exhaust(model, standard, 'Adjacent', false)).to be true
+  end
+
+  it 'Should add a Thermostats in HVAC System successfully' do
+    model = OpenStudio::Model::Model.new
+    hvac_system = BuildingSync::HVACSystem.new
+
+    expect(hvac_system.add_thermostats(model, ASHRAE90_1, false)).to be true
+  end
+
+  it 'Should add HVAC System successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref 1980-2004')
+    hvac_system = BuildingSync::HVACSystem.new
+
+    expect(hvac_system.add_hvac(model, standard, 'PSZ-AC with gas coil heat', false)).to be true
+  end
+
+  it 'Should apply sizing and assumptions in HVAC System' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref 1980-2004')
+    hvac_system = BuildingSync::HVACSystem.new
+
+    expect(hvac_system.apply_sizing_and_assumptions(model, standard, 'Retail', 'PSZ-AC with gas coil heat', '')).to be false
   end
 end
-

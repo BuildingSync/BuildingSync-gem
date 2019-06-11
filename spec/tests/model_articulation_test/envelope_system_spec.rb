@@ -34,9 +34,13 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-module BuildingSync
-  class BuildingSystem
-    # TODO: - Do we need this class to share functionality of the system
+
+RSpec.describe 'EnvelopeSystemSpec' do
+  it 'Should create a Envelope system successfully' do
+    standard = Standard.build('DOE Ref 1980-2004')
+
+    model = OpenStudio::Model::Model.new
+    envelopeSystem = BuildingSync::EnvelopeSystem.new
+    envelopeSystem.create(model, standard, 'Retail', 'Retail', false)
   end
 end
-
