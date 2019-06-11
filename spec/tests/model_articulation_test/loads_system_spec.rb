@@ -45,7 +45,7 @@ RSpec.describe 'LoadSystemSpec' do
 
   it 'Should add exterior lights successfully' do
     site = create_minimum_site('Retail', '1980', 'Gross', '20000')
-    site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw"', File.dirname(__FILE__)), ASHRAE90_1)
+    site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
     # we need to create a site and call the generate_baseline_osm method in order to set the space types in the model, why are those really needed?
     load_system = BuildingSync::LoadsSystem.new
     expect(load_system.add_exterior_lights(site.get_model, $open_studio_standards, 1.0, '3 - All Other Areas', false)).to be true
