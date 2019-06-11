@@ -37,16 +37,6 @@
 module BuildingSync
   class HVACSystem < BuildingSystem
 
-    # initialize
-    def initialize
-      # code to initialize
-    end
-
-    # create system
-    def create
-      # creating the typical HVAC systems
-    end
-
     def add_exhaust(model, standard, kitchen_makeup, remove_objects)
       # remove exhaust objects
       if remove_objects
@@ -65,6 +55,7 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_exhaust', "Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}")
         end
       end
+      return true
     end
 
     def add_thermostats(model, standard, remove_objects)
@@ -90,6 +81,7 @@ module BuildingSync
           next
         end
       end
+      return true
     end
 
     def add_hvac(model, standard, system_type, remove_objects)
@@ -166,6 +158,7 @@ module BuildingSync
         end
 
       end
+      return true
     end
 
     def apply_sizing_and_assumptions(model, standard, primary_bldg_type, system_type, climate_zone)
@@ -192,6 +185,7 @@ module BuildingSync
         # Apply the HVAC efficiency standard
         standard.model_apply_hvac_efficiency_standard(model, climate_zone)
       end
+      return true
     end
   end
 end

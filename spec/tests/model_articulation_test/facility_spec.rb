@@ -1,4 +1,3 @@
-
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
@@ -37,7 +36,7 @@
 # *******************************************************************************
 require 'builder'
 
-RSpec.describe 'SiteSpec' do
+RSpec.describe 'FacilitySpec' do
   it 'Should generate meaningful error when passing empty XML data' do
     begin
       generate_baseline('building_151_Blank', 'auc')
@@ -61,7 +60,6 @@ RSpec.describe 'SiteSpec' do
     @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
     expect(File.exist?(@xml_path)).to be true
     @doc = create_xml_file_object(@xml_path)
-    # @doc = create_blank_xml_file(ns)
 
     @doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_element|
       facilities.push(BuildingSync::Facility.new(facility_element, CA_TITLE24, ns))
