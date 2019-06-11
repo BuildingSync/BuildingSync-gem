@@ -85,7 +85,7 @@ module BuildingSync
       return true
     end
 
-    def add_exterior_lights(model, standard, remove_objects)
+    def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
       if remove_objects
         model.getExteriorLightss.each do |ext_light|
           next if ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name

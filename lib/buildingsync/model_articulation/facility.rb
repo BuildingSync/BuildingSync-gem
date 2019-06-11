@@ -147,7 +147,7 @@ module BuildingSync
 
       # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
       if add_exterior_lights
-        load_system.add_exterior_lights(model, standard, remove_objects)
+        load_system.add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
       end
 
       # add_exhaust
