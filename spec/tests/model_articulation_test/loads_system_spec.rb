@@ -51,7 +51,7 @@ RSpec.describe 'LoadSystemSpec' do
     expect(load_system.add_exterior_lights(site.get_model, $open_studio_standards, 1.0, '3 - All Other Areas', false)).to be true
   end
 
-  it 'should add elevator successfully' do
+  it 'Should add elevator successfully' do
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref Pre-1980')
     load_system = BuildingSync::LoadsSystem.new

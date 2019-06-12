@@ -69,4 +69,16 @@ RSpec.describe 'BuildingSync' do
 
     run_baseline_simulation(osm_path, 'CZ01RV2.epw')
   end
+
+  it 'should parse and write Golden Test File.xml (phase zero) with  Title 24 and perform a baseline simulation' do
+    osm_path = test_baseline_creation('Golden Test File.xml', CA_TITLE24, 'CZ01RV2.epw')
+
+    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+    osm_path = test_baseline_creation('Golden Test File.xml', ASHRAE90_1, 'CZ01RV2.epw')
+
+    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+  end
 end

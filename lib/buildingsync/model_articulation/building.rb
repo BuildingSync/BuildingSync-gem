@@ -517,7 +517,7 @@ module BuildingSync
         end
 
       end
-
+      puts "climate_zone: #{climate_zone}"
       # set climate zone
       climateZones.clear
       if standard_to_be_used == ASHRAE90_1
@@ -526,6 +526,9 @@ module BuildingSync
       elsif standard_to_be_used == CA_TITLE24
         climate_zone = climate_zone.gsub('CEC', '').strip
         climate_zone = climate_zone.gsub('Climate Zone', '').strip
+        climate_zone = climate_zone.gsub('A', '').strip
+        climate_zone = climate_zone.gsub('B', '').strip
+        climate_zone = climate_zone.gsub('C', '').strip
         climateZones.setClimateZone('CEC', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climate_zone}")
       end
