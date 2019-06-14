@@ -34,6 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'rexml/document'
 
 RSpec.describe 'SiteSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
@@ -72,6 +73,38 @@ RSpec.describe 'SiteSpec' do
     # call generate_baseline_osm
     # call write_osm
     # compare this osm file with a file that was previously generated.
+    osm_file_path = File.expand_path('../../files/osm_file', File.dirname(__FILE__))
+    site = create_minimum_site('Retail', '1980', 'Gross', '20000')
+    site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
+    site.write_osm(osm_file_path)
+
+    osm_file_full_path = "#{osm_file_path}/in.osm"
+    to_be_comparison_path = "#{osm_file_path}/FileToBeComparison/in.osm"
+
+    expect(File.size(osm_file_full_path) == File.size(to_be_comparison_path)).to be true
+  end
+
+  def blank_xml_string
+    buildingsync = REXML::Element.new('auc:BuildingSync')
+    facilities = REXML::Element.new('auc:Facilities')
+    facility = REXML::Element.new('auc:Facility')
+    sites = REXML::Element.new('auc:Sites')
+    site = REXML::Element.new('auc:Site')
+    buildings = REXML::Element.new('auc:Buildings')
+    building = REXML::Element.new('auc:Building')
+    subsections = REXML::Element.new('auc:Subsections')
+    subsection = REXML::Element.new('auc:Subsection')
+
+    buildingsync.add_element(facilities)
+    facilities.add_element(facility)
+    facility.add_element(sites)
+    sites.add_element(site)
+    site.add_element(buildings)
+    buildings.add_element(building)
+    building.add_element(subsections)
+    subsections.add_element(subsection)
+
+    return buildingsync
   end
 
   def generate_baseline(file_name, ns)
@@ -96,32 +129,4 @@ RSpec.describe 'SiteSpec' do
     return facilities[0]
   end
 
-  def create_blank_xml_file(ns)
-    xml = Builder::XmlMarkup.new(indent: 2)
-    xml.instruct! :xml, encoding: 'ASCII'
-
-    building_sync_element = REXML::Element.new("#{ns}:BuildingSync")
-    facilities_element = REXML::Element.new("#{ns}:Facilities")
-    facility_element = REXML::Element.new("#{ns}:Facility")
-    sites_element = REXML::Element.new("#{ns}:Sites")
-    site_element = REXML::Element.new("#{ns}:Site")
-    buildings_element =REXML::Element.new("#{ns}:Buildings")
-    building_element = REXML::Element.new("#{ns}:Building")
-    subsections_element = REXML::Element.new("#{ns}:Subsections")
-    subsection_element = REXML::Element.new("#{ns}:Subsection")
-
-    subsections_element.add_element(subsection_element)
-    building_element.add_element(subsections_element)
-    buildings_element.add_element(building_element)
-    site_element.add_element(buildings_element)
-    sites_element.add_element(site_element)
-    facility_element.add_element(sites_element)
-    facilities_element.add_element(facility_element)
-    building_sync_element.add_element(facilities_element)
-
-    return building_sync_element
-
-    xml_path = File.expand_path('../../files/building_151_Blank1.xml', File.dirname(__FILE__))
-    doc.write(File.open(xml_path, 'w'), 2)
-  end
 end
