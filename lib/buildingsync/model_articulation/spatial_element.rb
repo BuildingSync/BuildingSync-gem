@@ -120,59 +120,55 @@ module BuildingSync
         elsif occupancy_type == 'StripMall'
           @bldg_type = 'RetailStripmall'
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat' # Two speed DX AC
         elsif occupancy_type == 'PrimarySchool'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PVAV with reheat'
         elsif occupancy_type == 'SecondarySchool'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'VAV with reheat'
         elsif occupancy_type == 'Outpatient'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PVAV with reheat'
         elsif occupancy_type == 'Hospital'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'VAV with reheat'
         elsif occupancy_type == 'SmallHotel'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PTAC with electric baseboard heat'
         elsif occupancy_type == 'LargeHotel'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'VAV with reheat'
         elsif occupancy_type == 'QuickServiceRestaurant'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat'
         elsif occupancy_type == 'FullServiceRestaurant'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat'
         elsif occupancy_type == 'MidriseApartment'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat'
         elsif occupancy_type == 'HighriseApartment'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-HP'
         elsif occupancy_type == 'Warehouse'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat'
         elsif occupancy_type == 'SuperMarket'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
-        elsif occupancy_type == 'Laboratory-Testing'
-          @bldg_type = 'Laboratory'
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat'
         else
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
         end
