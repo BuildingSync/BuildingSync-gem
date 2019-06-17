@@ -81,7 +81,10 @@ RSpec.describe 'SiteSpec' do
     osm_file_full_path = "#{osm_file_path}/in.osm"
     to_be_comparison_path = "#{osm_file_path}/FileToBeComparison/in.osm"
 
-    expect(File.size(osm_file_full_path) == File.size(to_be_comparison_path)).to be true
+    original_file_size = File.size(to_be_comparison_path)
+    new_file_size = File.size(osm_file_full_path)
+    puts "original osm file size #{original_file_size} bytes versus new osm file size #{new_file_size} bytes"
+    expect((original_file_size - new_file_size).abs <= 1).to be true
   end
 
   def blank_xml_string
