@@ -169,6 +169,10 @@ module BuildingSync
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
           @system_type = 'PSZ-AC with gas coil heat'
+        elsif occupancy_type == 'Laboratory-Testing'
+          @bldg_type = 'Laboratory'
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'tbd'
         else
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
         end
