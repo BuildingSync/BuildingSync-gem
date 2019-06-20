@@ -37,8 +37,8 @@ module BuildingSync
   class GetBCLWeatherFile < OpenStudio::Ruleset::ModelUserScript
 
     # override name to return the name of your script
-    def initialize(model, runner, user_arguments)
-      run(model, runner, user_arguments)
+    def initialize(model, user_arguments)
+      run(model, user_arguments)
     end
 
     def name
@@ -86,7 +86,7 @@ module BuildingSync
 
     # model is an OpenStudio::Model::Model, runner is a OpenStudio::Ruleset::UserScriptRunner
 
-    def run(model, runner, user_arguments)
+    def run(model, user_arguments)
       # super(model, runner, user_arguments)
 
       city = user_arguments
@@ -164,20 +164,16 @@ module BuildingSync
 
       end
 
-      puts "files = #{files}"
+      # puts "files = #{files}"
 
       epw_path = component.files('epw')[0]
-
-      puts "epw_path = #{epw_path}"
+      # file_name = File.basename(epw_path1)
+      # current_path = File.expand_path('../../spec/files/weather_files', File.dirname(__FILE__))
 
       # parse epw file
-
       epw_file = OpenStudio::EpwFile.new(OpenStudio::Path.new(epw_path))
 
-
-
       # set weather file
-
       OpenStudio::Model::WeatherFile.setWeatherFile(model, epw_file)
 
 
@@ -208,4 +204,4 @@ module BuildingSync
 end
 
 # this call registers your script with the OpenStudio SketchUp plug-in
-#GetBCLWeatherFile.new.registerWithApplication
+# GetBCLWeatherFile.new.registerWithApplication
