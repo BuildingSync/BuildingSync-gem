@@ -36,19 +36,39 @@
 # *******************************************************************************
 
 require_relative '../../../lib/buildingsync/get_bcl_weather_file'
+
 RSpec.describe 'WeatherFileDownload' do
-    it 'weather file download from the nrel site.' do
-      city = get_city_name('building_151', 'auc')
-      BuildingSync::GetBCLWeatherFile.new(OpenStudio::Model::Model.new, city)
-    end
-
-    def get_city_name(file_name, ns)
-      @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
-      expect(File.exist?(@xml_path)).to be true
-
-      doc = create_xml_file_object(@xml_path)
-      address_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
-
-      return address_element.elements["#{ns}:Address/#{ns}:City"].text
-    end
+  it 'weather file download from the nrel site with the help of state and city name' do
+    state, city = get_state_and_city_name('building_151', 'auc')
+    BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state, city)
   end
+
+  it 'weather file download from the nrel site  with the help of weather station ID' do
+    weather_id = get_weather_id('building_151', 'auc')
+    BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_id)
+  end
+
+  def get_state_and_city_name(file_name, ns)
+    doc = get_xml_object(file_name, ns)
+
+    address_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
+
+    city = address_element.elements["#{ns}:Address/#{ns}:City"].text
+    state = address_element.elements["#{ns}:Address/#{ns}:State"].text
+    return state, city
+  end
+
+  def get_weather_id(file_name, ns)
+    doc = get_xml_object(file_name, ns)
+    site_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
+
+    return site_element.elements["#{ns}:WeatherDataStationID"].text
+  end
+
+  def get_xml_object(file_name, ns)
+    @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
+    expect(File.exist?(@xml_path)).to be true
+
+    return create_xml_file_object(@xml_path)
+  end
+end

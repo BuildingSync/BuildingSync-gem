@@ -34,72 +34,12 @@
 # *******************************************************************************
 
 module BuildingSync
-  class GetBCLWeatherFile < OpenStudio::Ruleset::ModelUserScript
-
-    # override name to return the name of your script
-    def initialize(model, user_arguments)
-      run(model, user_arguments)
-    end
-
-    def name
-      return 'Get BCL Weather File'
-    end
-
-    # returns a vector of arguments, the runner will present these arguments to the user
-
-    # then pass in the results on run
-
-    def arguments
-
-      result = OpenStudio::Ruleset::OSArgumentVector.new
-
-      # Check Auth Key in LocalBCL instance
-
-      library = OpenStudio::LocalBCL.instance
-
-      if library.prodAuthKey.empty?
-
-        authKey = OpenStudio::Ruleset::OSArgument.makeStringArgument('authKey')
-
-        authKey.setDisplayName('BCL AuthKey')
-
-        result << authKey
-
-      end
-
-
-
-      city = OpenStudio::Ruleset::OSArgument.makeStringArgument('city', false)
-
-      city.setDisplayName('City Name')
-
-      city.setDefaultValue('Denver')
-
-      result << city
-
-      return result
-    end
-
-
-
-    # override run to implement the functionality of your script
-
-    # model is an OpenStudio::Model::Model, runner is a OpenStudio::Ruleset::UserScriptRunner
-
-    def run(model, user_arguments)
-      # super(model, runner, user_arguments)
-
-      city = user_arguments
-
-
-      # Check Auth Key in LocalBCL instance
-
-      library = OpenStudio::LocalBCL.instance
+  class GetBCLWeatherFile
+    def download_weather_file_from_city_name(state, city)
 
       remote = OpenStudio::RemoteBCL.new
 
       # Search for weather files
-
       responses = remote.searchComponentLibrary(city, 'Weather File')
 
       # Create options for user prompt
@@ -109,99 +49,87 @@ module BuildingSync
       choices = OpenStudio::StringVector.new
 
       responses.each do |response|
-
-        name_to_uid[response.name] = response.uid
-
-        choices << response.uid
-
+        if response.name.include? 'TMY3'
+          response.attributes.each do |attribute|
+            if attribute.name == 'State'
+              next if attribute.valueAsString != state
+              choices << response.uid
+            end
+          end
+          name_to_uid[response.name] = response.uid
+        end
       end
 
-      arguments = OpenStudio::Ruleset::OSArgumentVector.new
-
-      name = OpenStudio::Ruleset::OSArgument.makeChoiceArgument('name', choices)
-
-      name.setDisplayName('Weather File')
-
-      name.setDefaultValue(choices[0])
-
-      arguments << name
-
-      uid = choices[0]
-
-      if uid.empty?
+      if choices.count == 0
         p "Error, could not find uid for #{name.valueAsString}.  Please try a different weather file."
-        # runner.registerError("Error, could not find uid for #{name.valueAsString}.  Please try a different weather file.")
-
         return false
-
       end
 
-      remote.downloadComponent(uid)
+      download_weather_file(remote, choices)
+    end
 
-      component = remote.waitForComponentDownload
+    def download_weather_file_from_weather_id(weather_id)
+      remote = OpenStudio::RemoteBCL.new
 
-      if component.empty?
-        p 'Cannot find local component'
-        # runner.registerError('Cannot find local component')
+      # Search for weather files
+      responses = remote.searchComponentLibrary(weather_id, 'Weather File')
 
-        return false
+      # Create options for user prompt
 
+      name_to_uid = Hash.new
+
+      choices = OpenStudio::StringVector.new
+
+      responses.each do |response|
+        if response.name.include? 'TMY3'
+          choices << response.uid
+          name_to_uid[response.name] = response.uid
+        end
       end
 
-      component = component.get
-
-
-
-      # get epw file
-
-      files = component.files('epw')
-
-      if files.empty?
-        p 'No epw file found'
-        # runner.registerError('No epw file found')
-
+      if choices.count == 0
+        p "Error, could not find uid for #{name.valueAsString}.  Please try a different weather file."
         return false
-
       end
 
-      # puts "files = #{files}"
+      download_weather_file(remote, choices)
+    end
 
-      epw_path = component.files('epw')[0]
-      # file_name = File.basename(epw_path1)
-      # current_path = File.expand_path('../../spec/files/weather_files', File.dirname(__FILE__))
+    def download_weather_file(remote, choices)
+      epw_path = ''
 
-      # parse epw file
-      epw_file = OpenStudio::EpwFile.new(OpenStudio::Path.new(epw_path))
+      choices.each do |choice|
+        uid = choice
 
-      # set weather file
-      OpenStudio::Model::WeatherFile.setWeatherFile(model, epw_file)
+        remote.downloadComponent(uid)
+        component = remote.waitForComponentDownload
 
+        if component.empty?
+          p 'Cannot find local component'
+          # runner.registerError('Cannot find local component')
+          return false
+        end
 
+        component = component.get
 
-      weather_name = "#{epw_file.city}, #{epw_file.stateProvinceRegion}, #{epw_file.country}"
+        # get epw file
 
-      weather_lat = epw_file.latitude
+        files = component.files('epw')
 
-      weather_lon = epw_file.longitude
+        if files.empty?
+          p 'No epw file found'
+          # runner.registerError('No epw file found')
 
-      weather_time = epw_file.timeZone
+          return false
+        end
 
-      weather_elev = epw_file.elevation
-
-
-
-      # set location, warning not portable
-
-      # OpenStudio::Plugin.command_manager.check_site('weather file', weather_name, weather_lat, weather_lon, weather_time, weather_elev)
-
+        epw_path = component.files('epw')[0]
+      end
 
       p "Successfully set weather file to #{epw_path}"
-      # runner.registerFinalCondition("Successfully set weather file to #{epw_path}")
     end
+
 
   end
 
 end
-
-# this call registers your script with the OpenStudio SketchUp plug-in
-# GetBCLWeatherFile.new.registerWithApplication
