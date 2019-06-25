@@ -302,20 +302,19 @@ module BuildingSync
       end
     end
 
-    def set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, *weather_argu)
+    def set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, *weather_argb)
       initialize_model
 
       # here we check if there is an valid EPW file, if there is we use that file otherwise everything will be generated from climate zone
       if !epw_file_path.nil? && File.exist?(epw_file_path)
         set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
-        puts 'using the EPW file'
       elsif climate_zone.nil?
-        weather_station_id = weather_argu[1]
-        state_name = weather_argu[2]
-        city_name = weather_argu[3]
+        weather_station_id = weather_argb[1]
+        state_name = weather_argb[2]
+        city_name = weather_argb[3]
 
         if !weather_station_id.nil?
-          epw_file_path =  BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
+          epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
         elsif !city_name.nil? && !state_name.nil?
           epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
         end
