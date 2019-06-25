@@ -41,14 +41,10 @@ module BuildingSync
 
       # Search for weather files
       responses = remote.searchComponentLibrary(city, 'Weather File')
-
-      # Create options for user prompt
-
-      name_to_uid = Hash.new
-
       choices = OpenStudio::StringVector.new
 
       responses.each do |response|
+        p "response name: #{response.name}"
         if response.name.include? 'TMY3'
           response.attributes.each do |attribute|
             if attribute.name == 'State'
@@ -56,12 +52,31 @@ module BuildingSync
               choices << response.uid
             end
           end
-          name_to_uid[response.name] = response.uid
         end
       end
 
       if choices.count == 0
-        p "Error, could not find uid for #{name.valueAsString}.  Please try a different weather file."
+        if responses.count > 0
+          responses.each do |response|
+            response.attributes.each do |attribute|
+              if attribute.valueType.value == 1
+                p "attribute name: #{attribute.name} and value: #{attribute.valueAsDouble}"
+              elsif attribute.valueType.value == 6
+                p "attribute name: #{attribute.name} and value: #{attribute.valueAsString}"
+              else
+                p "attribute name: #{attribute.name} and value type id: #{ attribute.valueType.value}"
+              end
+              if attribute.name == 'State'
+                next if attribute.valueAsString != state
+                choices << response.uid
+              end
+            end
+          end
+        end
+      end
+
+      if choices.count == 0
+        p "Error, could not find uid for state #{state} and city #{city}. Initial count of weather files: #{responses.count}. Please try a different weather file."
         return false
       end
 
