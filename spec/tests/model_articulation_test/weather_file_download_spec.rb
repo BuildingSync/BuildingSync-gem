@@ -49,7 +49,7 @@ RSpec.describe 'WeatherFileDownload' do
   end
 
   def get_state_and_city_name(file_name, ns)
-    doc = get_xml_object(file_name, ns)
+    doc = get_xml_object(file_name)
 
     address_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
 
@@ -59,13 +59,13 @@ RSpec.describe 'WeatherFileDownload' do
   end
 
   def get_weather_id(file_name, ns)
-    doc = get_xml_object(file_name, ns)
+    doc = get_xml_object(file_name)
     site_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
 
     return site_element.elements["#{ns}:WeatherDataStationID"].text
   end
 
-  def get_xml_object(file_name, ns)
+  def get_xml_object(file_name)
     @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
     expect(File.exist?(@xml_path)).to be true
 

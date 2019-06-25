@@ -35,6 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_subsection'
+require_relative '../../../lib/buildingsync/get_bcl_weather_file'
 require 'date'
 require 'openstudio/extension/core/os_lib_helper_methods'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
@@ -301,17 +302,25 @@ module BuildingSync
       end
     end
 
-    def set_weater_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
+    def set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, *weather_argu)
       initialize_model
 
-      puts "epw_file_path: #{epw_file_path}"
       # here we check if there is an valid EPW file, if there is we use that file otherwise everything will be generated from climate zone
       if !epw_file_path.nil? && File.exist?(epw_file_path)
         set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
         puts 'using the EPW file'
       elsif climate_zone.nil?
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'The epw file and the climate zone are nil.')
-        raise 'Error: BuildingSync.Facility.set_weater_and_climate_zone: The epw file and the climate zone are nil.'
+        weather_station_id = weather_argu[1]
+        state_name = weather_argu[2]
+        city_name = weather_argu[3]
+
+        if !weather_station_id.nil?
+          epw_file_path =  BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
+        elsif !city_name.nil? && !state_name.nil?
+          epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
+        end
+
+        set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, weather_station_id)
       else
         set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
         puts 'using the climate zone'
@@ -323,7 +332,7 @@ module BuildingSync
       yearDescription.setCalendarYear(::Date.today.year)
 
       # add final condition
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
     end
 
     def set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)

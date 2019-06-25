@@ -49,6 +49,8 @@ module BuildingSync
       @climate_zone_ca_t24 = nil
       @weather_file_name = nil
       @weather_station_id = nil
+      @city_name = nil
+      @state_name = nil
       @latitude = nil
       @longitude = nil
       # TM: just use the XML snippet to search for the buildings on the site
@@ -65,6 +67,8 @@ module BuildingSync
       read_climate_zone(build_element, ns)
       # read in the weather station name
       read_weather_file_name(build_element, ns)
+      # read city and state name
+      read_city_and_state_name(build_element, ns)
       # read latitude and longitude
       read_latitude_and_longitude(build_element, ns)
       # code to create a building
@@ -100,6 +104,19 @@ module BuildingSync
         @weather_station_id = build_element.elements["#{ns}:WeatherDataStationID"].text
       else
         @weather_station_id = nil
+      end
+    end
+
+    def read_city_and_state_name(build_element, ns)
+      if build_element.elements["#{ns}:Address/#{ns}:City"]
+        @city_name = build_element.elements["#{ns}:Address/#{ns}:City"].text
+      else
+        @city_name = nil
+      end
+      if build_element.elements["#{ns}:Address/#{ns}:State"]
+        @state_name = build_element.elements["#{ns}:Address/#{ns}:State"].text
+      else
+        @state_name = nil
       end
     end
 
@@ -174,7 +191,7 @@ module BuildingSync
       if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
         @climate_zone = @climate_zone_ca_t24
       end
-      building.set_weater_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude)
+      building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude, @weather_file_name, @weather_station_id, @state_name, @city_name)
       building.generate_baseline_osm(standard_to_be_used)
     end
 

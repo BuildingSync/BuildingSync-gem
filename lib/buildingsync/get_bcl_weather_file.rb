@@ -65,7 +65,7 @@ module BuildingSync
         return false
       end
 
-      download_weather_file(remote, choices)
+      return download_weather_file(remote, choices)
     end
 
     def download_weather_file_from_weather_id(weather_id)
@@ -92,7 +92,7 @@ module BuildingSync
         return false
       end
 
-      download_weather_file(remote, choices)
+      return download_weather_file(remote, choices)
     end
 
     def download_weather_file(remote, choices)
@@ -112,14 +112,10 @@ module BuildingSync
 
         component = component.get
 
-        # get epw file
-
         files = component.files('epw')
 
         if files.empty?
           p 'No epw file found'
-          # runner.registerError('No epw file found')
-
           return false
         end
 
@@ -127,9 +123,8 @@ module BuildingSync
       end
 
       p "Successfully set weather file to #{epw_path}"
+
+      return epw_path
     end
-
-
   end
-
 end
