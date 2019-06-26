@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://cdn.rawgit.com/BuildingSync/schema/develop/BuildingSync.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v1.0-patch/BuildingSync.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Facilities>
     <Facility>
       <Sites>
