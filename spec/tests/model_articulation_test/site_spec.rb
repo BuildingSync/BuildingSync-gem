@@ -74,52 +74,55 @@ RSpec.describe 'SiteSpec' do
     # call generate_baseline_osm
     # call write_osm
     # compare this osm file with a file that was previously generated.
-    osm_file_path = File.expand_path('../../files/osm_file', File.dirname(__FILE__))
-    site = create_minimum_site('Retail', '1980', 'Gross', '20000')
-    site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
-    site.write_osm(osm_file_path)
+    @osm_file_path = File.expand_path('../../files/osm_file', File.dirname(__FILE__))
+    @site = create_minimum_site('Retail', '1980', 'Gross', '20000')
+    @site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
+    @site.write_osm(@osm_file_path)
 
-    osm_file_full_path = "#{osm_file_path}/in.osm"
-    to_be_comparison_path = "#{osm_file_path}/FileToBeComparison/in.osm"
+    osm_file_full_path = "#{@osm_file_path}/in.osm"
+    to_be_comparison_path = "#{@osm_file_path}/FileToBeComparison/in.osm"
 
     original_file_size = File.size(to_be_comparison_path)
     new_file_size = File.size(osm_file_full_path)
     puts "original osm file size #{original_file_size} bytes versus new osm file size #{new_file_size} bytes"
     expect((original_file_size - new_file_size).abs <= 1).to be true
 
-    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(site.get_model)
-    if (workspace.save("#{osm_file_path}/in.idf"))
-      p "IDF file successfully saved"
-    end
+    generate_idf_file
+    line_not_match_counter = compare_two_idf_files
 
-    oldModel = OpenStudio::Model::Model.load("#{osm_file_path}/FileToBeComparison/in.osm").get
-    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
-    if (workspace.save("#{osm_file_path}/FileToBeComparison/in.idf"))
-      p "IDF file 2 successfully saved"
-    end
+    expect(line_not_match_counter == 0).to be true
   end
 
-  def blank_xml_string
-    buildingsync = REXML::Element.new('auc:BuildingSync')
-    facilities = REXML::Element.new('auc:Facilities')
-    facility = REXML::Element.new('auc:Facility')
-    sites = REXML::Element.new('auc:Sites')
-    site = REXML::Element.new('auc:Site')
-    buildings = REXML::Element.new('auc:Buildings')
-    building = REXML::Element.new('auc:Building')
-    subsections = REXML::Element.new('auc:Subsections')
-    subsection = REXML::Element.new('auc:Subsection')
+  def compare_two_idf_files
+    idf_file1 = File.open("#{@osm_file_path}/in.idf")
+    idf_file2 = File.open("#{@osm_file_path}/FileToBeComparison/in.idf")
 
-    buildingsync.add_element(facilities)
-    facilities.add_element(facility)
-    facility.add_element(sites)
-    sites.add_element(site)
-    site.add_element(buildings)
-    buildings.add_element(building)
-    building.add_element(subsections)
-    subsections.add_element(subsection)
+    file1_lines = idf_file1.readlines
+    file2_lines = idf_file2.readlines
 
-    return buildingsync
+    line_not_match_counter = 0
+    counter = 0
+    file1_lines.each do |line|
+      if !line.include?('Sub Surface') && !file2_lines[counter].eql?(line)
+        puts line
+        line_not_match_counter += 1
+      end
+      counter += 1
+    end
+    return line_not_match_counter
+  end
+
+  def generate_idf_file
+    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(@site.get_model)
+    if workspace.save("#{@osm_file_path}/in.idf")
+      p 'IDF file successfully saved'
+    end
+
+    oldModel = OpenStudio::Model::Model.load("#{@osm_file_path}/FileToBeComparison/in.osm").get
+    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
+    if workspace.save("#{@osm_file_path}/FileToBeComparison/in.idf")
+      p 'IDF file 2 successfully saved'
+    end
   end
 
   def generate_baseline(file_name, ns)
