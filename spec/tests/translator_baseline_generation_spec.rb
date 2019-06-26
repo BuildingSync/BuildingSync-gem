@@ -48,6 +48,10 @@ RSpec.describe 'BuildingSync' do
     test_baseline_creation('building_151.xml', ASHRAE90_1)
   end
 
+  it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace for Title24' do
+    test_baseline_creation('building_151_n1.xml', CA_TITLE24)
+  end
+
   it 'should not find the Standard for large office and Title24 with DC GSA Headquarters.xml (phase zero)' do
     begin
       test_baseline_creation('DC GSA Headquarters.xml', CA_TITLE24, 'CZ01RV2.epw')
