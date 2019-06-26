@@ -44,12 +44,12 @@ RSpec.describe 'BuildingSync' do
     expect(BuildingSync::VERSION).not_to be_nil
   end
 
-  it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace and run all simulations' do
-    # create_osw_file('building_151_n1.xml')
-    xml_path = File.expand_path('../files/building_151_n1.xml', File.dirname(__FILE__))
+  it 'should parse and write building_151.xml (phase zero) with n1 namespace and run all simulations' do
+    # create_osw_file('building_151.xml')
+    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
-    out_path = File.expand_path('../output/phase0_building_151_n1/', File.dirname(__FILE__))
+    out_path = File.expand_path('../output/phase0_building_151/', File.dirname(__FILE__))
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
     end
