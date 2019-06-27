@@ -35,7 +35,7 @@
 
 module BuildingSync
   class GetBCLWeatherFile
-    def download_weather_file_from_city_name(state, city)
+    def download_weather_file_from_city_name(state, city, latitude, longitude)
 
       remote = OpenStudio::RemoteBCL.new
 
@@ -46,11 +46,17 @@ module BuildingSync
       responses.each do |response|
         p "response name: #{response.name}"
         if response.name.include? 'TMY3'
+          stateAttrValue = nil
+          cityAttrValue = nil
           response.attributes.each do |attribute|
             if attribute.name == 'State'
-              next if attribute.valueAsString != state
-              choices << response.uid
+              stateAttrValue = attribute.valueAsString
+            elsif attribute.name == 'City'
+              cityAttrValue = attribute.valueAsString
             end
+          end
+          if stateAttrValue == state && cityAttrValue.include?(city)
+            choices << response.uid
           end
         end
       end
@@ -58,30 +64,60 @@ module BuildingSync
       if choices.count == 0
         if responses.count > 0
           responses.each do |response|
-            response.attributes.each do |attribute|
-              if attribute.valueType.value == 1
-                p "attribute name: #{attribute.name} and value: #{attribute.valueAsDouble}"
-              elsif attribute.valueType.value == 6
-                p "attribute name: #{attribute.name} and value: #{attribute.valueAsString}"
-              else
-                p "attribute name: #{attribute.name} and value type id: #{ attribute.valueType.value}"
+              stateAttrValue = nil
+              cityAttrValue = nil
+              response.attributes.each do |attribute|
+                if attribute.valueType.value == 1
+                  p "attribute name: #{attribute.name} and value: #{attribute.valueAsDouble}"
+                elsif attribute.valueType.value == 6
+                  p "attribute name: #{attribute.name} and value: #{attribute.valueAsString}"
+                else
+                  p "attribute name: #{attribute.name} and value type id: #{attribute.valueType.value}"
+                end
+                if attribute.name == 'State'
+                  stateAttrValue = attribute.valueAsString
+                elsif attribute.name == 'City'
+                  cityAttrValue = attribute.valueAsString
+                end
               end
-              if attribute.name == 'State'
-                next if attribute.valueAsString != state
+              if stateAttrValue == state && cityAttrValue.include?(city)
                 choices << response.uid
               end
             end
           end
         end
-      end
 
+      if choices.count == 0 && !latitude.nil? && !longitude.nil?
+        hash = {}
+        # let's try to find the closest EPW file via latitude and longitude
+        responses.each do |response|
+          latitudeAttrValue = nil
+          longitudeAttrValue = nil
+          response.attributes.each do |attribute|
+            if attribute.name == 'Latitude'
+              latitudeAttrValue = attribute.valueAsDouble
+            elsif attribute.name == 'Longitude'
+              longitudeAttrValue = attribute.valueAsDouble
+            end
+          end
+          next if latitudeAttrValue.nil?
+          next if longitudeAttrValue.nil?
+
+          diff = (latitudeAttrValue - latitude) ^ 2 + (longitudeAttrValue - longitude) ^ 2
+          hash[diff] = response
+        end
+
+        if(hash.count > 0)
+          choices << hash.sort_by { |key | key }.to_h[0]
+        end
+      end
       if choices.count == 0
         p "Error, could not find uid for state #{state} and city #{city}. Initial count of weather files: #{responses.count}. Please try a different weather file."
         return false
       end
 
       return download_weather_file(remote, choices)
-    end
+  end
 
     def download_weather_file_from_weather_id(weather_id)
       remote = OpenStudio::RemoteBCL.new

@@ -64,6 +64,10 @@ RSpec.describe 'BuildingSync' do
     test_baseline_creation('DC GSA Headquarters.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
+  it 'should parse and write DC GSA Headquarters.xml (phase zero) without weather file' do
+    test_baseline_creation('DC GSA Headquarters.xml', ASHRAE90_1)
+  end
+
   it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with Title 24' do
     test_baseline_creation('BuildingSync Website Valid Schema.xml', CA_TITLE24, 'CZ01RV2.epw')
   end
