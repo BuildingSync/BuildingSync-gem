@@ -35,8 +35,8 @@
 
 module BuildingSync
   class GetBCLWeatherFile
-    def download_weather_file_from_city_name(state, city, latitude, longitude)
-
+    def download_weather_file_from_city_name(state, city)
+      wmo_no = 0
       remote = OpenStudio::RemoteBCL.new
 
       # Search for weather files
@@ -58,6 +58,12 @@ module BuildingSync
           if stateAttrValue == state && cityAttrValue.include?(city)
             choices << response.uid
           end
+
+      response = find_response_from_given_state(responses, state)
+      choices << response.uid
+      response.attributes.each do |attribute|
+        if attribute.name == 'WMO'
+          wmo_no = attribute.valueAsDouble
         end
       end
 
@@ -116,8 +122,10 @@ module BuildingSync
         return false
       end
 
-      return download_weather_file(remote, choices)
-  end
+      epw_path = download_weather_file(remote, choices)
+      download_design_day_file(wmo_no, epw_path)
+      return epw_path
+    end
 
     def download_weather_file_from_weather_id(weather_id)
       remote = OpenStudio::RemoteBCL.new
@@ -144,6 +152,57 @@ module BuildingSync
       end
 
       return download_weather_file(remote, choices)
+    end
+
+    def download_design_day_file(wmo_no, epw_path)
+      remote = OpenStudio::RemoteBCL.new
+      responses = remote.searchComponentLibrary(wmo_no.to_s[0, 6], 'Design Day')
+      choices = OpenStudio::StringVector.new
+
+      idf_path_collection = []
+
+      choices << responses[0].uid
+
+      choices.each do |choice|
+        uid = choice
+
+        remote.downloadComponent(uid)
+        component = remote.waitForComponentDownload
+
+        if !component.empty?
+
+          component = component.get
+
+          files = component.files('idf')
+
+          if !files.empty?
+            idf_path_collection.push(component.files('idf')[0])
+          else
+            p 'No idf file found'
+          end
+        else
+          p "Cannot find local component for #{choice}"
+        end
+      end
+      create_ddy_file(idf_path_collection, epw_path)
+    end
+
+    def create_ddy_file(idf_path_collection, epw_path)
+      idf_file_lines = []
+
+      idf_path_collection.each do |idf_file_path|
+        idf_file = File.open(idf_file_path)
+        idf_file_lines.push(idf_file.readlines)
+      end
+
+      design_day_path = File.dirname(epw_path)
+      design_day_file = File.new("#{design_day_path}/design_day.ddy", 'w')
+
+      idf_file_lines.each do |line|
+        design_day_file.puts(line)
+      end
+
+      design_day_file.close
     end
 
     def download_weather_file(remote, choices)
@@ -176,6 +235,21 @@ module BuildingSync
       p "Successfully set weather file to #{epw_path}"
 
       return epw_path
+    end
+
+    def find_response_from_given_state(responses,state)
+      responses.each do |response|
+        if response.name.include? 'TMY3'
+          response.attributes.each do |attribute|
+            if attribute.name == 'State'
+              if attribute.valueAsString == state
+                return response
+              end
+            end
+          end
+        end
+      end
+      return nil
     end
   end
 end
