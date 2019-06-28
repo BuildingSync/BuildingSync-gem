@@ -83,5 +83,9 @@ RSpec.describe 'BuildingSync' do
   it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1' do
     test_baseline_creation('Golden Test File.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
+
+  it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1' do
+    test_baseline_creation('Golden Test File.xml', ASHRAE90_1)
+  end
 end
 

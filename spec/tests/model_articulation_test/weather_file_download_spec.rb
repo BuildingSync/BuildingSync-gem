@@ -40,7 +40,7 @@ require_relative '../../../lib/buildingsync/get_bcl_weather_file'
 RSpec.describe 'WeatherFileDownload' do
   it 'weather file download from the nrel site with the help of state and city name' do
     state, city = get_state_and_city_name('building_151', 'auc')
-    BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state, city, latitude, longitude)
+    BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state, city)
   end
 
   it 'weather file download from the nrel site  with the help of weather station ID' do
