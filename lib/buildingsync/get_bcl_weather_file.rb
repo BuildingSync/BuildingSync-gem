@@ -161,9 +161,7 @@ module BuildingSync
 
       idf_path_collection = []
 
-      responses.each do |response|
-        choices << response.uid
-      end
+      choices << responses[0].uid
 
       choices.each do |choice|
         uid = choice
