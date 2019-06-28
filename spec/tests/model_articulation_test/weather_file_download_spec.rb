@@ -34,18 +34,31 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-
 require_relative '../../../lib/buildingsync/get_bcl_weather_file'
 
 RSpec.describe 'WeatherFileDownload' do
   it 'weather file download from the nrel site with the help of state and city name' do
     state, city = get_state_and_city_name('building_151', 'auc')
-    BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state, city)
+    epw_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state, city)
+
+    check_weather_file_exist(epw_path)
   end
 
   it 'weather file download from the nrel site  with the help of weather station ID' do
     weather_id = get_weather_id('building_151', 'auc')
-    BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_id)
+    epw_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_id)
+
+    check_weather_file_exist(epw_path)
+  end
+
+  def check_weather_file_exist(epw_path)
+    # check weather file exist or not
+    expect(File.exist?(epw_path)).to be true
+
+    epw_path['.epw'] = '.ddy'
+
+    # check design day file exist or not
+    expect(File.exist?(epw_path)).to be true
   end
 
   def get_state_and_city_name(file_name, ns)
