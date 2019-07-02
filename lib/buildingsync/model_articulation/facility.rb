@@ -60,14 +60,13 @@ module BuildingSync
 
     # adding a site to the facility
     def read_xml(facility_xml, standard_to_be_used, ns)
-      # puts facility_xml.to_a
       facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
         @sites.push(Site.new(site_element, standard_to_be_used, ns))
       end
     end
 
     # generating the OpenStudio model based on the imported BuildingSync Data
-    def generate_baseline_osm(epw_file_path, standard_to_be_used)
+    def generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)
       if @sites.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', 'There are no sites attached to this facility in your BuildingSync file.')
         raise 'There are no sites attached to this facility in your BuildingSync file.'
@@ -79,24 +78,24 @@ module BuildingSync
       end
       @sites[0].generate_baseline_osm(epw_file_path, standard_to_be_used)
 
-      create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, @sites[0].get_climate_zone, 'Forced Air')
+      create_building_systems(output_path)
       return true
     end
 
-    def create_building_systems(model, template, system_type, climate_zone, hvac_delivery_type)
-      add_space_type_loads = true
-      add_constructions = true
-      add_elevators = false
-      add_exterior_lights = false
+    def get_sites
+      return @sites
+    end
+
+    def create_building_systems(output_path, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity',
+                                add_space_type_loads = true, add_constructions = true, add_elevators = false, add_exterior_lights = false,
+                                add_exhaust = true, add_swh = true, add_hvac = true, add_thermostat = true, remove_objects = false)
+      model = @sites[0].get_model
+      template = @sites[0].get_building_template
+      system_type = @sites[0].get_system_type
+      climate_zone = @sites[0].get_climate_zone
+
       onsite_parking_fraction = 1.0
       exterior_lighting_zone = '3 - All Other Areas'
-      add_exhaust = true
-      add_swh = true
-      add_hvac = true
-      htg_src = 'NaturalGas'
-      clg_src = 'Electricity'
-      remove_objects = false
-      add_thermostat = true
 
       initial_objects = model.getModelObjects.size
 
@@ -189,7 +188,7 @@ module BuildingSync
 
       # add hvac system
       if add_hvac
-        hvac_system.add_hvac(model, standard, system_type, remove_objects)
+        hvac_system.add_hvac(model, standard, system_type, hvac_delivery_type, htg_src, clg_src, remove_objects)
       end
 
       # TODO: - hours of operation customization (initially using existing measure downstream of this one)
@@ -197,7 +196,7 @@ module BuildingSync
 
       # set hvac controls and efficiencies (this should be last model articulation element)
       if add_hvac
-        hvac_system.apply_sizing_and_assumptions(model, standard, primary_bldg_type, system_type, climate_zone)
+        hvac_system.apply_sizing_and_assumptions(model, output_path, standard, primary_bldg_type, system_type, climate_zone)
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)

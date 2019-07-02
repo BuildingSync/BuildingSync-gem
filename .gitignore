@@ -24,3 +24,6 @@
 lib/measures/.rubocop.yml
 lib/measures/test_results/*
 
+spec/files/filecomparison/in.idf
+spec/files/filecomparison/in.osm
+spec/files/filecomparison/originalfiles/in.idf

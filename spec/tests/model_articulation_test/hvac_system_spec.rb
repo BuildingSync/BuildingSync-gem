@@ -56,7 +56,7 @@ RSpec.describe 'HVACSystemSpec' do
     standard = Standard.build('DOE Ref 1980-2004')
     hvac_system = BuildingSync::HVACSystem.new
 
-    expect(hvac_system.add_hvac(model, standard, 'PSZ-AC with gas coil heat', false)).to be true
+    expect(hvac_system.add_hvac(model, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true)).to be true
   end
 
   it 'Should apply sizing and assumptions in HVAC System' do
@@ -64,6 +64,8 @@ RSpec.describe 'HVACSystemSpec' do
     standard = Standard.build('DOE Ref 1980-2004')
     hvac_system = BuildingSync::HVACSystem.new
 
-    expect(hvac_system.apply_sizing_and_assumptions(model, standard, 'Retail', 'PSZ-AC with gas coil heat', '')).to be false
+    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
+
+    expect(hvac_system.apply_sizing_and_assumptions(model, output_path, standard, 'Retail', 'PSZ-AC with gas coil heat', '')).to be false
   end
 end

@@ -58,7 +58,7 @@ module BuildingSync
            end
       end
 
-      @facilities[0].generate_baseline_osm(epw_file_path, standard_to_be_used)
+      @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used)
       return write_osm(dir)
     end
 

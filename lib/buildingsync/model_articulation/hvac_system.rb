@@ -84,7 +84,7 @@ module BuildingSync
       return true
     end
 
-    def add_hvac(model, standard, system_type, remove_objects)
+    def add_hvac(model, standard, system_type, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity', remove_objects = false)
       # remove HVAC objects
       if remove_objects
         standard.model_remove_prm_hvac(model)
@@ -161,7 +161,7 @@ module BuildingSync
       return true
     end
 
-    def apply_sizing_and_assumptions(model, standard, primary_bldg_type, system_type, climate_zone)
+    def apply_sizing_and_assumptions(model, output_path, standard, primary_bldg_type, system_type, climate_zone)
       case system_type
       when 'Ideal Air Loads'
 
@@ -170,7 +170,7 @@ module BuildingSync
         standard.model_apply_prm_sizing_parameters(model)
 
         # Perform a sizing run
-        if standard.model_run_sizing_run(model, "#{Dir.pwd}/SR1") == false
+        if standard.model_run_sizing_run(model, "#{output_path}/SR") == false
           return false
         end
 

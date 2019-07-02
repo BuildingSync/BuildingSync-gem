@@ -52,7 +52,40 @@ RSpec.describe 'FacilitySpec' do
   it 'Should return the boolean value for creating osm file correctly or not.' do
     facility = create_minimum_facility('Retail', '1954', 'Gross', '69452')
     epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
-    expect(facility.generate_baseline_osm(epw_file_path, ASHRAE90_1)).to be true
+    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
+    expect(facility.generate_baseline_osm(epw_file_path, output_path, ASHRAE90_1)).to be true
+  end
+
+  it 'Should create a building system with parameters set to true' do
+    xml_file_path = File.expand_path('./../../files/building_151.xml', File.dirname(__FILE__))
+    doc = nil
+    File.open(xml_file_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+    end
+    ns = 'auc'
+    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ASHRAE90_1, ns)
+
+    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
+    facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
+    facility.create_building_systems(output_path, 'Forced Air', 'Electricity', 'Electricity',
+                                     true, true, true, true,
+                                     true, true, true, true, true)
+  end
+
+  it 'Should create a building system with parameters set to false' do
+    xml_file_path = File.expand_path('./../../files/building_151.xml', File.dirname(__FILE__))
+    doc = nil
+    File.open(xml_file_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+    end
+    ns = 'auc'
+    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ASHRAE90_1, ns)
+
+    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
+    facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
+    facility.create_building_systems(output_path, 'Forced Air', 'Electricity', 'Electricity',
+                                     false, false, false, false,
+                                     false, false, false, false, false)
   end
 
   def generate_baseline(file_name, ns)

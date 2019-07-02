@@ -281,12 +281,12 @@ module BuildingSync
 
     def initialize_model
       # let's create our new empty model
-      if @model.nil?
-        @model = OpenStudio::Model::Model.new
-      end
+      @model = OpenStudio::Model::Model.new if @model.nil?
     end
 
     def get_model
+      # in case the model was not initialized before we create a new model if it is nil
+      initialize_model
       return @model
     end
 
@@ -323,7 +323,6 @@ module BuildingSync
         set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
       else
         set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
-        puts 'using the climate zone'
       end
 
       # setting the current year, so we do not get these annoying log messages:
@@ -338,7 +337,7 @@ module BuildingSync
     def set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
 
       climate_zone_standard_string = climate_zone
-      puts "climate zone: #{climate_zone}"
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone_from_climate_zone', "climate zone: #{climate_zone}")
       if standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
         climate_zone_standard_string = "CEC T24-CEC#{climate_zone.gsub('Climate Zone', '').strip}"
       elsif standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
@@ -347,7 +346,6 @@ module BuildingSync
         climate_zone_standard_string = ''
       end
 
-      puts $open_studio_standards
       if !$open_studio_standards.nil? && !$open_studio_standards.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weater_and_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
       end
@@ -624,10 +622,6 @@ module BuildingSync
         target_areas[k] = v[:floor_area]
       end
 
-      puts "bar_hash: #{bar_hash}"
-      puts "target_areas: #{target_areas}"
-      puts "bar_hash[:num_stories_below_grade]: #{bar_hash[:num_stories_below_grade]}"
-      puts "bar_hash[:num_stories_above_grade]: #{bar_hash[:num_stories_above_grade]}"
       # create bar
       create_bar(runner, @model, bar_hash, 'Basements Ground Mid Top')
       # using the default value for story multiplier for now 'Basements Ground Mid Top'

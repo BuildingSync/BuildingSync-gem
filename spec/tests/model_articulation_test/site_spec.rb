@@ -70,17 +70,17 @@ RSpec.describe 'SiteSpec' do
     expect(site.get_climate_zone.nil?).to be true
   end
 
-  it 'Should write the same OSM file as previously generated' do
+  it 'Should write the same OSM file as previously generated - comparing the translated IDF files' do
     # call generate_baseline_osm
     # call write_osm
     # compare this osm file with a file that was previously generated.
-    @osm_file_path = File.expand_path('../../files/osm_file', File.dirname(__FILE__))
+    @osm_file_path = File.expand_path('../../files/filecomparison', File.dirname(__FILE__))
     @site = create_minimum_site('Retail', '1980', 'Gross', '20000')
     @site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
     @site.write_osm(@osm_file_path)
 
     osm_file_full_path = "#{@osm_file_path}/in.osm"
-    to_be_comparison_path = "#{@osm_file_path}/FileToBeComparison/in.osm"
+    to_be_comparison_path = "#{@osm_file_path}/originalfiles/in.osm"
 
     original_file_size = File.size(to_be_comparison_path)
     new_file_size = File.size(osm_file_full_path)
@@ -95,7 +95,7 @@ RSpec.describe 'SiteSpec' do
 
   def compare_two_idf_files
     idf_file1 = File.open("#{@osm_file_path}/in.idf")
-    idf_file2 = File.open("#{@osm_file_path}/FileToBeComparison/in.idf")
+    idf_file2 = File.open("#{@osm_file_path}/originalfiles/in.idf")
 
     file1_lines = idf_file1.readlines
     file2_lines = idf_file2.readlines
@@ -118,9 +118,9 @@ RSpec.describe 'SiteSpec' do
       p 'IDF file successfully saved'
     end
 
-    oldModel = OpenStudio::Model::Model.load("#{@osm_file_path}/FileToBeComparison/in.osm").get
+    oldModel = OpenStudio::Model::Model.load("#{@osm_file_path}/originalfiles/in.osm").get
     workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
-    if workspace.save("#{@osm_file_path}/FileToBeComparison/in.idf")
+    if workspace.save("#{@osm_file_path}/originalfiles/in.idf")
       p 'IDF file 2 successfully saved'
     end
   end
