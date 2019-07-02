@@ -36,77 +36,35 @@
 module BuildingSync
   class GetBCLWeatherFile
     def download_weather_file_from_city_name(state, city)
-
+      wmo_no = 0
       remote = OpenStudio::RemoteBCL.new
 
       # Search for weather files
       responses = remote.searchComponentLibrary(city, 'Weather File')
       choices = OpenStudio::StringVector.new
 
-      responses.each do |response|
-        p "response name: #{response.name}"
-        if response.name.include? 'TMY3'
-          response.attributes.each do |attribute|
-            if attribute.name == 'State'
-              next if attribute.valueAsString != state
-              choices << response.uid
-            end
+      filter_response = find_response_from_given_state(responses, state)
+      if !filter_response.nil?
+        choices << filter_response.uid
+        filter_response.attributes.each do |attribute|
+          if attribute.name == 'WMO'
+            wmo_no = attribute.valueAsDouble
           end
         end
       end
 
-      if choices.count == 0
-        if responses.count > 0
-          responses.each do |response|
-            response.attributes.each do |attribute|
-              if attribute.valueType.value == 1
-                p "attribute name: #{attribute.name} and value: #{attribute.valueAsDouble}"
-              elsif attribute.valueType.value == 6
-                p "attribute name: #{attribute.name} and value: #{attribute.valueAsString}"
-              else
-                p "attribute name: #{attribute.name} and value type id: #{ attribute.valueType.value}"
-              end
-              if attribute.name == 'State'
-                next if attribute.valueAsString != state
-              end
-            end
-          end
-        end
-      end
-
-      if choices.count == 0 && !latitude.nil? && !longitude.nil?
-        hash = {}
-        # let's try to find the closest EPW file via latitude and longitude
-        responses.each do |response|
-          latitudeAttrValue = nil
-          longitudeAttrValue = nil
-          response.attributes.each do |attribute|
-            if attribute.name == 'Latitude'
-              latitudeAttrValue = attribute.valueAsDouble
-            elsif attribute.name == 'Longitude'
-              longitudeAttrValue = attribute.valueAsDouble
-            end
-          end
-          next if latitudeAttrValue.nil?
-          next if longitudeAttrValue.nil?
-
-          diff = (latitudeAttrValue - latitude) ^ 2 + (longitudeAttrValue - longitude) ^ 2
-          hash[diff] = response
-        end
-
-        if(hash.count > 0)
-          choices << hash.sort_by { |key | key }.to_h[0]
-        end
-      end
       if choices.count == 0
         p "Error, could not find uid for state #{state} and city #{city}. Initial count of weather files: #{responses.count}. Please try a different weather file."
         return false
       end
 
-      return download_weather_file(remote, choices)
+      epw_path = download_weather_file(remote, choices)
+      download_design_day_file(wmo_no, epw_path)
+      return epw_path
   end
 
     def download_weather_file_from_weather_id(weather_id)
+      wmo_no = 0
       remote = OpenStudio::RemoteBCL.new
 
       # Search for weather files
@@ -122,6 +80,12 @@ module BuildingSync
         if response.name.include? 'TMY3'
           choices << response.uid
           name_to_uid[response.name] = response.uid
+
+          response.attributes.each do |attribute|
+            if attribute.name == 'WMO'
+              wmo_no = attribute.valueAsDouble
+            end
+          end
         end
       end
 
@@ -130,7 +94,9 @@ module BuildingSync
         return false
       end
 
-      return download_weather_file(remote, choices)
+      epw_path = download_weather_file(remote, choices)
+      download_design_day_file(wmo_no, epw_path)
+      return epw_path
     end
 
     def download_weather_file(remote, choices)
@@ -163,6 +129,75 @@ module BuildingSync
       p "Successfully set weather file to #{epw_path}"
 
       return epw_path
+    end
+
+    def download_design_day_file(wmo_no, epw_path)
+      remote = OpenStudio::RemoteBCL.new
+      responses = remote.searchComponentLibrary(wmo_no.to_s[0, 6], 'Design Day')
+      choices = OpenStudio::StringVector.new
+
+      idf_path_collection = []
+
+      responses.each do |response|
+        choices << response.uid
+      end
+
+      choices.each do |choice|
+        uid = choice
+
+        remote.downloadComponent(uid)
+        component = remote.waitForComponentDownload
+
+        if !component.empty?
+
+          component = component.get
+
+          files = component.files('idf')
+
+          if !files.empty?
+            idf_path_collection.push(component.files('idf')[0])
+          else
+            p 'No idf file found'
+          end
+        else
+          p "Cannot find local component for #{choice}"
+        end
+      end
+      create_ddy_file(idf_path_collection, epw_path)
+    end
+
+    def create_ddy_file(idf_path_collection, epw_path)
+      idf_file_lines = []
+
+      idf_path_collection.each do |idf_file_path|
+        idf_file = File.open(idf_file_path)
+        idf_file_lines.push(idf_file.readlines)
+      end
+
+      design_day_path = File.dirname(epw_path)
+      weather_file_name = File.basename(epw_path, '.*')
+      design_day_file = File.new("#{design_day_path}/#{weather_file_name}.ddy", 'w')
+
+      idf_file_lines.each do |line|
+        design_day_file.puts(line)
+      end
+
+      design_day_file.close
+    end
+
+    def find_response_from_given_state(responses,state)
+      responses.each do |response|
+        if response.name.include? 'TMY3'
+          response.attributes.each do |attribute|
+            if attribute.name == 'State'
+              if attribute.valueAsString == state
+                return response
+              end
+            end
+          end
+        end
+      end
+      return nil
     end
   end
 end
