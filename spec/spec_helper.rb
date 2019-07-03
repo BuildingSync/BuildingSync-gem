@@ -172,7 +172,8 @@ RSpec.configure do |config|
 
     osw_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
-    expect(osw_files.size).to eq expected_number_of_measures
+    # adding one additional count dues to the SR sizing run
+    expect(osw_files.size).to eq expected_number_of_measures + 2
 
     return osw_files
   end
