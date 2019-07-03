@@ -67,6 +67,10 @@ module BuildingSync
       end
     end
 
+    def add_measure(measure_dir)
+      add_new_measure(@workflow, measure_dir)
+    end
+
     def configure_for_scenario(osw, scenario)
       measure_ids = []
       scenario.elements.each("#{@ns}:ScenarioType/#{@ns}:PackageOfMeasures/#{@ns}:MeasureIDs/#{@ns}:MeasureID") do |measure_id|

@@ -114,6 +114,10 @@ module BuildingSync
       @model_maker.write_osws(@output_dir)
     end
 
+    def add_measure(measure_dir)
+      @model_maker.add_measure(measure_dir)
+    end
+
     private
 
     def choose_model_maker

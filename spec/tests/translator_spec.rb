@@ -34,77 +34,33 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative './../spec_helper'
 
 require 'fileutils'
-require 'json'
-require_relative 'model_maker'
+require 'parallel'
 
-module BuildingSync
-  # base class for objects that will configure workflows based on building sync files
-  class WorkflowMaker < ModelMaker
-    def write_osws(dir)
-      FileUtils.mkdir_p(dir)
+RSpec.describe 'BuildingSync' do
+  it 'should add a new measure' do
+    xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path('./../output/building_151/', File.dirname(__FILE__))
+
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
     end
+    # expect(File.exist?(out_path)).not_to be true
 
-    def gather_results(dir); end
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
 
-    def failed_scenarios
-      return []
-    end
+    epw_file_path = nil
 
-    def save_xml(filename)
-      File.open(filename, 'w') do |file|
-        @doc.write(file)
-      end
-    end
-
-    def set_measure_path(osw, measures_dir)
-      osw['measure_paths'] = [measures_dir]
-    end
-
-    def set_measure_paths(osw, measures_dir_array)
-      osw['measure_paths'] = measures_dir_array
-    end
-
-    def add_measure_path(osw, measures_dir)
-      osw['measure_paths'].each do |dir|
-        if dir == measures_dir
-          return false
-        end
-      end
-      osw['measure_paths'] << measures_dir
-      return true
-    end
-
-    def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
-      result = false
-      osw['steps'].each do |step|
-        if step['measure_dir_name'] == measure_dir_name
-          step['arguments'][argument_name] = argument_value
-          result = true
-        end
-      end
-
-      if !result
-        raise "Could not set '#{argument_name}' to '#{argument_value}' for measure '#{measure_dir_name}'"
-      end
-
-      return result
-    end
-
-    def add_new_measure(osw, measure_dir_name)
-      # first we check if the measure already exists
-      osw['steps'].each do |step|
-        if step['measure_dir_name'] == measure_dir_name
-          return false
-        end
-      end
-      # if it does not exist we add it
-      new_step = {}
-      new_step['measure_dir_name'] = measure_dir_name
-      osw['steps'] << osw['steps'][osw['steps'].length - 1]
-      osw['steps'][osw['steps'].length - 2] = new_step
-      return true
-    end
+    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, CA_TITLE24)
+    translator.add_measure('Occupancy_Simulator')
+    translator.write_osm
+    translator.write_osws
   end
 end
+
+
