@@ -271,7 +271,6 @@ module BuildingSync
         space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
         puts " Space types: #{space_types} selected for building type: #{@bldg_type} and standard template: #{@standard_template}"
         space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @bldg_type)
-        puts "space_types_floor_area: #{space_types_floor_area}"
         space_types_floor_area.each do |space_type, hash|
           new_hash[space_type] = hash
         end
