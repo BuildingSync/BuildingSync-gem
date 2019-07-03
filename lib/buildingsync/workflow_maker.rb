@@ -102,8 +102,8 @@ module BuildingSync
       # if it does not exist we add it
       new_step = {}
       new_step['measure_dir_name'] = measure_dir_name
-      osw['steps'] << osw['steps'][osw['steps'].length - 1]
-      osw['steps'][osw['steps'].length - 2] = new_step
+      # TODO: what about arguments to measures, need to add an option to also set arguments and their values
+      osw['steps'].unshift(new_step)
       return true
     end
   end
