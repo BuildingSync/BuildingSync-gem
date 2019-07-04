@@ -64,6 +64,20 @@ module BuildingSync
       @party_wall_stories_west = 0
       @party_wall_stories_east = 0
       @party_wall_fraction = 0
+      @ownership = nil
+      @occupancy_classification = nil
+      @primary_contact_id = nil
+      @built_year = nil
+      @major_remodel_year = nil
+      @year_of_last_energy_audit = nil
+      @retro_commissioning_date = nil
+      @building_automation_system = nil
+      @historical_landmark = nil
+      @percent_occupied_by_owner = nil
+      @occupant_quantity = nil
+      @number_of_units = nil
+
+
 
       @fraction_area = 1.0
       # code to initialize
@@ -102,6 +116,9 @@ module BuildingSync
       read_building_name(build_element, ns)
 
       read_width_and_length
+
+      read_ownership(build_element, ns)
+      read_other_building_detials(build_element, ns)
     end
 
     def read_width_and_length
@@ -125,39 +142,43 @@ module BuildingSync
         raise 'Error : Year of Construction is blank in your BuildingSync file.'
       end
 
-      built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_f
+      @built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_f
 
       if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
-        major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_f
-        built_year = major_remodel_year if major_remodel_year > built_year
+        @major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_f
+        @built_year = @major_remodel_year if @major_remodel_year > @built_year
+      end
+
+      if build_element.elements["#{ns}:YearOfLastEnergyAudit"]
+        @year_of_last_energy_audit = build_element.elements["#{ns}:YearOfLastEnergyAudit"].text.to_f
       end
 
       if standard_to_be_used == CA_TITLE24
-        if built_year < 1978
+        if @built_year < 1978
           @standard_template = 'CBES Pre-1978'
-        elsif built_year >= 1978 && built_year < 1992
+        elsif @built_year >= 1978 && @built_year < 1992
           @standard_template = 'CBES T24 1978'
-        elsif built_year >= 1992 && built_year < 2001
+        elsif @built_year >= 1992 && @built_year < 2001
           @standard_template = 'CBES T24 1992'
-        elsif built_year >= 2001 && built_year < 2005
+        elsif @built_year >= 2001 && @built_year < 2005
           @standard_template = 'CBES T24 2001'
-        elsif built_year >= 2005 && built_year < 2008
+        elsif @built_year >= 2005 && @built_year < 2008
           @standard_template = 'CBES T24 2005'
         else
           @standard_template = 'CBES T24 2008'
         end
       elsif standard_to_be_used == ASHRAE90_1
-        if built_year < 1980
+        if @built_year < 1980
           @standard_template = 'DOE Ref Pre-1980'
-        elsif built_year >= 1980 && built_year < 2004
+        elsif @built_year >= 1980 && @built_year < 2004
           @standard_template = 'DOE Ref 1980-2004'
-        elsif built_year >= 2004 && built_year < 2007
+        elsif @built_year >= 2004 && @built_year < 2007
           @standard_template = '90.1-2004'
-        elsif built_year >= 2007 && built_year < 2010
+        elsif @built_year >= 2007 && @built_year < 2010
           @standard_template = '90.1-2007'
-        elsif built_year >= 2010 && built_year < 2013
+        elsif @built_year >= 2010 && @built_year < 2013
           @standard_template = '90.1-2010'
-        elsif built_year >= 2013
+        elsif @built_year >= 2013
           @standard_template = '90.1-2013'
         end
         # TODO: add ASHRAE 2016 once it is available
@@ -238,6 +259,65 @@ module BuildingSync
         end
         @building_subsections[0].fraction_area = building_fraction
       end
+    end
+
+    def read_ownership(building_element, ns)
+      if building_element.elements["#{ns}:Ownership"]
+        @ownership = building_element.elements["#{ns}:Ownership"].text
+      else
+        @ownership = nil
+      end
+
+      if building_element.elements["#{ns}:OccupancyClassification"]
+        @occupancy_classification = building_element.elements["#{ns}:OccupancyClassification"].text
+      else
+        @occupancy_classification = nil
+      end
+    end
+
+    def read_other_building_detials(building_element, ns)
+      if building_element.elements["#{ns}:PrimaryContactID"]
+        @primary_contact_id = building_element.elements["#{ns}:PrimaryContactID"].text
+      else
+        @primary_contact_id = nil
+      end
+
+      if building_element.elements["#{ns}:RetrocommissioningDate"]
+        @retro_commissioning_date = Date.parse building_element.elements["#{ns}:RetrocommissioningDate"].text
+      else
+        @retro_commissioning_date = nil
+      end
+
+      if building_element.elements["#{ns}:BuildingAutomationSystem"]
+        @building_automation_system = building_element.elements["#{ns}:BuildingAutomationSystem"].text.to_bool
+      else
+        @building_automation_system = nil
+      end
+
+      if building_element.elements["#{ns}:HistoricalLandmark"]
+        @historical_landmark = building_element.elements["#{ns}:HistoricalLandmark"].text.to_bool
+      else
+        @historical_landmark = nil
+      end
+
+      if building_element.elements["#{ns}:PercentOccupiedByOwner"]
+        @percent_occupied_by_owner = building_element.elements["#{ns}:PercentOccupiedByOwner"].text
+      else
+        @percent_occupied_by_owner = nil
+      end
+
+      if building_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"]
+        @occupant_quantity = building_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text
+      else
+        @occupant_quantity = nil
+      end
+
+      if building_element.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"]
+        @number_of_units = building_element.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text
+      else
+        @number_of_units = nil
+      end
+
     end
 
     def read_building_name(building_element, ns)

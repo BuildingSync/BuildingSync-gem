@@ -53,6 +53,10 @@ module BuildingSync
       @state_name = nil
       @latitude = nil
       @longitude = nil
+      @street_address = nil
+      @postal_code = nil
+      @premises_notes = nil
+
       # TM: just use the XML snippet to search for the buildings on the site
       read_xml(build_element, standard_to_be_used, ns)
     end
@@ -71,6 +75,8 @@ module BuildingSync
       read_city_and_state_name(build_element, ns)
       # read latitude and longitude
       read_latitude_and_longitude(build_element, ns)
+      # read site address
+      read_site_other_details(build_element, ns)
       # code to create a building
       build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
         @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, standard_to_be_used, ns))
@@ -117,6 +123,26 @@ module BuildingSync
         @state_name = build_element.elements["#{ns}:Address/#{ns}:State"].text
       else
         @state_name = nil
+      end
+    end
+
+    def read_site_other_details(build_element, ns)
+      if build_element.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"]
+        @street_address = build_element.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"].text
+      else
+        @street_address = nil
+      end
+
+      if build_element.elements["#{ns}:Address/#{ns}:PostalCode"]
+        @postal_code = build_element.elements["#{ns}:Address/#{ns}:PostalCode"].text.to_i
+      else
+        @postal_code = nil
+      end
+
+      if build_element.elements["#{ns}:PremisesNotes"]
+        @premises_notes = build_element.elements["#{ns}:PremisesNotes"].text
+      else
+        @premises_notes = nil
       end
     end
 
