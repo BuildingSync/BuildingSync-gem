@@ -364,6 +364,10 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{weather_file.city}. State is #{weather_file.stateProvinceRegion}")
 
+      set_climate_zone(climate_zone, standard_to_be_used)
+    end
+
+    def set_climate_zone(climate_zone, standard_to_be_used)
       # Set climate zone
       climateZones = @model.getClimateZones
       if climate_zone.nil?
@@ -379,24 +383,30 @@ module BuildingSync
         regex = /Climate type \"(.*?)\" \(ASHRAE Standards?(.*)\)\*\*/
         match_data = text.match(regex)
         if match_data.nil?
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.set_weater_and_climate_zone', "Can't find ASHRAE climate zone in stat file.")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.set_climate_zone', "Can't find ASHRAE climate zone in stat file.")
         else
           climate_zone = match_data[1].to_s.strip
         end
-
       end
 
       # set climate zone
       climateZones.clear
       if standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
         climateZones.setClimateZone('ASHRAE', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
+        return true
       elsif standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
         climate_zone = climate_zone.gsub('CEC', '').strip
         climate_zone = climate_zone.gsub('Climate Zone', '').strip
+        climate_zone = climate_zone.gsub('A', '').strip
+        climate_zone = climate_zone.gsub('B', '').strip
+        climate_zone = climate_zone.gsub('C', '').strip
         climateZones.setClimateZone('CEC', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climate_zone}")
-        end
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climate_zone}")
+        return true
+      end
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.set_climate_zone', "Cannot set the #{climate_zone} in context of this standard #{standard_to_be_used}")
+      return false
     end
 
     def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
@@ -501,43 +511,7 @@ module BuildingSync
         end
       end
 
-      # Set climate zone
-      climateZones = @model.getClimateZones
-      if climate_zone.nil?
-
-        # get climate zone from stat file
-        text = nil
-        File.open(stat_file) do |f|
-          text = f.read.force_encoding('iso-8859-1')
-        end
-
-        # Get Climate zone.
-        # - Climate type "3B" (ASHRAE Standard 196-2006 Climate Zone)**
-        # - Climate type "6A" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
-        regex = /Climate type \"(.*?)\" \(ASHRAE Standards?(.*)\)\*\*/
-        match_data = text.match(regex)
-        if match_data.nil?
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.set_weater_and_climate_zone', "Can't find ASHRAE climate zone in stat file.")
-        else
-          climate_zone = match_data[1].to_s.strip
-        end
-
-      end
-      puts "climate_zone: #{climate_zone}"
-      # set climate zone
-      climateZones.clear
-      if standard_to_be_used == ASHRAE90_1
-        climateZones.setClimateZone('ASHRAE', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
-      elsif standard_to_be_used == CA_TITLE24
-        climate_zone = climate_zone.gsub('CEC', '').strip
-        climate_zone = climate_zone.gsub('Climate Zone', '').strip
-        climate_zone = climate_zone.gsub('A', '').strip
-        climate_zone = climate_zone.gsub('B', '').strip
-        climate_zone = climate_zone.gsub('C', '').strip
-        climateZones.setClimateZone('CEC', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climate_zone}")
-      end
+      set_climate_zone(climate_zone, standard_to_be_used)
     end
 
     def generate_baseline_osm(standard_to_be_used)

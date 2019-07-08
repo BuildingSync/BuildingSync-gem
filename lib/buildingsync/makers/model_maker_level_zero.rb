@@ -52,10 +52,9 @@ module BuildingSync
       if @facilities.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', 'There are no facilities in your BuildingSync file.')
         raise 'Error: There are no facilities in your BuildingSync file.'
-      else if @facilities.count > 1
-             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
-             raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
-           end
+      elsif @facilities.count > 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
+        raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
       end
 
       @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used)

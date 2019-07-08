@@ -54,14 +54,15 @@ module BuildingSync
       end
 
       if choices.count == 0
-        p "Error, could not find uid for state #{state} and city #{city}. Initial count of weather files: #{responses.count}. Please try a different weather file."
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file_from_city_name',
+                           "Error, could not find uid for state #{state} and city #{city}. Initial count of weather files: #{responses.count}. Please try a different weather file.")
         return false
       end
 
       epw_path = download_weather_file(remote, choices)
       download_design_day_file(wmo_no, epw_path)
       return epw_path
-  end
+    end
 
     def download_weather_file_from_weather_id(weather_id)
       wmo_no = 0
@@ -70,16 +71,11 @@ module BuildingSync
       # Search for weather files
       responses = remote.searchComponentLibrary(weather_id, 'Weather File')
 
-      # Create options for user prompt
-
-      name_to_uid = Hash.new
-
       choices = OpenStudio::StringVector.new
 
       responses.each do |response|
         if response.name.include? 'TMY3'
           choices << response.uid
-          name_to_uid[response.name] = response.uid
 
           response.attributes.each do |attribute|
             if attribute.name == 'WMO'
@@ -90,7 +86,8 @@ module BuildingSync
       end
 
       if choices.count == 0
-        p "Error, could not find uid for #{name.valueAsString}.  Please try a different weather file."
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file_from_weather_id',
+                           "Error, could not find uid for #{name.valueAsString}.  Please try a different weather file.")
         return false
       end
 
@@ -102,15 +99,13 @@ module BuildingSync
     def download_weather_file(remote, choices)
       epw_path = ''
 
-      choices.each do |choice|
-        uid = choice
-
+      choices.each do |uid|
         remote.downloadComponent(uid)
         component = remote.waitForComponentDownload
 
         if component.empty?
-          p 'Cannot find local component'
-          # runner.registerError('Cannot find local component')
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file',
+                             "Error, cannot find the EPW weather file with uid: #{uid}.  Please try a different weather file.")
           return false
         end
 
@@ -119,14 +114,15 @@ module BuildingSync
         files = component.files('epw')
 
         if files.empty?
-          p 'No epw file found'
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file',
+                             "Error, cannot find the EPW weather file within the downloaded zip container with uid: #{uid}.  Please try a different weather file.")
           return false
         end
 
         epw_path = component.files('epw')[0]
       end
 
-      p "Successfully set weather file to #{epw_path}"
+      puts "Successfully set weather file to #{epw_path}"
 
       return epw_path
     end
@@ -142,9 +138,7 @@ module BuildingSync
         choices << response.uid
       end
 
-      choices.each do |choice|
-        uid = choice
-
+      choices.each do |uid|
         remote.downloadComponent(uid)
         component = remote.waitForComponentDownload
 
@@ -157,10 +151,12 @@ module BuildingSync
           if !files.empty?
             idf_path_collection.push(component.files('idf')[0])
           else
-            p 'No idf file found'
+            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_design_day_file',
+                               "Error, cannot find the design day file within the downloaded zip container with uid: #{uid}.  Please try a different weather file.")
           end
         else
-          p "Cannot find local component for #{choice}"
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_design_day_file',
+                             "Error, cannot find local component for: #{choice}.  Please try a different weather file.")
         end
       end
       create_ddy_file(idf_path_collection, epw_path)
