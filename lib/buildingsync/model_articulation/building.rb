@@ -361,10 +361,10 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{weather_file.city}. State is #{weather_file.stateProvinceRegion}")
 
-      set_climate_zone(climate_zone, standard_to_be_used, stat_file)
+      set_climate_zone(climate_zone, standard_to_be_used)
     end
 
-    def set_climate_zone(climate_zone, standard_to_be_used, stat_file)
+    def set_climate_zone(climate_zone, standard_to_be_used, stat_file = nil)
       # Set climate zone
       climateZones = @model.getClimateZones
       if climate_zone.nil?
