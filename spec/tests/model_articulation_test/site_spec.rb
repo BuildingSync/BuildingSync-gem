@@ -79,15 +79,16 @@ RSpec.describe 'SiteSpec' do
     @site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
     @site.write_osm(@osm_file_path)
 
-    osm_file_full_path = "#{@osm_file_path}/in.osm"
-    to_be_comparison_path = "#{@osm_file_path}/originalfiles/in.osm"
+    generate_idf_file
+
+    osm_file_full_path = "#{@osm_file_path}/in.idf"
+    to_be_comparison_path = "#{@osm_file_path}/originalfiles/in.idf"
 
     original_file_size = File.size(to_be_comparison_path)
     new_file_size = File.size(osm_file_full_path)
-    puts "original osm file size #{original_file_size} bytes versus new osm file size #{new_file_size} bytes"
+    puts "original idf file size #{original_file_size} bytes versus new idf file size #{new_file_size} bytes"
     expect((original_file_size - new_file_size).abs <= 1).to be true
 
-    generate_idf_file
     line_not_match_counter = compare_two_idf_files
 
     expect(line_not_match_counter == 0).to be true
