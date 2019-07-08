@@ -64,6 +64,6 @@ RSpec.describe 'LoadSystemSpec' do
     standard = Standard.build('DOE Ref Pre-1980')
     load_system = BuildingSync::LoadsSystem.new
 
-    expect(load_system.add_daylighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
+    expect(load_system.add_day_lighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
   end
 end

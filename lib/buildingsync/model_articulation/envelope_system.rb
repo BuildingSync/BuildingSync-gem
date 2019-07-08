@@ -51,7 +51,7 @@ module BuildingSync
       end
 
       # TODO: - allow building type and space type specific constructions set selection.
-      if ['SmallHotel', 'LargeHotel', 'MidriseApartment', 'HighriseApartment'].include?(primary_bldg_type)
+      if %w(SmallHotel LargeHotel MidriseApartment HighriseApartment).include?(primary_bldg_type)
         is_residential = 'Yes'
       else
         is_residential = 'No'

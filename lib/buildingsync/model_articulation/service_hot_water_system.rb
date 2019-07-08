@@ -52,13 +52,13 @@ module BuildingSync
       end
 
       typical_swh = standard.model_add_typical_swh(model)
-      midrise_swh_loops = []
-      stripmall_swh_loops = []
+      mid_rise_swh_loops = []
+      strip_mall_swh_loops = []
       typical_swh.each do |loop|
         if loop.name.get.include?('MidriseApartment')
-          midrise_swh_loops << loop
+          mid_rise_swh_loops << loop
         elsif loop.name.get.include?('RetailStripmall')
-          stripmall_swh_loops << loop
+          strip_mall_swh_loops << loop
         else
           water_use_connections = []
           loop.demandComponents.each do |component|
@@ -68,11 +68,11 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{loop.name} to the building. It has #{water_use_connections.size} water use connections.")
         end
       end
-      if !midrise_swh_loops.empty?
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{midrise_swh_loops.size} MidriseApartment service water heating loops.")
+      if !mid_rise_swh_loops.empty?
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{mid_rise_swh_loops.size} MidriseApartment service water heating loops.")
       end
-      if !stripmall_swh_loops.empty?
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{stripmall_swh_loops.size} RetailStripmall service water heating loops.")
+      if !strip_mall_swh_loops.empty?
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{strip_mall_swh_loops.size} RetailStripmall service water heating loops.")
       end
       return true
     end

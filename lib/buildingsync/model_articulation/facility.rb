@@ -160,7 +160,7 @@ module BuildingSync
         serviceHotWaterSystem.add(model, standard, remove_objects)
       end
 
-      load_system.add_daylighting_controls(model, standard, template)
+      load_system.add_day_lighting_controls(model, standard, template)
 
       # TODO: - add refrigeration
       # remove refrigeration equipment

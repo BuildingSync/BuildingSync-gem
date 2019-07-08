@@ -122,7 +122,7 @@ module BuildingSync
       return true
     end
 
-    def add_daylighting_controls(model, standard, template)
+    def add_day_lighting_controls(model, standard, template)
       # add daylight controls, need to perform a sizing run for 2010
       if template == '90.1-2010'
         if standard.model_run_sizing_run(model, "#{Dir.pwd}/SRvt") == false

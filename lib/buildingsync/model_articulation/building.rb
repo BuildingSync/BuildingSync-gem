@@ -184,9 +184,9 @@ module BuildingSync
       end
     end
 
-    def read_aspect_ratio(build_element, nodesap)
-      if build_element.elements["#{nodesap}:AspectRatio"]
-        @ns_to_ew_ratio = build_element.elements["#{nodesap}:AspectRatio"].text.to_f
+    def read_aspect_ratio(build_element, ns)
+      if build_element.elements["#{ns}:AspectRatio"]
+        @ns_to_ew_ratio = build_element.elements["#{ns}:AspectRatio"].text.to_f
       else
         @ns_to_ew_ratio = 0.0 # setDefaultValue
       end
@@ -748,11 +748,11 @@ module BuildingSync
         best_fit = card_dir_array.reverse.min_by { |x| (x.to_f - rotation).abs }
 
         if ![90.0, 270.0].include? best_fit
-          width_card_dir = ['east', 'west']
-          length_card_dir = ['north', 'south']
+          width_card_dir = %w[east west]
+          length_card_dir = %w[north south]
         else # if rotation is closest to 90 or 270 then reverse which orientation is used for length and width
-          width_card_dir = ['north', 'south']
-          length_card_dir = ['east', 'west']
+          width_card_dir = %w[north south]
+          length_card_dir = %w[east west]
         end
 
         # if dont' find enough on short sides
