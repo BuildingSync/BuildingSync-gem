@@ -364,6 +364,10 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{weather_file.city}. State is #{weather_file.stateProvinceRegion}")
 
+      set_climate_zone(climate_zone, standard_to_be_used)
+    end
+
+    def set_climate_zone(climate_zone, standard_to_be_used)
       # Set climate zone
       climateZones = @model.getClimateZones
       if climate_zone.nil?
@@ -383,7 +387,6 @@ module BuildingSync
         else
           climate_zone = match_data[1].to_s.strip
         end
-
       end
 
       # set climate zone
@@ -391,12 +394,15 @@ module BuildingSync
       if standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
         climateZones.setClimateZone('ASHRAE', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
+        return true
       elsif standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
         climate_zone = climate_zone.gsub('CEC', '').strip
         climate_zone = climate_zone.gsub('Climate Zone', '').strip
         climateZones.setClimateZone('CEC', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Setting Climate Zone to #{climate_zone}")
-        end
+        return true
+      end
+      return false
     end
 
     def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
