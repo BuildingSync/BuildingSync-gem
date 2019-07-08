@@ -304,7 +304,6 @@ module BuildingSync
     def set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, *weather_argb)
       initialize_model
 
-      p "epw_file_path #{epw_file_path}"
       # here we check if there is an valid EPW file, if there is we use that file otherwise everything will be generated from climate zone
       if !epw_file_path.nil? && File.exist?(epw_file_path)
         set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
@@ -364,10 +363,10 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{weather_file.city}. State is #{weather_file.stateProvinceRegion}")
 
-      set_climate_zone(climate_zone, standard_to_be_used)
+      set_climate_zone(climate_zone, standard_to_be_used, stat_file)
     end
 
-    def set_climate_zone(climate_zone, standard_to_be_used)
+    def set_climate_zone(climate_zone, standard_to_be_used, stat_file)
       # Set climate zone
       climateZones = @model.getClimateZones
       if climate_zone.nil?
@@ -511,7 +510,7 @@ module BuildingSync
         end
       end
 
-      set_climate_zone(climate_zone, standard_to_be_used)
+      set_climate_zone(climate_zone, standard_to_be_used, stat_file)
     end
 
     def generate_baseline_osm(standard_to_be_used)
