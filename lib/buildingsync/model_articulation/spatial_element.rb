@@ -217,6 +217,7 @@ module BuildingSync
       puts " Space types: #{@space_types} selected for building type: #{@bldg_type} and standard template: #{standard_template}"
       # create space_type_map from array
       sum_of_ratios = 0.0
+
       @space_types.each do |space_type_name, hash|
         # create space type
         space_type = OpenStudio::Model::SpaceType.new(model)
