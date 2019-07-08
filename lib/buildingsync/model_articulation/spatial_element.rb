@@ -217,6 +217,7 @@ module BuildingSync
       puts " Space types: #{@space_types} selected for building type: #{@bldg_type} and standard template: #{standard_template}"
       # create space_type_map from array
       sum_of_ratios = 0.0
+
       @space_types.each do |space_type_name, hash|
         # create space type
         space_type = OpenStudio::Model::SpaceType.new(model)
@@ -240,7 +241,8 @@ module BuildingSync
       @ratio_adjustment_multiplier = 1.0 / sum_of_ratios
 
       @space_types_floor_area = {}
-      @space_types.each do |hash|
+      @space_types.each do |space_type_name, hash|
+
         ratio_of_bldg_total = hash[:ratio] * @ratio_adjustment_multiplier * @fraction_area
         final_floor_area = ratio_of_bldg_total * total_bldg_floor_area # I think I can just pass ratio but passing in area is cleaner
         @space_types_floor_area[hash[:space_type]] = { floor_area: final_floor_area }
