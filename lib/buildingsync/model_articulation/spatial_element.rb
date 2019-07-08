@@ -200,7 +200,6 @@ module BuildingSync
 
     # create space types
     def create_space_types(model, total_bldg_floor_area, standard_template, bldg_type)
-
       # create space types from subsection type
       # mapping lookup_name name is needed for a few methods
       if $open_studio_standards.nil?
@@ -228,7 +227,7 @@ module BuildingSync
         # set color
         test = $open_studio_standards.space_type_apply_rendering_color(space_type) # this uses openstudio-standards
         if !test
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm',"Warning: Could not find color for #{space_type.name}")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', "Warning: Could not find color for #{space_type.name}")
         end
         # extend hash to hold new space type object
         hash[:space_type] = space_type

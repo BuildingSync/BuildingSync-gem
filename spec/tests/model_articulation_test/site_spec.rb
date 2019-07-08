@@ -146,5 +146,4 @@ RSpec.describe 'SiteSpec' do
     end
     return facilities[0]
   end
-
 end

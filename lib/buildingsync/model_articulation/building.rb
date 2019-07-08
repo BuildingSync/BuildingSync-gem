@@ -105,7 +105,6 @@ module BuildingSync
     end
 
     def read_width_and_length
-
       footprint = nil
       # handle user-assigned single floor plate size condition
       if @single_floor_area > 0.0
@@ -119,7 +118,6 @@ module BuildingSync
     end
 
     def read_standard_template_based_on_year(build_element, ns, standard_to_be_used)
-
       if !build_element.elements["#{ns}:YearOfConstruction"]
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_standard_template_based_on_year', 'Year of Construction is blank in your BuildingSync file.')
         raise 'Error : Year of Construction is blank in your BuildingSync file.'
@@ -230,6 +228,7 @@ module BuildingSync
       if @building_subsections.count > 0
         @building_subsections.each do |subsection|
           next if subsection.fraction_area.nil?
+
           building_fraction -= subsection.fraction_area
         end
         if building_fraction <= 0.0
@@ -333,7 +332,6 @@ module BuildingSync
     end
 
     def set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
-
       climate_zone_standard_string = climate_zone
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone_from_climate_zone', "climate zone: #{climate_zone}")
       if standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
@@ -397,9 +395,9 @@ module BuildingSync
       elsif standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
         climate_zone = climate_zone.gsub('CEC', '').strip
         climate_zone = climate_zone.gsub('Climate Zone', '').strip
-        climate_zone = climate_zone.gsub('A', '').strip
-        climate_zone = climate_zone.gsub('B', '').strip
-        climate_zone = climate_zone.gsub('C', '').strip
+        climate_zone = climate_zone.delete('A').strip
+        climate_zone = climate_zone.delete('B').strip
+        climate_zone = climate_zone.delete('C').strip
         climateZones.setClimateZone('CEC', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climate_zone}")
         return true
@@ -721,11 +719,11 @@ module BuildingSync
         best_fit = card_dir_array.reverse.min_by { |x| (x.to_f - rotation).abs }
 
         if ![90.0, 270.0].include? best_fit
-          width_card_dir = %w[east west]
-          length_card_dir = %w[north south]
+          width_card_dir = ['east', 'west']
+          length_card_dir = ['north', 'south']
         else # if rotation is closest to 90 or 270 then reverse which orientation is used for length and width
-          width_card_dir = %w[north south]
-          length_card_dir = %w[east west]
+          width_card_dir = ['north', 'south']
+          length_card_dir = ['east', 'west']
         end
 
         # if dont' find enough on short sides

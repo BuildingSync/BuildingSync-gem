@@ -79,4 +79,3 @@ RSpec.describe 'BuildingSync' do
     test_baseline_creation('Golden Test File.xml', ASHRAE90_1)
   end
 end
-

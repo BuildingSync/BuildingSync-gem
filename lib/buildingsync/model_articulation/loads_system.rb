@@ -50,6 +50,7 @@ module BuildingSync
           next if instance.name.to_s.include?('Elevator') # most prototype building types model exterior elevators with name Elevator
           next if instance.to_InternalMass.is_initialized
           next if instance.to_WaterUseEquipment.is_initialized
+
           instance.remove
         end
         model.getDesignSpecificationOutdoorAirs.each(&:remove)
@@ -77,6 +78,7 @@ module BuildingSync
       spaces_without_space_types = []
       model.getSpaces.each do |space|
         next if space.spaceType.is_initialized
+
         spaces_without_space_types << space
       end
       if !spaces_without_space_types.empty?
@@ -89,6 +91,7 @@ module BuildingSync
       if remove_objects
         model.getExteriorLightss.each do |ext_light|
           next if ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name
+
           ext_light.remove
         end
       end
@@ -104,10 +107,12 @@ module BuildingSync
       # remove elevators as spaceLoads or exteriorLights
       model.getSpaceLoads.each do |instance|
         next if !instance.name.to_s.include?('Elevator') # most prototype building types model exterior elevators with name Elevator
+
         instance.remove
       end
       model.getExteriorLightss.each do |ext_light|
         next if !ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name
+
         ext_light.remove
       end
 

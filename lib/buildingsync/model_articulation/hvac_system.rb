@@ -36,7 +36,6 @@
 # *******************************************************************************
 module BuildingSync
   class HVACSystem < BuildingSystem
-
     def add_exhaust(model, standard, kitchen_makeup, remove_objects)
       # remove exhaust objects
       if remove_objects
@@ -73,9 +72,11 @@ module BuildingSync
         # identify thermal thermostat and apply to zones (apply_internal_load_schedules names )
         model.getThermostatSetpointDualSetpoints.each do |thermostat|
           next if !thermostat.name.to_s.include?(space_type.name.to_s)
+
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_thermostats', "Assigning #{thermostat.name} to thermal zones with #{space_type.name} assigned.")
           space_type.spaces.each do |space|
             next if !space.thermalZone.is_initialized
+
             space.thermalZone.get.setThermostatSetpointDualSetpoint(thermostat)
           end
           next

@@ -1,4 +1,3 @@
-
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
@@ -51,7 +50,7 @@ module BuildingSync
       end
 
       # TODO: - allow building type and space type specific constructions set selection.
-      if %w(SmallHotel LargeHotel MidriseApartment HighriseApartment).include?(primary_bldg_type)
+      if ['SmallHotel', 'LargeHotel', 'MidriseApartment', 'HighriseApartment'].include?(primary_bldg_type)
         is_residential = 'Yes'
       else
         is_residential = 'No'
@@ -72,6 +71,7 @@ module BuildingSync
       model.getSurfaces.each do |surface|
         next if surface.outsideBoundaryCondition != 'Adiabatic'
         next if surface.construction.is_initialized
+
         surface.setAdjacentSurface(surface)
         surface.setConstruction(surface.construction.get)
         surface.setOutsideBoundaryCondition('Adiabatic')

@@ -62,5 +62,3 @@ RSpec.describe 'BuildingSync' do
     translator.write_osws
   end
 end
-
-

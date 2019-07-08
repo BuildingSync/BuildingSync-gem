@@ -71,13 +71,13 @@ RSpec.describe 'BuildingSpec' do
   it 'Should successfully set an ASHRAE 90.1 climate zone' do
     building = create_minimum_building('Retail', '1954', 'Gross', '69452')
     building.get_model
-    expect(building.set_climate_zone('ASHRAE 3C', ASHRAE90_1, "")).to be true
+    expect(building.set_climate_zone('ASHRAE 3C', ASHRAE90_1, '')).to be true
   end
 
   it 'Should successfully set a CA T24 climate zone' do
     building = create_minimum_building('Office', '2015', 'Gross', '20000')
     building.get_model
-    expect(building.set_climate_zone('Climate Zone 6', CA_TITLE24, "")).to be true
+    expect(building.set_climate_zone('Climate Zone 6', CA_TITLE24, '')).to be true
   end
 
   # we skip the method "set_weater_and_climate_zone" function because this method doesn't return any value

@@ -41,8 +41,8 @@ require_relative 'makers/model_maker_level_zero'
 require_relative 'makers/workflow_maker_phase_zero'
 require_relative 'selection_tool'
 
-ASHRAE90_1 = 'ASHRAE90.1'
-CA_TITLE24 = 'CaliforniaTitle24'
+ASHRAE90_1 = 'ASHRAE90.1'.freeze
+CA_TITLE24 = 'CaliforniaTitle24'.freeze
 
 module BuildingSync
   $open_studio_standards = nil
@@ -79,7 +79,7 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
           puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
         end
-      rescue
+      rescue StandardError
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
       end
 

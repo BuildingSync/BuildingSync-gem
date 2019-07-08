@@ -181,7 +181,7 @@ module BuildingSync
       design_day_file.close
     end
 
-    def find_response_from_given_state(responses,state)
+    def find_response_from_given_state(responses, state)
       responses.each do |response|
         if response.name.include? 'TMY3'
           response.attributes.each do |attribute|

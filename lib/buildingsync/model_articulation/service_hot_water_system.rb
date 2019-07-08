@@ -1,4 +1,3 @@
-
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
@@ -37,9 +36,8 @@
 # *******************************************************************************
 module BuildingSync
   class ServiceHotWaterSystem < BuildingSystem
-
     # initialize
-    def initialize()
+    def initialize
       # code to initialize
     end
 
@@ -63,6 +61,7 @@ module BuildingSync
           water_use_connections = []
           loop.demandComponents.each do |component|
             next if !component.to_WaterUseConnections.is_initialized
+
             water_use_connections << component
           end
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{loop.name} to the building. It has #{water_use_connections.size} water use connections.")

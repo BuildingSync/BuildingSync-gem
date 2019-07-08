@@ -1,6 +1,6 @@
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. 
+# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -105,7 +105,6 @@ RSpec.configure do |config|
 
     counter = 1
     Parallel.each(osw_files, in_threads: num_parallel) do |osw_file|
-
       cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
       # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
       puts "#{counter}) #{cmd}"

@@ -152,7 +152,7 @@ RSpec.describe 'FacilitySpec' do
     end
   end
 
-  def create_blank_xml_file1()
+  def create_blank_xml_file1
     xml = Builder::XmlMarkup.new(indent: 2)
     xml.instruct! :xml, encoding: 'ASCII'
     xml.tag!('auc:BuildingSync') do |buildsync|

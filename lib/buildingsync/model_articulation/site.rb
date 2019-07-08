@@ -37,7 +37,6 @@
 require_relative 'building'
 module BuildingSync
   class Site < SpatialElement
-
     # initialize
     def initialize(build_element, standard_to_be_used, ns)
       # code to initialize
@@ -206,4 +205,3 @@ module BuildingSync
     end
   end
 end
-
