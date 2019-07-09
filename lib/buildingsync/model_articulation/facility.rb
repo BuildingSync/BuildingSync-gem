@@ -49,21 +49,27 @@ module BuildingSync
     include OsLib_Geometry
 
     # initialize
-    def initialize(facility_xml, standard_to_be_used, ns)
+    def initialize(facility_xml, ns)
       # code to initialize
       # an array that contains all the sites
       @sites = []
 
       # reading the xml
-      read_xml(facility_xml, standard_to_be_used, ns)
+      read_xml(facility_xml, ns)
     end
 
     # adding a site to the facility
-    def read_xml(facility_xml, standard_to_be_used, ns)
+    def read_xml(facility_xml, ns)
       facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-        @sites.push(Site.new(site_element, standard_to_be_used, ns))
+        @sites.push(Site.new(site_element, ns))
       end
     end
+
+    def determine_open_studio_standard(standard_to_be_used)
+      return @sites[0].determine_open_studio_standard(standard_to_be_used)
+    end
+
+
 
     # generating the OpenStudio model based on the imported BuildingSync Data
     def generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)

@@ -49,7 +49,7 @@ module BuildingSync
     include EnergyPlus
 
     # initialize
-    def initialize(build_element, site_occupancy_type, site_total_floor_area, standard_to_be_used, ns)
+    def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
       @building_subsections = []
       @standard_template = nil
       @single_floor_area = 0.0
@@ -64,21 +64,23 @@ module BuildingSync
       @party_wall_stories_west = 0
       @party_wall_stories_east = 0
       @party_wall_fraction = 0
+      @built_year = 0
+      @open_studio_standard = nil
 
       @fraction_area = 1.0
       # code to initialize
-      read_xml(build_element, site_occupancy_type, site_total_floor_area, standard_to_be_used, ns)
+      read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
     end
 
     def num_stories
       return @num_stories_above_grade + @num_stories_below_grade
     end
 
-    def read_xml(build_element, site_occupancy_type, site_total_floor_area, standard_to_be_used, ns)
+    def read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
       # floor areas
       read_floor_areas(build_element, site_total_floor_area, ns)
       # standard template
-      read_standard_template_based_on_year(build_element, ns, standard_to_be_used)
+      read_built_remodel_year(build_element, ns)
       # deal with stories above and below grade
       read_stories_above_and_below_grade(build_element, ns)
       # aspect ratio
@@ -87,7 +89,7 @@ module BuildingSync
       @occupancy_type = read_occupancy_type(build_element, site_occupancy_type, ns)
 
       build_element.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |subsection_element|
-        @building_subsections.push(BuildingSubsection.new(subsection_element, @standard_template, @occupancy_type, @total_floor_area, ns))
+        @building_subsections.push(BuildingSubsection.new(subsection_element, @occupancy_type, @total_floor_area, ns))
       end
 
       # floor areas
@@ -117,52 +119,18 @@ module BuildingSync
       @length = footprint / @width
     end
 
-    def read_standard_template_based_on_year(build_element, ns, standard_to_be_used)
+    def read_built_remodel_year(build_element, ns)
       if !build_element.elements["#{ns}:YearOfConstruction"]
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_standard_template_based_on_year', 'Year of Construction is blank in your BuildingSync file.')
         raise 'Error : Year of Construction is blank in your BuildingSync file.'
       end
 
-      built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_f
+      @built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_f
 
       if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
         major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_f
-        built_year = major_remodel_year if major_remodel_year > built_year
+        @built_year = major_remodel_year if major_remodel_year > @built_year
       end
-
-      if standard_to_be_used == CA_TITLE24
-        if built_year < 1978
-          @standard_template = 'CBES Pre-1978'
-        elsif built_year >= 1978 && built_year < 1992
-          @standard_template = 'CBES T24 1978'
-        elsif built_year >= 1992 && built_year < 2001
-          @standard_template = 'CBES T24 1992'
-        elsif built_year >= 2001 && built_year < 2005
-          @standard_template = 'CBES T24 2001'
-        elsif built_year >= 2005 && built_year < 2008
-          @standard_template = 'CBES T24 2005'
-        else
-          @standard_template = 'CBES T24 2008'
-        end
-      elsif standard_to_be_used == ASHRAE90_1
-        if built_year < 1980
-          @standard_template = 'DOE Ref Pre-1980'
-        elsif built_year >= 1980 && built_year < 2004
-          @standard_template = 'DOE Ref 1980-2004'
-        elsif built_year >= 2004 && built_year < 2007
-          @standard_template = '90.1-2004'
-        elsif built_year >= 2007 && built_year < 2010
-          @standard_template = '90.1-2007'
-        elsif built_year >= 2010 && built_year < 2013
-          @standard_template = '90.1-2010'
-        elsif built_year >= 2013
-          @standard_template = '90.1-2013'
-        end
-        # TODO: add ASHRAE 2016 once it is available
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_standard_template_based_on_year', "Unknown standard_to_be_used #{standard_to_be_used}.")
-      end
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.read_standard_template_based_on_year', "Using the follwing standard for default values #{@standard_template}.")
     end
 
     def read_stories_above_and_below_grade(build_element, ns)
@@ -269,7 +237,7 @@ module BuildingSync
       elsif @building_subsections.count == 0
         space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
         puts " Space types: #{space_types} selected for building type: #{@bldg_type} and standard template: #{@standard_template}"
-        space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @bldg_type)
+        space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @open_studio_standard)
         space_types_floor_area.each do |space_type, hash|
           new_hash[space_type] = hash
         end
@@ -286,6 +254,57 @@ module BuildingSync
       # in case the model was not initialized before we create a new model if it is nil
       initialize_model
       return @model
+    end
+
+    def determine_open_studio_standard(standard_to_be_used)
+      begin
+        set_standard_template(standard_to_be_used, get_built_year)
+        building_type = get_building_type
+        @open_studio_standard = Standard.build("#{@standard_template}_#{building_type}")
+      rescue StandardError => e
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.BuildingSubsection.read_xml', e.message)
+      end
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSubsection.read_xml', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
+    end
+
+    def set_standard_template(standard_to_be_used, built_year)
+      if standard_to_be_used == CA_TITLE24
+        if built_year < 1978
+          @standard_template = 'CBES Pre-1978'
+        elsif built_year >= 1978 && built_year < 1992
+          @standard_template = 'CBES T24 1978'
+        elsif built_year >= 1992 && built_year < 2001
+          @standard_template = 'CBES T24 1992'
+        elsif built_year >= 2001 && built_year < 2005
+          @standard_template = 'CBES T24 2001'
+        elsif built_year >= 2005 && built_year < 2008
+          @standard_template = 'CBES T24 2005'
+        else
+          @standard_template = 'CBES T24 2008'
+        end
+      elsif standard_to_be_used == ASHRAE90_1
+        if built_year < 1980
+          @standard_template = 'DOE Ref Pre-1980'
+        elsif built_year >= 1980 && built_year < 2004
+          @standard_template = 'DOE Ref 1980-2004'
+        elsif built_year >= 2004 && built_year < 2007
+          @standard_template = '90.1-2004'
+        elsif built_year >= 2007 && built_year < 2010
+          @standard_template = '90.1-2007'
+        elsif built_year >= 2010 && built_year < 2013
+          @standard_template = '90.1-2010'
+        elsif built_year >= 2013
+          @standard_template = '90.1-2013'
+        end
+        # TODO: add ASHRAE 2016 once it is available
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.get_standard_template', "Unknown standard_to_be_used #{standard_to_be_used}.")
+      end
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.get_standard_template', "Using the following standard for default values #{@standard_template}.")
+    end
+
+    def get_built_year
+      return @built_year
     end
 
     def get_building_template
@@ -342,7 +361,7 @@ module BuildingSync
         climate_zone_standard_string = ''
       end
 
-      if !$open_studio_standards.nil? && !$open_studio_standards.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
+      if !@open_studio_standards.nil? && !@open_studio_standards.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weater_and_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
       end
 
