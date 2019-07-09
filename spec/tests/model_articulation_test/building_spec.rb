@@ -65,6 +65,8 @@ RSpec.describe 'BuildingSpec' do
 
   it 'Should return the correct building template' do
     building = create_minimum_building('Retail', '1954', 'Gross', '69452')
+    building.determine_open_studio_standard(CA_TITLE24)
+    puts "expected building template: CBES Pre-1978 but got: #{building.get_building_template} " if building.get_building_template != 'CBES Pre-1978'
     expect(building.get_building_template == 'CBES Pre-1978').to be true
   end
 
@@ -91,7 +93,7 @@ RSpec.describe 'BuildingSpec' do
     site_xml = create_site_object(doc, ns)
 
     site_xml.elements.each("#{ns}:Buildings/#{ns}:Building") do |building_element|
-      buildings.push(BuildingSync::Building.new(building_element, occupancy_type, total_floor_area, CA_TITLE24, ns))
+      buildings.push(BuildingSync::Building.new(building_element, occupancy_type, total_floor_area, ns))
     end
     return buildings
   end
@@ -118,7 +120,7 @@ RSpec.describe 'BuildingSpec' do
 
     building_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building"]
     if !building_element.nil?
-      return BuildingSync::Building.new(building_element, '', '', CA_TITLE24, ns)
+      return BuildingSync::Building.new(building_element, '', '', ns)
     else
       expect(building_element.nil?).to be false
     end
