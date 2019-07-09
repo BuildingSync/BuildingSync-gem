@@ -52,6 +52,8 @@ RSpec.describe 'SiteSpec' do
 
   it 'Should return the correct building template' do
     site =  create_minimum_site('Retail', '1954', 'Gross', '69452')
+    site.determine_open_studio_standard(ASHRAE90_1)
+    puts "expected building template: DOE Ref Pre-1980 but got: #{site.get_building_template} " if site.get_building_template != 'DOE Ref Pre-1980'
     expect(site.get_building_template == 'DOE Ref Pre-1980').to be true
   end
 
@@ -76,6 +78,7 @@ RSpec.describe 'SiteSpec' do
     # compare this osm file with a file that was previously generated.
     @osm_file_path = File.expand_path('../../files/filecomparison', File.dirname(__FILE__))
     @site = create_minimum_site('Retail', '1980', 'Gross', '20000')
+    @site.determine_open_studio_standard(ASHRAE90_1)
     @site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
     @site.write_osm(@osm_file_path)
 
@@ -135,7 +138,7 @@ RSpec.describe 'SiteSpec' do
     facility_xml = create_facility_object(@doc, ns)
 
     facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-      sites.push(BuildingSync::Site.new(site_element, CA_TITLE24, ns))
+      sites.push(BuildingSync::Site.new(site_element, ns))
     end
     return sites
   end

@@ -221,7 +221,7 @@ module BuildingSync
 
     def create_bldg_space_types(model)
       @building_subsections.each do |bldg_subsec|
-        bldg_subsec.create_space_types(model, @total_floor_area, @standard_template, @bldg_type)
+        bldg_subsec.create_space_types(model, @total_floor_area, @standard_template, @open_studio_standard)
       end
     end
 
@@ -361,7 +361,7 @@ module BuildingSync
         climate_zone_standard_string = ''
       end
 
-      if !@open_studio_standards.nil? && !@open_studio_standards.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
+      if !@open_studio_standard.nil? && !@open_studio_standard.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weater_and_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
       end
 

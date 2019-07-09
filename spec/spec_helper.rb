@@ -185,7 +185,7 @@ RSpec.configure do |config|
     ns = 'auc'
     site_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
     if !site_element.nil?
-      return BuildingSync::Site.new(site_element, ASHRAE90_1, 'auc')
+      return BuildingSync::Site.new(site_element, 'auc')
     else
       expect(site_element.nil?).to be false
     end
