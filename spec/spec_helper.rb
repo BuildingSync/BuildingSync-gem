@@ -170,9 +170,12 @@ RSpec.configure do |config|
     translator.write_osws
 
     osw_files = []
+    osw_sr_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
-    # adding one additional count dues to the SR sizing run
-    expect(osw_files.size).to eq expected_number_of_measures + 2
+    Dir.glob("#{out_path}/SR/*.osw") { |osw| osw_sr_files << osw }
+
+    # we compare the counts, by also considering the two potential osw files in the SR directory
+    expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
 
     return osw_files
   end
