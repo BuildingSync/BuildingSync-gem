@@ -41,15 +41,15 @@ RSpec.describe BuildingSync do
   end
 
   it 'has a measures directory' do
-    instance = BuildingSync::BuildingSync.new
-    measure_path = File.expand_path('lib/measures')
+    instance = BuildingSync::Extension.new
+    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
     expect(instance.measures_dir).to eq measure_path
     expect(Dir.exist?(instance.measures_dir)).to eq true
   end
 
   it 'has a files directory' do
-    instance = BuildingSync::BuildingSync.new
-    file_path = File.expand_path('lib/files')
+    instance = BuildingSync::Extension.new
+    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
     expect(instance.files_dir).to eq file_path
     expect(Dir.exist?(instance.files_dir)).to eq true
   end
