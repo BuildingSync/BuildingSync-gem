@@ -112,7 +112,7 @@ RSpec.describe 'SiteSpec' do
     counter = 0
     file1_lines.each do |line|
       if !line.include?('Sub Surface') && !file2_lines[counter].eql?(line)
-        puts line
+        puts "This is the difference line : #{line} on line no : #{counter}"
         line_not_match_counter += 1
       end
       counter += 1
