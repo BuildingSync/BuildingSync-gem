@@ -268,6 +268,7 @@ module BuildingSync
     def update_name
       # update the name so it includes the standard_template string
       name_array = [@standard_template]
+      name_array << get_building_type
       @building_subsections.each do |bld_tp|
         name_array << bld_tp.bldg_type
       end
