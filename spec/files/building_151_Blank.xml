@@ -6,10 +6,6 @@
 				<auc:Site>
 					<auc:Buildings>
 						<auc:Building ID="Building151">
-							<auc:Subsections>
-								<auc:Subsection ID="Default_Subsection">
-								</auc:Subsection>
-							</auc:Subsections>
 						</auc:Building>
 					</auc:Buildings>
 				</auc:Site>

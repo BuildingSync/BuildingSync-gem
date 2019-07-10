@@ -55,7 +55,6 @@ RSpec.describe 'FacilitySpec' do
     facility.determine_open_studio_standard(ASHRAE90_1)
     epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
     output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
-    puts "expected generate baseline osm: true but got: #{facility.generate_baseline_osm(epw_file_path, output_path, ASHRAE90_1)} " if facility.generate_baseline_osm(epw_file_path, output_path, ASHRAE90_1) != true
     expect(facility.generate_baseline_osm(epw_file_path, output_path, ASHRAE90_1)).to be true
   end
 
