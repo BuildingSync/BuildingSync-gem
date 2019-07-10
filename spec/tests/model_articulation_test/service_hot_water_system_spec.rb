@@ -36,11 +36,11 @@
 # *******************************************************************************
 
 RSpec.describe 'ServiceHotWaterSystemSpec' do
-  it 'Should add succeffully Service hot water system' do
+  it 'Should add successfully Service hot water system' do
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref Pre-1980')
     serviceHotWaterSystem = BuildingSync::ServiceHotWaterSystem.new
-
+    puts 'expected : true but got: false} ' if serviceHotWaterSystem.add(model, standard, false) != true
     expect(serviceHotWaterSystem.add(model, standard, false)).to be true
   end
 end

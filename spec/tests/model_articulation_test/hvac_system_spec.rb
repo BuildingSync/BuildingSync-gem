@@ -40,14 +40,14 @@ RSpec.describe 'HVACSystemSpec' do
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref 1980-2004')
     hvac_system = BuildingSync::HVACSystem.new
-
+    puts 'expected : true but got: false} ' if hvac_system.add_exhaust(model, standard, 'Adjacent', false) != true
     expect(hvac_system.add_exhaust(model, standard, 'Adjacent', false)).to be true
   end
 
   it 'Should add a Thermostats in HVAC System successfully' do
     model = OpenStudio::Model::Model.new
     hvac_system = BuildingSync::HVACSystem.new
-
+    puts 'expected : true but got: false} ' if hvac_system.add_thermostats(model, ASHRAE90_1, false) != true
     expect(hvac_system.add_thermostats(model, ASHRAE90_1, false)).to be true
   end
 
@@ -55,7 +55,7 @@ RSpec.describe 'HVACSystemSpec' do
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref 1980-2004')
     hvac_system = BuildingSync::HVACSystem.new
-
+    puts 'expected : true but got: false} ' if hvac_system.add_hvac(model, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true) != true
     expect(hvac_system.add_hvac(model, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true)).to be true
   end
 
@@ -65,7 +65,7 @@ RSpec.describe 'HVACSystemSpec' do
     hvac_system = BuildingSync::HVACSystem.new
 
     output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
-
+    puts 'expected : false but got: true} ' if hvac_system.apply_sizing_and_assumptions(model, output_path, standard, 'Retail', 'PSZ-AC with gas coil heat', '') != false
     expect(hvac_system.apply_sizing_and_assumptions(model, output_path, standard, 'Retail', 'PSZ-AC with gas coil heat', '')).to be false
   end
 end

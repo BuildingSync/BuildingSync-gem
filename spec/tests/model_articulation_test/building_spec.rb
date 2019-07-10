@@ -50,16 +50,19 @@ RSpec.describe 'BuildingSpec' do
 
   it 'Should return the no of building stories' do
     building = create_minimum_building('Retail', '1954', 'Gross', '69452')
+    puts "expected no. of stories: 1 but got: #{building.num_stories} " if building.num_stories != 1
     expect(building.num_stories == 1).to be true
   end
 
   it 'Should return the correct building type' do
     building = create_minimum_building('Retail', '1954', 'Gross', '69452')
+    puts "expected building type: RetailStandalone but got: #{building.get_building_type} " if building.get_building_type != 'RetailStandalone'
     expect(building.get_building_type == 'RetailStandalone').to be true
   end
 
   it 'Should return the correct system type' do
     building = create_minimum_building('Retail', '1954', 'Gross', '69452')
+    puts "expected system type: PSZ-AC with gas coil heat but got: #{building.get_system_type} " if building.get_system_type != 'PSZ-AC with gas coil heat'
     expect(building.get_system_type == 'PSZ-AC with gas coil heat').to be true
   end
 
@@ -73,12 +76,14 @@ RSpec.describe 'BuildingSpec' do
   it 'Should successfully set an ASHRAE 90.1 climate zone' do
     building = create_minimum_building('Retail', '1954', 'Gross', '69452')
     building.get_model
+    puts "expected climate zone: true but got: #{building.set_climate_zone('ASHRAE 3C', ASHRAE90_1, '')} " if building.set_climate_zone('ASHRAE 3C', ASHRAE90_1, '') != true
     expect(building.set_climate_zone('ASHRAE 3C', ASHRAE90_1, '')).to be true
   end
 
   it 'Should successfully set a CA T24 climate zone' do
     building = create_minimum_building('Office', '2015', 'Gross', '20000')
     building.get_model
+    puts "expected climate zone: true but got: #{building.set_climate_zone('Climate Zone 6', CA_TITLE24, '')} " if building.set_climate_zone('Climate Zone 6', CA_TITLE24, '') != true
     expect(building.set_climate_zone('Climate Zone 6', CA_TITLE24, '')).to be true
   end
 
