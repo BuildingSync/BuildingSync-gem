@@ -272,7 +272,7 @@ module BuildingSync
       @building_subsections.each do |bld_tp|
         name_array << bld_tp.bldg_type
       end
-      name_array << @name
+      name_array << @name if !@name.nil? && !@name == ''
       @name = name_array.join('|').to_s
     end
 
