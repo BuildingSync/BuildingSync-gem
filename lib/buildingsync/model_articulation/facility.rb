@@ -69,8 +69,6 @@ module BuildingSync
       return @sites[0].determine_open_studio_standard(standard_to_be_used)
     end
 
-
-
     # generating the OpenStudio model based on the imported BuildingSync Data
     def generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)
       if @sites.count == 0

@@ -57,8 +57,11 @@ RSpec.describe 'BuildingSync' do
     epw_file_path = nil
 
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, CA_TITLE24)
-    translator.add_measure('Occupancy_Simulator')
+    translator.add_measure('scale_geometry')
     translator.write_osm
     translator.write_osws
+    osw_files = []
+    Dir.glob("#{out_path}/Baseline/in.osw") { |osw| osw_files << osw }
+    run_scenario_simulations(osw_files)
   end
 end
