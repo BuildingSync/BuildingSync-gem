@@ -336,6 +336,7 @@ module BuildingSync
           epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
         end
 
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weather_and_climate_zone', "Could not find a weather file with station id: #{weather_station_id} , state: #{state_name} and city: #{city_name}.") if epw_file_path.nil?
         set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
       else
         set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
