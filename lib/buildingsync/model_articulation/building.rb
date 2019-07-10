@@ -208,10 +208,7 @@ module BuildingSync
     end
 
     def read_building_name(building_element, ns)
-      name_array = [@standard_template]
-      @building_subsections.each do |bld_tp|
-        name_array << bld_tp.bldg_type
-      end
+      name_array = []
       name_element = building_element.elements["#{ns}:PremisesName"]
       if !name_element.nil?
         name_array << name_element.text
@@ -261,10 +258,21 @@ module BuildingSync
         set_standard_template(standard_to_be_used, get_built_year)
         building_type = get_building_type
         @open_studio_standard = Standard.build("#{@standard_template}_#{building_type}")
+        update_name
       rescue StandardError => e
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.BuildingSubsection.read_xml', e.message)
       end
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSubsection.read_xml', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
+    end
+
+    def update_name
+      # update the name so it includes the standard_template string
+      name_array = [@standard_template]
+      @building_subsections.each do |bld_tp|
+        name_array << bld_tp.bldg_type
+      end
+      name_array << @name
+      @name = name_array.join('|').to_s
     end
 
     def set_standard_template(standard_to_be_used, built_year)
