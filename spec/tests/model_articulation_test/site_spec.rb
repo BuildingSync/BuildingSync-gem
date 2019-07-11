@@ -123,15 +123,20 @@ RSpec.describe 'SiteSpec' do
 
   def generate_idf_file
     workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(@site.get_model)
-    if workspace.save("#{@osm_file_path}/in.idf")
-      p 'IDF file successfully saved'
-    end
+    new_file_path = "#{@osm_file_path}/in.idf"
+    # first delete idf file if exist
+    File.delete(new_file_path) if File.exist?(new_file_path)
 
-    oldModel = OpenStudio::Model::Model.load("#{@osm_file_path}/originalfiles/in.osm").get
+    # now create idf file.
+    p 'IDF file successfully saved' if workspace.save(new_file_path)
+
+    original_file_path = "#{@osm_file_path}/originalfiles"
+    oldModel = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
     workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
-    if workspace.save("#{@osm_file_path}/originalfiles/in.idf")
-      p 'IDF file 2 successfully saved'
-    end
+    # first delete the file if exist
+    File.delete("#{original_file_path}/in.idf") if File.exist?("#{original_file_path}/in.idf")
+
+    p 'IDF file 2 successfully saved' if workspace.save("#{original_file_path}/in.idf")
   end
 
   def generate_baseline(file_name, ns)
