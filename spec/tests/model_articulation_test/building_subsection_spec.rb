@@ -40,6 +40,7 @@ RSpec.describe 'BuildingSpec' do
     begin
       generate_baseline('building_151_Blank', nil, nil, 'auc')
     rescue StandardError => e
+      puts "expected error message:Building type '' is nil but got: #{e.message} " if !e.message.include?("Building type '' is nil")
       expect(e.message.include?("Building type '' is nil")).to be true
     end
   end
@@ -53,7 +54,7 @@ RSpec.describe 'BuildingSpec' do
     building_xml = create_building_object(doc, ns)
 
     building_xml.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |building_element|
-      sub_sections.push(BuildingSync::BuildingSubsection.new(building_element, occupancy_type, total_floor_area, CA_TITLE24, ns))
+      sub_sections.push(BuildingSync::BuildingSubsection.new(building_element, occupancy_type, total_floor_area, ns))
     end
     return sub_sections
   end

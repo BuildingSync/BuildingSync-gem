@@ -53,18 +53,18 @@ RSpec.describe 'BuildingSync' do
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
     end
-    expect(File.exist?(out_path)).not_to be true
 
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
 
     translator = BuildingSync::Translator.new(xml_path, out_path)
+    translator.write_osm
     translator.write_osws
 
     osw_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
 
-    expect(osw_files.size).to eq 30
+    expect(osw_files.size).to eq 32
 
     if BuildingSync::DO_SIMULATIONS
       num_sims = 0

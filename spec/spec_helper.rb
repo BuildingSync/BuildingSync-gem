@@ -1,6 +1,6 @@
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. 
+# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -105,7 +105,6 @@ RSpec.configure do |config|
 
     counter = 1
     Parallel.each(osw_files, in_threads: num_parallel) do |osw_file|
-
       cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
       # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
       puts "#{counter}) #{cmd}"
@@ -171,9 +170,12 @@ RSpec.configure do |config|
     translator.write_osws
 
     osw_files = []
+    osw_sr_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
-    # adding one additional count dues to the SR sizing run
-    expect(osw_files.size).to eq expected_number_of_measures + 2
+    Dir.glob("#{out_path}/SR/*.osw") { |osw| osw_sr_files << osw }
+
+    # we compare the counts, by also considering the two potential osw files in the SR directory
+    expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
 
     return osw_files
   end
@@ -183,7 +185,7 @@ RSpec.configure do |config|
     ns = 'auc'
     site_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
     if !site_element.nil?
-      return BuildingSync::Site.new(site_element, ASHRAE90_1, 'auc')
+      return BuildingSync::Site.new(site_element, 'auc')
     else
       expect(site_element.nil?).to be false
     end

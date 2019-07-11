@@ -37,9 +37,8 @@
 require_relative 'building'
 module BuildingSync
   class Site < SpatialElement
-
     # initialize
-    def initialize(build_element, standard_to_be_used, ns)
+    def initialize(build_element, ns)
       # code to initialize
       # an array that contains all the buildings
       @buildings = []
@@ -58,11 +57,11 @@ module BuildingSync
       @premises_notes = nil
 
       # TM: just use the XML snippet to search for the buildings on the site
-      read_xml(build_element, standard_to_be_used, ns)
+      read_xml(build_element, ns)
     end
 
     # adding a site to the facility
-    def read_xml(build_element, standard_to_be_used, ns)
+    def read_xml(build_element, ns)
       # check occupancy type at the site level
       @occupancy_type = read_occupancy_type(build_element, nil, ns)
       # check floor areas at the site level
@@ -79,7 +78,7 @@ module BuildingSync
       read_site_other_details(build_element, ns)
       # code to create a building
       build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
-        @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, standard_to_be_used, ns))
+        @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, ns))
       end
       if @buildings.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
@@ -163,6 +162,14 @@ module BuildingSync
       return get_largest_building.get_model
     end
 
+    def determine_open_studio_standard(standard_to_be_used)
+      return get_largest_building.determine_open_studio_standard(standard_to_be_used)
+    end
+
+    def determine_open_studio_system_standard
+      return Standard.build(get_building_template)
+    end
+
     def get_building_template
       return get_largest_building.get_building_template
     end
@@ -232,4 +239,3 @@ module BuildingSync
     end
   end
 end
-

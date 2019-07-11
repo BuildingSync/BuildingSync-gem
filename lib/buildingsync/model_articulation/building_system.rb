@@ -39,4 +39,3 @@ module BuildingSync
     # TODO: - Do we need this class to share functionality of the system
   end
 end
-

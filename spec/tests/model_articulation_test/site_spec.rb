@@ -42,31 +42,37 @@ RSpec.describe 'SiteSpec' do
     begin
       generate_baseline('building_151_Blank', 'auc')
     rescue StandardError => e
+      puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
     end
   end
 
   it 'Should create an instance of the site class with minimal XML snippet' do
-    site =  create_minimum_site('Retail', '1954', 'Gross', '69452')
+    create_minimum_site('Retail', '1954', 'Gross', '69452')
   end
 
   it 'Should return the correct building template' do
-    site =  create_minimum_site('Retail', '1954', 'Gross', '69452')
+    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    site.determine_open_studio_standard(ASHRAE90_1)
+    puts "expected building template: DOE Ref Pre-1980 but got: #{site.get_building_template} " if site.get_building_template != 'DOE Ref Pre-1980'
     expect(site.get_building_template == 'DOE Ref Pre-1980').to be true
   end
 
   it 'Should return the correct system type' do
     site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    puts "expected system type: PSZ-AC with gas coil heat but got: #{site.get_system_type} " if site.get_system_type != 'PSZ-AC with gas coil heat'
     expect(site.get_system_type == 'PSZ-AC with gas coil heat').to be true
   end
 
   it 'Should return the correct building type' do
     site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    puts "expected building type: RetailStandalone but got: #{site.get_building_type} " if site.get_building_type != 'RetailStandalone'
     expect(site.get_building_type == 'RetailStandalone').to be true
   end
 
   it 'Should return the correct climate zone' do
     site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    puts "expected climate zone: nil but got: #{site.get_climate_zone} " if !site.get_climate_zone.nil?
     expect(site.get_climate_zone.nil?).to be true
   end
 
@@ -76,18 +82,20 @@ RSpec.describe 'SiteSpec' do
     # compare this osm file with a file that was previously generated.
     @osm_file_path = File.expand_path('../../files/filecomparison', File.dirname(__FILE__))
     @site = create_minimum_site('Retail', '1980', 'Gross', '20000')
+    @site.determine_open_studio_standard(ASHRAE90_1)
     @site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
     @site.write_osm(@osm_file_path)
 
-    osm_file_full_path = "#{@osm_file_path}/in.osm"
-    to_be_comparison_path = "#{@osm_file_path}/originalfiles/in.osm"
+    generate_idf_file
+
+    osm_file_full_path = "#{@osm_file_path}/in.idf"
+    to_be_comparison_path = "#{@osm_file_path}/originalfiles/in.idf"
 
     original_file_size = File.size(to_be_comparison_path)
     new_file_size = File.size(osm_file_full_path)
-    puts "original osm file size #{original_file_size} bytes versus new osm file size #{new_file_size} bytes"
+    puts "original idf file size #{original_file_size} bytes versus new idf file size #{new_file_size} bytes"
     expect((original_file_size - new_file_size).abs <= 1).to be true
 
-    generate_idf_file
     line_not_match_counter = compare_two_idf_files
 
     expect(line_not_match_counter == 0).to be true
@@ -104,7 +112,8 @@ RSpec.describe 'SiteSpec' do
     counter = 0
     file1_lines.each do |line|
       if !line.include?('Sub Surface') && !file2_lines[counter].eql?(line)
-        puts line
+        puts "This is the newly create idf file line : #{line} on line no : #{counter}"
+        puts "This is the original idf file line : #{file2_lines[counter]} on line no : #{counter}"
         line_not_match_counter += 1
       end
       counter += 1
@@ -114,15 +123,20 @@ RSpec.describe 'SiteSpec' do
 
   def generate_idf_file
     workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(@site.get_model)
-    if workspace.save("#{@osm_file_path}/in.idf")
-      p 'IDF file successfully saved'
-    end
+    new_file_path = "#{@osm_file_path}/in.idf"
+    # first delete idf file if exist
+    File.delete(new_file_path) if File.exist?(new_file_path)
 
-    oldModel = OpenStudio::Model::Model.load("#{@osm_file_path}/originalfiles/in.osm").get
+    # now create idf file.
+    p 'IDF file successfully saved' if workspace.save(new_file_path)
+
+    original_file_path = "#{@osm_file_path}/originalfiles"
+    oldModel = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
     workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
-    if workspace.save("#{@osm_file_path}/originalfiles/in.idf")
-      p 'IDF file 2 successfully saved'
-    end
+    # first delete the file if exist
+    File.delete("#{original_file_path}/in.idf") if File.exist?("#{original_file_path}/in.idf")
+
+    p 'IDF file 2 successfully saved' if workspace.save("#{original_file_path}/in.idf")
   end
 
   def generate_baseline(file_name, ns)
@@ -134,7 +148,7 @@ RSpec.describe 'SiteSpec' do
     facility_xml = create_facility_object(@doc, ns)
 
     facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-      sites.push(BuildingSync::Site.new(site_element, CA_TITLE24, ns))
+      sites.push(BuildingSync::Site.new(site_element, ns))
     end
     return sites
   end
@@ -146,5 +160,4 @@ RSpec.describe 'SiteSpec' do
     end
     return facilities[0]
   end
-
 end

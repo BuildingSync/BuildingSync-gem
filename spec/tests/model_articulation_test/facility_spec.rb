@@ -41,6 +41,7 @@ RSpec.describe 'FacilitySpec' do
     begin
       generate_baseline('building_151_Blank', 'auc')
     rescue StandardError => e
+      puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
     end
   end
@@ -51,6 +52,7 @@ RSpec.describe 'FacilitySpec' do
 
   it 'Should return the boolean value for creating osm file correctly or not.' do
     facility = create_minimum_facility('Retail', '1954', 'Gross', '69452')
+    facility.determine_open_studio_standard(ASHRAE90_1)
     epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
     output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
     expect(facility.generate_baseline_osm(epw_file_path, output_path, ASHRAE90_1)).to be true
@@ -63,8 +65,8 @@ RSpec.describe 'FacilitySpec' do
       doc = REXML::Document.new(file)
     end
     ns = 'auc'
-    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ASHRAE90_1, ns)
-
+    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
+    facility.determine_open_studio_standard(ASHRAE90_1)
     output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
     facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
     facility.create_building_systems(output_path, 'Forced Air', 'Electricity', 'Electricity',
@@ -79,8 +81,8 @@ RSpec.describe 'FacilitySpec' do
       doc = REXML::Document.new(file)
     end
     ns = 'auc'
-    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ASHRAE90_1, ns)
-
+    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
+    facility.determine_open_studio_standard(ASHRAE90_1)
     output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
     facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
     facility.create_building_systems(output_path, 'Forced Air', 'Electricity', 'Electricity',
@@ -95,7 +97,7 @@ RSpec.describe 'FacilitySpec' do
     @doc = create_xml_file_object(@xml_path)
 
     @doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_element|
-      facilities.push(BuildingSync::Facility.new(facility_element, CA_TITLE24, ns))
+      facilities.push(BuildingSync::Facility.new(facility_element, ns))
     end
     return facilities
   end
@@ -146,13 +148,13 @@ RSpec.describe 'FacilitySpec' do
     ns = 'auc'
     facility_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"]
     if !facility_element.nil?
-      return BuildingSync::Facility.new(facility_element, ASHRAE90_1, 'auc')
+      return BuildingSync::Facility.new(facility_element, 'auc')
     else
       expect(facility_element.nil?).to be false
     end
   end
 
-  def create_blank_xml_file1()
+  def create_blank_xml_file1
     xml = Builder::XmlMarkup.new(indent: 2)
     xml.instruct! :xml, encoding: 'ASCII'
     xml.tag!('auc:BuildingSync') do |buildsync|

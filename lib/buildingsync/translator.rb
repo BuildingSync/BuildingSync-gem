@@ -41,12 +41,10 @@ require_relative 'makers/model_maker_level_zero'
 require_relative 'makers/workflow_maker_phase_zero'
 require_relative 'selection_tool'
 
-ASHRAE90_1 = 'ASHRAE90.1'
-CA_TITLE24 = 'CaliforniaTitle24'
+ASHRAE90_1 = 'ASHRAE90.1'.freeze
+CA_TITLE24 = 'CaliforniaTitle24'.freeze
 
 module BuildingSync
-  $open_studio_standards = nil
-
   class Translator
     # load the building sync file and chooses the correct workflow
     def initialize(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
@@ -79,7 +77,7 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
           puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
         end
-      rescue
+      rescue StandardError
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
       end
 
@@ -112,6 +110,10 @@ module BuildingSync
 
     def write_osws
       @model_maker.write_osws(@output_dir)
+    end
+
+    def add_measure(measure_dir)
+      @model_maker.add_measure(measure_dir)
     end
 
     private

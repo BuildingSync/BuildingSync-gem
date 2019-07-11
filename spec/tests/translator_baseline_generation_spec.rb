@@ -34,11 +34,6 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative './../spec_helper'
-
-require 'fileutils'
-require 'parallel'
-
 RSpec.describe 'BuildingSync' do
   it 'should parse and write building_151.xml (phase zero) with auc namespace for Title24' do
     test_baseline_creation('building_151.xml', CA_TITLE24)
@@ -84,4 +79,3 @@ RSpec.describe 'BuildingSync' do
     test_baseline_creation('Golden Test File.xml', ASHRAE90_1)
   end
 end
-

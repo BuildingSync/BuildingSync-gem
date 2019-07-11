@@ -67,6 +67,10 @@ module BuildingSync
       end
     end
 
+    def add_measure(measure_dir)
+      add_new_measure(@workflow, measure_dir)
+    end
+
     def configure_for_scenario(osw, scenario)
       measure_ids = []
       scenario.elements.each("#{@ns}:ScenarioType/#{@ns}:PackageOfMeasures/#{@ns}:MeasureIDs/#{@ns}:MeasureID") do |measure_id|
@@ -206,7 +210,7 @@ module BuildingSync
           # Heating System
           if measure_category == 'Heating System'
             # Heating System / OtherHVAC
-            if defined? (measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text)
+            if defined? measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
               measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
               # Heating System / OtherHVAC / Replace burner
               if measure_name == 'Replace burner'
@@ -223,7 +227,7 @@ module BuildingSync
             end
 
             # Heating System / BoilerPlantImprovements
-            if defined? (measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BoilerPlantImprovements/#{@ns}:MeasureName"].text)
+            if defined? measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BoilerPlantImprovements/#{@ns}:MeasureName"].text
               measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BoilerPlantImprovements/#{@ns}:MeasureName"].text
               # Heating System / BoilerPlantImprovements / Replace boiler
               if measure_name == 'Replace boiler'
@@ -530,7 +534,7 @@ module BuildingSync
           File.open(path, 'w') do |file|
             file << JSON.generate(osw)
           end
-        rescue => e
+        rescue StandardError => e
           puts "Could not configure for scenario #{scenario_name}"
           puts e.backtrace.join("\n\t")
         end
@@ -588,8 +592,6 @@ module BuildingSync
         File.open(path, 'r') do |file|
           results[scenario_name] = JSON.parse(file.read, symbolize_names: true)
         end
-
-
       end
 
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
@@ -733,6 +735,5 @@ module BuildingSync
     def failed_scenarios
       return @failed_scenarios
     end
-
   end
 end

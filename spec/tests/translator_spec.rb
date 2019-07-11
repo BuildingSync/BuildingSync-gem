@@ -34,23 +34,34 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative './../spec_helper'
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
-  end
+require 'fileutils'
+require 'parallel'
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
-  end
+RSpec.describe 'BuildingSync' do
+  it 'should add a new measure' do
+    xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
 
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+    out_path = File.expand_path('./../output/building_151/', File.dirname(__FILE__))
+
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    # expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    epw_file_path = nil
+
+    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, CA_TITLE24)
+    translator.add_measure('scale_geometry')
+    translator.write_osm
+    translator.write_osws
+    osw_files = []
+    Dir.glob("#{out_path}/Baseline/in.osw") { |osw| osw_files << osw }
+    run_scenario_simulations(osw_files)
   end
 end
