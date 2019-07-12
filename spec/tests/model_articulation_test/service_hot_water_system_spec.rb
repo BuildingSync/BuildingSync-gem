@@ -35,22 +35,12 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
-  end
-
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
-  end
-
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+RSpec.describe 'ServiceHotWaterSystemSpec' do
+  it 'Should add successfully Service hot water system' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref Pre-1980')
+    serviceHotWaterSystem = BuildingSync::ServiceHotWaterSystem.new
+    puts 'expected : true but got: false} ' if serviceHotWaterSystem.add(model, standard, false) != true
+    expect(serviceHotWaterSystem.add(model, standard, false)).to be true
   end
 end

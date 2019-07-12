@@ -34,23 +34,25 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative './../spec_helper'
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
+require 'fileutils'
+require 'parallel'
+
+RSpec.describe 'BuildingSync' do
+  it 'should parse the building_151.xml (phase zero) with auc namespace for CA Title 24 and generate baseline and scenarios' do
+    test_baseline_and_scenario_creation('building_151.xml', 30)
   end
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
+  it 'should parse the DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
+    test_baseline_and_scenario_creation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw')
   end
 
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with CA Title 24 and generate baseline and scenarios' do
+    test_baseline_and_scenario_creation('BuildingSync Website Valid Schema.xml', 30, CA_TITLE24, 'CZ01RV2.epw')
+  end
+
+  it 'should parse the Golden Test File.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
+    test_baseline_and_scenario_creation('Golden Test File.xml', 1, ASHRAE90_1, 'CZ01RV2.epw')
   end
 end

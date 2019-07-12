@@ -58,16 +58,15 @@ module BuildingSync
 
       @hash_response = JSON.parse(response.read_body)
       p @hash_response
-
     end
 
     def validate_use_case
-
       if !@hash_response['validation_results']['use_cases']['BRICR']['valid']
         @hash_response['validation_results']['use_cases']['BRICR']['errors'].each do |error|
           p "#{error['path']} => #{error['message']}"
         end
       end
+
       return @hash_response['validation_results']['use_cases']['BRICR']['valid']
     end
 
@@ -77,6 +76,7 @@ module BuildingSync
           p error['message']
         end
       end
+
       return @hash_response['validation_results']['schema']['valid']
     end
 
@@ -85,8 +85,8 @@ module BuildingSync
     end
 
     def get_ASHRAE_211_Level
-      return 0
       # or 1 or 2 or 3
+      return 0
     end
   end
 end

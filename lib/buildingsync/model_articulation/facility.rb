@@ -49,69 +49,76 @@ module BuildingSync
     include OsLib_Geometry
 
     # initialize
-    def initialize(facility_xml, standard_to_be_used, ns)
+    def initialize(facility_xml, ns)
       # code to initialize
       # an array that contains all the sites
       @sites = []
 
       # reading the xml
-      read_xml(facility_xml, standard_to_be_used, ns)
+      read_xml(facility_xml, ns)
     end
 
     # adding a site to the facility
-    def read_xml(facility_xml, standard_to_be_used, ns)
-      # puts facility_xml.to_a
+    def read_xml(facility_xml, ns)
       facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-        @sites.push(Site.new(site_element, standard_to_be_used, ns))
+        @sites.push(Site.new(site_element, ns))
       end
+    end
+
+    def determine_open_studio_standard(standard_to_be_used)
+      return @sites[0].determine_open_studio_standard(standard_to_be_used)
     end
 
     # generating the OpenStudio model based on the imported BuildingSync Data
-    def generate_baseline_osm(epw_file_path, standard_to_be_used)
+    def generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)
       if @sites.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', 'There are no sites attached to this facility in your BuildingSync file.')
         raise 'There are no sites attached to this facility in your BuildingSync file.'
-      else if @sites.count > 1
-             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file.")
-             raise "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file."
-           else
-             OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.generate_baseline_osm', "Info: There is/are #{@sites.count} sites in this facility.")
-           end
+      elsif @sites.count > 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file.")
+        raise "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file."
+      else
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.generate_baseline_osm', "Info: There is/are #{@sites.count} sites in this facility.")
       end
       @sites[0].generate_baseline_osm(epw_file_path, standard_to_be_used)
 
-      create_building_systems(@sites[0].get_model, @sites[0].get_building_template, @sites[0].get_system_type, @sites[0].get_climate_zone, 'Forced Air')
+      create_building_systems(output_path)
+      return true
     end
 
-    def create_building_systems(model, template, system_type, climate_zone, hvac_delivery_type)
-      add_space_type_loads = true
-      add_constructions = true
-      add_elevators = false
-      add_exterior_lights = false
+    def get_sites
+      return @sites
+    end
+
+    def determine_open_studio_system_standard
+      return @sites[0].determine_open_studio_system_standard
+    end
+
+    def create_building_systems(output_path, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity',
+                                add_space_type_loads = true, add_constructions = true, add_elevators = false, add_exterior_lights = false,
+                                add_exhaust = true, add_swh = true, add_hvac = true, add_thermostat = true, remove_objects = false)
+      model = @sites[0].get_model
+      template = @sites[0].get_building_template
+      system_type = @sites[0].get_system_type
+      climate_zone = @sites[0].get_climate_zone
+
       onsite_parking_fraction = 1.0
       exterior_lighting_zone = '3 - All Other Areas'
-      add_exhaust = true
-      add_swh = true
-      add_hvac = true
-      htg_src = 'NaturalGas'
-      clg_src = 'Electricity'
-      remove_objects = false
-      add_thermostat = true
 
       initial_objects = model.getModelObjects.size
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
 
       load_system = LoadsSystem.new
-      hvacSystem = HVACSystem.new
+      hvac_system = HVACSystem.new
 
-      # Make the standard applier
-      standard = Standard.build(template)
+      # Make the open_studio_system_standard applier
+      open_studio_system_standard = determine_open_studio_system_standard
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Building Standard with template: #{template}.")
 
       # add internal loads to space types
       if add_space_type_loads
-        load_system.add_internal_loads(model, standard, template, remove_objects)
+        load_system.add_internal_loads(model, open_studio_system_standard, template, remove_objects)
       end
 
       # identify primary building type (used for construction, and ideally HVAC as well)
@@ -130,38 +137,38 @@ module BuildingSync
         end
       end
       primary_bldg_type = building_types.key(building_types.values.max) # TODO: - this fails if no space types, or maybe just no space types with standards
-      lookup_building_type = standard.model_get_lookup_name(primary_bldg_type) # Used for some lookups in the standards gem
+      lookup_building_type = open_studio_system_standard.model_get_lookup_name(primary_bldg_type) # Used for some lookups in the standards gem
       model.getBuilding.setStandardsBuildingType(primary_bldg_type)
 
       envelopeSystem = nil
       # make construction set and apply to building
       if add_constructions
         envelopeSystem = EnvelopeSystem.new
-        envelopeSystem.create(model, standard, primary_bldg_type, lookup_building_type, remove_objects)
+        envelopeSystem.create(model, open_studio_system_standard, primary_bldg_type, lookup_building_type, remove_objects)
       end
 
       # add elevators (returns ElectricEquipment object)
       if add_elevators
-        load_system.add_elevator(model, standard)
+        load_system.add_elevator(model, open_studio_system_standard)
       end
 
       # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
       if add_exterior_lights
-        load_system.add_exterior_lights(model, standard, remove_objects)
+        load_system.add_exterior_lights(model, open_studio_system_standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
       end
 
       # add_exhaust
       if add_exhaust
-        hvacSystem.add_exhaust(model, standard, 'Adjacent', remove_objects)
+        hvac_system.add_exhaust(model, open_studio_system_standard, 'Adjacent', remove_objects)
       end
 
       # add service water heating demand and supply
       if add_swh
         serviceHotWaterSystem = ServiceHotWaterSystem.new
-        serviceHotWaterSystem.add(model, standard, remove_objects)
+        serviceHotWaterSystem.add(model, open_studio_system_standard, remove_objects)
       end
 
-      load_system.add_daylighting_controls(model, standard, template)
+      load_system.add_day_lighting_controls(model, open_studio_system_standard, template)
 
       # TODO: - add refrigeration
       # remove refrigeration equipment
@@ -184,12 +191,12 @@ module BuildingSync
       # works by switching some fraction of electric loads to gas if requested (assuming base load is electric)
       # add thermostats
       if add_thermostat
-        hvacSystem.add_thermostats(model, standard, remove_objects)
+        hvac_system.add_thermostats(model, open_studio_system_standard, remove_objects)
       end
 
       # add hvac system
       if add_hvac
-        hvacSystem.add_hvac(model, standard, system_type, remove_objects)
+        hvac_system.add_hvac(model, open_studio_system_standard, system_type, hvac_delivery_type, htg_src, clg_src, remove_objects)
       end
 
       # TODO: - hours of operation customization (initially using existing measure downstream of this one)
@@ -197,7 +204,7 @@ module BuildingSync
 
       # set hvac controls and efficiencies (this should be last model articulation element)
       if add_hvac
-        hvacSystem.apply_sizing_and_assumptions(model, standard, primary_bldg_type, system_type, climate_zone)
+        hvac_system.apply_sizing_and_assumptions(model, output_path, open_studio_system_standard, primary_bldg_type, system_type, climate_zone)
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)

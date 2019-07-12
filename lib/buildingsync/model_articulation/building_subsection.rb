@@ -42,30 +42,21 @@ module BuildingSync
     include OpenstudioStandards
 
     # initialize
-    def initialize(subsection_element, standard_template, occ_type, bldg_total_floor_area, ns)
+    def initialize(subsection_element, occ_type, bldg_total_floor_area, ns)
       @subsection_element = nil
-      @standard = nil
       @fraction_area = nil
       @bldg_type = {}
-      @space_types = {}
-      @space_types_floor_area = {}
       # code to initialize
-      read_xml(subsection_element, standard_template, occ_type, bldg_total_floor_area, ns)
+      read_xml(subsection_element, occ_type, bldg_total_floor_area, ns)
     end
 
-    def read_xml(subsection_element, standard_template, occ_type, bldg_total_floor_area, ns)
+    def read_xml(subsection_element, occ_type, bldg_total_floor_area, ns)
       # floor areas
       @total_floor_area = read_floor_areas(subsection_element, bldg_total_floor_area, ns)
       # based on the occupancy type set building type, system type and bar division method
       read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
 
-      @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
-
       @subsection_element = subsection_element
-
-      # Make the standard applier
-      @standard = Standard.build("#{standard_template}_#{@bldg_type}")
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSubsection.read_xml', "Building Standard with template: #{standard_template}_#{@bldg_type}")
     end
 
     def read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)

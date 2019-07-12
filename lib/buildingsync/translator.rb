@@ -41,8 +41,8 @@ require_relative 'makers/model_maker_level_zero'
 require_relative 'makers/workflow_maker_phase_zero'
 require_relative 'selection_tool'
 
-ASHRAE90_1 = 'ASHRAE90.1'
-CA_TITLE24 = 'CaliforniaTitle24'
+ASHRAE90_1 = 'ASHRAE90.1'.freeze
+CA_TITLE24 = 'CaliforniaTitle24'.freeze
 
 module BuildingSync
   class Translator
@@ -56,6 +56,8 @@ module BuildingSync
       @standard_to_be_used = standard_to_be_used
       @epw_path = epw_file_path
 
+      # to further reduce the log messages we can change the log level with this command
+      # OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Error)
       # Open a log for the library
       logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
       logFile.setLogLevel(OpenStudio::Info)
@@ -75,7 +77,7 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
           puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
         end
-      rescue
+      rescue StandardError
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
       end
 
@@ -108,6 +110,14 @@ module BuildingSync
 
     def write_osws
       @model_maker.write_osws(@output_dir)
+    end
+
+    def add_measure(measure_dir)
+      @model_maker.add_measure(measure_dir)
+    end
+
+    def get_workflow
+      @model_maker.get_workflow
     end
 
     private

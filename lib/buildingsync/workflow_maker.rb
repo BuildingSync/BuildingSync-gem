@@ -58,6 +58,24 @@ module BuildingSync
       end
     end
 
+    def set_measure_path(osw, measures_dir)
+      osw['measure_paths'] = [measures_dir]
+    end
+
+    def set_measure_paths(osw, measures_dir_array)
+      osw['measure_paths'] = measures_dir_array
+    end
+
+    def add_measure_path(osw, measures_dir)
+      osw['measure_paths'].each do |dir|
+        if dir == measures_dir
+          return false
+        end
+      end
+      osw['measure_paths'] << measures_dir
+      return true
+    end
+
     def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
       result = false
       osw['steps'].each do |step|
@@ -72,6 +90,21 @@ module BuildingSync
       end
 
       return result
+    end
+
+    def add_new_measure(osw, measure_dir_name)
+      # first we check if the measure already exists
+      osw['steps'].each do |step|
+        if step['measure_dir_name'] == measure_dir_name
+          return false
+        end
+      end
+      # if it does not exist we add it
+      new_step = {}
+      new_step['measure_dir_name'] = measure_dir_name
+      # TODO: what about arguments to measures, need to add an option to also set arguments and their values
+      osw['steps'].unshift(new_step)
+      return true
     end
   end
 end

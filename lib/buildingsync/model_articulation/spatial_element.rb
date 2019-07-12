@@ -41,12 +41,14 @@ require 'json'
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpatialElement
-    include OpenStudio
     def initialize
       @total_floor_area = nil
       @bldg_type = nil
       @system_type = nil
       @bar_division_method = nil
+      @space_types = {}
+      @fraction_area = nil
+      @space_types_floor_area = nil
     end
 
     def read_floor_areas(build_element, parent_total_floor_area, ns)
@@ -117,53 +119,61 @@ module BuildingSync
         elsif occupancy_type == 'StripMall'
           @bldg_type = 'RetailStripmall'
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat' # Two speed DX AC
         elsif occupancy_type == 'PrimarySchool'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PVAV with reheat'
         elsif occupancy_type == 'SecondarySchool'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'VAV with reheat'
         elsif occupancy_type == 'Outpatient'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PVAV with reheat'
         elsif occupancy_type == 'Hospital'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'VAV with reheat'
         elsif occupancy_type == 'SmallHotel'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PTAC with electric baseboard heat'
         elsif occupancy_type == 'LargeHotel'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'VAV with reheat'
         elsif occupancy_type == 'QuickServiceRestaurant'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat'
         elsif occupancy_type == 'FullServiceRestaurant'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat'
         elsif occupancy_type == 'MidriseApartment'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat'
         elsif occupancy_type == 'HighriseApartment'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-HP'
         elsif occupancy_type == 'Warehouse'
           @bldg_type = occupancy_type
           @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
+          @system_type = 'PSZ-AC with gas coil heat'
         elsif occupancy_type == 'SuperMarket'
           @bldg_type = occupancy_type
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'PSZ-AC with gas coil heat'
+        elsif occupancy_type == 'Lodging'
+          @bldg_type = 'MidriseApartment'
+          @bar_division_method = 'Single Space Type - Core and Perimeter'
+          @system_type = 'PSZ-AC with gas coil heat'
+        elsif occupancy_type == 'Laboratory-Testing'
+          @bldg_type = 'Laboratory'
           @bar_division_method = 'Single Space Type - Core and Perimeter'
           @system_type = 'tbd'
         else
@@ -193,15 +203,23 @@ module BuildingSync
     end
 
     # create space types
-    def create_space_types(model, total_bldg_floor_area, standard_template, bldg_type)
+    def create_space_types(model, total_bldg_floor_area, standard_template, open_studio_standard)
       # create space types from subsection type
-      # mapping building_type name is needed for a few methods
-      if @standard.nil?
-        @standard = Standard.build("#{standard_template}_#{bldg_type}")
+      # mapping lookup_name name is needed for a few methods
+      if @bldg_type.nil?
+        set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false)
       end
-      building_type = @standard.model_get_lookup_name(@occupancy_type)
+      if open_studio_standard.nil?
+        open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
+      end
+      lookup_name = open_studio_standard.model_get_lookup_name(@occupancy_type)
+      puts " Building type: #{lookup_name} selected for occupancy type: #{@occupancy_type}"
+
+      @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
+      puts " Space types: #{@space_types} selected for building type: #{@bldg_type} and standard template: #{standard_template}"
       # create space_type_map from array
       sum_of_ratios = 0.0
+
       @space_types.each do |space_type_name, hash|
         # create space type
         space_type = OpenStudio::Model::SpaceType.new(model)
@@ -210,9 +228,9 @@ module BuildingSync
         space_type.setName("#{@occupancy_type} #{space_type_name}")
 
         # set color
-        test = @standard.space_type_apply_rendering_color(space_type) # this uses openstudio-standards
+        test = open_studio_standard.space_type_apply_rendering_color(space_type) # this uses openstudio-standards
         if !test
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm',"Warning: Could not find color for #{space_type.name}")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', "Warning: Could not find color for #{space_type.name}")
         end
         # extend hash to hold new space type object
         hash[:space_type] = space_type
@@ -224,10 +242,11 @@ module BuildingSync
       # store multiplier needed to adjust sum of ratios to equal 1.0
       @ratio_adjustment_multiplier = 1.0 / sum_of_ratios
 
+      @space_types_floor_area = {}
       @space_types.each do |space_type_name, hash|
-        ratio_of_bldg_total = hash[:ratio] * @ratio_adjustment_multiplier * fraction_area
+        ratio_of_bldg_total = hash[:ratio] * @ratio_adjustment_multiplier * @fraction_area
         final_floor_area = ratio_of_bldg_total * total_bldg_floor_area # I think I can just pass ratio but passing in area is cleaner
-        @space_types_floor_area[hash[:space_type]] = {floor_area: final_floor_area }
+        @space_types_floor_area[hash[:space_type]] = { floor_area: final_floor_area }
       end
       return @space_types_floor_area
     end

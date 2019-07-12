@@ -35,18 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 module BuildingSync
-    class BuildingSystem
-      #
-
-      # initialize
-      def initialize(building_system_xml)
-        # code to initialize
-      end
-
-      # create system
-      def create
-        # creating the typical system
-      end
-    end
+  class BuildingSystem
+    # TODO: - Do we need this class to share functionality of the system
+  end
 end
-

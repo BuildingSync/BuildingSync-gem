@@ -36,17 +36,6 @@
 # *******************************************************************************
 module BuildingSync
   class HVACSystem < BuildingSystem
-
-    # initialize
-    def initialize
-      # code to initialize
-    end
-
-    # create system
-    def create
-      # creating the typical HVAC systems
-    end
-
     def add_exhaust(model, standard, kitchen_makeup, remove_objects)
       # remove exhaust objects
       if remove_objects
@@ -65,6 +54,7 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_exhaust', "Adding #{OpenStudio.toNeatString(max_flow_rate_ip, 0, true)} (cfm) of exhaust to #{k.thermalZone.get.name}")
         end
       end
+      return true
     end
 
     def add_thermostats(model, standard, remove_objects)
@@ -82,17 +72,20 @@ module BuildingSync
         # identify thermal thermostat and apply to zones (apply_internal_load_schedules names )
         model.getThermostatSetpointDualSetpoints.each do |thermostat|
           next if !thermostat.name.to_s.include?(space_type.name.to_s)
+
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_thermostats', "Assigning #{thermostat.name} to thermal zones with #{space_type.name} assigned.")
           space_type.spaces.each do |space|
             next if !space.thermalZone.is_initialized
+
             space.thermalZone.get.setThermostatSetpointDualSetpoint(thermostat)
           end
           next
         end
       end
+      return true
     end
 
-    def add_hvac(model, standard, system_type, remove_objects)
+    def add_hvac(model, standard, system_type, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity', remove_objects = false)
       # remove HVAC objects
       if remove_objects
         standard.model_remove_prm_hvac(model)
@@ -166,9 +159,10 @@ module BuildingSync
         end
 
       end
+      return true
     end
 
-    def apply_sizing_and_assumptions(model, standard, primary_bldg_type, system_type, climate_zone)
+    def apply_sizing_and_assumptions(model, output_path, standard, primary_bldg_type, system_type, climate_zone)
       case system_type
       when 'Ideal Air Loads'
 
@@ -177,7 +171,7 @@ module BuildingSync
         standard.model_apply_prm_sizing_parameters(model)
 
         # Perform a sizing run
-        if standard.model_run_sizing_run(model, "#{Dir.pwd}/SR1") == false
+        if standard.model_run_sizing_run(model, "#{output_path}/SR") == false
           return false
         end
 
@@ -192,6 +186,7 @@ module BuildingSync
         # Apply the HVAC efficiency standard
         standard.model_apply_hvac_efficiency_standard(model, climate_zone)
       end
+      return true
     end
   end
 end

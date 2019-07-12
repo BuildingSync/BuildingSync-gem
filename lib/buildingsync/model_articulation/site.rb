@@ -37,22 +37,27 @@
 require_relative 'building'
 module BuildingSync
   class Site < SpatialElement
-
     # initialize
-    def initialize(build_element, standard_to_be_used, ns)
+    def initialize(build_element, ns)
       # code to initialize
       # an array that contains all the buildings
       @buildings = []
+      @largest_building = nil
       @climate_zone = nil
       @climate_zone_ashrae = nil
       @climate_zone_ca_t24 = nil
       @weather_file_name = nil
+      @weather_station_id = nil
+      @city_name = nil
+      @state_name = nil
+      @latitude = nil
+      @longitude = nil
       # TM: just use the XML snippet to search for the buildings on the site
-      read_xml(build_element, standard_to_be_used, ns)
+      read_xml(build_element, ns)
     end
 
     # adding a site to the facility
-    def read_xml(build_element, standard_to_be_used, ns)
+    def read_xml(build_element, ns)
       # check occupancy type at the site level
       @occupancy_type = read_occupancy_type(build_element, nil, ns)
       # check floor areas at the site level
@@ -61,17 +66,17 @@ module BuildingSync
       read_climate_zone(build_element, ns)
       # read in the weather station name
       read_weather_file_name(build_element, ns)
+      # read city and state name
+      read_city_and_state_name(build_element, ns)
+      # read latitude and longitude
+      read_latitude_and_longitude(build_element, ns)
       # code to create a building
       build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
-        @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, standard_to_be_used, ns))
+        @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, ns))
       end
       if @buildings.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
         raise 'Error: There is no building attached to this site in your BuildingSync file.'
-      else if @buildings.count > 1
-             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
-             raise "Error: There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file."
-           end
       end
     end
 
@@ -94,23 +99,62 @@ module BuildingSync
       else
         @weather_file_name = nil
       end
+      if build_element.elements["#{ns}:WeatherDataStationID"]
+        @weather_station_id = build_element.elements["#{ns}:WeatherDataStationID"].text
+      else
+        @weather_station_id = nil
+      end
+    end
+
+    def read_city_and_state_name(build_element, ns)
+      if build_element.elements["#{ns}:Address/#{ns}:City"]
+        @city_name = build_element.elements["#{ns}:Address/#{ns}:City"].text
+      else
+        @city_name = nil
+      end
+      if build_element.elements["#{ns}:Address/#{ns}:State"]
+        @state_name = build_element.elements["#{ns}:Address/#{ns}:State"].text
+      else
+        @state_name = nil
+      end
+    end
+
+    def read_latitude_and_longitude(build_element, ns)
+      if build_element.elements["#{ns}:Latitude"]
+        @latitude = build_element.elements["#{ns}:Latitude"].text
+      else
+        @latitude = nil
+      end
+      if build_element.elements["#{ns}:Longitude"]
+        @longitude = build_element.elements["#{ns}:Longitude"].text
+      else
+        @longitude = nil
+      end
     end
 
     def get_model
-      return @buildings[0].get_model
+      return get_largest_building.get_model
+    end
+
+    def determine_open_studio_standard(standard_to_be_used)
+      return get_largest_building.determine_open_studio_standard(standard_to_be_used)
+    end
+
+    def determine_open_studio_system_standard
+      return Standard.build(get_building_template)
     end
 
     def get_building_template
-      return @buildings[0].get_building_template
+      return get_largest_building.get_building_template
     end
 
     def get_system_type
-      return @buildings[0].get_system_type
+      return get_largest_building.get_system_type
     end
 
     def get_building_type
       if @bldg_type.nil?
-        return @buildings[0].get_building_type
+        return get_largest_building.get_building_type
       else
         return @bldg_type
       end
@@ -120,22 +164,47 @@ module BuildingSync
       return @climate_zone
     end
 
-    def generate_baseline_osm(epw_file_path, standard_to_be_used)
-      @buildings.each do |building|
-        @climate_zone = @climate_zone_ashrae
-        # for now we use the california climate zone if it is available
-        if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
-          @climate_zone = @climate_zone_ca_t24
+    def get_building_objects
+      return @buildings
+    end
+
+    def get_largest_building
+      if !@largest_building.nil?
+        return @largest_building
+      else
+        if @buildings.count == 1
+          return @buildings[0]
+        elsif @buildings.count > 1
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
+          @largest_building = nil
+          largest_floor_area = -Float::INFINITY
+          @buildings.each do |building|
+            if largest_floor_area < building.total_floor_area
+              largest_floor_area = building.total_floor_area
+              @largest_building = building
+            end
+          end
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Site.generate_baseline_osm', "The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) was selected.")
+          puts "BuildingSync.Site.generate_baseline_osm: The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) m^2 was selected."
+          return @largest_building
         end
-        building.set_weater_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used)
-        building.generate_baseline_osm(standard_to_be_used)
       end
     end
 
-    def write_osm(dir)
-      @buildings.each do |building|
-        building.write_osm(dir)
+    def generate_baseline_osm(epw_file_path, standard_to_be_used)
+      building = get_largest_building
+      @climate_zone = @climate_zone_ashrae
+      # for now we use the california climate zone if it is available
+      if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
+        @climate_zone = @climate_zone_ca_t24
       end
+      building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude, @weather_file_name, @weather_station_id, @state_name, @city_name)
+      building.generate_baseline_osm(standard_to_be_used)
+    end
+
+    def write_osm(dir)
+      building = get_largest_building
+      building.write_osm(dir)
       scenario_types = {}
       scenario_types['system_type'] = get_system_type
       scenario_types['bldg_type'] = get_building_type
@@ -144,4 +213,3 @@ module BuildingSync
     end
   end
 end
-

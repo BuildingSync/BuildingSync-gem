@@ -1,0 +1,15 @@
+<!-- edited with XMLSpy v2016 rel. 2 sp1 (x64) (http://www.altova.com) by Dan Macumber (NREL) -->
+<auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://cdn.rawgit.com/BuildingSync/schema/develop/BuildingSync.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<auc:Facilities>
+		<auc:Facility>
+			<auc:Sites>
+				<auc:Site>
+					<auc:Buildings>
+						<auc:Building ID="Building151">
+						</auc:Building>
+					</auc:Buildings>
+				</auc:Site>
+			</auc:Sites>
+		</auc:Facility>
+	</auc:Facilities>
+</auc:BuildingSync>

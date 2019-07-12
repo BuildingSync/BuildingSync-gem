@@ -1,5 +1,5 @@
 {
-	"seed_file": "in.osw",
+	"seed_file": "../in.osm",
 	"weather_file": null,
 	"root_directory": null,
 	"run_directory": null,

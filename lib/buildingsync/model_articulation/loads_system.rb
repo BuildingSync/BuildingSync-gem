@@ -50,6 +50,7 @@ module BuildingSync
           next if instance.name.to_s.include?('Elevator') # most prototype building types model exterior elevators with name Elevator
           next if instance.to_InternalMass.is_initialized
           next if instance.to_WaterUseEquipment.is_initialized
+
           instance.remove
         end
         model.getDesignSpecificationOutdoorAirs.each(&:remove)
@@ -77,17 +78,20 @@ module BuildingSync
       spaces_without_space_types = []
       model.getSpaces.each do |space|
         next if space.spaceType.is_initialized
+
         spaces_without_space_types << space
       end
       if !spaces_without_space_types.empty?
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "#{spaces_without_space_types.size} spaces do not have space types assigned, and wont' receive internal loads from standards space type lookups.")
       end
+      return true
     end
 
-    def add_exterior_lights(model, standard, remove_objects)
+    def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
       if remove_objects
         model.getExteriorLightss.each do |ext_light|
           next if ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name
+
           ext_light.remove
         end
       end
@@ -96,16 +100,19 @@ module BuildingSync
       exterior_lights.each do |k, v|
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding Exterior Lights named #{v.exteriorLightsDefinition.name} with design level of #{v.exteriorLightsDefinition.designLevel} * #{OpenStudio.toNeatString(v.multiplier, 0, true)}.")
       end
+      return true
     end
 
     def add_elevator(model, standard)
       # remove elevators as spaceLoads or exteriorLights
       model.getSpaceLoads.each do |instance|
         next if !instance.name.to_s.include?('Elevator') # most prototype building types model exterior elevators with name Elevator
+
         instance.remove
       end
       model.getExteriorLightss.each do |ext_light|
         next if !ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name
+
         ext_light.remove
       end
 
@@ -117,9 +124,10 @@ module BuildingSync
         design_level = elevator_def.designLevel.get
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{elevators.multiplier.round(1)} elevators each with power of #{OpenStudio.toNeatString(design_level, 0, true)} (W), plus lights and fans.")
       end
+      return true
     end
 
-    def add_daylighting_controls(model, standard, template)
+    def add_day_lighting_controls(model, standard, template)
       # add daylight controls, need to perform a sizing run for 2010
       if template == '90.1-2010'
         if standard.model_run_sizing_run(model, "#{Dir.pwd}/SRvt") == false
@@ -127,6 +135,7 @@ module BuildingSync
         end
       end
       standard.model_add_daylighting_controls(model)
+      return true
     end
   end
 end

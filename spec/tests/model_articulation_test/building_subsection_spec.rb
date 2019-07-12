@@ -35,22 +35,43 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
+RSpec.describe 'BuildingSpec' do
+  it 'Should generate meaningful error when passing empty XML data' do
+    begin
+      generate_baseline('building_151_Blank', nil, nil, 'auc')
+    rescue StandardError => e
+      puts "expected error message:Building type '' is nil but got: #{e.message} " if !e.message.include?("Building type '' is nil")
+      expect(e.message.include?("Building type '' is nil")).to be true
+    end
   end
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
+  def generate_baseline(file_name, occupancy_type, total_floor_area, ns)
+    sub_sections = []
+    xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    doc = create_xml_file_object(xml_path)
+    building_xml = create_building_object(doc, ns)
+
+    building_xml.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |building_element|
+      sub_sections.push(BuildingSync::BuildingSubsection.new(building_element, occupancy_type, total_floor_area, ns))
+    end
+    return sub_sections
   end
 
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+  def create_building_object(doc, ns)
+    buildings = []
+    doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building_xml|
+      buildings.push(building_xml)
+    end
+    return buildings[0]
+  end
+
+  def create_xml_file_object(xml_file_path)
+    doc = nil
+    File.open(xml_file_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+    end
+    return doc
   end
 end

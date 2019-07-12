@@ -34,23 +34,54 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative '../../../lib/buildingsync/get_bcl_weather_file'
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
+RSpec.describe 'WeatherFileDownload' do
+  it 'weather file download from the nrel site with the help of state and city name' do
+    state, city = get_state_and_city_name('building_151', 'auc')
+    epw_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state, city)
+
+    check_weather_file_exist(epw_path)
   end
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
+  it 'weather file download from the nrel site  with the help of weather station ID' do
+    weather_id = get_weather_id('building_151', 'auc')
+    epw_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_id)
+
+    check_weather_file_exist(epw_path)
   end
 
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+  def check_weather_file_exist(epw_path)
+    # check weather file exist or not
+    expect(File.exist?(epw_path)).to be true
+
+    epw_path['.epw'] = '.ddy'
+
+    # check design day file exist or not
+    expect(File.exist?(epw_path)).to be true
+  end
+
+  def get_state_and_city_name(file_name, ns)
+    doc = get_xml_object(file_name)
+
+    address_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
+
+    city = address_element.elements["#{ns}:Address/#{ns}:City"].text
+    state = address_element.elements["#{ns}:Address/#{ns}:State"].text
+    return state, city
+  end
+
+  def get_weather_id(file_name, ns)
+    doc = get_xml_object(file_name)
+    site_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
+
+    return site_element.elements["#{ns}:WeatherDataStationID"].text
+  end
+
+  def get_xml_object(file_name)
+    @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
+    expect(File.exist?(@xml_path)).to be true
+
+    return create_xml_file_object(@xml_path)
   end
 end
