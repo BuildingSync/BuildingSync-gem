@@ -119,7 +119,17 @@ module BuildingSync
           return false
         end
 
-        epw_path = component.files('epw')[0]
+        epw_weather_file_path = component.files('epw')[0]
+        dir_path = File.dirname(epw_weather_file_path)
+        weather_file_name = File.basename(epw_weather_file_path)
+
+        epw_path = File.expand_path('../../spec/weather', File.dirname(__FILE__))
+
+        Dir.glob("#{dir_path}/**/*.*").each do |filename|
+          FileUtils.mv(filename, epw_path)
+        end
+        epw_path = File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
+
       end
 
       puts "Successfully set weather file to #{epw_path}"
@@ -156,7 +166,7 @@ module BuildingSync
           end
         else
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_design_day_file',
-                             "Error, cannot find local component for: #{choice}.  Please try a different weather file.")
+                             "Error, cannot find local component for: #{uid}.  Please try a different weather file.")
         end
       end
       create_ddy_file(idf_path_collection, epw_path)
