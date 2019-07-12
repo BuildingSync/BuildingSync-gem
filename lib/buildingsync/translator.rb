@@ -116,6 +116,10 @@ module BuildingSync
       @model_maker.add_measure(measure_dir)
     end
 
+    def get_workflow
+      @model_maker.get_workflow
+    end
+
     private
 
     def choose_model_maker
