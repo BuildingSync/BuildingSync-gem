@@ -32,6 +32,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'json'
 
 module BuildingSync
   class GetBCLWeatherFile
@@ -181,14 +182,40 @@ module BuildingSync
       end
 
       design_day_path = File.dirname(epw_path)
-      weather_file_name = File.basename(epw_path, '.*')
+      weather_file_name = File.basename(epw_path)
       design_day_file = File.new("#{design_day_path}/#{weather_file_name}.ddy", 'w')
 
       idf_file_lines.each do |line|
         design_day_file.puts(line)
       end
 
+      update_jsone_file(epw_path)
+
       design_day_file.close
+    end
+
+    def update_jsone_file(epw_path)
+      location = []
+      weather_file = File.open(epw_path)
+      location = weather_file.readlines.first.split(',')
+
+      weather_file_name = File.basename(epw_path)
+      city_name = location[1]
+      state_code = location[2]
+      weather_id = location[5]
+
+      weather_detail = {
+        'weather_file_name' => weather_file_name,
+        'city_name' => city_name,
+        'state_code' => state_code,
+        'weather_id' => weather_id
+      }
+
+      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+
+      File.open(weather_file_path,"w") do |f|
+        f.write(weather_detail.to_json)
+      end
     end
 
     def find_response_from_given_state(responses, state)
