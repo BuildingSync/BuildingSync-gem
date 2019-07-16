@@ -178,6 +178,8 @@ module BuildingSync
           else
             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_design_day_file',
                                "Error, cannot find the design day file within the downloaded zip container with uid: #{uid}.  Please try a different weather file.")
+
+            raise "Error, cannot find the design day file within the downloaded zip container with uid: #{uid}.  Please try a different weather file."
           end
         else
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_design_day_file',
@@ -186,6 +188,7 @@ module BuildingSync
         end
       end
       create_ddy_file(idf_path_collection, epw_path)
+      update_json_file(epw_path)
     end
 
     def create_ddy_file(idf_path_collection, epw_path)
@@ -197,15 +200,12 @@ module BuildingSync
       end
 
       design_day_path = File.dirname(epw_path)
-      weather_file_name = File.basename(epw_path)
+      weather_file_name = File.basename(epw_path, '.*')
       design_day_file = File.new("#{design_day_path}/#{weather_file_name}.ddy", 'w')
 
       idf_file_lines.each do |line|
         design_day_file.puts(line)
       end
-
-      update_json_file(epw_path)
-
       design_day_file.close
     end
 
