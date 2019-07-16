@@ -37,35 +37,49 @@ require 'json'
 module BuildingSync
   class GetBCLWeatherFile
     def download_weather_file_from_city_name(state, city)
-      wmo_no = 0
-      remote = OpenStudio::RemoteBCL.new
 
-      # Search for weather files
-      responses = remote.searchComponentLibrary(city, 'Weather File')
-      choices = OpenStudio::StringVector.new
+      weather_file_name = get_weather_file_from_city_and_state(city)
 
-      filter_response = find_response_from_given_state(responses, state)
-      if !filter_response.nil?
-        choices << filter_response.uid
-        filter_response.attributes.each do |attribute|
-          if attribute.name == 'WMO'
-            wmo_no = attribute.valueAsDouble
+      if !weather_file_name.empty?
+        return File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
+      else
+        wmo_no = 0
+        remote = OpenStudio::RemoteBCL.new
+
+        # Search for weather files
+        responses = remote.searchComponentLibrary(city, 'Weather File')
+        choices = OpenStudio::StringVector.new
+
+        filter_response = find_response_from_given_state(responses, state)
+
+        if !filter_response.nil?
+          choices << filter_response.uid
+          filter_response.attributes.each do |attribute|
+            if attribute.name == 'WMO'
+              wmo_no = attribute.valueAsDouble
+            end
           end
         end
-      end
 
-      if choices.count == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file_from_city_name',
-                           "Error, could not find uid for state #{state} and city #{city}. Initial count of weather files: #{responses.count}. Please try a different weather file.")
-        return false
-      end
+        if choices.count == 0
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file_from_city_name',
+                             "Error, could not find uid for state #{state} and city #{city}. Initial count of weather files: #{responses.count}. Please try a different weather file.")
+          return false
+        end
 
-      epw_path = download_weather_file(remote, choices)
-      download_design_day_file(wmo_no, epw_path)
-      return epw_path
+        epw_path = download_weather_file(remote, choices)
+        download_design_day_file(wmo_no, epw_path)
+        return epw_path
+      end
     end
 
     def download_weather_file_from_weather_id(weather_id)
+
+      weather_file_name = get_weather_file_from_weatherid(weather_id)
+
+      if !weather_file_name.empty?
+        return File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
+      else
       wmo_no = 0
       remote = OpenStudio::RemoteBCL.new
 
@@ -95,6 +109,7 @@ module BuildingSync
       epw_path = download_weather_file(remote, choices)
       download_design_day_file(wmo_no, epw_path)
       return epw_path
+        end
     end
 
     def download_weather_file(remote, choices)
@@ -130,7 +145,6 @@ module BuildingSync
           FileUtils.mv(filename, epw_path)
         end
         epw_path = File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
-
       end
 
       puts "Successfully set weather file to #{epw_path}"
@@ -164,13 +178,17 @@ module BuildingSync
           else
             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_design_day_file',
                                "Error, cannot find the design day file within the downloaded zip container with uid: #{uid}.  Please try a different weather file.")
+
+            raise "Error, cannot find the design day file within the downloaded zip container with uid: #{uid}.  Please try a different weather file."
           end
         else
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_design_day_file',
                              "Error, cannot find local component for: #{uid}.  Please try a different weather file.")
+          raise "Error, cannot find local component for: #{uid}.  Please try a different weather file."
         end
       end
       create_ddy_file(idf_path_collection, epw_path)
+      update_json_file(epw_path)
     end
 
     def create_ddy_file(idf_path_collection, epw_path)
@@ -182,19 +200,16 @@ module BuildingSync
       end
 
       design_day_path = File.dirname(epw_path)
-      weather_file_name = File.basename(epw_path)
+      weather_file_name = File.basename(epw_path, '.*')
       design_day_file = File.new("#{design_day_path}/#{weather_file_name}.ddy", 'w')
 
       idf_file_lines.each do |line|
         design_day_file.puts(line)
       end
-
-      update_jsone_file(epw_path)
-
       design_day_file.close
     end
 
-    def update_jsone_file(epw_path)
+    def update_json_file(epw_path)
       location = []
       weather_file = File.open(epw_path)
       location = weather_file.readlines.first.split(',')
@@ -204,18 +219,73 @@ module BuildingSync
       state_code = location[2]
       weather_id = location[5]
 
-      weather_detail = {
-        'weather_file_name' => weather_file_name,
-        'city_name' => city_name,
-        'state_code' => state_code,
-        'weather_id' => weather_id
-      }
+      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      weather_json = eval(File.read(weather_file_path))
+
+      weather_json[:weather_file_name] << weather_file_name
+      weather_json[:city_name] << city_name
+      weather_json[:state_code] << state_code
+      weather_json[:weather_id] << weather_id
+
+      File.open(weather_file_path, 'w') { |f| f.write(weather_json.to_json) }
+
+    end
+
+    def read_json_file
+      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      File.open(weather_file_path) do |f|
+        str = f.gets
+        p str
+        # start parsing
+      end
+    end
+
+    def get_weather_file_from_weatherid(weather_id)
+      weather_file_name = ''
 
       weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      json = eval(File.read(weather_file_path))
 
-      File.open(weather_file_path,"w") do |f|
-        f.write(weather_detail.to_json)
+      is_found, counter = weatherid_found_in_json_data(json, weather_id)
+
+      weather_file_name = json[:weather_file_name][counter] if is_found
+
+      return weather_file_name
+    end
+
+    def weatherid_found_in_json_data(json, weather_id)
+      counter = 0
+      json[:weather_id].each do |cname|
+        if cname.include? weather_id
+          return true, counter
+        end
+        counter += 1
       end
+      return false, counter
+    end
+
+    def get_weather_file_from_city_and_state(city)
+      weather_file_name = ''
+
+      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      json = eval(File.read(weather_file_path))
+
+      is_found, counter = city_found_in_json_data(json, city)
+
+      weather_file_name = json[:weather_file_name][counter] if is_found
+
+      return weather_file_name
+    end
+
+    def city_found_in_json_data(json, city)
+      counter = 0
+      json[:city_name].each do |cname|
+        if cname.include? city
+          return true, counter
+        end
+        counter += 1
+      end
+      return false, counter
     end
 
     def find_response_from_given_state(responses, state)
