@@ -112,8 +112,16 @@ module BuildingSync
       @model_maker.write_osws(@output_dir)
     end
 
-    def add_measure(measure_dir)
-      @model_maker.add_measure(measure_dir)
+    def insert_energyplus_measure(measure_dir, position = 0)
+      @model_maker.insert_energyplus_measure(measure_dir, position)
+    end
+
+    def insert_model_measure(measure_dir, position = 0)
+      @model_maker.insert_model_measure(measure_dir, position)
+    end
+
+    def insert_report_measure(measure_dir, position = 0)
+      @model_maker.insert_report_measure(measure_dir, position)
     end
 
     def get_workflow

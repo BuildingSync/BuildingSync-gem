@@ -40,7 +40,7 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  it 'should add a new measure' do
+  it 'should add a new EnergyPlus measure' do
     xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -57,7 +57,7 @@ RSpec.describe 'BuildingSync' do
     epw_file_path = nil
 
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, CA_TITLE24)
-    translator.add_measure('scale_geometry')
+    translator.insert_energyplus_measure('scale_geometry', 1)
     translator.write_osm
     translator.write_osws
     osw_files = []

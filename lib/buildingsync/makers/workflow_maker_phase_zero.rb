@@ -55,20 +55,81 @@ module BuildingSync
       # select base osw for standalone, small office, medium office
       base_osw = 'phase_zero_base.osw'
 
-      common_measures_instance = OpenStudio::CommonMeasures::Extension.new
-      model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
-
       workflow_path = File.join(File.dirname(__FILE__), base_osw)
       raise "File '#{workflow_path}' does not exist" unless File.exist?(workflow_path)
 
       File.open(workflow_path, 'r') do |file|
         @workflow = JSON.parse(file.read)
-        set_measure_paths(@workflow, [common_measures_instance.measures_dir, model_articulation_instance.measures_dir])
+        set_measure_paths(@workflow, get_measure_directories_array)
       end
     end
 
-    def add_measure(measure_dir)
-      add_new_measure(@workflow, measure_dir)
+    def get_measure_directories_array
+      common_measures_instance = OpenStudio::CommonMeasures::Extension.new
+      model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir]
+    end
+
+    def insert_energyplus_measure(measure_dir, item = 0)
+      insert_measure('EnergyPlusMeasure', measure_dir, item)
+    end
+
+    def insert_report_measure(measure_dir, item = 0)
+      insert_measure('ReportMeasure', measure_dir, item)
+    end
+
+    def insert_model_measure(measure_dir, item = 0)
+      insert_measure('ModelMeasure', measure_dir, item)
+    end
+
+    def insert_measure(measure_goal_type, measure_dir, item = 0)
+      count = 0
+      measure_type_count = 0
+      measure_type_found = false
+      @workflow['steps'].each do |step|
+        measure_dir_name = step['measure_dir_name']
+        measure_type = get_measure_type(measure_dir_name)
+        puts "measure: #{measure_dir_name} with type: #{measure_type} found"
+        if measure_type == measure_goal_type
+          measure_type_found = true
+          if measure_type_count == item
+            # insert measure here
+            puts "inserting measure at position #{count} and dir: #{measure_dir}  and type: #{get_measure_type(measure_dir)}"
+            new_step = {}
+            new_step['measure_dir_name'] = measure_dir
+            @workflow['steps'].insert(count, new_step)
+            #@workflow['steps'].insert(count, {"measure_dir_name": "#{measure_dir}", "arguments": {}})
+            break
+          end
+          measure_type_count += 1
+        elsif measure_type_found
+          puts "inserting measure at position #{count} and dir: #{measure_dir}  and type: #{get_measure_type(measure_dir)}"
+          new_step = {}
+          new_step['measure_dir_name'] = measure_dir
+          @workflow['steps'].insert(count - 1, new_step)
+          break
+        end
+        count += 1
+      end
+    end
+
+    def get_measure_type(measure_dir)
+      get_measure_directories_array.each do |potential_measure_path|
+        measure_dir_full_path = "#{potential_measure_path}/#{measure_dir}"
+        puts "measure_dir: #{measure_dir}"
+        if Dir.exist?(measure_dir_full_path)
+          measure_xml_doc = nil
+          File.open(measure_dir_full_path + '/measure.xml', 'r') do |file|
+            measure_xml_doc = REXML::Document.new(file)
+          end
+          measure_xml_doc.elements.each('/measure/attributes/attribute') do |attribute|
+            attribute_name = attribute.elements['name'].text
+            if attribute_name == 'Measure Type'
+              return attribute.elements['value'].text
+            end
+          end
+        end
+      end
     end
 
     def get_workflow
