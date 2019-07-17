@@ -248,8 +248,7 @@ module BuildingSync
     def get_weather_file_from_weatherid(weather_id)
       weather_file_name = ''
 
-      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
-      json = eval(File.read(weather_file_path))
+      json = get_weather_json_data
 
       is_found, counter = weatherid_found_in_json_data(json, weather_id)
 
@@ -272,8 +271,7 @@ module BuildingSync
     def get_weather_file_from_city_and_state(city)
       weather_file_name = ''
 
-      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
-      json = eval(File.read(weather_file_path))
+      json = get_weather_json_data
 
       is_found, counter = city_found_in_json_data(json, city)
 
@@ -293,16 +291,23 @@ module BuildingSync
       return false, counter
     end
 
+    def get_weather_json_data
+      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      create_json_file(weather_file_path) if !File.exist?(weather_file_path)
+
+      return eval(File.read(weather_file_path))
+    end
+
     def create_json_file(weather_file_path)
       weather_file_folder = File.expand_path('../../spec/weather', File.dirname(__FILE__))
       weather_file = File.new("#{weather_file_folder}/weather_file.json", 'w')
 
       arr = []
       weather_detail = {
-          'weather_file_name' => arr,
-          'city_name' => arr,
-          'state_code' => arr,
-          'weather_id' => arr
+        'weather_file_name' => arr,
+        'city_name' => arr,
+        'state_code' => arr,
+        'weather_id' => arr
       }
 
       File.open(weather_file_path, 'w') { |f| f.write(weather_detail.to_json) }
