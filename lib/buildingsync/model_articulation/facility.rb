@@ -53,6 +53,13 @@ module BuildingSync
       # code to initialize
       # an array that contains all the sites
       @sites = []
+      @auditor_contact_id = nil
+      @audit_date = nil
+      @contact_name = nil
+      @utility_name = nil
+      @utility_meter_number = nil
+      @metering_configuration= nil
+      @rate_schedules = nil
 
       # reading the xml
       read_xml(facility_xml, ns)
@@ -63,6 +70,8 @@ module BuildingSync
       facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
         @sites.push(Site.new(site_element, ns))
       end
+
+      read_other_detials(facility_xml, ns)
     end
 
     def determine_open_studio_standard(standard_to_be_used)
@@ -92,6 +101,50 @@ module BuildingSync
 
     def determine_open_studio_system_standard
       return @sites[0].determine_open_studio_system_standard
+    end
+
+    def read_other_detials(facility_xml, ns)
+      if facility_xml.elements["#{ns}:Report/#{ns}:AuditorContactID"]
+        @auditor_contact_id = facility_xml.elements["#{ns}:Report/#{ns}:AuditorContactID"].text
+      else
+        @auditor_contact_id = nil
+      end
+
+      if facility_xml.elements["#{ns}:Report/#{ns}:AuditDate"]
+        @auditor_contact_id = Date.parse(facility_xml.elements["#{ns}:Report/#{ns}:AuditDate"].text)
+      else
+        @auditor_contact_id = nil
+      end
+
+      if facility_xml.elements["#{ns}:Contacts/#{ns}:Contact/#{ns}:ContactName"]
+        @contact_name = facility_xml.elements["#{ns}:Contacts/#{ns}:Contact/#{ns}:ContactName"].text
+      else
+        @contact_name = nil
+      end
+
+      if facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:UtilityName"]
+        @utility_name = facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:UtilityName"].text
+      else
+        @utility_name = nil
+      end
+
+      if facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:MeteringConfiguration"]
+        @metering_configuration = facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:MeteringConfiguration"].text
+      else
+        @metering_configuration = nil
+      end
+
+      if facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:RateSchedules"]
+        @rate_schedules = facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:RateSchedules"].text
+      else
+        @rate_schedules = nil
+      end
+
+      if facility_xml.elements["#{ns}:Utilities/#{ns}:UtilityMeterNumbers/#{ns}:UtilityMeterNumber"]
+        @utility_meter_number = facility_xml.elements["#{ns}:Utilities/#{ns}:UtilityMeterNumbers/#{ns}:UtilityMeterNumber"].text
+      else
+        @utility_meter_number = nil
+      end
     end
 
     def create_building_systems(output_path, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity',
