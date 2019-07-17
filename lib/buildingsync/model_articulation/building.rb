@@ -801,6 +801,10 @@ module BuildingSync
       @model.save("#{dir}/in.osm", true)
     end
 
+    def get_space_types
+      return @model.getSpaceTypes
+    end
+
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr
   end
 end

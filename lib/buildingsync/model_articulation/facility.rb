@@ -90,6 +90,10 @@ module BuildingSync
       return @sites
     end
 
+    def get_space_types
+      return @sites[0].get_space_types
+    end
+
     def determine_open_studio_system_standard
       return @sites[0].determine_open_studio_system_standard
     end

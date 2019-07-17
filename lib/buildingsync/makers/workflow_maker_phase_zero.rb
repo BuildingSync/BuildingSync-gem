@@ -70,19 +70,19 @@ module BuildingSync
       return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir]
     end
 
-    def insert_energyplus_measure(measure_dir, item = 0)
-      insert_measure('EnergyPlusMeasure', measure_dir, item)
+    def insert_energyplus_measure(measure_dir, item = 0, args_hash = {})
+      insert_measure('EnergyPlusMeasure', measure_dir, item, args_hash)
     end
 
-    def insert_report_measure(measure_dir, item = 0)
-      insert_measure('ReportMeasure', measure_dir, item)
+    def insert_report_measure(measure_dir, item = 0, args_hash = {})
+      insert_measure('ReportMeasure', measure_dir, item, args_hash)
     end
 
-    def insert_model_measure(measure_dir, item = 0)
-      insert_measure('ModelMeasure', measure_dir, item)
+    def insert_model_measure(measure_dir, item = 0, args_hash = {})
+      insert_measure('ModelMeasure', measure_dir, item, args_hash)
     end
 
-    def insert_measure(measure_goal_type, measure_dir, item = 0)
+    def insert_measure(measure_goal_type, measure_dir, item = 0, args_hash = {})
       count = 0
       measure_type_count = 0
       measure_type_found = false
@@ -97,6 +97,7 @@ module BuildingSync
             puts "inserting measure at position #{count} and dir: #{measure_dir}  and type: #{get_measure_type(measure_dir)}"
             new_step = {}
             new_step['measure_dir_name'] = measure_dir
+            new_step['arguments'] = args_hash
             @workflow['steps'].insert(count, new_step)
             #@workflow['steps'].insert(count, {"measure_dir_name": "#{measure_dir}", "arguments": {}})
             break

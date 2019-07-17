@@ -136,6 +136,10 @@ module BuildingSync
       return get_largest_building.get_model
     end
 
+    def get_space_types
+      return get_largest_building.get_space_types
+    end
+
     def determine_open_studio_standard(standard_to_be_used)
       return get_largest_building.determine_open_studio_standard(standard_to_be_used)
     end
