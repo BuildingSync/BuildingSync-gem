@@ -34,23 +34,39 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative '../model_articulation/facility'
+require_relative 'workflow_maker_phase_zero'
+module BuildingSync
+  class ModelMakerLevelZero < PhaseZeroWorkflowMaker
+    def initialize(doc, ns)
+      super
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
-  end
+      @facilities = []
+    end
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
-  end
+    def generate_baseline(dir, epw_file_path, standard_to_be_used)
+      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
+        @facilities.push(Facility.new(facility_element, @ns))
+      end
 
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+      if @facilities.count == 0
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', 'There are no facilities in your BuildingSync file.')
+        raise 'Error: There are no facilities in your BuildingSync file.'
+      elsif @facilities.count > 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
+        raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
+      end
+
+      open_studio_standard = @facilities[0].determine_open_studio_standard(standard_to_be_used)
+
+      @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used)
+      return write_osm(dir)
+    end
+
+    private
+
+    def write_osm(dir)
+      @@facility = @facilities[0].write_osm(dir)
+    end
   end
 end

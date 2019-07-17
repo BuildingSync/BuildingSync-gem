@@ -35,22 +35,76 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
-  end
+require 'fileutils'
+require 'json'
+require_relative 'model_maker'
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
-  end
+module BuildingSync
+  # base class for objects that will configure workflows based on building sync files
+  class WorkflowMaker < ModelMaker
+    def write_osws(dir)
+      FileUtils.mkdir_p(dir)
+    end
 
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+    def gather_results(dir); end
+
+    def failed_scenarios
+      return []
+    end
+
+    def save_xml(filename)
+      File.open(filename, 'w') do |file|
+        @doc.write(file)
+      end
+    end
+
+    def set_measure_path(osw, measures_dir)
+      osw['measure_paths'] = [measures_dir]
+    end
+
+    def set_measure_paths(osw, measures_dir_array)
+      osw['measure_paths'] = measures_dir_array
+    end
+
+    def add_measure_path(osw, measures_dir)
+      osw['measure_paths'].each do |dir|
+        if dir == measures_dir
+          return false
+        end
+      end
+      osw['measure_paths'] << measures_dir
+      return true
+    end
+
+    def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
+      result = false
+      osw['steps'].each do |step|
+        if step['measure_dir_name'] == measure_dir_name
+          step['arguments'][argument_name] = argument_value
+          result = true
+        end
+      end
+
+      if !result
+        raise "Could not set '#{argument_name}' to '#{argument_value}' for measure '#{measure_dir_name}'"
+      end
+
+      return result
+    end
+
+    def add_new_measure(osw, measure_dir_name)
+      # first we check if the measure already exists
+      osw['steps'].each do |step|
+        if step['measure_dir_name'] == measure_dir_name
+          return false
+        end
+      end
+      # if it does not exist we add it
+      new_step = {}
+      new_step['measure_dir_name'] = measure_dir_name
+      # TODO: what about arguments to measures, need to add an option to also set arguments and their values
+      osw['steps'].unshift(new_step)
+      return true
+    end
   end
 end

@@ -34,23 +34,46 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+module BuildingSync
+  class ServiceHotWaterSystem < BuildingSystem
+    # initialize
+    def initialize
+      # code to initialize
+    end
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
-  end
+    def add(model, standard, remove_objects)
+      # remove water use equipment and water use connections
+      if remove_objects
+        # TODO: - remove plant loops used for service water heating
+        model.getWaterUseEquipments.each(&:remove)
+        model.getWaterUseConnectionss.each(&:remove)
+      end
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
-  end
+      typical_swh = standard.model_add_typical_swh(model)
+      mid_rise_swh_loops = []
+      strip_mall_swh_loops = []
+      typical_swh.each do |loop|
+        if loop.name.get.include?('MidriseApartment')
+          mid_rise_swh_loops << loop
+        elsif loop.name.get.include?('RetailStripmall')
+          strip_mall_swh_loops << loop
+        else
+          water_use_connections = []
+          loop.demandComponents.each do |component|
+            next if !component.to_WaterUseConnections.is_initialized
 
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+            water_use_connections << component
+          end
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{loop.name} to the building. It has #{water_use_connections.size} water use connections.")
+        end
+      end
+      if !mid_rise_swh_loops.empty?
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{mid_rise_swh_loops.size} MidriseApartment service water heating loops.")
+      end
+      if !strip_mall_swh_loops.empty?
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{strip_mall_swh_loops.size} RetailStripmall service water heating loops.")
+      end
+      return true
+    end
   end
 end

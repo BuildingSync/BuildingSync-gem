@@ -34,23 +34,48 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative './../spec_helper'
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
+require 'fileutils'
+require 'parallel'
+
+RSpec.describe 'SelectionTool' do
+  it 'Should validate valid XML file against BuildingSync schema' do
+    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    selection_tool = BuildingSync::SelectionTool.new(xml_path)
+    expect(selection_tool.validate_schema).to be true
   end
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
+  it 'Should validate valid XML file against BuildingSync Use-Cases' do
+    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    selection_tool = BuildingSync::SelectionTool.new(xml_path)
+
+    if selection_tool.validate_schema
+      expect(selection_tool.validate_use_case).to be true
+    end
   end
 
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+  it 'Should not validate invalid XML file against BuildingSync schema' do
+    xml_path = File.expand_path('../files/Example - Invalid Schema.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    selection_tool = BuildingSync::SelectionTool.new(xml_path)
+
+    expect(selection_tool.validate_schema).to be false
+  end
+
+  it 'Should not validate valid XML file against BuildingSync Use-Cases' do
+    xml_path = File.expand_path('../files/Example – Valid Schema Invalid UseCase.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    selection_tool = BuildingSync::SelectionTool.new(xml_path)
+
+    if selection_tool.validate_schema
+      expect(selection_tool.validate_use_case).to be false
+    end
   end
 end

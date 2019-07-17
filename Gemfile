@@ -14,11 +14,18 @@ if File.exist?('../openstudio-model-articulation-gem')
   # gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', branch: 'develop'
   gem 'openstudio-model-articulation', path: '../openstudio-model-articulation-gem'
 else
-  gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', branch: 'develop'
+  gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', branch: 'DA'
 end
 
-gem 'openstudio_measure_tester', '= 0.1.7' # This includes the dependencies for running unit tests, coverage, and rubocop
-# gem 'openstudio_measure_tester', :github => 'NREL/OpenStudio-measure-tester-gem', :ref => '273d1f1a5c739312688ea605ef4a5b6e7325332c'
+if File.exist?('../openstudio-common-measures-gem')
+  # gem 'openstudio-model-articulation', github: 'NREL/openstudio-common-measures-gem', branch: 'develop'
+  gem 'openstudio-common-measures', path: '../openstudio-common-measures-gem'
+else
+  gem 'openstudio-common-measures', github: 'NREL/openstudio-common-measures-gem', branch: 'develop'
+end
+
+# OpenStudio Measure Tester includes the dependencies for running unit tests, coverage, and rubocop
+gem 'openstudio_measure_tester', '0.1.7'
 
 # simplecov has an unneccesary dependency on native json gem, use fork that does not require this
 gem 'simplecov', github: 'NREL/simplecov'

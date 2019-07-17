@@ -35,22 +35,37 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
+RSpec.describe 'HVACSystemSpec' do
+  it 'Should add a Exhaust in HVAC system successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref 1980-2004')
+    hvac_system = BuildingSync::HVACSystem.new
+    puts 'expected : true but got: false} ' if hvac_system.add_exhaust(model, standard, 'Adjacent', false) != true
+    expect(hvac_system.add_exhaust(model, standard, 'Adjacent', false)).to be true
   end
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
+  it 'Should add a Thermostats in HVAC System successfully' do
+    model = OpenStudio::Model::Model.new
+    hvac_system = BuildingSync::HVACSystem.new
+    puts 'expected : true but got: false} ' if hvac_system.add_thermostats(model, ASHRAE90_1, false) != true
+    expect(hvac_system.add_thermostats(model, ASHRAE90_1, false)).to be true
   end
 
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+  it 'Should add HVAC System successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref 1980-2004')
+    hvac_system = BuildingSync::HVACSystem.new
+    puts 'expected : true but got: false} ' if hvac_system.add_hvac(model, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true) != true
+    expect(hvac_system.add_hvac(model, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true)).to be true
+  end
+
+  it 'Should apply sizing and assumptions in HVAC System' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref 1980-2004')
+    hvac_system = BuildingSync::HVACSystem.new
+
+    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
+    puts 'expected : false but got: true} ' if hvac_system.apply_sizing_and_assumptions(model, output_path, standard, 'Retail', 'PSZ-AC with gas coil heat', '') != false
+    expect(hvac_system.apply_sizing_and_assumptions(model, output_path, standard, 'Retail', 'PSZ-AC with gas coil heat', '')).to be false
   end
 end

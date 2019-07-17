@@ -1,6 +1,6 @@
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC. 
+# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,46 +36,6 @@
 # *******************************************************************************
 
 require 'buildingsync/version'
+require 'buildingsync/extension'
 require 'openstudio/extension'
 require 'buildingsync/selection_tool'
-
-module BuildingSync
-  # The BuildingSync class contains both the instance of the BuildingSync file (in XML) and the
-  # helper methods from the OpenStudio::Extension gem to support managing measures that are related
-  # to BuildingSync.
-  class BuildingSync < OpenStudio::Extension::Extension
-    def initialize
-      # Initialize the root directory for use in the extension class. This must be done, otherwise the
-      # root_dir will be the root_dir in the OpenStudio Extension Gem.
-      @root_dir = File.absolute_path(File.join(File.dirname(__FILE__), '..'))
-    end
-
-    # Read in an existing buildingsync file
-    #
-    # @param buildingsync_file [string]: path to BuildingSync XML
-    def self.from_file(buildingsync_file)
-      bsync = BuildingSync.new
-      bsync.read_from_xml(buildingsync_file)
-      return bsync
-    end
-
-    # read the XML from file
-    def read_from_xml(buildingsync_file)
-      return nil
-    end
-
-    # write OSW file
-    # This method will write a single OSW from the BuildingSync file. The OSW will not include any of the scenarios
-    # other than the baseline.
-    def to_osw
-      return nil
-    end
-
-    # write multiple OSW files
-    # This method will write out multiple OSW files from the BuildingSync file. The OSWs will be constructed based
-    # on the various scenarios that are in the BuildingSync file
-    def to_osws
-      return nil
-    end
-  end
-end

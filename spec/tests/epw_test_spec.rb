@@ -35,22 +35,20 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
-  end
+RSpec.describe 'BuildingSync' do
+  it 'should support an absolute path of EPW' do
+    standard_template = '90.1-2004'
+    bldg_type = 'SmallOffice'
+    climate_zone_standard_string = 'ASHRAE 169-2006-4'
+    open_studio_standards = Standard.build("#{standard_template}_#{bldg_type}")
+    model = OpenStudio::Model::Model.new
+    epw_file_name = 'CZ01RV2.epw'
+    epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
-  end
-
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+    begin
+      open_studio_standards.model_add_design_days_and_weather_file(model, climate_zone_standard_string, epw_file_path)
+    rescue StandardError => e
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.epq_test_spec', e.message)
+    end
   end
 end

@@ -35,22 +35,38 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-RSpec.describe BuildingSync do
-  it 'has a version number' do
-    expect(BuildingSync::VERSION).not_to be nil
+RSpec.describe 'LoadSystemSpec' do
+  it 'Should add internal loads successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref Pre-1980')
+    load_system = BuildingSync::LoadsSystem.new
+    puts 'expected add internal loads : true but got: false} ' if load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', false) != true
+    expect(load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', false)).to be true
   end
 
-  it 'has a measures directory' do
-    instance = BuildingSync::Extension.new
-    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
-    expect(instance.measures_dir).to eq measure_path
-    expect(Dir.exist?(instance.measures_dir)).to eq true
+  it 'Should add exterior lights successfully' do
+    site = create_minimum_site('Retail', '1980', 'Gross', '20000')
+    site.determine_open_studio_standard(ASHRAE90_1)
+    site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
+    # we need to create a site and call the generate_baseline_osm method in order to set the space types in the model, why are those really needed?
+    load_system = BuildingSync::LoadsSystem.new
+    puts 'expected add internal loads : true but got: false} ' if load_system.add_exterior_lights(site.get_model, site.determine_open_studio_system_standard, 1.0, '3 - All Other Areas', false) != true
+    expect(load_system.add_exterior_lights(site.get_model, site.determine_open_studio_system_standard, 1.0, '3 - All Other Areas', false)).to be true
   end
 
-  it 'has a files directory' do
-    instance = BuildingSync::Extension.new
-    file_path = File.expand_path('../../lib/files', File.dirname(__FILE__))
-    expect(instance.files_dir).to eq file_path
-    expect(Dir.exist?(instance.files_dir)).to eq true
+  it 'Should add elevator successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref Pre-1980')
+    load_system = BuildingSync::LoadsSystem.new
+    puts 'expected add elevator : true but got: false} ' if load_system.add_elevator(model, standard) != true
+    expect(load_system.add_elevator(model, standard)).to be true
+  end
+
+  it 'Should add daylighting controls successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref Pre-1980')
+    load_system = BuildingSync::LoadsSystem.new
+    puts 'expected add day lighting controls : true but got: false} ' if load_system.add_day_lighting_controls(model, standard, 'DOE Ref Pre-1980') != true
+    expect(load_system.add_day_lighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
   end
 end
