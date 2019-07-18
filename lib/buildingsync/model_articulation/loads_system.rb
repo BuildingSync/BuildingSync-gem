@@ -38,7 +38,7 @@ require_relative 'building_system'
 module BuildingSync
   class LoadsSystem < BuildingSystem
     # initialize
-    def initialize
+    def initialize(system_element = '', ns = '')
       # code to initialize
     end
 
