@@ -151,7 +151,7 @@ module BuildingSync
       if measure_category == 'Wall' || measure_category == 'Roof' || measure_category == 'Ceiling' || measure_category == 'Fenestration'
         measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BuildingEnvelopeModifications/#{@ns}:MeasureName"].text
       end
-      if  measure_category == 'Cooling System' || measure_category == 'General Controls and Operations' || measure_category == 'Heat Recovery'
+      if measure_category == 'Cooling System' || measure_category == 'General Controls and Operations' || measure_category == 'Heat Recovery'
         measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
       end
       if measure_category == 'Heating System'
@@ -190,39 +190,38 @@ module BuildingSync
       return measure_name
     end
 
-    def set_argument_detial(osw, argument, measure_dir_name)
+    def set_argument_detail(osw, argument, measure_dir_name)
       argument_name = ''
       argument_value = ''
       if measure_dir_name == 'Add daylight controls' || measure_dir_name == 'Replace HVAC system type to PZHP'
+        puts "argument[:condition] == @@facility['bldg_type'] #{argument[:condition]} == #{@@facility['bldg_type']}"
         if argument[:condition] == @@facility['bldg_type']
           argument_name = argument[:name]
           argument_value = "#{argument[:value]} #{@@facility['template']}"
         end
-      end
-
-      if measure_dir_name == 'Replace burner'
+      elsif measure_dir_name == 'Replace burner'
         if @@facility['system_type'] == 'PSZ-AC with gas coil heat'
           argument_name = argument[:name]
           argument_value = argument[:value]
         end
-      end
-      if measure_dir_name == 'Replace boiler'
+      elsif measure_dir_name == 'Replace boiler'
         if @@facility['system_type'] == 'PVAV with reheat'
           argument_name = argument[:name]
           argument_value = argument[:value]
         end
-      end
-      if measure_dir_name == 'Replace package units'
+      elsif measure_dir_name == 'Replace package units'
         if argument[:condition] == @@facility['system_type']
           argument_name = argument[:name]
           argument_value = argument[:value]
         end
-      end
-      if measure_dir_name == 'Replace HVAC system type to VRF' || measure_dir_name == 'Replace HVAC with GSHP and DOAS' || measure_dir_name == 'Replace AC and heating units with ground coupled heat pump systems'
+      elsif measure_dir_name == 'Replace HVAC system type to VRF' || measure_dir_name == 'Replace HVAC with GSHP and DOAS' || measure_dir_name == 'Replace AC and heating units with ground coupled heat pump systems'
         if argument[:condition] == @@facility['bldg_type']
           argument_name = "#{argument[:name]} #{@@facility['template']}"
           argument_value = argument[:value]
         end
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.set_argument_detail', "measure dir name not found #{measure_dir_name}.")
+        puts "BuildingSync.WorkflowMakerPhaseZero.set_argument_detail: Measure dir name not found #{measure_dir_name}."
       end
 
       set_measure_argument(osw, measure_dir_name, argument_name, argument_value) if !argument_name.nil? && !argument_name.empty?
@@ -253,7 +252,7 @@ module BuildingSync
               meas_name[:"#{measure_name}"][:arguments].each do |argument|
                 num_measures += 1
                 if !argument[:condition].nil? && !argument[:condition].empty?
-                  set_argument_detial(osw, argument, measure_dir_name)
+                  set_argument_detail(osw, argument, measure_dir_name)
                 else
                   set_measure_argument(osw, measure_dir_name, argument[:name], argument[:value])
                 end
