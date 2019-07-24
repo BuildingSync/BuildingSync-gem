@@ -275,40 +275,43 @@
     }
   ],
   "Cooling System": [{
-    "Replace package units": [{
+    "Replace package units": {
       "measure_dir_name": "SetCOPforSingleSpeedDXCoolingUnits",
-      "arguments": [{
-        "name": "__SKIP__",
-        "value": false,
-        "condition": "PSZ-AC with gas coil heat"
-      },
+      "arguments": [
+        {
+          "name": "__SKIP__",
+          "value": false,
+          "condition": "PSZ-AC with gas coil heat"
+        },
         {
           "name": "cop",
           "value": 4.1,
           "condition": "PSZ-AC with gas coil heat"
         }
       ]
+    }
     },
       {
-        "measure_dir_name": "SetCOPforTwoSpeedDXCoolingUnits",
-        "arguments": [{
-          "name": "__SKIP__",
-          "value": false,
-          "condition": "PVAV with reheat"
-        },
-          {
-            "name": "cop_high",
-            "value": 4.1,
-            "condition": "PVAV with reheat"
-          },
-          {
-            "name": "cop_low",
-            "value": 4.1,
-            "condition": "PVAV with reheat"
-          }
-        ]
-      }
-    ]
+        "Replace package units": {
+          "measure_dir_name": "SetCOPforTwoSpeedDXCoolingUnits",
+          "arguments": [
+            {
+              "name": "__SKIP__",
+              "value": false,
+              "condition": "PVAV with reheat"
+            },
+            {
+              "name": "cop_high",
+              "value": 4.1,
+              "condition": "PVAV with reheat"
+            },
+            {
+              "name": "cop_low",
+              "value": 4.1,
+              "condition": "PVAV with reheat"
+            }
+          ]
+        }
   }],
   "Other HVAC": [{
     "Replace HVAC system type to VRF": {
@@ -733,7 +736,7 @@
       ]
     }
   }],
-  "'Water Use": [{
+  "Water Use": [{
     "Install low-flow faucets and showerheads": {
       "measure_dir_name": "reduce_water_use_by_percentage",
       "arguments": [{
