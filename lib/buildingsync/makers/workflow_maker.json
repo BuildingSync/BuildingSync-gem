@@ -367,7 +367,53 @@
     }
   },
     {
-      "Replace HVAC with GSHP and DOAS| Replace AC and heating units with ground coupled heat pump systems": {
+      "Replace HVAC with GSHP and DOAS": {
+        "measure_dir_name": "replace_hvac_with_gshp_and_doas",
+        "arguments": [{
+          "name": "__SKIP__",
+          "value": false,
+          "condition": ""
+        },
+          {
+            "name": "Office WholeBuilding - Sm Office -",
+            "value": true,
+            "condition": "SmallOffice"
+          },
+          {
+            "name": "Office WholeBuilding - Md Office -",
+            "value": true,
+            "condition": "MediumOffice"
+          },
+          {
+            "name": "Office WholeBuilding - Md Office -",
+            "value": true,
+            "condition": "MediumOffice"
+          },
+          {
+            "name": "Retail Retail -",
+            "value": true,
+            "condition": "RetailStandalone"
+          },
+          {
+            "name": "Retail Point_of_Sale -",
+            "value": true,
+            "condition": "RetailStandalone"
+          },
+          {
+            "name": "Retail Entry -",
+            "value": true,
+            "condition": "RetailStandalone"
+          },
+          {
+            "name": "Retail Back_Space -",
+            "value": true,
+            "condition": "RetailStandalone"
+          }
+        ]
+      }
+    },
+    {
+      "Replace AC and heating units with ground coupled heat pump systems": {
         "measure_dir_name": "replace_hvac_with_gshp_and_doas",
         "arguments": [{
           "name": "__SKIP__",
