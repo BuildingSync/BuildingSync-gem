@@ -803,7 +803,7 @@ module BuildingSync
         spaces.each do |space|
           oldName = space.nameString
           newName = space.nameString.gsub(/\s+/, '')
-          space.name = newName
+          space.setName(newName)
           puts "Removing whitespaces from space name: old: #{oldName} new: #{newName}"
         end
       end
