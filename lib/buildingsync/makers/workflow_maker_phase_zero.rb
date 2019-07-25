@@ -89,12 +89,12 @@ module BuildingSync
       @workflow['steps'].each do |step|
         measure_dir_name = step['measure_dir_name']
         measure_type = get_measure_type(measure_dir_name)
-        puts "measure: #{measure_dir_name} with type: #{measure_type} found"
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "measure: #{measure_dir_name} with type: #{measure_type} found")
         if measure_type == measure_goal_type
           measure_type_found = true
           if measure_type_count == item
             # insert measure here
-            puts "inserting measure at position #{count} and dir: #{measure_dir}  and type: #{get_measure_type(measure_dir)}"
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
             new_step = {}
             new_step['measure_dir_name'] = measure_dir
             new_step['arguments'] = args_hash
@@ -104,7 +104,7 @@ module BuildingSync
           end
           measure_type_count += 1
         elsif measure_type_found
-          puts "inserting measure at position #{count} and dir: #{measure_dir}  and type: #{get_measure_type(measure_dir)}"
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
           new_step = {}
           new_step['measure_dir_name'] = measure_dir
           @workflow['steps'].insert(count - 1, new_step)
