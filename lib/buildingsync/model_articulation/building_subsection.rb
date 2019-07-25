@@ -50,6 +50,7 @@ module BuildingSync
       @floor_area_value = nil
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
+      @occupant_quantity = nil
 
       # code to initialize
       read_xml(subsection_element, occ_type, bldg_total_floor_area, ns)

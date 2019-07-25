@@ -41,14 +41,14 @@ module BuildingSync
       # code to initialize
       @primary_hvac_system_type = nil
 
-      read_xml(system_element, ns)
+      read_xml(system_element, ns) if !system_element.empty?
     end
 
     def read_xml(system_element, ns)
       if system_element.elements["#{ns}:PrimaryHVACSystemType"]
-        @auditor_contact_id = system_element.elements["#{ns}:PrimaryHVACSystemType"].text
+        @primary_hvac_system_type = system_element.elements["#{ns}:PrimaryHVACSystemType"].text
       else
-        @auditor_contact_id = nil
+        @primary_hvac_system_type = nil
       end
     end
 

@@ -46,6 +46,8 @@ module BuildingSync
       @annual_savings_cost = nil
       @simple_payback = nil
       @measure_rank = nil
+      @field_value = nil
+      @system_category_affected = nil
 
       read_xml(measure_element, ns)
     end
@@ -91,6 +93,18 @@ module BuildingSync
         @measure_total_first_cost = measure_element.elements["#{ns}:MeasureTotalFirstCost"].text
       else
         @measure_total_first_cost = nil
+      end
+
+      if measure_element.elements["#{ns}:SystemCategoryAffected"]
+        @system_category_affected = measure_element.elements["#{ns}:SystemCategoryAffected"].text
+      else
+        @system_category_affected = nil
+      end
+
+      if measure_element.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"]
+        @field_value = measure_element.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text
+      else
+        @field_value = nil
       end
     end
   end
