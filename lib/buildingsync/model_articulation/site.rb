@@ -206,9 +206,9 @@ module BuildingSync
       building.generate_baseline_osm(standard_to_be_used)
     end
 
-    def write_osm(dir)
+    def write_osm(dir, replace_whitespace = false)
       building = get_largest_building
-      building.write_osm(dir)
+      building.write_osm(dir, replace_whitespace)
       scenario_types = {}
       scenario_types['system_type'] = get_system_type
       scenario_types['bldg_type'] = get_building_type

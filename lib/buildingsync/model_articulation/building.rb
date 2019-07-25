@@ -797,7 +797,16 @@ module BuildingSync
       party_walls_array
     end
 
-    def write_osm(dir)
+    def write_osm(dir, replace_whitespace = false)
+      if replace_whitespace
+        spaces = @model.getSpaces
+        spaces.each do |space|
+          oldName = space.name
+          newName = space.name.gsub(/\s+/, '')
+          space.name = newName
+          puts "Removing whitespaces from space name: old: #{oldName} new: #{newName}"
+        end
+      end
       @model.save("#{dir}/in.osm", true)
     end
 

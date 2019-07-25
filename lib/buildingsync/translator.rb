@@ -109,8 +109,8 @@ module BuildingSync
       choose_model_maker
     end
 
-    def write_osm
-      @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used)
+    def write_osm(replace_whitespace = false)
+      @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, replace_whitespace)
     end
 
     def write_osws
