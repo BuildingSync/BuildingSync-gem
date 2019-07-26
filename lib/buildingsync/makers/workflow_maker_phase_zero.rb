@@ -67,15 +67,16 @@ module BuildingSync
     def get_measure_directories_array
       common_measures_instance = OpenStudio::CommonMeasures::Extension.new
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
-      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir]
+      bldg_sync_instance = BuildingSync::Extension.new
+      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir]
     end
 
     def insert_energyplus_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('EnergyPlusMeasure', measure_dir, item, args_hash)
     end
 
-    def insert_report_measure(measure_dir, item = 0, args_hash = {})
-      insert_measure('ReportMeasure', measure_dir, item, args_hash)
+    def insert_reporting_measure(measure_dir, item = 0, args_hash = {})
+      insert_measure('ReportingMeasure', measure_dir, item, args_hash)
     end
 
     def insert_model_measure(measure_dir, item = 0, args_hash = {})
@@ -83,6 +84,7 @@ module BuildingSync
     end
 
     def insert_measure(measure_goal_type, measure_dir, item = 0, args_hash = {})
+      successfully_added = false
       count = 0
       measure_type_count = 0
       measure_type_found = false
@@ -90,34 +92,42 @@ module BuildingSync
         measure_dir_name = step['measure_dir_name']
         measure_type = get_measure_type(measure_dir_name)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "measure: #{measure_dir_name} with type: #{measure_type} found")
+        puts "measure: #{measure_dir_name} with type: #{measure_type} found"
         if measure_type == measure_goal_type
           measure_type_found = true
           if measure_type_count == item
             # insert measure here
             OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+            puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
             new_step = {}
             new_step['measure_dir_name'] = measure_dir
             new_step['arguments'] = args_hash
             @workflow['steps'].insert(count, new_step)
-            #@workflow['steps'].insert(count, {"measure_dir_name": "#{measure_dir}", "arguments": {}})
+            successfully_added = true
             break
           end
           measure_type_count += 1
         elsif measure_type_found
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+          puts "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
           new_step = {}
           new_step['measure_dir_name'] = measure_dir
           @workflow['steps'].insert(count - 1, new_step)
+          successfully_added = true
           break
         end
         count += 1
       end
+      if (!successfully_added)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "CANNOT insert measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+      end
+      return successfully_added
     end
 
     def get_measure_type(measure_dir)
+      measure_type = nil
       get_measure_directories_array.each do |potential_measure_path|
         measure_dir_full_path = "#{potential_measure_path}/#{measure_dir}"
-        puts "measure_dir: #{measure_dir}"
         if Dir.exist?(measure_dir_full_path)
           measure_xml_doc = nil
           File.open(measure_dir_full_path + '/measure.xml', 'r') do |file|
@@ -126,11 +136,13 @@ module BuildingSync
           measure_xml_doc.elements.each('/measure/attributes/attribute') do |attribute|
             attribute_name = attribute.elements['name'].text
             if attribute_name == 'Measure Type'
-              return attribute.elements['value'].text
+              measure_type = attribute.elements['value'].text
             end
           end
         end
       end
+      puts "measure_dir: #{measure_dir} with type: #{measure_type}"
+      return measure_type
     end
 
     def get_workflow

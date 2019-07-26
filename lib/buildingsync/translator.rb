@@ -129,8 +129,8 @@ module BuildingSync
       @model_maker.insert_model_measure(measure_dir, position, args_hash)
     end
 
-    def insert_report_measure(measure_dir, position = 0, args_hash = {})
-      @model_maker.insert_report_measure(measure_dir, position, args_hash)
+    def insert_reporting_measure(measure_dir, position = 0, args_hash = {})
+      @model_maker.insert_reporting_measure(measure_dir, position, args_hash)
     end
 
     def get_workflow
