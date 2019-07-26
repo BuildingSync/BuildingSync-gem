@@ -78,7 +78,8 @@ module BuildingSync
       @percent_occupied_by_owner = nil
       @occupant_quantity = nil
       @number_of_units = nil
-
+      @eui_building = nil
+      @benchmark_eui = nil
 
 
       @fraction_area = 1.0
@@ -120,7 +121,7 @@ module BuildingSync
       read_width_and_length
 
       read_ownership(build_element, ns)
-      read_other_building_detials(build_element, ns)
+      read_other_building_details(build_element, ns)
     end
 
     def read_width_and_length
@@ -241,7 +242,7 @@ module BuildingSync
       end
     end
 
-    def read_other_building_detials(building_element, ns)
+    def read_other_building_details(building_element, ns)
       if building_element.elements["#{ns}:PrimaryContactID"]
         @primary_contact_id = building_element.elements["#{ns}:PrimaryContactID"].text
       else
@@ -284,6 +285,17 @@ module BuildingSync
         @number_of_units = nil
       end
 
+      if building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EndUse"]
+        @eui_building = building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EndUse"].text
+      else
+        @eui_building = nil
+      end
+
+      if building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"]
+        @benchmark_eui = building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text
+      else
+        @benchmark_eui = nil
+      end
     end
 
     def read_building_name(building_element, ns)

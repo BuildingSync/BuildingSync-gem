@@ -48,6 +48,7 @@ module BuildingSync
       @measure_rank = nil
       @field_value = nil
       @system_category_affected = nil
+      @annual_savings_native_units = nil
 
       read_xml(measure_element, ns)
     end
@@ -65,20 +66,20 @@ module BuildingSync
         @annual_savings_cost = nil
       end
 
-      if measure_element.elements["#{ns}:SimplePayback"]
-        @simple_payback = measure_element.elements["#{ns}:SimplePayback"].text
+      if measure_element.elements["#{ns}:AnnualSavingsByFuels/#{ns}:SimplePayback"]
+        @simple_payback = measure_element.elements["#{ns}:AnnualSavingsByFuels/#{ns}:SimplePayback"].text
       else
         @simple_payback = nil
       end
 
-      if measure_element.elements["#{ns}:MeasureRank"]
-        @measure_rank = measure_element.elements["#{ns}:MeasureRank"].text
+      if measure_element.elements["#{ns}:AnnualSavingsByFuels/#{ns}:MeasureRank"]
+        @measure_rank = measure_element.elements["#{ns}:AnnualSavingsByFuels/#{ns}:MeasureRank"].text
       else
         @measure_rank = nil
       end
 
-      if measure_element.elements["#{ns}:AnnualSavingsCost"]
-        @system_category_affected = measure_element.elements["#{ns}:AnnualSavingsCost"].text
+      if measure_element.elements["#{ns}:AnnualSavingsByFuels/#{ns}:AnnualSavingsCost"]
+        @system_category_affected = measure_element.elements["#{ns}:AnnualSavingsByFuels/#{ns}:AnnualSavingsCost"].text
       else
         @system_category_affected = nil
       end
@@ -105,6 +106,12 @@ module BuildingSync
         @field_value = measure_element.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text
       else
         @field_value = nil
+      end
+
+      if measure_element.elements["#{ns}:MeasureSavingsAnalysis/#{ns}:AnnualSavingsByFuels/#{ns}:AnnualSavingsByFuel/#{ns}:AnnualSavingsNativeUnits"]
+        @annual_savings_native_units = measure_element.elements["#{ns}:MeasureSavingsAnalysis/#{ns}:AnnualSavingsByFuels/#{ns}:AnnualSavingsByFuel/#{ns}:AnnualSavingsNativeUnits"].text
+      else
+        @annual_savings_native_units = nil
       end
     end
   end

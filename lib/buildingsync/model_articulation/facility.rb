@@ -42,6 +42,7 @@ require_relative 'service_hot_water_system'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio/extension/core/os_lib_geometry'
 require_relative '../helpers/Model.hvac'
+require_relative '../helpers/metered_energy'
 
 module BuildingSync
   class Facility
@@ -58,8 +59,14 @@ module BuildingSync
       @contact_name = nil
       @utility_name = nil
       @utility_meter_number = nil
-      @metering_configuration= nil
+      @metering_configuration = nil
       @rate_schedules = nil
+      @interval_reading_monthly = []
+      @interval_reading_yearly = []
+      @energy_resource = nil
+      @benchmark_source = nil
+      @energy_cost = nil
+      @annual_fuel_use_native_units = 0
 
       # reading the xml
       read_xml(facility_xml, ns)
@@ -71,7 +78,8 @@ module BuildingSync
         @sites.push(Site.new(site_element, ns))
       end
 
-      read_other_detials(facility_xml, ns)
+      read_other_details(facility_xml, ns)
+      read_interval_reading(facility_xml, ns)
     end
 
     def determine_open_studio_standard(standard_to_be_used)
@@ -103,11 +111,59 @@ module BuildingSync
       return @sites[0].determine_open_studio_system_standard
     end
 
-    def read_other_detials(facility_xml, ns)
+    def read_interval_reading(facility_xml, ns)
+      interval_frequency = ''
+      reading_type = ''
+      interval_reading = ''
+      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"]
+        @energy_resource = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"].text
+      else
+        @energy_resource = nil
+      end
+
+      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalFrequency"]
+        interval_frequency = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalFrequency"].text
+      end
+
+      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:ReadingType"]
+        reading_type = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:ReadingType"].text
+      end
+
+      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalReading"]
+        interval_reading = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalReading"].text
+      end
+
+      if interval_frequency == 'Month'
+      @interval_reading_monthly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
+      elsif interval_frequency == 'Year'
+        @interval_reading_yearly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
+      end
+
+    end
+
+    def read_other_details(facility_xml, ns)
       if facility_xml.elements["#{ns}:Report/#{ns}:AuditorContactID"]
         @auditor_contact_id = facility_xml.elements["#{ns}:Report/#{ns}:AuditorContactID"].text
       else
         @auditor_contact_id = nil
+      end
+
+      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"]
+        @benchmark_source = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"].text
+      else
+        @benchmark_source = nil
+      end
+
+      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"]
+        @annual_fuel_use_native_units = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"].text
+      else
+        @annual_fuel_use_native_units = nil
+      end
+
+      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"]
+        @energy_cost = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"].text
+      else
+        @energy_cost = nil
       end
 
       if facility_xml.elements["#{ns}:Report/#{ns}:AuditDate"]
