@@ -40,6 +40,7 @@ require_relative 'model_articulation/spatial_element'
 require_relative 'makers/model_maker_level_zero'
 require_relative 'makers/workflow_maker_phase_zero'
 require_relative 'selection_tool'
+require_relative 'extension'
 
 ASHRAE90_1 = 'ASHRAE90.1'.freeze
 CA_TITLE24 = 'CaliforniaTitle24'.freeze
@@ -47,7 +48,7 @@ CA_TITLE24 = 'CaliforniaTitle24'.freeze
 module BuildingSync
   class Translator
     # load the building sync file and chooses the correct workflow
-    def initialize(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
+    def initialize(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1, validate_xml_file_against_schema = true)
       @doc = nil
       @model_maker = nil
       @workflow_maker = nil
@@ -68,17 +69,22 @@ module BuildingSync
         raise "File '#{xml_file_path}' does not exist" unless File.exist?(xml_file_path)
       end
 
-      # we wil try to validate the file, but if it fails, we will not cancel the process, but log an error
-      begin
-        selection_tool = BuildingSync::SelectionTool.new(xml_file_path)
-        if !selection_tool.validate_schema
-          raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
-        else
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
-          puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
+      if validate_xml_file_against_schema
+        # we wil try to validate the file, but if it fails, we will not cancel the process, but log an error
+        begin
+          selection_tool = BuildingSync::SelectionTool.new(xml_file_path)
+          if !selection_tool.validate_schema
+            raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
+          else
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
+            puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
+          end
+        rescue StandardError
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
         end
-      rescue StandardError
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
+      else
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' was not validated against the BuildingSync schema")
+        puts "File '#{xml_file_path}' was not validated against the BuildingSync schema"
       end
 
       File.open(xml_file_path, 'r') do |file|
@@ -104,16 +110,36 @@ module BuildingSync
       choose_model_maker
     end
 
-    def write_osm
-      @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used)
+    def write_osm(replace_whitespace = false)
+      @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, replace_whitespace)
     end
 
     def write_osws
       @model_maker.write_osws(@output_dir)
     end
 
-    def add_measure(measure_dir)
-      @model_maker.add_measure(measure_dir)
+    def add_measure_path(measure_path)
+      @model_maker.add_measure_path(measure_path)
+    end
+
+    def insert_energyplus_measure(measure_dir, position = 0, args_hash = {})
+      @model_maker.insert_energyplus_measure(measure_dir, position, args_hash)
+    end
+
+    def insert_model_measure(measure_dir, position = 0, args_hash = {})
+      @model_maker.insert_model_measure(measure_dir, position, args_hash)
+    end
+
+    def insert_reporting_measure(measure_dir, position = 0, args_hash = {})
+      @model_maker.insert_reporting_measure(measure_dir, position, args_hash)
+    end
+
+    def get_workflow
+      @model_maker.get_workflow
+    end
+
+    def get_space_types
+      return @model_maker.get_space_types
     end
 
     private

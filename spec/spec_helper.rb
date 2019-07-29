@@ -112,7 +112,9 @@ RSpec.configure do |config|
       # Run the sizing run
       OpenstudioStandards.run_command(cmd)
 
-      expect(File.exist?(osw_file.gsub('in.osw', 'eplusout.sql'))).to be true
+      sql_file = osw_file.gsub('in.osw', 'eplusout.sql')
+      puts "Simulation not completed successfully for file: #{osw_file}" if !File.exist?(sql_file)
+      expect(File.exist?(sql_file)).to be true
     end
   end
 
@@ -177,7 +179,7 @@ RSpec.configure do |config|
     # we compare the counts, by also considering the two potential osw files in the SR directory
     expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
 
-    return osw_files
+    return osw_files - osw_sr_files
   end
 
   def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)

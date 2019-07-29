@@ -162,6 +162,10 @@ module BuildingSync
       return get_largest_building.get_model
     end
 
+    def get_space_types
+      return get_largest_building.get_space_types
+    end
+
     def determine_open_studio_standard(standard_to_be_used)
       return get_largest_building.determine_open_studio_standard(standard_to_be_used)
     end
@@ -228,9 +232,9 @@ module BuildingSync
       building.generate_baseline_osm(standard_to_be_used)
     end
 
-    def write_osm(dir)
+    def write_osm(dir, replace_whitespace = false)
       building = get_largest_building
-      building.write_osm(dir)
+      building.write_osm(dir, replace_whitespace)
       scenario_types = {}
       scenario_types['system_type'] = get_system_type
       scenario_types['bldg_type'] = get_building_type
