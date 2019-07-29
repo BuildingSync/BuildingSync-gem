@@ -103,7 +103,7 @@ module BuildingSync
       # read occupancy
       @occupancy_type = read_occupancy_type(build_element, site_occupancy_type, ns)
 
-      build_element.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |subsection_element|
+      build_element.elements.each("#{ns}:Sections/#{ns}:Section") do |subsection_element|
         @building_subsections.push(BuildingSubsection.new(subsection_element, @occupancy_type, @total_floor_area, ns))
       end
 
