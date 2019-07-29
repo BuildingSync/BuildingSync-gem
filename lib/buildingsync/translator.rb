@@ -40,6 +40,7 @@ require_relative 'model_articulation/spatial_element'
 require_relative 'makers/model_maker_level_zero'
 require_relative 'makers/workflow_maker_phase_zero'
 require_relative 'selection_tool'
+require_relative 'extension'
 
 ASHRAE90_1 = 'ASHRAE90.1'.freeze
 CA_TITLE24 = 'CaliforniaTitle24'.freeze
