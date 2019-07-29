@@ -36,6 +36,22 @@
 # *******************************************************************************
 module BuildingSync
   class HVACSystem < BuildingSystem
+
+    def initialize(system_element = '', ns = '')
+      # code to initialize
+      @primary_hvac_system_type = nil
+
+      read_xml(system_element, ns) if !system_element.empty?
+    end
+
+    def read_xml(system_element, ns)
+      if system_element.elements["#{ns}:PrimaryHVACSystemType"]
+        @primary_hvac_system_type = system_element.elements["#{ns}:PrimaryHVACSystemType"].text
+      else
+        @primary_hvac_system_type = nil
+      end
+    end
+
     def add_exhaust(model, standard, kitchen_makeup, remove_objects)
       # remove exhaust objects
       if remove_objects

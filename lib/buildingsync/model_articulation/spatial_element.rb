@@ -49,6 +49,10 @@ module BuildingSync
       @space_types = {}
       @fraction_area = nil
       @space_types_floor_area = nil
+      @heated_only_floor_area = nil
+      @cooled_only_floor_area = nil
+      @custom_conditioned_above_grade_floor_area = nil
+      @custom_conditioned_below_grade_floor_area = nil
     end
 
     def read_floor_areas(build_element, parent_total_floor_area, ns)
@@ -65,6 +69,16 @@ module BuildingSync
           @footprint_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@footprint_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Conditioned'
           @conditioned_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@@conditioned_floor_area', floor_area), 'ft^2', 'm^2').get
+        elsif floor_area_type == 'Heated Only'
+          @heated_only_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@heated_only_floor_area', floor_area), 'ft^2', 'm^2').get
+        elsif floor_area_type == 'Cooled Only'
+          @cooled_only_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@cooled_only_floor_area', floor_area), 'ft^2', 'm^2').get
+        elsif floor_area_type == 'Custom'
+          if floor_area_element.elements["#{ns}:FloorAreaCustomName"].text == 'Conditioned above grade'
+            @custom_conditioned_above_grade_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@custom_conditioned_above_grade_floor_area', floor_area), 'ft^2', 'm^2').get
+          elsif floor_area_element.elements["#{ns}:FloorAreaCustomName"].text == 'Conditioned below grade'
+            @custom_conditioned_below_grade_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@custom_conditioned_below_grade_floor_area', floor_area), 'ft^2', 'm^2').get
+          end
         else
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.SpatialElement.generate_baseline_osm', "Unsupported floor area type found: #{floor_area_type}")
         end

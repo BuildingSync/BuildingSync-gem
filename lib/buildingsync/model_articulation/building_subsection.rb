@@ -46,6 +46,12 @@ module BuildingSync
       @subsection_element = nil
       @fraction_area = nil
       @bldg_type = {}
+      @occupancy_classification = nil
+      @floor_area_value = nil
+      @typical_occupant_usage_value_hours = nil
+      @typical_occupant_usage_value_weeks = nil
+      @occupant_quantity = nil
+
       # code to initialize
       read_xml(subsection_element, occ_type, bldg_total_floor_area, ns)
     end
@@ -55,13 +61,31 @@ module BuildingSync
       @total_floor_area = read_floor_areas(subsection_element, bldg_total_floor_area, ns)
       # based on the occupancy type set building type, system type and bar division method
       read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
-
+      read_building_subsection_other_detail(subsection_element, ns)
       @subsection_element = subsection_element
     end
 
     def read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
       @occupancy_type = read_occupancy_type(subsection_element, occ_type, ns)
       set_bldg_and_system_type(@occupancy_type, @total_floor_area, true)
+    end
+
+    def read_building_subsection_other_detail(subsection_element, ns)
+      if subsection_element.elements["#{ns}:OccupancyClassification"]
+        @occupancy_classification = subsection_element.elements["#{ns}:OccupancyClassification"].text
+      else
+        @occupancy_classification = nil
+      end
+
+      if subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"]
+        if subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'
+          @typical_occupant_usage_value_hours = subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text
+        elsif subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageUnits"].text == 'Weeks per year'
+          @typical_occupant_usage_value_weeks = subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text
+        end
+      end
+
+
     end
 
     attr_reader :bldg_type, :space_types_floor_area
