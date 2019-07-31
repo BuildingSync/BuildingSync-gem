@@ -66,13 +66,13 @@ module BuildingSync
       osw['measure_paths'] = measures_dir_array
     end
 
-    def add_measure_path(osw, measures_dir)
-      osw['measure_paths'].each do |dir|
+    def add_measure_path(measures_dir)
+      @workflow['measure_paths'].each do |dir|
         if dir == measures_dir
           return false
         end
       end
-      osw['measure_paths'] << measures_dir
+      @workflow['measure_paths'] << measures_dir
       return true
     end
 

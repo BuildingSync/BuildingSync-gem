@@ -107,6 +107,10 @@ module BuildingSync
       return @sites
     end
 
+    def get_space_types
+      return @sites[0].get_space_types
+    end
+
     def determine_open_studio_system_standard
       return @sites[0].determine_open_studio_system_standard
     end
@@ -329,10 +333,10 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building finished with #{model.getModelObjects.size} objects.")
     end
 
-    def write_osm(dir)
+    def write_osm(dir, replace_whitespace = false)
       scenario_types = {}
       @sites.each do |site|
-        scenario_types = site.write_osm(dir)
+        scenario_types = site.write_osm(dir, replace_whitespace)
       end
       return scenario_types
     end

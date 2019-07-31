@@ -102,7 +102,7 @@ module BuildingSync
 
       if choices.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file_from_weather_id',
-                           "Error, could not find uid for #{name.valueAsString}.  Please try a different weather file.")
+                           "Error, could not find uid for #{weather_id}.  Please try a different weather file.")
         return false
       end
 
