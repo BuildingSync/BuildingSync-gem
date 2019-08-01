@@ -102,7 +102,7 @@ module BuildingSync
       # read occupancy
       @occupancy_type = read_occupancy_type(build_element, site_occupancy_type, ns)
 
-      build_element.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |subsection_element|
+      build_element.elements.each("#{ns}:Sections/#{ns}:Section") do |subsection_element|
         @building_subsections.push(BuildingSubsection.new(subsection_element, @occupancy_type, @total_floor_area, ns))
       end
 
@@ -887,8 +887,21 @@ module BuildingSync
       party_walls_array
     end
 
-    def write_osm(dir)
+    def write_osm(dir, replace_whitespace = false)
+      if replace_whitespace
+        spaces = @model.getSpaces
+        spaces.each do |space|
+          oldName = space.name
+          newName = space.name.gsub(/\s+/, '')
+          space.name = newName
+          puts "Removing whitespaces from space name: old: #{oldName} new: #{newName}"
+        end
+      end
       @model.save("#{dir}/in.osm", true)
+    end
+
+    def get_space_types
+      return @model.getSpaceTypes
     end
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr
