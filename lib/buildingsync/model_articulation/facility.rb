@@ -42,7 +42,7 @@ require_relative 'service_hot_water_system'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio/extension/core/os_lib_geometry'
 require_relative '../helpers/Model.hvac'
-require_relative '../helpers/metered_energy'
+require_relative 'metered_energy'
 
 module BuildingSync
   class Facility

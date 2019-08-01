@@ -37,11 +37,11 @@
 
 class MeteredEnergy
 
-  def initialize(energy_resource, interval_frequency, reading_type, interval_reading)
+  def initialize(energy_resource, interval_frequency, reading_type, interval_readings)
     @energy_resource = energy_resource
     @interval_frequency = interval_frequency
     @reading_type = reading_type
-    @interval_reading = interval_reading
+    @interval_readings = interval_readings
   end
 
   attr_reader :energy_resource, :interval_frequency, :reading_type, :interval_reading

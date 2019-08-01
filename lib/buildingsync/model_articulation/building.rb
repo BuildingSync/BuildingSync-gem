@@ -69,7 +69,6 @@ module BuildingSync
       @ownership = nil
       @occupancy_classification = nil
       @primary_contact_id = nil
-      @built_year = nil
       @major_remodel_year = nil
       @year_of_last_energy_audit = nil
       @retro_commissioning_date = nil
