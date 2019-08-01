@@ -32,41 +32,59 @@
 							<auc:PremisesName>Building 151</auc:PremisesName>
 							<auc:PremisesNotes/>
 							<auc:PremisesIdentifiers>
-								<auc:PremisesIdentifier>
-									<auc:IdentifierLabel>Assessor parcel number</auc:IdentifierLabel>
-								<auc:IdentifierValue>PN 123</auc:IdentifierValue>
-								</auc:PremisesIdentifier>
-								<auc:PremisesIdentifier>
-									<auc:IdentifierLabel>Custom</auc:IdentifierLabel>
-									<auc:IdentifierCustomName>Custom ID 1</auc:IdentifierCustomName>
-									<auc:IdentifierValue>151</auc:IdentifierValue>
-								</auc:PremisesIdentifier>
-								<auc:PremisesIdentifier>
-									<auc:IdentifierLabel>Custom</auc:IdentifierLabel>
-									<auc:IdentifierCustomName>City Custom Building ID</auc:IdentifierCustomName>
-									<auc:IdentifierValue>151</auc:IdentifierValue>
-								</auc:PremisesIdentifier>
-							</auc:PremisesIdentifiers>
+									<auc:PremisesIdentifier>
+										<auc:IdentifierLabel>Assessor parcel number</auc:IdentifierLabel>
+									<auc:IdentifierValue>PN 123</auc:IdentifierValue>
+									</auc:PremisesIdentifier>
+									<auc:PremisesIdentifier>
+										<auc:IdentifierLabel>Custom</auc:IdentifierLabel>
+										<auc:IdentifierCustomName>Custom ID 1</auc:IdentifierCustomName>
+										<auc:IdentifierValue>151</auc:IdentifierValue>
+									</auc:PremisesIdentifier>
+									<auc:PremisesIdentifier>
+										<auc:IdentifierLabel>Custom</auc:IdentifierLabel>
+										<auc:IdentifierCustomName>City Custom Building ID</auc:IdentifierCustomName>
+										<auc:IdentifierValue>151</auc:IdentifierValue>
+									</auc:PremisesIdentifier>
+								</auc:PremisesIdentifiers>
 							<auc:FloorsAboveGrade>1</auc:FloorsAboveGrade>
 							<auc:FloorsBelowGrade>0</auc:FloorsBelowGrade>
 							<auc:FloorAreas>
-								<auc:FloorArea>
-									<auc:FloorAreaType>Gross</auc:FloorAreaType>
-									<auc:FloorAreaValue>69452</auc:FloorAreaValue>
-								</auc:FloorArea>
-								<auc:FloorArea>
-									<auc:FloorAreaType>Heated and Cooled</auc:FloorAreaType>
-									<auc:FloorAreaValue>69452</auc:FloorAreaValue>
-								</auc:FloorArea>
-								<auc:FloorArea>
-									<auc:FloorAreaType>Footprint</auc:FloorAreaType>
-									<auc:FloorAreaValue>73872.6457</auc:FloorAreaValue>
-								</auc:FloorArea>
-							</auc:FloorAreas>
+									<auc:FloorArea>
+										<auc:FloorAreaType>Gross</auc:FloorAreaType>
+										<auc:FloorAreaValue>69452</auc:FloorAreaValue>
+									</auc:FloorArea>
+									<auc:FloorArea>
+										<auc:FloorAreaType>Heated and Cooled</auc:FloorAreaType>
+										<auc:FloorAreaValue>69452</auc:FloorAreaValue>
+									</auc:FloorArea>
+									<auc:FloorArea>
+										<auc:FloorAreaType>Footprint</auc:FloorAreaType>
+										<auc:FloorAreaValue>73872.6457</auc:FloorAreaValue>
+									</auc:FloorArea>
+								</auc:FloorAreas>
 							<auc:AspectRatio>3.6732677131179763</auc:AspectRatio>
 							<auc:Perimeter>1325</auc:Perimeter>
 							<auc:YearOfConstruction>1954</auc:YearOfConstruction>
 							<auc:YearOfLastMajorRemodel>2003</auc:YearOfLastMajorRemodel>
+							<auc:YearOfLastEnergyAudit>2010</auc:YearOfLastEnergyAudit>
+							<auc:Ownership>The owner</auc:Ownership>
+							<auc:OccupancyClassification>Hospital</auc:OccupancyClassification>
+							<auc:PrimaryContactID>12345</auc:PrimaryContactID>
+							<auc:RetrocommissioningDate>1/1/2019</auc:RetrocommissioningDate>
+							<auc:BuildingAutomationSystem>true</auc:BuildingAutomationSystem>
+							<auc:HistoricalLandmark>true</auc:HistoricalLandmark>
+							<auc:PercentOccupiedByOwner>60</auc:PercentOccupiedByOwner>
+							<auc:OccupancyLevels>
+								<auc:OccupancyLevel>
+									<auc:OccupantQuantity>15</auc:OccupantQuantity>
+								</auc:OccupancyLevel>
+							</auc:OccupancyLevels>
+							<auc:SpatialUnits>
+								<auc:SpatialUnit>
+									<auc:NumberOfUnits>18</auc:NumberOfUnits>
+								</auc:SpatialUnit>
+							</auc:SpatialUnits>
 							<auc:Subsections>
 								<auc:Subsection ID="Default_Subsection">
 									<auc:OccupancyClassification>Retail</auc:OccupancyClassification>
