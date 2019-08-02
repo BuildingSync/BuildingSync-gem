@@ -991,7 +991,39 @@
 				</auc:Measure>
 			</auc:Measures>
 			<auc:Report>
+				<auc:AuditorContactID>123</auc:AuditorContactID>
+				<auc:AuditDate>5/1/2019</auc:AuditDate>
 				<auc:Scenarios>
+					<auc:Scenario>
+						<auc:ScenarioType>
+							<auc:CurrentBuilding/>
+						</auc:ScenarioType>
+						<auc:AllResourceTotals>
+							<auc:AllResourceTotal>
+								<auc:SiteEnergyUseIntensity>10.5</auc:SiteEnergyUseIntensity>
+								<auc:EnergyCost>1000</auc:EnergyCost>
+							</auc:AllResourceTotal>
+						</auc:AllResourceTotals>
+						<auc:ResourceUses>
+							<auc:ResourceUse>
+								<auc:AnnualFuelUseNativeUnits>kBtu/ft2</auc:AnnualFuelUseNativeUnits>
+							</auc:ResourceUse>
+						</auc:ResourceUses>
+					</auc:Scenario>
+					<auc:Scenario>
+						<auc:ScenarioType>
+							<auc:Benchmark>
+								<auc:BenchmarkType>
+									<auc:Other>Benchmark Type 1</auc:Other>
+								</auc:BenchmarkType>
+							</auc:Benchmark>
+						</auc:ScenarioType>
+						<auc:AllResourceTotals>
+							<auc:AllResourceTotal>
+								<auc:SiteEnergyUseIntensity>9.7</auc:SiteEnergyUseIntensity>
+							</auc:AllResourceTotal>
+						</auc:AllResourceTotals>
+					</auc:Scenario>
 					<auc:Scenario ID="Baseline">
 						<auc:ScenarioName>Baseline</auc:ScenarioName>
 						<auc:ScenarioType>
@@ -1640,6 +1672,21 @@
 					</auc:Scenario>
 				</auc:Scenarios>
 			</auc:Report>
+			<auc:Contacts>
+				<auc:Contact>
+					<auc:ContactName>a contact person</auc:ContactName>
+				</auc:Contact>
+			</auc:Contacts>
+			<auc:Utilities>
+				<auc:Utility>
+					<auc:UtilityName>an utility</auc:UtilityName>
+					<auc:MeteringConfiguration>metering config</auc:MeteringConfiguration>
+					<auc:RateSchedules>rate schedule</auc:RateSchedules>
+				</auc:Utility>
+				<auc:UtilityMeterNumbers>
+					<auc:UtilityMeterNumber>meter 1</auc:UtilityMeterNumber>
+				</auc:UtilityMeterNumbers>
+			</auc:Utilities>
 		</auc:Facility>
 	</auc:Facilities>
 </auc:BuildingSync>

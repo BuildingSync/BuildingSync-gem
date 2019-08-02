@@ -77,9 +77,6 @@ module BuildingSync
       @percent_occupied_by_owner = nil
       @occupant_quantity = nil
       @number_of_units = nil
-      @eui_building = nil
-      @benchmark_eui = nil
-
 
       @fraction_area = 1.0
       # code to initialize
@@ -282,18 +279,6 @@ module BuildingSync
         @number_of_units = building_element.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text
       else
         @number_of_units = nil
-      end
-
-      if building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EndUse"]
-        @eui_building = building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EndUse"].text
-      else
-        @eui_building = nil
-      end
-
-      if building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"]
-        @benchmark_eui = building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text
-      else
-        @benchmark_eui = nil
       end
     end
 

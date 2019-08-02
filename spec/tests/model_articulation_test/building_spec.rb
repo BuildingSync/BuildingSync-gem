@@ -158,7 +158,6 @@ RSpec.describe 'BuildingSpec' do
     expect(building.number_of_units == expected_value).to be true
   end
 
-
   # we skip the method "set_weater_and_climate_zone" function because this method doesn't return any value
   def get_building_from_file(xml_file_name, standard_to_be_used)
     xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
