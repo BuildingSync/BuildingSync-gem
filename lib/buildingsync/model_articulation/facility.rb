@@ -146,8 +146,8 @@ module BuildingSync
     end
 
     def read_other_details(facility_xml, ns)
-      if facility_xml.elements["#{ns}:Report/#{ns}:AuditorContactID"]
-        @auditor_contact_id = facility_xml.elements["#{ns}:Report/#{ns}:AuditorContactID"].text
+      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:AuditorContactID"]
+        @auditor_contact_id = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:AuditorContactID"].text
       else
         @auditor_contact_id = nil
       end
@@ -170,8 +170,8 @@ module BuildingSync
         @energy_cost = nil
       end
 
-      if facility_xml.elements["#{ns}:Report/#{ns}:AuditDate"]
-        @auditor_contact_id = Date.parse(facility_xml.elements["#{ns}:Report/#{ns}:AuditDate"].text)
+      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:AuditDate"]
+        @auditor_contact_id = Date.parse(facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:AuditDate"].text)
       else
         @auditor_contact_id = nil
       end
