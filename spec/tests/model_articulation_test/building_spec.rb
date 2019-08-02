@@ -158,6 +158,27 @@ RSpec.describe 'BuildingSpec' do
     expect(building.number_of_units == expected_value).to be true
   end
 
+  it 'Should return built_year' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = Integer('2003')
+    puts "expected built_year: #{expected_value} but got: #{building.built_year} " if building.built_year != expected_value
+    expect(building.built_year == expected_value).to be true
+  end
+
+  it 'Should return major_remodel_year' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = Integer('2003')
+    puts "expected major_remodel_year: #{expected_value} but got: #{building.major_remodel_year} " if building.major_remodel_year != expected_value
+    expect(building.major_remodel_year == expected_value).to be true
+  end
+
+  it 'Should return year_of_last_energy_audit' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = Integer('2010')
+    puts "expected year_of_last_energy_audit: #{expected_value} but got: #{building.year_of_last_energy_audit} " if building.year_of_last_energy_audit != expected_value
+    expect(building.year_of_last_energy_audit == expected_value).to be true
+  end
+
   # we skip the method "set_weater_and_climate_zone" function because this method doesn't return any value
   def get_building_from_file(xml_file_name, standard_to_be_used)
     xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))

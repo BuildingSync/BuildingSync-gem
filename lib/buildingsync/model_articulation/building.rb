@@ -34,7 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative 'building_subsection'
+require_relative 'building_section'
 require_relative '../../../lib/buildingsync/get_bcl_weather_file'
 require 'date'
 require 'openstudio/extension/core/os_lib_helper_methods'
@@ -100,7 +100,7 @@ module BuildingSync
       @occupancy_type = read_occupancy_type(build_element, site_occupancy_type, ns)
 
       build_element.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |subsection_element|
-        @building_subsections.push(BuildingSubsection.new(subsection_element, @occupancy_type, @total_floor_area, ns))
+        @building_subsections.push(BuildingSection.new(subsection_element, @occupancy_type, @total_floor_area, ns))
       end
 
       # floor areas
@@ -139,15 +139,15 @@ module BuildingSync
         raise 'Error : Year of Construction is blank in your BuildingSync file.'
       end
 
-      @built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_f
+      @built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_i
 
       if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
-        @major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_f
+        @major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_i
         @built_year = @major_remodel_year if @major_remodel_year > @built_year
       end
 
       if build_element.elements["#{ns}:YearOfLastEnergyAudit"]
-        @year_of_last_energy_audit = build_element.elements["#{ns}:YearOfLastEnergyAudit"].text.to_f
+        @year_of_last_energy_audit = build_element.elements["#{ns}:YearOfLastEnergyAudit"].text.to_i
       end
     end
 
@@ -891,6 +891,6 @@ module BuildingSync
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr, :year_of_last_energy_audit, :ownership,
                 :occupancy_classification, :primary_contact_id, :retro_commissioning_date, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
-                :occupant_quantity, :number_of_units
+                :occupant_quantity, :number_of_units, :built_year, :major_remodel_year
   end
 end

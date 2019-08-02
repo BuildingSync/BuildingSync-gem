@@ -37,7 +37,7 @@
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio-standards'
 module BuildingSync
-  class BuildingSubsection < SpatialElement
+  class BuildingSection < SpatialElement
     include OsLib_ModelGenerationBRICR
     include OpenstudioStandards
 
@@ -84,11 +84,9 @@ module BuildingSync
           @typical_occupant_usage_value_weeks = subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text
         end
       end
-
-
     end
 
-    attr_reader :bldg_type, :space_types_floor_area
+    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_hours, :typical_occupant_usage_value_weeks
     attr_accessor :fraction_area
   end
 end
