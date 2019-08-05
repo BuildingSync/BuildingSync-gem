@@ -37,7 +37,7 @@
 module BuildingSync
   class HVACSystem < BuildingSystem
 
-    def initialize(system_element = '', ns = '')
+    def initialize(system_element = nil, ns = '')
       # code to initialize
       @primary_hvac_system_type = nil
 
