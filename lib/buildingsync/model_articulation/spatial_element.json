@@ -1,0 +1,116 @@
+{
+  "Retail": [{
+    "bldg_type": "RetailStandalone",
+    "bar_division_method": "Multiple Space Types - Individual Stories Sliced",
+    "system_type": "PSZ-AC with gas coil heat",
+    "condition": ""
+  }],
+  "Office": [{
+    "bldg_type": "SmallOffice",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-AC with gas coil heat",
+    "condition": "0-2000"
+  },
+    {
+      "bldg_type": "MediumOffice",
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PVAV with reheat",
+      "condition": "2000-75000"
+    },
+    {
+      "bldg_type": "LargeOffice",
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "VAV with reheat",
+      "condition": ""
+    }],
+  "StripMall": [{
+    "bldg_type": "RetailStripmall",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-AC with gas coil heat",
+    "condition": ""
+  }],
+  "PrimarySchool": [{
+    "bldg_type": "PrimarySchool",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PVAV with reheat",
+    "condition": ""
+  }],
+  "SecondarySchool": [{
+    "bldg_type": "SecondarySchool",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "VAV with reheat",
+    "condition": ""
+  }],
+  "Outpatient": [{
+    "bldg_type": "Outpatient",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PVAV with reheat",
+    "condition": ""
+  }],
+  "Hospital": [{
+    "bldg_type": "Hospital",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "VAV with reheat",
+    "condition": ""
+  }],
+  "SmallHotel": [{
+    "bldg_type": "SmallHotel",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PTAC with electric baseboard heat",
+    "condition": ""
+  }],
+  "LargeHotel": [{
+    "bldg_type": "LargeHotel",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "VAV with reheat",
+    "condition": ""
+  }],
+  "QuickServiceRestaurant": [{
+    "bldg_type": "QuickServiceRestaurant",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-AC with gas coil heat",
+    "condition": ""
+  }],
+  "FullServiceRestaurant": [{
+    "bldg_type": "FullServiceRestaurant",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-AC with gas coil heat",
+    "condition": ""
+  }],
+  "MidriseApartment": [{
+    "bldg_type": "MidriseApartment",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-AC with gas coil heat",
+    "condition": ""
+  }],
+  "HighriseApartment": [{
+    "bldg_type": "HighriseApartment",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-HP",
+    "condition": ""
+  }],
+  "Warehouse": [{
+    "bldg_type": "Warehouse",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-AC with gas coil heat",
+    "condition": ""
+  }],
+  "SuperMarket": [{
+    "bldg_type": "SuperMarket",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-AC with gas coil heat",
+    "condition": ""
+  }],
+  "Lodging": [{
+    "bldg_type": "Lodging",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-AC with gas coil heat",
+    "condition": ""
+  }],
+  "Laboratory-Testing": [{
+    "bldg_type": "Laboratory",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "tbd",
+    "condition": ""
+  }]
+}
