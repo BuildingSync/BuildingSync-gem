@@ -138,21 +138,25 @@ module BuildingSync
           raise "Building total floor area '#{total_floor_area}' is nil"
         end
       end
+      puts "to get @bldg_type #{@bldg_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}"
     end
 
     def process_bldg_and_system_type(json, occupancy_type, total_floor_area)
+      puts "using occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}"
       min_floor_area_correct = false
       max_floor_area_correct = false
       json[:"#{occupancy_type}"].each do |occ_type|
         if !occ_type[:bldg_type].nil?
-          if occ_type[:min_floor_area] != 'undefined' || occ_type[:max_floor_area] != 'undefined'
+          puts "occ_type[:min_floor_area] #{occ_type[:min_floor_area]}"
+          puts "occ_type[:max_floor_area] #{occ_type[:max_floor_area]}"
+          if occ_type[:min_floor_area] || occ_type[:max_floor_area]
             if occ_type[:min_floor_area] && occ_type[:min_floor_area].to_f < total_floor_area
               min_floor_area_correct = true
             end
             if occ_type[:max_floor_area] && occ_type[:max_floor_area].to_f > total_floor_area
               max_floor_area_correct = true
             end
-            if min_floor_area_correct && max_floor_area_correct
+            if (min_floor_area_correct && max_floor_area_correct) || (occ_type[:min_floor_area] && max_floor_area_correct) || (min_floor_area_correct && occ_type[:max_floor_area])
               @bldg_type = occ_type[:bldg_type]
               @bar_division_method = occ_type[:bar_division_method]
               @system_type = occ_type[:system_type]
