@@ -118,25 +118,15 @@ module BuildingSync
     end
 
     def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
-      ' DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb'
-      ' SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient'
-      ' Hospital, SmallHotel, LargeHotel, QuickServiceRestaurant, FullServiceRestaurant, MidriseApartment, HighriseApartment, Warehouse'
+      # DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb
+      # SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient
+      # Hospital, SmallHotel, LargeHotel, QuickServiceRestaurant, FullServiceRestaurant, MidriseApartment, HighriseApartment, Warehouse
 
       if !occupancy_type.nil? && !total_floor_area.nil?
-        json_file_path = File.expand_path('spatial_element.json', File.dirname(__FILE__))
+        json_file_path = File.expand_path('bldg_and_system_types.json', File.dirname(__FILE__))
         json = eval(File.read(json_file_path))
 
-        json[:"#{occupancy_type}"].each do |occ_type|
-          if !occ_type[:bldg_type].nil?
-            if occupancy_type == 'Office'
-              set_bldg_and_system_type_for_office_bldg_type(occ_type, total_floor_area)
-            else
-              @bldg_type = occ_type[:bldg_type]
-              @bar_division_method = occ_type[:bar_division_method]
-              @system_type = occ_type[:system_type]
-            end
-          end
-        end
+        process_bldg_and_system_type(json, occupancy_type, total_floor_area)
 
         if @bldg_type == ''
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
@@ -149,6 +139,35 @@ module BuildingSync
         end
       end
     end
+
+    def process_bldg_and_system_type(json, occupancy_type, total_floor_area)
+      min_floor_area_correct = false
+      max_floor_area_correct = false
+      json[:"#{occupancy_type}"].each do |occ_type|
+        if !occ_type[:bldg_type].nil?
+          if occ_type[:min_floor_area] != 'undefined' || occ_type[:max_floor_area] != 'undefined'
+            if occ_type[:min_floor_area] && occ_type[:min_floor_area].to_f < total_floor_area
+              min_floor_area_correct = true
+            end
+            if occ_type[:max_floor_area] && occ_type[:max_floor_area].to_f > total_floor_area
+              max_floor_area_correct = true
+            end
+            if min_floor_area_correct && max_floor_area_correct
+              @bldg_type = occ_type[:bldg_type]
+              @bar_division_method = occ_type[:bar_division_method]
+              @system_type = occ_type[:system_type]
+              return
+            end
+          else
+            # otherwise we assume the first one is correct and we select this
+            @bldg_type = occ_type[:bldg_type]
+            @bar_division_method = occ_type[:bar_division_method]
+            @system_type = occ_type[:system_type]
+          end
+        end
+      end
+    end
+
 
     def validate_positive_number_excluding_zero(name, value)
       if value <= 0
