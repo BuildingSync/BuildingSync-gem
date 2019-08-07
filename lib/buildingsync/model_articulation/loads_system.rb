@@ -114,7 +114,7 @@ module BuildingSync
 
     def adjust_people_schedule(space_type, building_section, model)
       default_sch_set = space_type.defaultScheduleSet.get
-      if building_section.typical_occupant_usage_value_hours
+      if building_section && building_section.typical_occupant_usage_value_hours
         # should we just assume constant schedule for the number of hours per week/day or adjust the existing schedules?
         hours_per_day = building_section.typical_occupant_usage_value_hours.to_f / 7
 
