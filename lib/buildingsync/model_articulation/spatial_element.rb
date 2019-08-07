@@ -109,88 +109,36 @@ module BuildingSync
       end
     end
 
+    def set_bldg_and_system_type_for_office_bldg_type(occ_type, total_floor_area)
+      if ((total_floor_area > 0) && (total_floor_area < 20000) && occ_type[:condition] == '0-2000') || ((total_floor_area >= 20000) && (total_floor_area < 75000) && occ_type[:condition] == '2000-75000') || occ_type[:condition] = ''
+        @bldg_type = occ_type[:bldg_type]
+        @bar_division_method = occ_type[:bar_division_method]
+        @system_type = occ_type[:system_type]
+      end
+    end
+
     def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
       ' DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb'
       ' SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient'
       ' Hospital, SmallHotel, LargeHotel, QuickServiceRestaurant, FullServiceRestaurant, MidriseApartment, HighriseApartment, Warehouse'
+
       if !occupancy_type.nil? && !total_floor_area.nil?
-        if occupancy_type == 'Retail'
-          @bldg_type = 'RetailStandalone'
-          @bar_division_method = 'Multiple Space Types - Individual Stories Sliced'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'Office'
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          if (total_floor_area > 0) && (total_floor_area < 20000)
-            @bldg_type = 'SmallOffice'
-            @system_type = 'PSZ-AC with gas coil heat'
-          elsif total_floor_area >= 20000 && total_floor_area < 75000
-            @bldg_type = 'MediumOffice'
-            @system_type = 'PVAV with reheat'
-          else
-            @bldg_type = 'LargeOffice'
-            @system_type = 'VAV with reheat'
+        json_file_path = File.expand_path('spatial_element.json', File.dirname(__FILE__))
+        json = eval(File.read(json_file_path))
+
+        json[:"#{occupancy_type}"].each do |occ_type|
+          if !occ_type[:bldg_type].nil?
+            if occupancy_type == 'Office'
+              set_bldg_and_system_type_for_office_bldg_type(occ_type, total_floor_area)
+            else
+              @bldg_type = occ_type[:bldg_type]
+              @bar_division_method = occ_type[:bar_division_method]
+              @system_type = occ_type[:system_type]
+            end
           end
-        elsif occupancy_type == 'StripMall'
-          @bldg_type = 'RetailStripmall'
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat' # Two speed DX AC
-        elsif occupancy_type == 'PrimarySchool'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PVAV with reheat'
-        elsif occupancy_type == 'SecondarySchool'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'VAV with reheat'
-        elsif occupancy_type == 'Outpatient'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PVAV with reheat'
-        elsif occupancy_type == 'Hospital'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'VAV with reheat'
-        elsif occupancy_type == 'SmallHotel'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PTAC with electric baseboard heat'
-        elsif occupancy_type == 'LargeHotel'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'VAV with reheat'
-        elsif occupancy_type == 'QuickServiceRestaurant'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'FullServiceRestaurant'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'MidriseApartment'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'HighriseApartment'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-HP'
-        elsif occupancy_type == 'Warehouse'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'SuperMarket'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'Lodging'
-          @bldg_type = 'MidriseApartment'
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'Laboratory-Testing'
-          @bldg_type = 'Laboratory'
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
-        else
+        end
+
+        if @bldg_type == ''
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
         end
       elsif raise_exception
