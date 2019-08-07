@@ -61,7 +61,7 @@ RSpec.describe 'BuildingSpec' do
 
   it 'Should return typical_occupant_usage_value_weeks ' do
     building_section = get_building_section_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = '50,0'
+    expected_value = '50.0'
     puts "expected typical_occupant_usage_value_weeks : #{expected_value} but got: #{building_section.typical_occupant_usage_value_weeks} " if building_section.typical_occupant_usage_value_weeks != expected_value
     expect(building_section.typical_occupant_usage_value_weeks == expected_value).to be true
   end

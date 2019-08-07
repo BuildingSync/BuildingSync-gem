@@ -891,6 +891,6 @@ module BuildingSync
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr, :year_of_last_energy_audit, :ownership,
                 :occupancy_classification, :primary_contact_id, :retro_commissioning_date, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
-                :occupant_quantity, :number_of_units, :built_year, :major_remodel_year
+                :occupant_quantity, :number_of_units, :built_year, :major_remodel_year, :building_subsections
   end
 end

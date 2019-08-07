@@ -43,7 +43,7 @@ module BuildingSync
     end
 
     # add internal loads from standard definitions
-    def add_internal_loads(model, standard, template, remove_objects)
+    def add_internal_loads(model, standard, template, building_sections, remove_objects)
       # remove internal loads
       if remove_objects
         model.getSpaceLoads.each do |instance|
@@ -69,6 +69,9 @@ module BuildingSync
         # the last bool test it to make thermostat schedules. They are now added in HVAC section instead of here
         standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
 
+        # here we adjust the people schedules according to user input of hours per week and weeks per year
+        adjust_people_schedule(space_type, get_building_section(building_sections, space_type.standardsBuildingType, space_type.standardsSpaceType), model)
+
         # extend space type name to include the template. Consider this as well for load defs
         space_type.setName("#{space_type.name} - #{template}")
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding loads to space type named #{space_type.name}")
@@ -85,6 +88,104 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "#{spaces_without_space_types.size} spaces do not have space types assigned, and wont' receive internal loads from standards space type lookups.")
       end
       return true
+    end
+
+    def get_building_section(building_sections, standard_building_type, standard_space_type)
+      puts "building_sections: #{building_sections}"
+      puts "standard_building_type: #{standard_building_type}"
+      puts "standard_space_type: #{standard_space_type}"
+      if building_sections.count == 1
+        return building_sections[0]
+      end
+      building_sections.each do |section|
+        puts "section #{section}"
+        puts "section.occupancy_type #{section.occupancy_type}"
+        if section.occupancy_type == standard_building_type
+          section.space_types.each do |space_type_name, hash|
+            if space_type_name == standard_space_type
+              puts "space_type_name #{space_type_name}"
+              return section
+            end
+          end
+        end
+      end
+      return nil
+    end
+
+    def adjust_people_schedule(space_type, building_section, model)
+      default_sch_set = space_type.defaultScheduleSet.get
+      if building_section.typical_occupant_usage_value_hours
+        # should we just assume constant schedule for the number of hours per week/day or adjust the existing schedules?
+        hours_per_day = building_section.typical_occupant_usage_value_hours.to_f / 7
+
+        off_part = (24 - hours_per_day) / 2
+
+        values = []
+        off_part.to_i.times do
+          values << 0
+        end
+        hours_per_day.to_i.times do
+          values << 1
+        end
+        remainder = 24 - 2 * off_part.to_i - hours_per_day.to_i
+        if remainder > 0
+          values << 1
+        end
+        last_part = 24 - values.count
+        last_part.to_i.times do
+          values << 0
+        end
+
+        dates = []
+        start_date = OpenStudio::Date.new(OpenStudio::MonthOfYear.new(1), 1)
+        end_date = OpenStudio::Date.new(OpenStudio::MonthOfYear.new(12), 31)
+        if building_section.typical_occupant_usage_value_weeks
+          if building_section.typical_occupant_usage_value_weeks.to_i < 52
+            # we assume one week on Christmas and the remainder during summer
+            start_date_holiday = start_date + OpenStudio::Time.new(7 * building_section.typical_occupant_usage_value_weeks.to_i/2, 0)
+            start_date_christmas = end_date - OpenStudio::Time.new(7, 0)
+            end_date_holiday = start_date_christmas - OpenStudio::Time.new(7 * building_section.typical_occupant_usage_value_weeks.to_i/2, 0)
+            dates << start_date
+            dates << start_date_holiday
+            dates << end_date_holiday
+            dates << start_date_christmas
+            dates << end_date
+          end
+        end
+        default_sch_set.setNumberofPeopleSchedule(add_schedule(model, 'Number Of People', values, dates))
+      end
+    end
+
+    def add_schedule(model, schedule_name, values, dates)
+      # Make a schedule ruleset
+      sch_ruleset = OpenStudio::Model::ScheduleRuleset.new(model)
+      sch_ruleset.setName(schedule_name.to_s)
+      day_sch = sch_ruleset.defaultDaySchedule
+      day_sch.setName("#{schedule_name} Default")
+      (0..23).each do |i|
+        next if values[i] == values[i + 1]
+        day_sch.addValue(OpenStudio::Time.new(0, i + 1, 0, 0), values[i])
+      end
+
+      if dates.count > 2
+        # first we create an empty day schedule
+        null_day_sch = OpenStudio::Model::ScheduleDay.new(model)
+        null_day_sch.setName(schedule_name.to_s + ' null sched')
+        null_day_sch.addValue(OpenStudio::Time.new(0, 24, 0, 0), 0)
+        i = 1
+        iIndex = 0
+        while i < dates.count
+          # if we have more than two dates we need to add more rules
+          sch_rule = OpenStudio::Model::ScheduleRule.new(sch_ruleset, null_day_sch)
+          sch_rule.setName(schedule_name.to_s)
+          sch_rule.setStartDate(dates[i])
+          i += 1
+          sch_rule.setEndDate(dates[i])
+          i += 1
+          iIndex += 1
+        end
+      end
+      return sch_ruleset
     end
 
     def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)

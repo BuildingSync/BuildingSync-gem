@@ -39,6 +39,7 @@ require_relative 'loads_system'
 require_relative 'envelope_system'
 require_relative 'hvac_system'
 require_relative 'service_hot_water_system'
+require_relative 'measure'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio/extension/core/os_lib_geometry'
 require_relative '../helpers/Model.hvac'
@@ -55,6 +56,7 @@ module BuildingSync
       # code to initialize
       # an array that contains all the sites
       @sites = []
+      @measures = []
       @auditor_contact_id = nil
       @audit_date = nil
       @contact_name = nil
@@ -79,6 +81,10 @@ module BuildingSync
     def read_xml(facility_xml, ns)
       facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
         @sites.push(Site.new(site_element, ns))
+      end
+
+      facility_xml.elements.each("#{ns}:Measures/#{ns}:Measure") do |measure_element|
+        @measures.push(Measure.new(measure_element, ns))
       end
 
       read_other_details(facility_xml, ns)
@@ -204,7 +210,7 @@ module BuildingSync
 
       # add internal loads to space types
       if add_space_type_loads
-        load_system.add_internal_loads(model, open_studio_system_standard, template, remove_objects)
+        load_system.add_internal_loads(model, open_studio_system_standard, template, @sites[0].get_building_sections, remove_objects)
       end
 
       # identify primary building type (used for construction, and ideally HVAC as well)

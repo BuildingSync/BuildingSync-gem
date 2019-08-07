@@ -142,6 +142,11 @@
 					</auc:TechnologyCategories>
 					<auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
 					<auc:LongDescription>Retrofit with light emitting diode technologies</auc:LongDescription>
+					<auc:AnnualSavingsCost>26956</auc:AnnualSavingsCost>
+					<auc:AnnualSavingsByFuels>
+						<auc:SimplePayback>5</auc:SimplePayback>
+						<auc:MeasureRank>2</auc:MeasureRank>
+					</auc:AnnualSavingsByFuels>
 					<auc:MVCost>0</auc:MVCost>
 					<auc:UsefulLife>12</auc:UsefulLife>
 					<auc:MeasureTotalFirstCost>267390.2</auc:MeasureTotalFirstCost>
