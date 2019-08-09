@@ -362,6 +362,12 @@ module BuildingSync
       return @failed_scenarios
     end
 
+    def saveXML(filename)
+      File.open(filename, 'w') do |file|
+        @doc.write(file)
+      end
+    end
+
     def gather_results(dir)
 
       super
@@ -376,7 +382,7 @@ module BuildingSync
 
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) and BRICR::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
+        next if defined?(BUILDINGSYNC::SIMULATE_BASELINE_ONLY) and BUILDINGSYNC::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
 
         # dir for the osw
         osw_dir = File.join(dir, scenario_name)
@@ -418,7 +424,7 @@ module BuildingSync
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) and BRICR::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
+        next if defined?(BUILDINGSYNC::SIMULATE_BASELINE_ONLY) and BUILDINGSYNC::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
 
         package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
 
@@ -471,25 +477,6 @@ module BuildingSync
           user_defined_fields.elements.delete(element)
         end
 
-        # user_defined_field = REXML::Element.new("#{@ns}:UserDefinedField")
-        # field_name = REXML::Element.new("#{@ns}:FieldName")
-        # field_name.text = 'OpenStudioCompletedStatus'
-        # field_value = REXML::Element.new("#{@ns}:FieldValue")
-        # field_value.text = result[:completed_status]
-        # user_defined_field.add_element(field_name)
-        # user_defined_field.add_element(field_value)
-        # user_defined_fields.add_element(user_defined_field)
-
-        # KAF: I don't think we are using this in new schema. you would look at the baseline scenario and check its "SimulationCompletionStatus"
-        #user_defined_field = REXML::Element.new("#{@ns}:UserDefinedField")
-        #field_name = REXML::Element.new("#{@ns}:FieldName")
-        #field_name.text = 'OpenStudioBaselineCompletedStatus'
-        #field_value = REXML::Element.new("#{@ns}:FieldValue")
-        #field_value.text = baseline[:completed_status]
-        #user_defined_field.add_element(field_name)
-        #user_defined_field.add_element(field_value)
-        #user_defined_fields.add_element(user_defined_field)
-
         # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
         # options are: Not Started, Started, Finished, Failed, Unknown
         calc_method = REXML::Element.new("#{@ns}:CalculationMethod")
@@ -515,10 +502,6 @@ module BuildingSync
 
         total_site_eui_kbtu_ft2 = getMeasureResult(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
         baseline_total_site_eui_kbtu_ft2 = getMeasureResult(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-
-        # DLM: this is not being populated, https://github.com/NREL/OpenStudio-measures/issues/254
-        #total_source_energy_kbtu = getMeasureResult(result, 'openstudio_results', 'total_source_energy') # in kBtu
-        #baseline_total_source_energy_kbtu = getMeasureResult(baseline, 'openstudio_results', 'total_source_energy') # in kBtu
 
         # temporary hack to get source energy
         eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
@@ -600,25 +583,6 @@ module BuildingSync
         annual_savings.add_element(annual_saving)
 
         package_of_measures.add_element(annual_savings)
-
-        # KAF: replacing user defined fields with BuildingSync fields
-
-        # user_defined_field = REXML::Element.new("#{@ns}:UserDefinedField")
-        # field_name = REXML::Element.new("#{@ns}:FieldName")
-        # field_name.text = 'OpenStudioAnnualElectricity_kBtu'
-        # field_value = REXML::Element.new("#{@ns}:FieldValue")
-        # field_value.text = fuel_electricity.to_s
-        # user_defined_field.add_element(field_name)
-        # user_defined_field.add_element(field_value)
-        # user_defined_fields.add_element(user_defined_field)
-        # user_defined_field = REXML::Element.new("#{@ns}:UserDefinedField")
-        # field_name = REXML::Element.new("#{@ns}:FieldName")
-        # field_name.text = 'OpenStudioAnnualNaturalGas_kBtu'
-        # field_value = REXML::Element.new("#{@ns}:FieldValue")
-        # field_value.text = fuel_natural_gas.to_s
-        # user_defined_field.add_element(field_name)
-        # user_defined_field.add_element(field_value)
-        # user_defined_fields.add_element(user_defined_field)
 
         res_uses = REXML::Element.new("#{@ns}:ResourceUses")
         scenario_name_ns = scenario_name.gsub(" ", "_").gsub(/[^0-9a-z_]/i, '')
@@ -777,6 +741,26 @@ module BuildingSync
         # no longer using user defined fields
         scenario.elements.delete("#{@ns}:UserDefinedFields")
       end
+    end
+
+    # DLM: total hack because these are not reported in the out.osw
+    # output is array of [source_energy, source_eui] in kBtu and kBtu/ft2
+    def getSourceEnergyArray(eplustbl_path)
+      result = []
+      File.open(eplustbl_path, 'r') do |f|
+        while line = f.gets
+          if /\<td align=\"right\"\>Total Source Energy\<\/td\>/.match(line)
+            result << /\<td align=\"right\"\>(.*?)<\/td\>/.match(f.gets)[1].to_f
+            result << /\<td align=\"right\"\>(.*?)<\/td\>/.match(f.gets)[1].to_f
+            break
+          end
+        end
+      end
+
+      result[0] = result[0]*947.8171203133 # GJ to kBtu
+      result[1] = result[1]*0.947817120313*0.092903 # MJ/m2 to kBtu/ft2
+
+      return result
     end
   end
 
