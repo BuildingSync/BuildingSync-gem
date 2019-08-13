@@ -34,7 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative 'building_section'
+require_relative 'building_subsection'
 require_relative '../../../lib/buildingsync/get_bcl_weather_file'
 require 'date'
 require 'openstudio/extension/core/os_lib_helper_methods'
@@ -100,7 +100,7 @@ module BuildingSync
       @occupancy_type = read_occupancy_type(build_element, site_occupancy_type, ns)
 
       build_element.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |subsection_element|
-        @building_subsections.push(BuildingSection.new(subsection_element, @occupancy_type, @total_floor_area, ns))
+        @building_subsections.push(BuildingSubsection.new(subsection_element, @occupancy_type, @total_floor_area, ns))
       end
 
       # floor areas
