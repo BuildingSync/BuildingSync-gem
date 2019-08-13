@@ -378,7 +378,8 @@ module BuildingSync
 
       # write an osw for each scenario
 
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      # @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
 
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
@@ -421,7 +422,8 @@ module BuildingSync
         end
       end
 
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      # @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         next if defined?(BUILDINGSYNC::SIMULATE_BASELINE_ONLY) and BUILDINGSYNC::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
@@ -666,8 +668,10 @@ module BuildingSync
           timeseries.add_element(interval_frequency)
           interval_reading = REXML::Element.new("#{@ns}:IntervalReading")
           the_key = "electricity_ip_#{month_lookup[month]}"
-          #puts "saving value: #{monthly_results[scenario_name][the_key.to_sym]}"
+          # puts "saving value 123: #{monthly_results[scenario_name][the_key]}"
+          if !monthly_results[scenario_name][the_key.to_sym].nil?
           interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 3.4121416331 # kWh to kBtu
+          end
           timeseries.add_element(interval_reading)
           resource_id = REXML::Element.new("#{@ns}:ResourceUseID")
           resource_id.add_attribute('IDref', scenario_name_ns + "_Electricity")
@@ -708,7 +712,9 @@ module BuildingSync
           interval_reading = REXML::Element.new("#{@ns}:IntervalReading")
           the_key = "natural_gas_ip_#{month_lookup[month]}"
           #puts "saving value: #{monthly_results[scenario_name][the_key.to_sym]}"
-          interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 1000.0 # MMBtu to kBtu
+          if !monthly_results[scenario_name][the_key.to_sym].nil?
+            interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 1000.0 # MMBtu to kBtu
+          end
           timeseries.add_element(interval_reading)
           resource_id = REXML::Element.new("#{@ns}:ResourceUseID")
           resource_id.add_attribute('IDref', scenario_name_ns + "_NaturalGas")
@@ -740,6 +746,7 @@ module BuildingSync
 
         # no longer using user defined fields
         scenario.elements.delete("#{@ns}:UserDefinedFields")
+        p "code come here #{package_of_measures}"
       end
     end
 
@@ -761,6 +768,22 @@ module BuildingSync
       result[1] = result[1]*0.947817120313*0.092903 # MJ/m2 to kBtu/ft2
 
       return result
+    end
+
+    def getMeasureResult(result, measure_dir_name, result_name)
+      result[:steps].each do |step|
+        if step[:measure_dir_name] == measure_dir_name
+          if step[:result] && step[:result][:step_values]
+            step[:result][:step_values].each do |step_value|
+              if step_value[:name] == result_name
+                return step_value[:value]
+              end
+            end
+          end
+        end
+      end
+
+      return nil
     end
   end
 
