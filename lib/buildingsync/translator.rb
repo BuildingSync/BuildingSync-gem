@@ -117,6 +117,10 @@ module BuildingSync
       @model_maker.gather_results(dir)
     end
 
+    def saveXML(filename)
+      @model_maker.saveXML(filename)
+    end
+
     def write_osws
       @model_maker.write_osws(@output_dir)
     end

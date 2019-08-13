@@ -224,6 +224,7 @@ RSpec.configure do |config|
     parent_dir_path = File.expand_path('..', dir_path)
 
     translator.gather_results(parent_dir_path)
+    translator.saveXML(File.join(parent_dir_path, 'results.xml'))
   end
 
   def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
