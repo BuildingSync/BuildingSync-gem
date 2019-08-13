@@ -113,6 +113,14 @@ module BuildingSync
       @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, replace_whitespace)
     end
 
+    def gather_results(dir)
+      @model_maker.gather_results(dir)
+    end
+
+    def saveXML(filename)
+      @model_maker.saveXML(filename)
+    end
+
     def write_osws
       @model_maker.write_osws(@output_dir)
     end

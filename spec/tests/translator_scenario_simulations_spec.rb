@@ -49,4 +49,12 @@ RSpec.describe 'BuildingSync' do
     osw_paths = test_baseline_and_scenario_creation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw')
     run_scenario_simulations(osw_paths)
   end
+
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and all simulations and gather their results also' do
+    test_baseline_and_scenario_creation_with_simulation('building_151.xml', 30)
+  end
+
+  it 'should parse and write DC GSA Headquarters.xml (phase zero) with auc namespace for ASHRAE90_1 and all simulations and gather their results also' do
+    test_baseline_and_scenario_creation_with_simulation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw')
+  end
 end
