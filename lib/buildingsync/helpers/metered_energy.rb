@@ -36,7 +36,6 @@
 # *******************************************************************************
 
 class MeteredEnergy
-
   def initialize(energy_resource, interval_frequency, reading_type, interval_reading)
     @energy_resource = energy_resource
     @interval_frequency = interval_frequency
