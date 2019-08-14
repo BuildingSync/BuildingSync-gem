@@ -113,79 +113,39 @@ module BuildingSync
     end
 
     def adjust_people_schedule(space_type, building_section, model)
-      default_sch_set = space_type.defaultScheduleSet.get
-      if building_section && building_section.typical_occupant_usage_value_hours
-        # should we just assume constant schedule for the number of hours per week/day or adjust the existing schedules?
-        hours_per_day = building_section.typical_occupant_usage_value_hours.to_f / 7
+      args = {}
+      args['hoo_per_week'] = building_section.typical_occupant_usage_value_hours
 
-        off_part = (24 - hours_per_day) / 2
+      model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+      path = model_articulation_instance.measures_dir + '/create_parametric_schedules/measure.rb'
+      puts "create parametric schedule path: #{path}"
+      require path
 
-        values = []
-        off_part.to_i.times do
-          values << 0
-        end
-        hours_per_day.to_i.times do
-          values << 1
-        end
-        remainder = 24 - 2 * off_part.to_i - hours_per_day.to_i
-        if remainder > 0
-          values << 1
-        end
-        last_part = 24 - values.count
-        last_part.to_i.times do
-          values << 0
-        end
+      # create an instance of the measure
+      measure = CreateParametricSchedules.new
 
-        dates = []
-        start_date = OpenStudio::Date.new(OpenStudio::MonthOfYear.new(1), 1)
-        end_date = OpenStudio::Date.new(OpenStudio::MonthOfYear.new(12), 31)
-        if building_section.typical_occupant_usage_value_weeks
-          if building_section.typical_occupant_usage_value_weeks.to_i < 52
-            # we assume one week on Christmas and the remainder during summer
-            start_date_holiday = start_date + OpenStudio::Time.new(7 * building_section.typical_occupant_usage_value_weeks.to_i/2, 0)
-            start_date_christmas = end_date - OpenStudio::Time.new(7, 0)
-            end_date_holiday = start_date_christmas - OpenStudio::Time.new(7 * building_section.typical_occupant_usage_value_weeks.to_i/2, 0)
-            dates << start_date
-            dates << start_date_holiday
-            dates << end_date_holiday
-            dates << start_date_christmas
-            dates << end_date
-          end
-        end
-        default_sch_set.setNumberofPeopleSchedule(add_schedule(model, 'Number Of People', values, dates))
-      end
-    end
+      # create an instance of a runner
+      runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
 
-    def add_schedule(model, schedule_name, values, dates)
-      # Make a schedule ruleset
-      sch_ruleset = OpenStudio::Model::ScheduleRuleset.new(model)
-      sch_ruleset.setName(schedule_name.to_s)
-      day_sch = sch_ruleset.defaultDaySchedule
-      day_sch.setName("#{schedule_name} Default")
-      (0..23).each do |i|
-        next if values[i] == values[i + 1]
-        day_sch.addValue(OpenStudio::Time.new(0, i + 1, 0, 0), values[i])
+      # get arguments
+      arguments = measure.arguments(model)
+      argument_map = OpenStudio::Ruleset.convertOSArgumentVectorToMap(arguments)
+
+      # populate argument with specified hash value if specified
+      arguments.each do |arg|
+        temp_arg_var = arg.clone
+        if args.key?(arg.name)
+          temp_arg_var.setValue(args[arg.name])
+        end
+        argument_map[arg.name] = temp_arg_var
       end
 
-      if dates.count > 2
-        # first we create an empty day schedule
-        null_day_sch = OpenStudio::Model::ScheduleDay.new(model)
-        null_day_sch.setName(schedule_name.to_s + ' null sched')
-        null_day_sch.addValue(OpenStudio::Time.new(0, 24, 0, 0), 0)
-        i = 1
-        iIndex = 0
-        while i < dates.count
-          # if we have more than two dates we need to add more rules
-          sch_rule = OpenStudio::Model::ScheduleRule.new(sch_ruleset, null_day_sch)
-          sch_rule.setName(schedule_name.to_s)
-          sch_rule.setStartDate(dates[i])
-          i += 1
-          sch_rule.setEndDate(dates[i])
-          i += 1
-          iIndex += 1
-        end
-      end
-      return sch_ruleset
+      # run the measure
+      measure.run(model, runner, argument_map)
+      result = runner.result
+
+      # if 'Fail' passed in make sure at least one error message (while not typical there may be more than one message)
+      if result.value.valueName == 'Fail' then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.adjust_people_schedule', "Applying the create parametric schedule measure failed with #{result.errors.size} errors") end
     end
 
     def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
