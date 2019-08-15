@@ -45,6 +45,38 @@ RSpec.describe 'BuildingSpec' do
     end
   end
 
+  it 'Should return occupancy_classification ' do
+    building_section = get_building_section_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = 'Retail'
+    puts "expected occupancy_classification : #{expected_value} but got: #{building_section.occupancy_classification} " if building_section.occupancy_classification != expected_value
+    expect(building_section.occupancy_classification == expected_value).to be true
+  end
+
+  it 'Should return typical_occupant_usage_value_hours ' do
+    building_section = get_building_section_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = '40.0'
+    puts "expected typical_occupant_usage_value_hours : #{expected_value} but got: #{building_section.typical_occupant_usage_value_hours} " if building_section.typical_occupant_usage_value_hours != expected_value
+    expect(building_section.typical_occupant_usage_value_hours == expected_value).to be true
+  end
+
+  it 'Should return typical_occupant_usage_value_weeks ' do
+    building_section = get_building_section_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = '50.0'
+    puts "expected typical_occupant_usage_value_weeks : #{expected_value} but got: #{building_section.typical_occupant_usage_value_weeks} " if building_section.typical_occupant_usage_value_weeks != expected_value
+    expect(building_section.typical_occupant_usage_value_weeks == expected_value).to be true
+  end
+
+  def get_building_section_from_file(xml_file_name, standard_to_be_used)
+    xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
+    File.open(xml_file_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+      ns = 'auc'
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building/#{ns}:Subsections/#{ns}:Subsection") do |building_section|
+        return BuildingSync::BuildingSubsection.new(building_section, 'Office', '20000', ns)
+      end
+    end
+  end
+
   def generate_baseline(file_name, occupancy_type, total_floor_area, ns)
     sub_sections = []
     xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))

@@ -77,18 +77,18 @@ module BuildingSync
         @occupancy_classification = nil
       end
 
-      if subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"]
-        if subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'
-          @typical_occupant_usage_value_hours = subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text
-        elsif subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageUnits"].text == 'Weeks per year'
-          @typical_occupant_usage_value_weeks = subsection_element.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text
+      if subsection_element.elements["#{ns}:TypicalOccupantUsages"]
+        subsection_element.elements.each("#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage") do |occ_usage|
+          if occ_usage.elements["#{ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'
+            @typical_occupant_usage_value_hours = occ_usage.elements["#{ns}:TypicalOccupantUsageValue"].text
+          elsif occ_usage.elements["#{ns}:TypicalOccupantUsageUnits"].text == 'Weeks per year'
+            @typical_occupant_usage_value_weeks = occ_usage.elements["#{ns}:TypicalOccupantUsageValue"].text
+          end
         end
       end
-
-
     end
 
-    attr_reader :bldg_type, :space_types_floor_area
+    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type
     attr_accessor :fraction_area
   end
 end

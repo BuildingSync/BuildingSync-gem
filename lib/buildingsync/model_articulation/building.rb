@@ -77,9 +77,6 @@ module BuildingSync
       @percent_occupied_by_owner = nil
       @occupant_quantity = nil
       @number_of_units = nil
-      @eui_building = nil
-      @benchmark_eui = nil
-
 
       @fraction_area = 1.0
       # code to initialize
@@ -142,15 +139,15 @@ module BuildingSync
         raise 'Error : Year of Construction is blank in your BuildingSync file.'
       end
 
-      @built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_f
+      @built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_i
 
       if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
-        @major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_f
+        @major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_i
         @built_year = @major_remodel_year if @major_remodel_year > @built_year
       end
 
       if build_element.elements["#{ns}:YearOfLastEnergyAudit"]
-        @year_of_last_energy_audit = build_element.elements["#{ns}:YearOfLastEnergyAudit"].text.to_f
+        @year_of_last_energy_audit = build_element.elements["#{ns}:YearOfLastEnergyAudit"].text.to_i
       end
     end
 
@@ -282,18 +279,6 @@ module BuildingSync
         @number_of_units = building_element.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text
       else
         @number_of_units = nil
-      end
-
-      if building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EndUse"]
-        @eui_building = building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EndUse"].text
-      else
-        @eui_building = nil
-      end
-
-      if building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"]
-        @benchmark_eui = building_element.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text
-      else
-        @benchmark_eui = nil
       end
     end
 
@@ -904,6 +889,8 @@ module BuildingSync
       return @model.getSpaceTypes
     end
 
-    attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr
+    attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr, :year_of_last_energy_audit, :ownership,
+                :occupancy_classification, :primary_contact_id, :retro_commissioning_date, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
+                :occupant_quantity, :number_of_units, :built_year, :major_remodel_year, :building_subsections
   end
 end
