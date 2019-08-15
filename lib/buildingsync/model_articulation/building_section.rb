@@ -37,7 +37,7 @@
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio-standards'
 module BuildingSync
-  class BuildingSubsection < SpatialElement
+  class BuildingSection < SpatialElement
     include OsLib_ModelGenerationBRICR
     include OpenstudioStandards
 

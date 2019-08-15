@@ -54,7 +54,7 @@ RSpec.describe 'BuildingSpec' do
     building_xml = create_building_object(doc, ns)
 
     building_xml.elements.each("#{ns}:Sections/#{ns}:Section") do |building_element|
-      sub_sections.push(BuildingSync::BuildingSubsection.new(building_element, occupancy_type, total_floor_area, ns))
+      sub_sections.push(BuildingSync::BuildingSection.new(building_element, occupancy_type, total_floor_area, ns))
     end
     return sub_sections
   end
