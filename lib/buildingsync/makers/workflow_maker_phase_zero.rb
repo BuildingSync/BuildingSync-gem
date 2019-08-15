@@ -37,7 +37,6 @@
 require_relative '../workflow_maker'
 require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
-require 'openstudio-extension'
 require_relative '../../../lib/buildingsync/extension'
 
 module BuildingSync

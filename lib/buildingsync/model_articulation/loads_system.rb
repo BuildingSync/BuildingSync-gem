@@ -70,8 +70,9 @@ module BuildingSync
         standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
 
         # here we adjust the people schedules according to user input of hours per week and weeks per year
-        adjust_people_schedule(space_type, get_building_section(building_sections, space_type.standardsBuildingType, space_type.standardsSpaceType), model)
-
+        if building_sections.size > 0
+          adjust_people_schedule(space_type, get_building_section(building_sections, space_type.standardsBuildingType, space_type.standardsSpaceType), model)
+        end
         # extend space type name to include the template. Consider this as well for load defs
         space_type.setName("#{space_type.name} - #{template}")
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding loads to space type named #{space_type.name}")
