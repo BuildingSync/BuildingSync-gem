@@ -88,35 +88,43 @@ module BuildingSync
       count = 0
       measure_type_count = 0
       measure_type_found = false
-      @workflow['steps'].each do |step|
-        measure_dir_name = step['measure_dir_name']
-        measure_type = get_measure_type(measure_dir_name)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "measure: #{measure_dir_name} with type: #{measure_type} found")
-        puts "measure: #{measure_dir_name} with type: #{measure_type} found"
-        if measure_type == measure_goal_type
-          measure_type_found = true
-          if measure_type_count == item
-            # insert measure here
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
-            puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
+      if @workflow['steps'].nil?
+        new_step = {}
+        new_step['measure_dir_name'] = measure_dir
+        new_step['arguments'] = args_hash
+        @workflow['steps'].insert(count, new_step)
+        successfully_added = true
+      else
+        @workflow['steps'].each do |step|
+          measure_dir_name = step['measure_dir_name']
+          measure_type = get_measure_type(measure_dir_name)
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "measure: #{measure_dir_name} with type: #{measure_type} found")
+          puts "measure: #{measure_dir_name} with type: #{measure_type} found"
+          if measure_type == measure_goal_type
+            measure_type_found = true
+            if measure_type_count == item
+              # insert measure here
+              OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+              puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
+              new_step = {}
+              new_step['measure_dir_name'] = measure_dir
+              new_step['arguments'] = args_hash
+              @workflow['steps'].insert(count, new_step)
+              successfully_added = true
+              break
+            end
+            measure_type_count += 1
+          elsif measure_type_found
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+            puts "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
             new_step = {}
             new_step['measure_dir_name'] = measure_dir
-            new_step['arguments'] = args_hash
-            @workflow['steps'].insert(count, new_step)
+            @workflow['steps'].insert(count - 1, new_step)
             successfully_added = true
             break
           end
-          measure_type_count += 1
-        elsif measure_type_found
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
-          puts "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
-          new_step = {}
-          new_step['measure_dir_name'] = measure_dir
-          @workflow['steps'].insert(count - 1, new_step)
-          successfully_added = true
-          break
+          count += 1
         end
-        count += 1
       end
       if (!successfully_added)
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "CANNOT insert measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
@@ -292,23 +300,24 @@ module BuildingSync
 
       if !found_baseline
         scenarios_element = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios"]
+        if !scenarios_element.nil?
+          scenario_element = REXML::Element.new("#{@ns}:Scenario")
+          scenario_element.attributes['ID'] = 'Baseline'
 
-        scenario_element = REXML::Element.new("#{@ns}:Scenario")
-        scenario_element.attributes['ID'] = 'Baseline'
+          scenario_name_element = REXML::Element.new("#{@ns}:ScenarioName")
+          scenario_name_element.text = 'Baseline'
+          scenario_element.add_element(scenario_name_element)
 
-        scenario_name_element = REXML::Element.new("#{@ns}:ScenarioName")
-        scenario_name_element.text = 'Baseline'
-        scenario_element.add_element(scenario_name_element)
+          scenario_type_element = REXML::Element.new("#{@ns}:ScenarioType")
+          package_of_measures_element = REXML::Element.new("#{@ns}:PackageOfMeasures")
+          reference_case_element = REXML::Element.new("#{@ns}:ReferenceCase")
+          reference_case_element.attributes['IDref'] = 'Baseline'
+          package_of_measures_element.add_element(reference_case_element)
+          scenario_type_element.add_element(package_of_measures_element)
+          scenario_element.add_element(scenario_type_element)
 
-        scenario_type_element = REXML::Element.new("#{@ns}:ScenarioType")
-        package_of_measures_element = REXML::Element.new("#{@ns}:PackageOfMeasures")
-        reference_case_element = REXML::Element.new("#{@ns}:ReferenceCase")
-        reference_case_element.attributes['IDref'] = 'Baseline'
-        package_of_measures_element.add_element(reference_case_element)
-        scenario_type_element.add_element(package_of_measures_element)
-        scenario_element.add_element(scenario_type_element)
-
-        scenarios_element.add_element(scenario_element)
+          scenarios_element.add_element(scenario_element)
+        end
       end
 
       found_baseline = false

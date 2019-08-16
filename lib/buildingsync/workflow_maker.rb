@@ -66,6 +66,11 @@ module BuildingSync
       osw['measure_paths'] = measures_dir_array
     end
 
+    def clear_all_measures
+      @workflow.delete('steps')
+      @workflow['steps'] = []
+    end
+
     def add_measure_path(measures_dir)
       @workflow['measure_paths'].each do |dir|
         if dir == measures_dir
@@ -102,7 +107,6 @@ module BuildingSync
       # if it does not exist we add it
       new_step = {}
       new_step['measure_dir_name'] = measure_dir_name
-      # TODO: what about arguments to measures, need to add an option to also set arguments and their values
       osw['steps'].unshift(new_step)
       return true
     end
