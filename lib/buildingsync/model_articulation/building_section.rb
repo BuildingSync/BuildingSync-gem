@@ -42,8 +42,7 @@ module BuildingSync
     include OpenstudioStandards
 
     # initialize
-    def initialize(subsection_element, occ_type, bldg_total_floor_area, ns)
-      @subsection_element = nil
+    def initialize(section_element, occ_type, bldg_total_floor_area, ns)
       @fraction_area = nil
       @bldg_type = {}
       @occupancy_classification = nil
@@ -53,32 +52,31 @@ module BuildingSync
       @occupant_quantity = nil
 
       # code to initialize
-      read_xml(subsection_element, occ_type, bldg_total_floor_area, ns)
+      read_xml(section_element, occ_type, bldg_total_floor_area, ns)
     end
 
-    def read_xml(subsection_element, occ_type, bldg_total_floor_area, ns)
+    def read_xml(section_element, occ_type, bldg_total_floor_area, ns)
       # floor areas
-      @total_floor_area = read_floor_areas(subsection_element, bldg_total_floor_area, ns)
+      @total_floor_area = read_floor_areas(section_element, bldg_total_floor_area, ns)
       # based on the occupancy type set building type, system type and bar division method
-      read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
-      read_building_subsection_other_detail(subsection_element, ns)
-      @subsection_element = subsection_element
+      read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
+      read_building_section_other_detail(section_element, ns)
     end
 
-    def read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
-      @occupancy_type = read_occupancy_type(subsection_element, occ_type, ns)
+    def read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
+      @occupancy_type = read_occupancy_type(section_element, occ_type, ns)
       set_bldg_and_system_type(@occupancy_type, @total_floor_area, true)
     end
 
-    def read_building_subsection_other_detail(subsection_element, ns)
-      if subsection_element.elements["#{ns}:OccupancyClassification"]
-        @occupancy_classification = subsection_element.elements["#{ns}:OccupancyClassification"].text
+    def read_building_section_other_detail(section_element, ns)
+      if section_element.elements["#{ns}:OccupancyClassification"]
+        @occupancy_classification = section_element.elements["#{ns}:OccupancyClassification"].text
       else
         @occupancy_classification = nil
       end
 
-      if subsection_element.elements["#{ns}:TypicalOccupantUsages"]
-        subsection_element.elements.each("#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage") do |occ_usage|
+      if section_element.elements["#{ns}:TypicalOccupantUsages"]
+        section_element.elements.each("#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage") do |occ_usage|
           if occ_usage.elements["#{ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'
             @typical_occupant_usage_value_hours = occ_usage.elements["#{ns}:TypicalOccupantUsageValue"].text
           elsif occ_usage.elements["#{ns}:TypicalOccupantUsageUnits"].text == 'Weeks per year'

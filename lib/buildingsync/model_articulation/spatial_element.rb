@@ -189,7 +189,7 @@ module BuildingSync
 
     # create space types
     def create_space_types(model, total_bldg_floor_area, standard_template, open_studio_standard)
-      # create space types from subsection type
+      # create space types from section type
       # mapping lookup_name name is needed for a few methods
       if @bldg_type.nil?
         set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false)

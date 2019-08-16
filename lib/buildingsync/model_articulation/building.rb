@@ -50,7 +50,7 @@ module BuildingSync
 
     # initialize
     def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
-      @building_subsections = []
+      @building_sections = []
       @standard_template = nil
       @single_floor_area = 0.0
       @building_rotation = 0.0
@@ -99,8 +99,8 @@ module BuildingSync
       # read occupancy
       @occupancy_type = read_occupancy_type(build_element, site_occupancy_type, ns)
 
-      build_element.elements.each("#{ns}:Sections/#{ns}:Section") do |subsection_element|
-        @building_subsections.push(BuildingSection.new(subsection_element, @occupancy_type, @total_floor_area, ns))
+      build_element.elements.each("#{ns}:Sections/#{ns}:Section") do |section_element|
+        @building_sections.push(BuildingSection.new(section_element, @occupancy_type, @total_floor_area, ns))
       end
 
       # floor areas
@@ -108,7 +108,7 @@ module BuildingSync
 
       set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
 
-      # need to set those defaults after initializing the subsections
+      # need to set those defaults after initializing the sections
       read_building_form_defaults
 
       # generate building name
@@ -177,13 +177,13 @@ module BuildingSync
     end
 
     def get_building_type
-      # try to get the bldg type at the building level, if it is nil then look at the first subsection
+      # try to get the bldg type at the building level, if it is nil then look at the first section
       if @bldg_type.nil?
-        if @building_subsections.count == 0
+        if @building_sections.count == 0
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_building_type', 'There is no occupancy type attached to this building in your BuildingSync file.')
           raise 'Error: There is no occupancy type attached to this building in your BuildingSync file.'
         else
-          return @building_subsections[0].bldg_type
+          return @building_sections[0].bldg_type
         end
       else
         return @bldg_type
@@ -211,16 +211,16 @@ module BuildingSync
     def check_building_faction
       # check that sum of fractions for b,c, and d is less than 1.0 (so something is left for primary building type)
       building_fraction = 1.0
-      if @building_subsections.count > 0
-        @building_subsections.each do |subsection|
-          next if subsection.fraction_area.nil?
-          building_fraction -= subsection.fraction_area
+      if @building_sections.count > 0
+        @building_sections.each do |section|
+          next if section.fraction_area.nil?
+          building_fraction -= section.fraction_area
         end
         if building_fraction <= 0.0
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
         end
-        @building_subsections[0].fraction_area = building_fraction
+        @building_sections[0].fraction_area = building_fraction
       end
     end
 
@@ -292,21 +292,21 @@ module BuildingSync
     end
 
     def create_bldg_space_types(model)
-      @building_subsections.each do |bldg_subsec|
+      @building_sections.each do |bldg_subsec|
         bldg_subsec.create_space_types(model, @total_floor_area, @standard_template, @open_studio_standard)
       end
     end
 
     def bldg_space_types_floor_area_hash
       new_hash = {}
-      if @building_subsections.count > 0
-        @building_subsections.each do |bldg_subsec|
+      if @building_sections.count > 0
+        @building_sections.each do |bldg_subsec|
           bldg_subsec.space_types_floor_area.each do |space_type, hash|
             new_hash[space_type] = hash
           end
         end
-        # if we have no subsections we need to do the same just for the building
-      elsif @building_subsections.count == 0
+        # if we have no sections we need to do the same just for the building
+      elsif @building_sections.count == 0
         space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
         puts " Space types: #{space_types} selected for building type: #{@bldg_type} and standard template: #{@standard_template}"
         space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @open_studio_standard)
@@ -335,16 +335,16 @@ module BuildingSync
         @open_studio_standard = Standard.build("#{@standard_template}_#{building_type}")
         update_name
       rescue StandardError => e
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.BuildingSubsection.read_xml', e.message)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.BuildingSection.read_xml', e.message)
       end
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSubsection.read_xml', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSection.read_xml', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
     end
 
     def update_name
       # update the name so it includes the standard_template string
       name_array = [@standard_template]
       name_array << get_building_type
-      @building_subsections.each do |bld_tp|
+      @building_sections.each do |bld_tp|
         name_array << bld_tp.bldg_type
       end
       name_array << @name if !@name.nil? && !@name == ''
@@ -399,7 +399,7 @@ module BuildingSync
       if !@system_type.nil?
         return @system_type
       else
-        return @building_subsections[0].system_type
+        return @building_sections[0].system_type
       end
     end
 
@@ -891,6 +891,6 @@ module BuildingSync
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr, :year_of_last_energy_audit, :ownership,
                 :occupancy_classification, :primary_contact_id, :retro_commissioning_date, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
-                :occupant_quantity, :number_of_units, :built_year, :major_remodel_year, :building_subsections
+                :occupant_quantity, :number_of_units, :built_year, :major_remodel_year, :building_sections
   end
 end

@@ -167,7 +167,7 @@ module BuildingSync
     end
 
     def get_building_sections
-      return get_largest_building.building_subsections
+      return get_largest_building.building_sections
     end
 
     def determine_open_studio_standard(standard_to_be_used)
