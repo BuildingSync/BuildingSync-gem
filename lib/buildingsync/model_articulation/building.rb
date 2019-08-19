@@ -876,9 +876,9 @@ module BuildingSync
       if replace_whitespace
         spaces = @model.getSpaces
         spaces.each do |space|
-          oldName = space.name
-          newName = space.name.gsub(/\s+/, '')
-          space.name = newName
+          oldName = space.nameString
+          newName = space.nameString.gsub(/\s+/, '')
+          space.setName(newName)
           puts "Removing whitespaces from space name: old: #{oldName} new: #{newName}"
         end
       end

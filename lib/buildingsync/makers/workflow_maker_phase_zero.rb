@@ -37,6 +37,7 @@
 require_relative '../workflow_maker'
 require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
+require_relative '../../../lib/buildingsync/extension'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
@@ -67,15 +68,16 @@ module BuildingSync
     def get_measure_directories_array
       common_measures_instance = OpenStudio::CommonMeasures::Extension.new
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
-      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir]
+      bldg_sync_instance = BuildingSync::Extension.new
+      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir]
     end
 
     def insert_energyplus_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('EnergyPlusMeasure', measure_dir, item, args_hash)
     end
 
-    def insert_report_measure(measure_dir, item = 0, args_hash = {})
-      insert_measure('ReportMeasure', measure_dir, item, args_hash)
+    def insert_reporting_measure(measure_dir, item = 0, args_hash = {})
+      insert_measure('ReportingMeasure', measure_dir, item, args_hash)
     end
 
     def insert_model_measure(measure_dir, item = 0, args_hash = {})
@@ -83,41 +85,58 @@ module BuildingSync
     end
 
     def insert_measure(measure_goal_type, measure_dir, item = 0, args_hash = {})
+      successfully_added = false
       count = 0
       measure_type_count = 0
       measure_type_found = false
-      @workflow['steps'].each do |step|
-        measure_dir_name = step['measure_dir_name']
-        measure_type = get_measure_type(measure_dir_name)
-        puts "measure: #{measure_dir_name} with type: #{measure_type} found"
-        if measure_type == measure_goal_type
-          measure_type_found = true
-          if measure_type_count == item
-            # insert measure here
-            puts "inserting measure at position #{count} and dir: #{measure_dir}  and type: #{get_measure_type(measure_dir)}"
+      if @workflow['steps'].empty?
+        new_step = {}
+        new_step['measure_dir_name'] = measure_dir
+        new_step['arguments'] = args_hash
+        @workflow['steps'].insert(count, new_step)
+        successfully_added = true
+      else
+        @workflow['steps'].each do |step|
+          measure_dir_name = step['measure_dir_name']
+          measure_type = get_measure_type(measure_dir_name)
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "measure: #{measure_dir_name} with type: #{measure_type} found")
+          puts "measure: #{measure_dir_name} with type: #{measure_type} found"
+          if measure_type == measure_goal_type
+            measure_type_found = true
+            if measure_type_count == item
+              # insert measure here
+              OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+              puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
+              new_step = {}
+              new_step['measure_dir_name'] = measure_dir
+              new_step['arguments'] = args_hash
+              @workflow['steps'].insert(count, new_step)
+              successfully_added = true
+              break
+            end
+            measure_type_count += 1
+          elsif measure_type_found
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+            puts "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
             new_step = {}
             new_step['measure_dir_name'] = measure_dir
-            new_step['arguments'] = args_hash
-            @workflow['steps'].insert(count, new_step)
-            #@workflow['steps'].insert(count, {"measure_dir_name": "#{measure_dir}", "arguments": {}})
+            @workflow['steps'].insert(count - 1, new_step)
+            successfully_added = true
             break
           end
-          measure_type_count += 1
-        elsif measure_type_found
-          puts "inserting measure at position #{count} and dir: #{measure_dir}  and type: #{get_measure_type(measure_dir)}"
-          new_step = {}
-          new_step['measure_dir_name'] = measure_dir
-          @workflow['steps'].insert(count - 1, new_step)
-          break
+          count += 1
         end
-        count += 1
       end
+      if (!successfully_added)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "CANNOT insert measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+      end
+      return successfully_added
     end
 
     def get_measure_type(measure_dir)
+      measure_type = nil
       get_measure_directories_array.each do |potential_measure_path|
         measure_dir_full_path = "#{potential_measure_path}/#{measure_dir}"
-        puts "measure_dir: #{measure_dir}"
         if Dir.exist?(measure_dir_full_path)
           measure_xml_doc = nil
           File.open(measure_dir_full_path + '/measure.xml', 'r') do |file|
@@ -126,11 +145,13 @@ module BuildingSync
           measure_xml_doc.elements.each('/measure/attributes/attribute') do |attribute|
             attribute_name = attribute.elements['name'].text
             if attribute_name == 'Measure Type'
-              return attribute.elements['value'].text
+              measure_type = attribute.elements['value'].text
             end
           end
         end
       end
+      puts "measure_dir: #{measure_dir} with type: #{measure_type}"
+      return measure_type
     end
 
     def get_workflow
@@ -279,24 +300,25 @@ module BuildingSync
       end
 
       if !found_baseline
-        scenarios_element = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"]
+        scenarios_element = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios"]
+        if !scenarios_element.nil?
+          scenario_element = REXML::Element.new("#{@ns}:Scenario")
+          scenario_element.attributes['ID'] = 'Baseline'
 
-        scenario_element = REXML::Element.new("#{@ns}:Scenario")
-        scenario_element.attributes['ID'] = 'Baseline'
+          scenario_name_element = REXML::Element.new("#{@ns}:ScenarioName")
+          scenario_name_element.text = 'Baseline'
+          scenario_element.add_element(scenario_name_element)
 
-        scenario_name_element = REXML::Element.new("#{@ns}:ScenarioName")
-        scenario_name_element.text = 'Baseline'
-        scenario_element.add_element(scenario_name_element)
+          scenario_type_element = REXML::Element.new("#{@ns}:ScenarioType")
+          package_of_measures_element = REXML::Element.new("#{@ns}:PackageOfMeasures")
+          reference_case_element = REXML::Element.new("#{@ns}:ReferenceCase")
+          reference_case_element.attributes['IDref'] = 'Baseline'
+          package_of_measures_element.add_element(reference_case_element)
+          scenario_type_element.add_element(package_of_measures_element)
+          scenario_element.add_element(scenario_type_element)
 
-        scenario_type_element = REXML::Element.new("#{@ns}:ScenarioType")
-        package_of_measures_element = REXML::Element.new("#{@ns}:PackageOfMeasures")
-        reference_case_element = REXML::Element.new("#{@ns}:ReferenceCase")
-        reference_case_element.attributes['IDref'] = 'Baseline'
-        package_of_measures_element.add_element(reference_case_element)
-        scenario_type_element.add_element(package_of_measures_element)
-        scenario_element.add_element(scenario_type_element)
-
-        scenarios_element.add_element(scenario_element)
+          scenarios_element.add_element(scenario_element)
+        end
       end
 
       found_baseline = false
@@ -317,7 +339,7 @@ module BuildingSync
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BUILDINGSYNC::SIMULATE_BASELINE_ONLY) && BUILDINGSYNC::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
+        next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         # deep clone
         osw = JSON.load(JSON.generate(@workflow))
@@ -383,7 +405,7 @@ module BuildingSync
 
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BUILDINGSYNC::SIMULATE_BASELINE_ONLY) and BUILDINGSYNC::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
+        next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         # dir for the osw
         osw_dir = File.join(dir, scenario_name)
@@ -426,7 +448,7 @@ module BuildingSync
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BUILDINGSYNC::SIMULATE_BASELINE_ONLY) and BUILDINGSYNC::SIMULATE_BASELINE_ONLY and scenario_name != 'Baseline'
+        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) && BRICR::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
 
@@ -746,7 +768,7 @@ module BuildingSync
 
         # no longer using user defined fields
         scenario.elements.delete("#{@ns}:UserDefinedFields")
-        p "code come here #{package_of_measures}"
+
       end
     end
 

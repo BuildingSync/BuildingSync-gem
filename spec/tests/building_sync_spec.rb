@@ -38,6 +38,7 @@ require_relative './../spec_helper'
 
 require 'fileutils'
 require 'parallel'
+require 'openstudio-extension'
 
 RSpec.describe 'BuildingSync' do
   it 'should have a version' do
@@ -66,10 +67,10 @@ RSpec.describe 'BuildingSync' do
 
     expect(osw_files.size).to eq 32
 
-    if BuildingSync::DO_SIMULATIONS
+    if BuildingSync::Extension::DO_SIMULATIONS
       num_sims = 0
-      Parallel.each(osw_files, in_threads: [BuildingSync::NUM_PARALLEL, BuildingSync::MAX_DATAPOINTS].min) do |osw|
-        break if num_sims > BuildingSync::MAX_DATAPOINTS
+      Parallel.each(osw_files, in_threads: [BuildingSync::Extension::NUM_PARALLEL, BuildingSync::Extension::MAX_DATAPOINTS].min) do |osw|
+        break if num_sims > BuildingSync::Extension::MAX_DATAPOINTS
 
         cmd = "\"#{BuildingSync::OPENSTUDIO_EXE}\" run -w \"#{osw}\""
         puts "Running cmd: #{cmd}"

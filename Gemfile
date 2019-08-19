@@ -7,7 +7,7 @@ if File.exist?('../OpenStudio-extension-gem')
   # gem 'openstudio-extension', github: 'NREL/OpenStudio-extension-gem', branch: 'develop'
   gem 'openstudio-extension', path: '../OpenStudio-extension-gem'
 else
-  gem 'openstudio-extension', github: 'NREL/OpenStudio-extension-gem', branch: 'develop'
+  gem 'openstudio-extension', github: 'NREL/OpenStudio-extension-gem', branch: 'DA'
 end
 
 if File.exist?('../openstudio-model-articulation-gem')

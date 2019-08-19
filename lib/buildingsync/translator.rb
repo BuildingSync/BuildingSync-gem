@@ -40,6 +40,7 @@ require_relative 'model_articulation/spatial_element'
 require_relative 'makers/model_maker_level_zero'
 require_relative 'makers/workflow_maker_phase_zero'
 require_relative 'selection_tool'
+require_relative 'extension'
 
 ASHRAE90_1 = 'ASHRAE90.1'.freeze
 CA_TITLE24 = 'CaliforniaTitle24'.freeze
@@ -125,6 +126,10 @@ module BuildingSync
       @model_maker.write_osws(@output_dir)
     end
 
+    def clear_all_measures
+      @model_maker.clear_all_measures
+    end
+
     def add_measure_path(measure_path)
       @model_maker.add_measure_path(measure_path)
     end
@@ -137,8 +142,8 @@ module BuildingSync
       @model_maker.insert_model_measure(measure_dir, position, args_hash)
     end
 
-    def insert_report_measure(measure_dir, position = 0, args_hash = {})
-      @model_maker.insert_report_measure(measure_dir, position, args_hash)
+    def insert_reporting_measure(measure_dir, position = 0, args_hash = {})
+      @model_maker.insert_reporting_measure(measure_dir, position, args_hash)
     end
 
     def get_workflow
