@@ -126,6 +126,10 @@ module BuildingSync
       @model_maker.write_osws(@output_dir)
     end
 
+    def clear_all_measures
+      @model_maker.clear_all_measures
+    end
+
     def add_measure_path(measure_path)
       @model_maker.add_measure_path(measure_path)
     end
