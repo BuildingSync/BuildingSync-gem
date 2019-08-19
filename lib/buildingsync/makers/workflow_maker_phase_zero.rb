@@ -90,7 +90,7 @@ module BuildingSync
       count = 0
       measure_type_count = 0
       measure_type_found = false
-      if @workflow['steps'].nil?
+      if @workflow['steps'].empty?
         new_step = {}
         new_step['measure_dir_name'] = measure_dir
         new_step['arguments'] = args_hash
