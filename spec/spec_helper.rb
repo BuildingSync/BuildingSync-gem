@@ -87,34 +87,36 @@ RSpec.configure do |config|
     osw_path = osm_name.gsub('.osm', '.osw')
     workflow.saveAs(File.absolute_path(osw_path.to_s))
 
-    cli_path = OpenStudio.getOpenStudioCLI
-    cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
-    # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_path}\""
-    puts cmd
+    if BuildingSync::Extension::DO_SIMULATIONS || BuildingSync::Extension::SIMULATE_BASELINE_ONLY
+      cli_path = OpenStudio.getOpenStudioCLI
+      cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
+      # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_path}\""
+      puts cmd
 
-    # Run the sizing run
-    OpenstudioStandards.run_command(cmd)
-
-    expect(File.exist?(osm_name.gsub('in.osm', 'run/eplusout.sql'))).to be true
-  end
-
-  def run_scenario_simulations(osw_files)
-    num_parallel = 4
-
-    cli_path = OpenStudio.getOpenStudioCLI
-
-    counter = 1
-    Parallel.each(osw_files, in_threads: num_parallel) do |osw_file|
-      cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
-      # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
-      puts "#{counter}) #{cmd}"
-      counter += 1
       # Run the sizing run
       OpenstudioStandards.run_command(cmd)
 
-      sql_file = osw_file.gsub('in.osw', 'eplusout.sql')
-      puts "Simulation not completed successfully for file: #{osw_file}" if !File.exist?(sql_file)
-      expect(File.exist?(sql_file)).to be true
+      expect(File.exist?(osm_name.gsub('in.osm', 'run/eplusout.sql'))).to be true
+    end
+  end
+
+  def run_scenario_simulations(osw_files)
+    cli_path = OpenStudio.getOpenStudioCLI
+
+    if BuildingSync::Extension::DO_SIMULATIONS || !BuildingSync::Extension::SIMULATE_BASELINE_ONLY
+      counter = 1
+      Parallel.each(osw_files, in_threads: BuildingSync::Extension::NUM_PARALLEL) do |osw_file|
+        cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
+        # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
+        puts "#{counter}) #{cmd}"
+        counter += 1
+        # Run the sizing run
+        OpenstudioStandards.run_command(cmd)
+
+        sql_file = osw_file.gsub('in.osw', 'eplusout.sql')
+        puts "Simulation not completed successfully for file: #{osw_file}" if !File.exist?(sql_file)
+        expect(File.exist?(sql_file)).to be true
+      end
     end
   end
 
