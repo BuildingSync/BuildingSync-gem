@@ -118,7 +118,7 @@ module BuildingSync
       @model_maker.gather_results(dir)
     end
 
-    def saveXML(filename)
+    def save_xml(filename)
       @model_maker.saveXML(filename)
     end
 

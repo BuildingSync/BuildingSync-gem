@@ -27,9 +27,6 @@ module BuildingSync
   # MAX_DATAPOINTS = Float::INFINITY
   #MAX_DATAPOINTS = 2
 
-  # number of parallel jobs per BuildingSync file
-  # NUM_PARALLEL = 4
-
   # number of parallel BuildingSync files to run
   NUM_BUILDINGS_PARALLEL = 2
 

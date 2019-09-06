@@ -48,16 +48,6 @@ rescue LoadError, StandardError
 
     # one or more file paths
     OPENSTUDIO_FILES = [].freeze
-
-    # max number of datapoints to run
-    # MAX_DATAPOINTS = Float::INFINITY
-    # MAX_DATAPOINTS = 2
-
-    # number of parallel jobs
-    # NUM_PARALLEL = 7
-
-    # do simulations
-    # DO_SIMULATIONS = false
   end
 end
 
@@ -99,12 +89,10 @@ RSpec.configure do |config|
   end
 
   def run_scenario_simulations(osw_files)
-    num_parallel = 4
-
     cli_path = OpenStudio.getOpenStudioCLI
 
     counter = 1
-    Parallel.each(osw_files, in_threads: num_parallel) do |osw_file|
+    Parallel.each(osw_files, in_threads: BuildingSync::Extension::NUM_PARALLEL) do |osw_file|
       cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
       # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
       puts "#{counter}) #{cmd}"
@@ -191,7 +179,6 @@ RSpec.configure do |config|
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
     end
-    expect(File.exist?(out_path)).not_to be true
 
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
@@ -224,7 +211,7 @@ RSpec.configure do |config|
     parent_dir_path = File.expand_path('..', dir_path)
 
     translator.gather_results(parent_dir_path)
-    translator.saveXML(File.join(parent_dir_path, 'results.xml'))
+    translator.save_xml(File.join(parent_dir_path, 'results.xml'))
   end
 
   def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)

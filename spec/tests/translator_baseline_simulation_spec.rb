@@ -81,4 +81,33 @@ RSpec.describe 'BuildingSync' do
 
     run_baseline_simulation(osm_path, 'CZ01RV2.epw')
   end
+
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24, perform a baseline simulation and gather results' do
+    xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path("./../output/#{File.basename(xml_path, File.extname(xml_path))}/", File.dirname(__FILE__))
+
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    # expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    translator = BuildingSync::Translator.new(xml_path, out_path, nil, CA_TITLE24)
+    translator.write_osm
+
+    puts "Looking for the following OSM file: #{out_path}/in.osm"
+    expect(File.exist?("#{out_path}/in.osm")).to be true
+    osm_path = "#{out_path}/in.osm"
+
+    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+
+    translator.gather_results(out_path)
+    translator.save_xml(File.join(out_path, 'results.xml'))
+
+    # expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
+  end
 end
