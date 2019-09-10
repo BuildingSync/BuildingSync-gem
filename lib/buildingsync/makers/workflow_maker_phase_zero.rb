@@ -100,7 +100,6 @@ module BuildingSync
           measure_dir_name = step['measure_dir_name']
           measure_type = get_measure_type(measure_dir_name)
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "measure: #{measure_dir_name} with type: #{measure_type} found")
-          puts "measure: #{measure_dir_name} with type: #{measure_type} found"
           if measure_type == measure_goal_type
             measure_type_found = true
             if measure_type_count == item
@@ -300,7 +299,7 @@ module BuildingSync
       end
 
       if !found_baseline
-        scenarios_element = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios"]
+        scenarios_element = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"]
         if !scenarios_element.nil?
           scenario_element = REXML::Element.new("#{@ns}:Scenario")
           scenario_element.attributes['ID'] = 'Baseline'
