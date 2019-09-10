@@ -408,7 +408,7 @@ module BuildingSync
 
       # here we check if there is an valid EPW file, if there is we use that file otherwise everything will be generated from climate zone
       if !epw_file_path.nil? && File.exist?(epw_file_path)
-        puts "case 1: epw file exists #{epw_file_path}"
+        puts "case 1: epw file exists #{epw_file_path} and climate_zone is: #{climate_zone}"
         set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
       elsif climate_zone.nil?
         weather_station_id = weather_argb[1]
