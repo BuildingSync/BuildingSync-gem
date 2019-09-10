@@ -149,7 +149,6 @@ module BuildingSync
           end
         end
       end
-      puts "measure_dir: #{measure_dir} with type: #{measure_type}"
       return measure_type
     end
 
