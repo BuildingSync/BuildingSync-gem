@@ -497,7 +497,6 @@ module BuildingSync
       climateZones = @model.getClimateZones
       # set climate zone
       climateZones.clear
-      puts "clearing climate zones"
       if standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
         climateZones.setClimateZone('ASHRAE', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
@@ -557,33 +556,8 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{epw_file.city}. State is #{epw_file.state}")
 
-      # Add SiteWaterMainsTemperature -- via parsing of STAT file.
-      stat_file = "#{File.join(File.dirname(epw_file.filename), File.basename(epw_file.filename, '.*'))}.stat"
-      unless File.exist? stat_file
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find STAT file by filename, looking in the directory')
-        stat_files = Dir["#{File.dirname(epw_file.filename)}/*.stat"]
-        if stat_files.size > 1
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'More than one stat file in the EPW directory')
-          return false
-        end
-        if stat_files.empty?
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Cound not find the stat file in the EPW directory')
-          return false
-        end
-
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Using STAT file: #{stat_files.first}")
-        stat_file = stat_files.first
-      end
-      unless stat_file
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find stat file')
-        return false
-      end
-
-      stat_model = ::EnergyPlus::StatFile.new(stat_file)
-      water_temp = @model.getSiteWaterMainsTemperature
-      water_temp.setAnnualAverageOutdoorAirTemperature(stat_model.mean_dry_bulb)
-      water_temp.setMaximumDifferenceInMonthlyAverageOutdoorAirTemperatures(stat_model.delta_dry_bulb)
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "mean dry bulb is #{stat_model.mean_dry_bulb}")
+      stat_file = get_stat_file(epw_file)
+      add_site_water_mains_temperature(stat_file) if !stat_file.nil?
 
       # Remove all the Design Day objects that are in the file
       @model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each(&:remove)
@@ -622,6 +596,42 @@ module BuildingSync
       end
 
       set_climate_zone(climate_zone, standard_to_be_used, stat_file)
+    end
+
+    def get_stat_file(epw_file)
+      # Add SiteWaterMainsTemperature -- via parsing of STAT file.
+      stat_file = "#{File.join(File.dirname(epw_file.filename), File.basename(epw_file.filename, '.*'))}.stat"
+      unless File.exist? stat_file
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find STAT file by filename, looking in the directory')
+        stat_files = Dir["#{File.dirname(epw_file.filename)}/*.stat"]
+        if stat_files.size > 1
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'More than one stat file in the EPW directory')
+          return nil
+        end
+        if stat_files.empty?
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Cound not find the stat file in the EPW directory')
+          return nil
+        end
+
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Using STAT file: #{stat_files.first}")
+        stat_file = stat_files.first
+      end
+      unless stat_file
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find stat file')
+        return nil
+      end
+      return stat_file
+    end
+
+    def add_site_water_mains_temperature(stat_file)
+      # Add SiteWaterMainsTemperature -- via parsing of STAT file.
+
+      stat_model = ::EnergyPlus::StatFile.new(stat_file)
+      water_temp = @model.getSiteWaterMainsTemperature
+      water_temp.setAnnualAverageOutdoorAirTemperature(stat_model.mean_dry_bulb)
+      water_temp.setMaximumDifferenceInMonthlyAverageOutdoorAirTemperatures(stat_model.delta_dry_bulb)
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "mean dry bulb is #{stat_model.mean_dry_bulb}")
+      return true
     end
 
     def generate_baseline_osm(standard_to_be_used)

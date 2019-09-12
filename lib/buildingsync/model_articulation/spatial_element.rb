@@ -147,8 +147,6 @@ module BuildingSync
       max_floor_area_correct = false
       json[:"#{occupancy_type}"].each do |occ_type|
         if !occ_type[:bldg_type].nil?
-          puts "occ_type[:min_floor_area] #{occ_type[:min_floor_area]}"
-          puts "occ_type[:max_floor_area] #{occ_type[:max_floor_area]}"
           if occ_type[:min_floor_area] || occ_type[:max_floor_area]
             if occ_type[:min_floor_area] && occ_type[:min_floor_area].to_f < total_floor_area
               min_floor_area_correct = true
@@ -171,7 +169,6 @@ module BuildingSync
         end
       end
     end
-
 
     def validate_positive_number_excluding_zero(name, value)
       if value <= 0
