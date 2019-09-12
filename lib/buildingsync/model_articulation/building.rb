@@ -501,6 +501,7 @@ module BuildingSync
       if standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
         climateZones.setClimateZone('ASHRAE', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
+        puts "setting ASHRAE climate zone to: #{climate_zone}"
         return true
       elsif standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
         climate_zone = climate_zone.gsub('CEC', '').strip
@@ -510,8 +511,10 @@ module BuildingSync
         climate_zone = climate_zone.delete('C').strip
         climateZones.setClimateZone('CEC', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climate_zone}")
+        puts "setting CA_TITLE24 climate zone to: #{climate_zone}"
         return true
       end
+      puts "could not set climate_zone #{climate_zone}"
       OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.set_climate_zone', "Cannot set the #{climate_zone} in context of this standard #{standard_to_be_used}")
       return false
     end
