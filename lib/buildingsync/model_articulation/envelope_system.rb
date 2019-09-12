@@ -56,6 +56,7 @@ module BuildingSync
         is_residential = 'No'
       end
       climate_zone = standard.model_get_building_climate_zone_and_building_type(model)['climate_zone']
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.create_building_system', 'Could not find climate zone in the model. Verify that the climate zone is set in the BuildingSync File or can be derived from other inputs.') if climate_zone.nil?
       bldg_def_const_set = standard.model_add_construction_set(model, climate_zone, lookup_building_type, nil, is_residential)
       if bldg_def_const_set.is_initialized
         bldg_def_const_set = bldg_def_const_set.get
