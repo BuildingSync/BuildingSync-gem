@@ -97,6 +97,9 @@ module BuildingSync
       else
         @climate_zone_ca_t24 = nil
       end
+      if @climate_zone_ca_t24.nil? && @climate_zone_ashrae.nil?
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Site.read_climate_zone', 'Could not find a climate zone in the BuildingSync file.')
+      end
     end
 
     def read_weather_file_name(build_element, ns)

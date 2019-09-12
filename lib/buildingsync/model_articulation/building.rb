@@ -474,8 +474,8 @@ module BuildingSync
 
     def set_climate_zone(climate_zone, standard_to_be_used, stat_file = nil)
       # Set climate zone
-      climateZones = @model.getClimateZones
       if climate_zone.nil?
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_climate_zone', 'Climate Zone is nil, trying to get it from stat file')
         # get climate zone from stat file
         text = nil
         File.open(stat_file) do |f|
@@ -488,14 +488,16 @@ module BuildingSync
         regex = /Climate type \"(.*?)\" \(ASHRAE Standards?(.*)\)\*\*/
         match_data = text.match(regex)
         if match_data.nil?
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.set_climate_zone', "Can't find ASHRAE climate zone in stat file.")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_climate_zone', "Can't find ASHRAE climate zone in stat file.")
         else
           climate_zone = match_data[1].to_s.strip
         end
       end
 
+      climateZones = @model.getClimateZones
       # set climate zone
       climateZones.clear
+      puts "clearing climate zones"
       if standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
         climateZones.setClimateZone('ASHRAE', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
