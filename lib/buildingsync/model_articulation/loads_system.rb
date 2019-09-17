@@ -35,6 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_system'
+
 module BuildingSync
   class LoadsSystem < BuildingSystem
     # initialize
@@ -114,6 +115,25 @@ module BuildingSync
     end
 
     def adjust_people_schedule(space_type, building_section, model)
+      if !building_section.typical_occupant_usage_value_hours.nil?
+        puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
+        model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+        path = model_articulation_instance.measures_dir + '/create_parametric_schedules/resources/os_lib_parametric_schedules.rb'
+        puts "create parametric schedule path: #{path}"
+        require path
+
+        param_Schedules = OsLib_Parametric_Schedules.new(model)
+        param_Schedules.override_hours_per_week(building_section.typical_occupant_usage_value_hours.to_f)
+
+        param_Schedules.pre_process_space_types()
+
+        param_Schedules.create_default_schedule_set()
+
+        param_Schedules.create_schedules_and_apply_default_schedule_set()
+      end
+    end
+
+    def adjust_people_schedule_old(space_type, building_section, model)
       if !building_section.typical_occupant_usage_value_hours.nil?
         args = {}
         puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"

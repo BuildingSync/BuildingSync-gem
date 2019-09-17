@@ -133,6 +133,95 @@ RSpec.configure do |config|
     return "#{out_path}/in.osm"
   end
 
+  def generated_baseline_idf_and_compare(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+    xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
+
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    # expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    epw_file_path = nil
+    if !epw_file_name.nil?
+      epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
+    end
+
+    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
+    translator.write_osm
+
+    puts "Looking for the following OSM file: #{out_path}/in.osm"
+    expect(File.exist?("#{out_path}/in.osm")).to be true
+
+    new_idf_file = "#{out_path}/in.idf"
+    save_idf_from_osm("#{out_path}/in.osm", new_idf_file)
+
+    osm_comparison_file_path = File.expand_path('../files/filecomparison', File.dirname(__FILE__))
+    old_osm_file = "#{osm_comparison_file_path}/#{file_name}.osm"
+    expect(File.exist?(old_osm_file)).to be true
+    old_idf_file = "#{osm_comparison_file_path}/#{file_name}.idf"
+    File.delete(old_idf_file) if File.exist?(old_idf_file)
+    save_idf_from_osm(old_osm_file, old_idf_file)
+
+    old_file_size = File.size(old_idf_file)
+    new_file_size = File.size(new_idf_file)
+    puts "original idf file size #{old_file_size} bytes versus new idf file size #{new_file_size} bytes"
+    expect((old_file_size - new_file_size).abs <= 1).to be true
+
+    line_not_match_counter = compare_two_idf_files(old_idf_file, new_idf_file)
+
+    expect(line_not_match_counter == 0).to be true
+  end
+
+  def compare_two_idf_files(old_idf_file, new_idf_file)
+    idf_file1 = File.open(old_idf_file)
+    idf_file2 = File.open(new_idf_file)
+
+    file1_lines = idf_file1.readlines
+    file2_lines = idf_file2.readlines
+
+    line_not_match_counter = 0
+    counter = 0
+    file1_lines.each do |line|
+      if !line.include?('Sub Surface') && !file2_lines[counter].eql?(line)
+        puts "This is the newly create idf file line : #{line} on line no : #{counter}"
+        puts "This is the original idf file line : #{file2_lines[counter]} on line no : #{counter}"
+        line_not_match_counter += 1
+      end
+      counter += 1
+    end
+    return line_not_match_counter
+  end
+
+  def generate_idf_file(model)
+    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(model)
+    new_file_path = "#{@osm_file_path}/in.idf"
+    # first delete idf file if exist
+    File.delete(new_file_path) if File.exist?(new_file_path)
+
+    # now create idf file.
+    p 'IDF file successfully saved' if workspace.save(new_file_path)
+
+    original_file_path = "#{@osm_file_path}/originalfiles"
+    oldModel = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
+    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
+    # first delete the file if exist
+    File.delete("#{original_file_path}/in.idf") if File.exist?("#{original_file_path}/in.idf")
+
+    p 'IDF file 2 successfully saved' if workspace.save("#{original_file_path}/in.idf")
+  end
+
+  def save_idf_from_osm(osm_file, idf_file)
+    model = OpenStudio::Model::Model.load(osm_file).get
+    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(model)
+    puts "IDF file (#{File.basename(idf_file)})successfully saved" if workspace.save(idf_file)
+  end
+
   def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true

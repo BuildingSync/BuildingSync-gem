@@ -154,6 +154,10 @@ module BuildingSync
       return @model_maker.get_space_types
     end
 
+    def get_model
+      return @model_maker.get_model
+    end
+
     private
 
     def choose_model_maker

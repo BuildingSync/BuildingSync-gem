@@ -59,6 +59,16 @@ RSpec.describe 'BuildingSync' do
     test_baseline_creation('DC GSA Headquarters.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
+  it 'should parse and write DC GSA Headquarterswith.xml (phase zero) with ASHRAE 90.1' do
+    test_baseline_creation('DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write Office_Abbey.xml (phase zero) with ASHRAE 90.1' do
+    osm_path = test_baseline_creation('Office_Abbey.xml', ASHRAE90_1, 'AZ_PHOENIX-SKY-HARBOR-IAP_722780S_15.epw')
+
+    run_baseline_simulation(osm_path, 'AZ_PHOENIX-SKY-HARBOR-IAP_722780S_15.epw')
+  end
+
   it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with Title 24' do
     test_baseline_creation('BuildingSync Website Valid Schema.xml', CA_TITLE24, 'CZ01RV2.epw')
   end

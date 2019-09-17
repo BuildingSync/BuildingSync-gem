@@ -320,6 +320,10 @@ module BuildingSync
       return scenario_types
     end
 
+    def get_model
+      return @sites[0].get_model
+    end
+
     attr_reader :building_eui_benchmark, :building_eui, :auditor_contact_id, :annual_fuel_use_native_units, :audit_date, :benchmark_source, :contact_name, :energy_cost, :energy_resource,
                 :rate_schedules, :utility_meter_number, :utility_name, :metering_configuration
   end

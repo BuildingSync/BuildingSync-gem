@@ -67,6 +67,10 @@ module BuildingSync
       return @facilities[0].get_space_types
     end
 
+    def get_model
+      return @facilities[0].get_model
+    end
+
     private
 
     def write_osm(dir, replace_whitespace = false)

@@ -86,7 +86,7 @@ RSpec.describe 'SiteSpec' do
     @site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
     @site.write_osm(@osm_file_path)
 
-    generate_idf_file
+    generate_idf_file(@site.get_model)
 
     osm_file_full_path = "#{@osm_file_path}/in.idf"
     to_be_comparison_path = "#{@osm_file_path}/originalfiles/in.idf"
@@ -96,47 +96,9 @@ RSpec.describe 'SiteSpec' do
     puts "original idf file size #{original_file_size} bytes versus new idf file size #{new_file_size} bytes"
     expect((original_file_size - new_file_size).abs <= 1).to be true
 
-    line_not_match_counter = compare_two_idf_files
+    line_not_match_counter = compare_two_idf_files("#{@osm_file_path}/in.idf", "#{@osm_file_path}/originalfiles/in.idf")
 
     expect(line_not_match_counter == 0).to be true
-  end
-
-  def compare_two_idf_files
-    idf_file1 = File.open("#{@osm_file_path}/in.idf")
-    idf_file2 = File.open("#{@osm_file_path}/originalfiles/in.idf")
-
-    file1_lines = idf_file1.readlines
-    file2_lines = idf_file2.readlines
-
-    line_not_match_counter = 0
-    counter = 0
-    file1_lines.each do |line|
-      if !line.include?('Sub Surface') && !file2_lines[counter].eql?(line)
-        puts "This is the newly create idf file line : #{line} on line no : #{counter}"
-        puts "This is the original idf file line : #{file2_lines[counter]} on line no : #{counter}"
-        line_not_match_counter += 1
-      end
-      counter += 1
-    end
-    return line_not_match_counter
-  end
-
-  def generate_idf_file
-    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(@site.get_model)
-    new_file_path = "#{@osm_file_path}/in.idf"
-    # first delete idf file if exist
-    File.delete(new_file_path) if File.exist?(new_file_path)
-
-    # now create idf file.
-    p 'IDF file successfully saved' if workspace.save(new_file_path)
-
-    original_file_path = "#{@osm_file_path}/originalfiles"
-    oldModel = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
-    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
-    # first delete the file if exist
-    File.delete("#{original_file_path}/in.idf") if File.exist?("#{original_file_path}/in.idf")
-
-    p 'IDF file 2 successfully saved' if workspace.save("#{original_file_path}/in.idf")
   end
 
   def generate_baseline(file_name, ns)
