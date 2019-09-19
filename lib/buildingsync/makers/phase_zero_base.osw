@@ -170,7 +170,8 @@
 				"outdoor_air_section": true,
 				"cost_summary_section": true,
 				"source_energy_section": true,
-				"schedules_overview_section": true
+				"schedules_overview_section": true,
+				"reg_monthly_details": true
 			}
 		}
 	]
