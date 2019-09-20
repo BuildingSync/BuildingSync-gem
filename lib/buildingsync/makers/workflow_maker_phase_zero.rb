@@ -126,7 +126,7 @@ module BuildingSync
           count += 1
         end
       end
-      if (!successfully_added)
+      if !successfully_added
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "CANNOT insert measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
       end
       return successfully_added
@@ -396,34 +396,41 @@ module BuildingSync
 
       month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }
 
+      scenarios_found = false
       # write an osw for each scenario
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
-
+        scenarios_found = true
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
-        puts "processing scneario with name #{scenario_name}"
+        puts "processing scenario with name #{scenario_name}"
         # dir for the osw
         osw_dir = File.join(dir, scenario_name)
 
+        if scenario_name == 'Baseline'
+          if !Dir.exist?(osw_dir)
+            osw_dir = dir
+          end
+        end
+
         # cleanup large files
         path = File.join(osw_dir, 'eplusout.sql')
-        FileUtils.rm_f(path) if File.exists?(path)
+        FileUtils.rm_f(path) if File.exist?(path)
         path = File.join(osw_dir, 'data_point.zip')
-        FileUtils.rm_f(path) if File.exists?(path)
+        FileUtils.rm_f(path) if File.exist?(path)
 
         path = File.join(osw_dir, 'eplusout.eso')
-        FileUtils.rm_f(path) if File.exists?(path)
+        FileUtils.rm_f(path) if File.exist?(path)
 
         Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-          FileUtils.rm_rf(path) if File.exists?(path)
+          FileUtils.rm_rf(path) if File.exist?(path)
         end
 
         # find the osw
         path = File.join(osw_dir, 'out.osw')
-        if !File.exists?(path)
-          puts "Cannot load results for scenario #{scenario_name}"
+        if !File.exist?(path)
+          puts "Cannot load results for scenario #{scenario_name}, because the osw files does not exist #{path}"
           next
         end
 
@@ -442,6 +449,7 @@ module BuildingSync
       end
 
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+        scenarios_found = true
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         next if defined?(BRICR::SIMULATE_BASELINE_ONLY) && BRICR::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
@@ -461,7 +469,7 @@ module BuildingSync
         baseline = results['Baseline']
 
         if result.nil?
-          puts "Cannot load results for scenario #{scenario_name}"
+          puts "Cannot load results for scenario #{scenario_name}, because the result is nil"
           @failed_scenarios << scenario_name
           next
         elsif baseline.nil?
@@ -505,13 +513,13 @@ module BuildingSync
         software_program_used.text = 'OpenStudio'
         modeled.add_element(software_program_used)
         software_program_version = REXML::Element.new("#{@ns}:SoftwareProgramVersion")
-        software_program_version.text = OpenStudio::openStudioLongVersion.to_s
+        software_program_version.text = OpenStudio.openStudioLongVersion.to_s
         modeled.add_element(software_program_version)
         weather_data_type = REXML::Element.new("#{@ns}:WeatherDataType")
         weather_data_type.text = 'TMY3'
         modeled.add_element(weather_data_type)
         sim_completion_status = REXML::Element.new("#{@ns}:SimulationCompletionStatus")
-        sim_completion_status.text = result[:completed_status] === 'Success' ? 'Finished' : 'Failed'  # TODO: double check what these keys can be
+        sim_completion_status.text = result[:completed_status] === 'Success' ? 'Finished' : 'Failed' # TODO: double check what these keys can be
         modeled.add_element(sim_completion_status)
         calc_method.add_element(modeled)
         package_of_measures.add_element(calc_method)
@@ -605,10 +613,10 @@ module BuildingSync
         package_of_measures.add_element(annual_savings)
 
         res_uses = REXML::Element.new("#{@ns}:ResourceUses")
-        scenario_name_ns = scenario_name.gsub(" ", "_").gsub(/[^0-9a-z_]/i, '')
+        scenario_name_ns = scenario_name.gsub(' ', '_').gsub(/[^0-9a-z_]/i, '')
         # ELECTRICITY
         res_use = REXML::Element.new("#{@ns}:ResourceUse")
-        res_use.add_attribute('ID', scenario_name_ns + "_Electricity")
+        res_use.add_attribute('ID', scenario_name_ns + '_Electricity')
         energy_res = REXML::Element.new("#{@ns}:EnergyResource")
         energy_res.text = 'Electricity'
         res_units = REXML::Element.new("#{@ns}:ResourceUnits")
@@ -616,7 +624,7 @@ module BuildingSync
         native_units = REXML::Element.new("#{@ns}:AnnualFuelUseNativeUnits")
         native_units.text = fuel_electricity_kbtu.to_s
         consistent_units = REXML::Element.new("#{@ns}:AnnualFuelUseConsistentUnits")
-        consistent_units.text = (fuel_electricity_kbtu / 1000.0).to_s  # convert to MMBtu
+        consistent_units.text = (fuel_electricity_kbtu / 1000.0).to_s # convert to MMBtu
         res_use.add_element(energy_res)
         res_use.add_element(res_units)
         res_use.add_element(native_units)
@@ -634,7 +642,7 @@ module BuildingSync
 
         # NATURAL GAS
         res_use = REXML::Element.new("#{@ns}:ResourceUse")
-        res_use.add_attribute('ID', scenario_name_ns + "_NaturalGas")
+        res_use.add_attribute('ID', scenario_name_ns + '_NaturalGas')
         energy_res = REXML::Element.new("#{@ns}:EnergyResource")
         energy_res.text = 'Natural gas'
         res_units = REXML::Element.new("#{@ns}:ResourceUnits")
@@ -642,7 +650,7 @@ module BuildingSync
         native_units = REXML::Element.new("#{@ns}:AnnualFuelUseNativeUnits")
         native_units.text = fuel_natural_gas_kbtu.to_s
         consistent_units = REXML::Element.new("#{@ns}:AnnualFuelUseConsistentUnits")
-        consistent_units.text = (fuel_natural_gas_kbtu / 1000.0).to_s  # in MMBtu
+        consistent_units.text = (fuel_natural_gas_kbtu / 1000.0).to_s # in MMBtu
         res_use.add_element(energy_res)
         res_use.add_element(res_units)
         res_use.add_element(native_units)
@@ -674,9 +682,9 @@ module BuildingSync
           timeseries.add_element(start_time)
           end_time = REXML::Element.new("#{@ns}:EndTimeStamp")
           if month < 9
-            end_time.text = '2017-0' + (month+1).to_s + '-01T00:00:00'
+            end_time.text = '2017-0' + (month + 1).to_s + '-01T00:00:00'
           elsif month < 12
-            end_time.text = '2017-' + (month+1).to_s + '-01T00:00:00'
+            end_time.text = '2017-' + (month + 1).to_s + '-01T00:00:00'
           else
             end_time.text = '2018-01-01T00:00:00'
           end
@@ -688,11 +696,11 @@ module BuildingSync
           the_key = "electricity_ip_#{month_lookup[month]}"
           # puts "saving value 123: #{monthly_results[scenario_name][the_key]}"
           if !monthly_results[scenario_name][the_key.to_sym].nil?
-          interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 3.4121416331 # kWh to kBtu
+            interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 3.4121416331 # kWh to kBtu
           end
           timeseries.add_element(interval_reading)
           resource_id = REXML::Element.new("#{@ns}:ResourceUseID")
-          resource_id.add_attribute('IDref', scenario_name_ns + "_Electricity")
+          resource_id.add_attribute('IDref', scenario_name_ns + '_Electricity')
           timeseries.add_element(resource_id)
           timeseriesdata.add_element(timeseries)
         end
@@ -717,9 +725,9 @@ module BuildingSync
           timeseries.add_element(start_time)
           end_time = REXML::Element.new("#{@ns}:EndTimeStamp")
           if month < 9
-            end_time.text = '2017-0' + (month+1).to_s + '-01T00:00:00'
+            end_time.text = '2017-0' + (month + 1).to_s + '-01T00:00:00'
           elsif month < 12
-            end_time.text = '2017-' + (month+1).to_s + '-01T00:00:00'
+            end_time.text = '2017-' + (month + 1).to_s + '-01T00:00:00'
           else
             end_time.text = '2018-01-01T00:00:00'
           end
@@ -729,13 +737,13 @@ module BuildingSync
           timeseries.add_element(interval_frequency)
           interval_reading = REXML::Element.new("#{@ns}:IntervalReading")
           the_key = "natural_gas_ip_#{month_lookup[month]}"
-          #puts "saving value: #{monthly_results[scenario_name][the_key.to_sym]}"
+          # puts "saving value: #{monthly_results[scenario_name][the_key.to_sym]}"
           if !monthly_results[scenario_name][the_key.to_sym].nil?
             interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 1000.0 # MMBtu to kBtu
           end
           timeseries.add_element(interval_reading)
           resource_id = REXML::Element.new("#{@ns}:ResourceUseID")
-          resource_id.add_attribute('IDref', scenario_name_ns + "_NaturalGas")
+          resource_id.add_attribute('IDref', scenario_name_ns + '_NaturalGas')
           timeseries.add_element(resource_id)
           timeseriesdata.add_element(timeseries)
         end
@@ -764,8 +772,9 @@ module BuildingSync
 
         # no longer using user defined fields
         scenario.elements.delete("#{@ns}:UserDefinedFields")
-
       end
+
+      puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
     end
 
     # DLM: total hack because these are not reported in the out.osw
@@ -782,8 +791,8 @@ module BuildingSync
         end
       end
 
-      result[0] = result[0]*947.8171203133 # GJ to kBtu
-      result[1] = result[1]*0.947817120313*0.092903 # MJ/m2 to kBtu/ft2
+      result[0] = result[0] * 947.8171203133 # GJ to kBtu
+      result[1] = result[1] * 0.947817120313 * 0.092903 # MJ/m2 to kBtu/ft2
 
       return result
     end
@@ -804,6 +813,4 @@ module BuildingSync
       return nil
     end
   end
-
-
 end
