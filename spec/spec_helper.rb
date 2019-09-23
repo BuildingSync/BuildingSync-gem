@@ -71,10 +71,20 @@ RSpec.configure do |config|
   end
 
   def run_baseline_simulation(osm_name, epw_name)
+    basic_dir = File.dirname(osm_name)
+    file_name = File.basename(osm_name)
+
+    osm_baseline_dir = File.join(basic_dir, 'Baseline')
+    if !File.exist?(osm_baseline_dir)
+      FileUtils.mkdir_p(osm_baseline_dir)
+    end
+    osm_baseline_path = File.join(osm_baseline_dir, file_name)
+    FileUtils.cp(osm_name, osm_baseline_dir)
+    puts "osm_baseline_path: #{osm_baseline_path}"
     workflow = OpenStudio::WorkflowJSON.new
-    workflow.setSeedFile(osm_name)
-    workflow.setWeatherFile(epw_name)
-    osw_path = osm_name.gsub('.osm', '.osw')
+    workflow.setSeedFile(osm_baseline_path)
+    workflow.setWeatherFile(File.join('../../../weather', epw_name))
+    osw_path = osm_baseline_path.gsub('.osm', '.osw')
     workflow.saveAs(File.absolute_path(osw_path.to_s))
 
     cli_path = OpenStudio.getOpenStudioCLI
@@ -85,7 +95,7 @@ RSpec.configure do |config|
     # Run the sizing run
     OpenstudioStandards.run_command(cmd)
 
-    expect(File.exist?(osm_name.gsub('in.osm', 'run/eplusout.sql'))).to be true
+    expect(File.exist?(osm_baseline_path.gsub('in.osm', 'run/eplusout.sql'))).to be true
   end
 
   def run_scenario_simulations(osw_files)
@@ -155,16 +165,19 @@ RSpec.configure do |config|
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
     translator.write_osm
 
-    puts "Looking for the following OSM file: #{out_path}/in.osm"
-    expect(File.exist?("#{out_path}/in.osm")).to be true
+    base_file_name = File.basename(file_name, '.xml')
+    new_osm_file = "#{out_path}/#{base_file_name}.osm"
+    puts "Looking for the following OSM file: #{new_osm_file}"
+    expect(File.exist?(new_osm_file)).to be true
 
-    new_idf_file = "#{out_path}/in.idf"
-    save_idf_from_osm("#{out_path}/in.osm", new_idf_file)
+    new_idf_file = "#{out_path}/#{base_file_name}.idf"
+    save_idf_from_osm(new_osm_file, new_idf_file)
 
-    osm_comparison_file_path = File.expand_path('../files/filecomparison', File.dirname(__FILE__))
-    old_osm_file = "#{osm_comparison_file_path}/#{file_name}.osm"
+    osm_comparison_file_path = File.expand_path('files/filecomparison', File.dirname(__FILE__))
+    old_osm_file = "#{osm_comparison_file_path}/#{base_file_name}.osm"
+    puts "Looking for the following OSM file: #{old_osm_file}"
     expect(File.exist?(old_osm_file)).to be true
-    old_idf_file = "#{osm_comparison_file_path}/#{file_name}.idf"
+    old_idf_file = "#{osm_comparison_file_path}/#{base_file_name}.idf"
     File.delete(old_idf_file) if File.exist?(old_idf_file)
     save_idf_from_osm(old_osm_file, old_idf_file)
 

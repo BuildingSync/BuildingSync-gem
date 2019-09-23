@@ -409,10 +409,17 @@ module BuildingSync
         osw_dir = File.join(dir, scenario_name)
 
         if scenario_name == 'Baseline'
-          if !Dir.exist?(osw_dir)
-            osw_dir = dir
+          if !File.exist?(File.join(osw_dir, 'eplusout.sql'))
+            if File.exist?(File.join(dir, 'eplusout.sql'))
+              osw_dir = dir
+            elsif File.exist?(File.join(dir, '/run/eplusout.sql'))
+              osw_dir = "#{dir}/run"
+            elsif File.exist?(File.join(dir, '/Baseline/run/eplusout.sql'))
+              osw_dir = "#{dir}/Baseline/run"
+            end
           end
         end
+        puts "osw_dir: #{osw_dir}"
 
         # cleanup large files
         path = File.join(osw_dir, 'eplusout.sql')
