@@ -192,7 +192,13 @@ module BuildingSync
         set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false)
       end
       if open_studio_standard.nil?
-        open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
+        begin
+          open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
+        rescue
+          # if the combination of standard type and bldg type fails we try the standard type alone.
+          puts "could not find open studio standard for template #{standard_template} and bldg type: #{bldg_type}, trying the standard type alone"
+          open_studio_standard = Standard.build(standard_template)
+        end
       end
       lookup_name = open_studio_standard.model_get_lookup_name(@occupancy_type)
       puts " Building type: #{lookup_name} selected for occupancy type: #{@occupancy_type}"
