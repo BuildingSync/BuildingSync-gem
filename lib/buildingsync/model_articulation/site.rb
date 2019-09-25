@@ -83,6 +83,9 @@ module BuildingSync
       if @buildings.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
         raise 'Error: There is no building attached to this site in your BuildingSync file.'
+      elsif @buildings.count > 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There is more than one (#{@buildings.count}) building attached to this site in your BuildingSync file.")
+        raise "Error: There is more than one (#{@buildings.count}) building attached to this site in your BuildingSync file."
       end
     end
 

@@ -82,17 +82,14 @@ module BuildingSync
         else
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.SpatialElement.generate_baseline_osm', "Unsupported floor area type found: #{floor_area_type}")
         end
-
-        if @total_floor_area.nil? && !@conditioned_floor_area.nil?
-          @total_floor_area = @conditioned_floor_area
-        else
-          if @total_floor_area.nil? && !@heated_and_cooled_floor_area.nil?
-            @total_floor_area = @heated_and_cooled_floor_area
-          end
-        end
-
-        raise 'Spatial element does not define gross floor area' if @total_floor_area.nil? && parent_total_floor_area.nil?
       end
+
+      if @total_floor_area.nil? && !@conditioned_floor_area.nil?
+        @total_floor_area = @conditioned_floor_area
+      elsif @total_floor_area.nil? && !@heated_and_cooled_floor_area.nil?
+        @total_floor_area = @heated_and_cooled_floor_area
+      end
+
       if @total_floor_area.nil?
         return parent_total_floor_area
       else
