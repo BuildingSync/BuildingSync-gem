@@ -391,6 +391,7 @@ module BuildingSync
     def gather_results(dir)
       puts 'starting to gather results'
       super
+      begin
       results = {}
       monthly_results = {}
 
@@ -782,6 +783,9 @@ module BuildingSync
       end
 
       puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
+      rescue
+        puts "An error occured while processing results in #{dir}"
+      end
     end
 
     # DLM: total hack because these are not reported in the out.osw
