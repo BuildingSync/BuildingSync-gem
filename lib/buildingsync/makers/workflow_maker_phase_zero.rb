@@ -391,6 +391,7 @@ module BuildingSync
 
     def gather_results(dir)
       puts 'starting to gather results'
+      results_counter = 0
       super
       begin
       results = {}
@@ -465,6 +466,7 @@ module BuildingSync
         next if scenario_name == 'Measured'
         next if defined?(BRICR::SIMULATE_BASELINE_ONLY) && BRICR::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
+        results_counter += 1
         package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
 
         # delete previous results
@@ -788,6 +790,10 @@ module BuildingSync
       puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
       rescue
         puts "An error occured while processing results in #{dir}"
+      end
+
+      if results_counter > 0
+        puts "#{results_counter} scenarios successfully simulated and results processed"
       end
     end
 

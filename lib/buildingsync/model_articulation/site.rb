@@ -231,14 +231,14 @@ module BuildingSync
       end
     end
 
-    def generate_baseline_osm(epw_file_path, standard_to_be_used)
+    def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
       building = get_largest_building
       @climate_zone = @climate_zone_ashrae
       # for now we use the california climate zone if it is available
       if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
         @climate_zone = @climate_zone_ca_t24
       end
-      building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude, @weather_file_name, @weather_station_id, @state_name, @city_name)
+      building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude, ddy_file, @weather_file_name, @weather_station_id, @state_name, @city_name)
       building.generate_baseline_osm(standard_to_be_used)
     end
 
