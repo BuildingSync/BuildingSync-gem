@@ -337,6 +337,7 @@ module BuildingSync
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+        next if scenario_name == 'Measured'
         next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         # deep clone
@@ -403,6 +404,7 @@ module BuildingSync
         scenarios_found = true
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+        next if scenario_name == 'Measured'
         next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         puts "processing scenario with name #{scenario_name}"
@@ -460,6 +462,7 @@ module BuildingSync
         scenarios_found = true
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+        next if scenario_name == 'Measured'
         next if defined?(BRICR::SIMULATE_BASELINE_ONLY) && BRICR::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]

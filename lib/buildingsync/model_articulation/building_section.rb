@@ -65,7 +65,7 @@ module BuildingSync
 
     def read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
       @occupancy_type = read_occupancy_type(section_element, occ_type, ns)
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area, true)
+      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
     end
 
     def read_building_section_other_detail(section_element, ns)
