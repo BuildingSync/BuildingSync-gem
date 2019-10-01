@@ -110,15 +110,15 @@ module BuildingSync
       choose_model_maker
     end
 
-    def write_osm(replace_whitespace = false)
-      @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, replace_whitespace)
+    def write_osm(ddy_file = nil, replace_whitespace = false)
+      @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, ddy_file, replace_whitespace)
     end
 
     def gather_results(dir)
       @model_maker.gather_results(dir)
     end
 
-    def saveXML(filename)
+    def save_xml(filename)
       @model_maker.saveXML(filename)
     end
 
@@ -152,6 +152,10 @@ module BuildingSync
 
     def get_space_types
       return @model_maker.get_space_types
+    end
+
+    def get_model
+      return @model_maker.get_model
     end
 
     private

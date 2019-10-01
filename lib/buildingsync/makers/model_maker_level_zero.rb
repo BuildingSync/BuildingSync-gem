@@ -44,7 +44,7 @@ module BuildingSync
       @facilities = []
     end
 
-    def generate_baseline(dir, epw_file_path, standard_to_be_used, replace_whitespace = false)
+    def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil, replace_whitespace = false)
       @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
         @facilities.push(Facility.new(facility_element, @ns))
       end
@@ -59,12 +59,16 @@ module BuildingSync
 
       open_studio_standard = @facilities[0].determine_open_studio_standard(standard_to_be_used)
 
-      @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used)
+      @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used, ddy_file)
       return write_osm(dir, replace_whitespace)
     end
 
     def get_space_types
       return @facilities[0].get_space_types
+    end
+
+    def get_model
+      return @facilities[0].get_model
     end
 
     private

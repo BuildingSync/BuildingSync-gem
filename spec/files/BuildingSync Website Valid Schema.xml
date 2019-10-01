@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<!-- edited with XMLSpy v2016 rel. 2 sp1 (x64) (http://www.altova.com) by Dan Macumber (NREL) -->
-<auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://cdn.rawgit.com/BuildingSync/schema/develop/BuildingSync.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 ../BuildingSync.xsd">
   <auc:Facilities>
     <auc:Facility>
       <auc:Sites>
@@ -68,8 +67,8 @@
               <auc:Perimeter>1350</auc:Perimeter>
               <auc:YearOfConstruction>1960</auc:YearOfConstruction>
               <auc:YearOfLastMajorRemodel>2008</auc:YearOfLastMajorRemodel>
-              <auc:Subsections>
-                <auc:Subsection ID="Default_Subsection">
+              <auc:Sections>
+                <auc:Section ID="Default_Section">
                   <auc:OccupancyClassification>Retail</auc:OccupancyClassification>
                   <auc:TypicalOccupantUsages>
                     <auc:TypicalOccupantUsage>
@@ -95,8 +94,8 @@
                       <auc:FloorAreaValue>0.0</auc:FloorAreaValue>
                     </auc:FloorArea>
                   </auc:FloorAreas>
-                </auc:Subsection>
-              </auc:Subsections>
+                </auc:Section>
+              </auc:Sections>
             </auc:Building>
           </auc:Buildings>
         </auc:Site>
@@ -120,17 +119,12 @@
           <auc:LongDescription>Retrofit with light emitting diode technologies</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
           <auc:UsefulLife>12</auc:UsefulLife>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureTotalFirstCost>267390.2</auc:MeasureTotalFirstCost>
           <auc:MeasureInstallationCost>0</auc:MeasureInstallationCost>
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure2">
           <auc:SystemCategoryAffected>Plug Load</auc:SystemCategoryAffected>
@@ -146,6 +140,7 @@
               </auc:PlugLoadReductions>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace with ENERGY STAR rated</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -155,12 +150,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure3">
           <auc:SystemCategoryAffected>Wall</auc:SystemCategoryAffected>
@@ -176,6 +165,7 @@
               </auc:BuildingEnvelopeModifications>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Air seal envelope</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -185,12 +175,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure4">
           <auc:SystemCategoryAffected>Cooling System</auc:SystemCategoryAffected>
@@ -206,6 +190,7 @@
               </auc:OtherHVAC>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace package units</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -215,12 +200,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure5">
           <auc:SystemCategoryAffected>Heating System</auc:SystemCategoryAffected>
@@ -236,6 +215,7 @@
               </auc:OtherHVAC>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace burner</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -245,12 +225,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure6">
           <auc:SystemCategoryAffected>Lighting</auc:SystemCategoryAffected>
@@ -266,6 +240,7 @@
               </auc:LightingImprovements>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Add daylight controls</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -275,12 +250,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure7">
           <auc:SystemCategoryAffected>Lighting</auc:SystemCategoryAffected>
@@ -296,6 +265,7 @@
               </auc:LightingImprovements>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Add occupancy sensors</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -305,12 +275,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure8">
           <auc:SystemCategoryAffected>Plug Load</auc:SystemCategoryAffected>
@@ -326,6 +290,7 @@
               </auc:PlugLoadReductions>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Install plug load controls</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -335,12 +300,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure9">
           <auc:SystemCategoryAffected>Wall</auc:SystemCategoryAffected>
@@ -356,6 +315,7 @@
               </auc:BuildingEnvelopeModifications>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Increase wall insulation</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -365,12 +325,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure10">
           <auc:SystemCategoryAffected>Wall</auc:SystemCategoryAffected>
@@ -386,6 +340,7 @@
               </auc:BuildingEnvelopeModifications>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Insulate thermal bypasses</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -395,12 +350,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure11">
           <auc:SystemCategoryAffected>Roof</auc:SystemCategoryAffected>
@@ -416,6 +365,7 @@
               </auc:BuildingEnvelopeModifications>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Increase roof insulation</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -425,12 +375,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure12">
           <auc:SystemCategoryAffected>Ceiling</auc:SystemCategoryAffected>
@@ -446,6 +390,7 @@
               </auc:BuildingEnvelopeModifications>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Increase ceiling insulation</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -455,12 +400,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure13">
           <auc:SystemCategoryAffected>Fenestration</auc:SystemCategoryAffected>
@@ -476,6 +415,7 @@
               </auc:BuildingEnvelopeModifications>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Add window films</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -485,12 +425,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure14">
           <auc:SystemCategoryAffected>General Controls and Operations</auc:SystemCategoryAffected>
@@ -506,6 +440,7 @@
               </auc:OtherHVAC>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Upgrade operating protocols, calibration, and/or sequencing</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -515,12 +450,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure15">
           <auc:SystemCategoryAffected>Domestic Hot Water</auc:SystemCategoryAffected>
@@ -536,6 +465,7 @@
               </auc:ChilledWaterHotWaterAndSteamDistributionSystems>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace or upgrade water heater</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -545,12 +475,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure16">
           <auc:SystemCategoryAffected>Refrigeration</auc:SystemCategoryAffected>
@@ -566,6 +490,7 @@
               </auc:Refrigeration>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace ice/refrigeration equipment with high efficiency units</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -575,12 +500,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure17">
           <auc:SystemCategoryAffected>Fenestration</auc:SystemCategoryAffected>
@@ -596,6 +515,7 @@
               </auc:BuildingEnvelopeModifications>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace windows</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -605,12 +525,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure18">
           <auc:SystemCategoryAffected>Heating System</auc:SystemCategoryAffected>
@@ -626,6 +540,7 @@
               </auc:BoilerPlantImprovements>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace boiler</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -635,12 +550,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure19">
           <auc:SystemCategoryAffected>Other HVAC</auc:SystemCategoryAffected>
@@ -656,6 +565,7 @@
               </auc:OtherHVAC>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace AC and heating units with ground coupled heat pump systems</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -665,12 +575,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure20">
           <auc:SystemCategoryAffected>Other HVAC</auc:SystemCategoryAffected>
@@ -686,6 +590,7 @@
               </auc:OtherHVAC>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>VRF with DOAS</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -695,12 +600,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>Replace HVAC system type to VRF</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure21">
           <auc:SystemCategoryAffected>Other HVAC</auc:SystemCategoryAffected>
@@ -716,6 +615,7 @@
               </auc:OtherHVAC>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace HVAC system type to PZHP</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -725,12 +625,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>Replace HVAC system type to PZHP</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure22">
           <auc:SystemCategoryAffected>Fan</auc:SystemCategoryAffected>
@@ -746,6 +640,7 @@
               </auc:OtherElectricMotorsAndDrives>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace with higher efficiency</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -755,12 +650,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure23">
           <auc:SystemCategoryAffected>Air Distribution</auc:SystemCategoryAffected>
@@ -776,6 +665,7 @@
               </auc:OtherHVAC>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Improve ventilation fans</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -785,12 +675,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure24">
           <auc:SystemCategoryAffected>Air Distribution</auc:SystemCategoryAffected>
@@ -806,6 +690,7 @@
               </auc:OtherHVAC>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Install demand control ventilation</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -815,12 +700,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure25">
           <auc:SystemCategoryAffected>Air Distribution</auc:SystemCategoryAffected>
@@ -836,6 +715,7 @@
               </auc:OtherHVAC>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Add or repair economizer</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -845,12 +725,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure26">
           <auc:SystemCategoryAffected>Heat Recovery</auc:SystemCategoryAffected>
@@ -866,6 +740,7 @@
               </auc:OtherHVAC>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Add energy recovery</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -875,12 +750,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure27">
           <auc:SystemCategoryAffected>Domestic Hot Water</auc:SystemCategoryAffected>
@@ -896,6 +765,7 @@
               </auc:ChilledWaterHotWaterAndSteamDistributionSystems>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Add pipe insulation</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -905,12 +775,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure28">
           <auc:SystemCategoryAffected>Domestic Hot Water</auc:SystemCategoryAffected>
@@ -926,6 +790,7 @@
               </auc:ChilledWaterHotWaterAndSteamDistributionSystems>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Add recirculating pumps</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -935,12 +800,6 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
         <auc:Measure ID="Measure29">
           <auc:SystemCategoryAffected>Water Use</auc:SystemCategoryAffected>
@@ -956,6 +815,7 @@
               </auc:WaterAndSewerConservationSystems>
             </auc:TechnologyCategory>
           </auc:TechnologyCategories>
+          <auc:CustomMeasureName>TBD</auc:CustomMeasureName>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Install low-flow faucets and showerheads</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
@@ -965,664 +825,660 @@
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
           <auc:Recommended>true</auc:Recommended>
           <auc:ImplementationStatus>Proposed</auc:ImplementationStatus>
-          <auc:UserDefinedFields>
-            <auc:UserDefinedField>
-              <auc:FieldName>OpenStudioMeasureName</auc:FieldName>
-              <auc:FieldValue>TBD</auc:FieldValue>
-            </auc:UserDefinedField>
-          </auc:UserDefinedFields>
         </auc:Measure>
       </auc:Measures>
-      <auc:Report>
-        <auc:Scenarios>
-          <auc:Scenario ID="Baseline">
-            <auc:ScenarioName>Baseline</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>LED Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure1"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Electric_Appliance_30%_Reduction Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure2"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Air_Seal_Infiltration_30%_More_Airtight Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure3"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Cooling_System_SEER 14 Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure4"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Heating_System_Efficiency_0.93 Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure5"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Add daylight controls Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure6"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Add occupancy sensors Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure7"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Install plug load controls Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure8"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Increase wall insulation Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure9"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Insulate thermal bypasses Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure10"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Increase roof insulation Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure11"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Increase ceiling insulation Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure12"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Add window films Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure13"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Upgrade operating protocols calibration and-or sequencing Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure14"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Replace or upgrade water heater Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure15"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Replace ice-refrigeration equipment with high efficiency units Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure16"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Replace windows Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure17"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Replace boiler Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure18"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Replace HVAC with GSHP and DOAS Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure19"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>VRF with DOAS Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure20"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Replace HVAC system type to PZHP Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure21"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Replace with higher efficiency Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure22"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Improve ventilation fans Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure23"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Install demand control ventilation Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure24"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Add or repair economizer Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure25"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Add energy recovery Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure26"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Add pipe insulation Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure27"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Add recirculating pumps Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure28"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-          <auc:Scenario>
-            <auc:ScenarioName>Install low-flow faucets and showerheads Only</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-                <auc:MeasureIDs>
-                  <auc:MeasureID IDref="Measure29"/>
-                </auc:MeasureIDs>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-            <auc:LinkedPremises>
-              <auc:Building>
-                <auc:LinkedBuildingID IDref="Building001"/>
-              </auc:Building>
-            </auc:LinkedPremises>
-            <auc:UserDefinedFields>
-              <auc:UserDefinedField>
-                <auc:FieldName>Recommendation Category</auc:FieldName>
-                <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
-              </auc:UserDefinedField>
-            </auc:UserDefinedFields>
-          </auc:Scenario>
-        </auc:Scenarios>
-      </auc:Report>
+      <auc:Reports>
+        <auc:Report>
+          <auc:Scenarios>
+            <auc:Scenario ID="Baseline">
+              <auc:ScenarioName>Baseline</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>LED Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure1"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Electric_Appliance_30%_Reduction Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure2"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Air_Seal_Infiltration_30%_More_Airtight Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure3"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Cooling_System_SEER 14 Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure4"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Heating_System_Efficiency_0.93 Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure5"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Add daylight controls Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure6"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Add occupancy sensors Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure7"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Install plug load controls Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure8"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Increase wall insulation Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure9"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Insulate thermal bypasses Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure10"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Increase roof insulation Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure11"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Increase ceiling insulation Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure12"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Add window films Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure13"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Upgrade operating protocols calibration and-or sequencing Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure14"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Replace or upgrade water heater Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure15"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Replace ice-refrigeration equipment with high efficiency units Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure16"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Replace windows Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure17"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Replace boiler Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure18"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Replace HVAC with GSHP and DOAS Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure19"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>VRF with DOAS Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure20"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Replace HVAC system type to PZHP Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure21"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Replace with higher efficiency Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure22"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Improve ventilation fans Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure23"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Install demand control ventilation Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure24"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Add or repair economizer Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure25"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Add energy recovery Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure26"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Add pipe insulation Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure27"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Add recirculating pumps Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure28"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+            <auc:Scenario>
+              <auc:ScenarioName>Install low-flow faucets and showerheads Only</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:PackageOfMeasures>
+                  <auc:ReferenceCase IDref="Baseline"/>
+                  <auc:MeasureIDs>
+                    <auc:MeasureID IDref="Measure29"/>
+                  </auc:MeasureIDs>
+                </auc:PackageOfMeasures>
+              </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Building001"/>
+                </auc:Building>
+              </auc:LinkedPremises>
+              <auc:UserDefinedFields>
+                <auc:UserDefinedField>
+                  <auc:FieldName>Recommendation Category</auc:FieldName>
+                  <auc:FieldValue>Potential Capital Recommendations</auc:FieldValue>
+                </auc:UserDefinedField>
+              </auc:UserDefinedFields>
+            </auc:Scenario>
+          </auc:Scenarios>
+        </auc:Report>
+      </auc:Reports>
     </auc:Facility>
   </auc:Facilities>
 </auc:BuildingSync>

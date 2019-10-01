@@ -35,6 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_system'
+
 module BuildingSync
   class LoadsSystem < BuildingSystem
     # initialize
@@ -114,39 +115,62 @@ module BuildingSync
     end
 
     def adjust_people_schedule(space_type, building_section, model)
-      args = {}
-      args['hoo_per_week'] = building_section.typical_occupant_usage_value_hours
+      if !building_section.typical_occupant_usage_value_hours.nil?
+        puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
+        model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+        path = model_articulation_instance.measures_dir + '/create_parametric_schedules/resources/os_lib_parametric_schedules.rb'
+        puts "create parametric schedule path: #{path}"
+        require path
 
-      model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
-      path = model_articulation_instance.measures_dir + '/create_parametric_schedules/measure.rb'
-      puts "create parametric schedule path: #{path}"
-      require path
+        param_Schedules = OsLib_Parametric_Schedules.new(model)
+        param_Schedules.override_hours_per_week(building_section.typical_occupant_usage_value_hours.to_f)
 
-      # create an instance of the measure
-      measure = CreateParametricSchedules.new
+        param_Schedules.pre_process_space_types()
 
-      # create an instance of a runner
-      runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
+        param_Schedules.create_default_schedule_set()
 
-      # get arguments
-      arguments = measure.arguments(model)
-      argument_map = OpenStudio::Ruleset.convertOSArgumentVectorToMap(arguments)
-
-      # populate argument with specified hash value if specified
-      arguments.each do |arg|
-        temp_arg_var = arg.clone
-        if args.key?(arg.name)
-          temp_arg_var.setValue(args[arg.name])
-        end
-        argument_map[arg.name] = temp_arg_var
+        param_Schedules.create_schedules_and_apply_default_schedule_set()
       end
+    end
 
-      # run the measure
-      measure.run(model, runner, argument_map)
-      result = runner.result
+    def adjust_people_schedule_old(space_type, building_section, model)
+      if !building_section.typical_occupant_usage_value_hours.nil?
+        args = {}
+        puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
+        args['hoo_per_week'] = building_section.typical_occupant_usage_value_hours
 
-      # if 'Fail' passed in make sure at least one error message (while not typical there may be more than one message)
-      if result.value.valueName == 'Fail' then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.adjust_people_schedule', "Applying the create parametric schedule measure failed with #{result.errors.size} errors") end
+        model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+        path = model_articulation_instance.measures_dir + '/create_parametric_schedules/measure.rb'
+        puts "create parametric schedule path: #{path}"
+        require path
+
+        # create an instance of the measure
+        measure = CreateParametricSchedules.new
+
+        # create an instance of a runner
+        runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
+
+        # get arguments
+        arguments = measure.arguments(model)
+        argument_map = OpenStudio::Ruleset.convertOSArgumentVectorToMap(arguments)
+
+        # populate argument with specified hash value if specified
+        arguments.each do |arg|
+          puts "arg #{arg}"
+          temp_arg_var = arg.clone
+          if args.key?(arg.name)
+            temp_arg_var.setValue(args[arg.name])
+          end
+          argument_map[arg.name] = temp_arg_var
+        end
+
+        # run the measure
+        measure.run(model, runner, argument_map)
+        result = runner.result
+
+        # if 'Fail' passed in make sure at least one error message (while not typical there may be more than one message)
+        if result.value.valueName == 'Fail' then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.adjust_people_schedule', "Applying the create parametric schedule measure failed with #{result.errors.size} errors") end
+      end
     end
 
     def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)

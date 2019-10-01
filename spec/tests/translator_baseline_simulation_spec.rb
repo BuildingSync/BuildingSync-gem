@@ -39,6 +39,8 @@ require_relative './../spec_helper'
 require 'fileutils'
 require 'parallel'
 
+test_new_files = false
+
 RSpec.describe 'BuildingSync' do
   it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and perform a baseline simulation' do
     osm_path = test_baseline_creation('building_151.xml', CA_TITLE24)
@@ -71,14 +73,57 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write Golden Test File.xml (phase zero) with  Title 24 and perform a baseline simulation' do
-    osm_path = test_baseline_creation('Golden Test File.xml', CA_TITLE24, 'CZ01RV2.epw')
+    begin
+      osm_path = test_baseline_creation('Golden Test File.xml', CA_TITLE24, 'CZ01RV2.epw')
 
-    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+      run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+    rescue StandardError => e
+      expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
+    end
   end
 
-  it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
-    osm_path = test_baseline_creation('Golden Test File.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  it 'should parse and write AT_example_property_report_25.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+    if test_new_files
+      osm_path = test_baseline_creation('AT_example_property_report_25.xml', ASHRAE90_1, 'CZ01RV2.epw')
+
+      run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+    end
+  end
+
+  it 'should parse and write AT_example_report_332.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+    if test_new_files
+      osm_path = test_baseline_creation('AT_example_report_332.xml', ASHRAE90_1, 'CZ01RV2.epw')
+
+      run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+    end
+  end
+
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24, perform a baseline simulation and gather results' do
+    xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path("./../output/#{File.basename(xml_path, File.extname(xml_path))}/", File.dirname(__FILE__))
+
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    # expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    translator = BuildingSync::Translator.new(xml_path, out_path, nil, CA_TITLE24)
+    translator.write_osm
+
+    puts "Looking for the following OSM file: #{out_path}/in.osm"
+    expect(File.exist?("#{out_path}/in.osm")).to be true
+    osm_path = "#{out_path}/in.osm"
 
     run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+
+    translator.gather_results(out_path)
+    translator.save_xml(File.join(out_path, 'results.xml'))
+
+    # expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
   end
 end

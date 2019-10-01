@@ -83,6 +83,9 @@ module BuildingSync
       if @buildings.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
         raise 'Error: There is no building attached to this site in your BuildingSync file.'
+      elsif @buildings.count > 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There is more than one (#{@buildings.count}) building attached to this site in your BuildingSync file.")
+        raise "Error: There is more than one (#{@buildings.count}) building attached to this site in your BuildingSync file."
       end
     end
 
@@ -96,6 +99,9 @@ module BuildingSync
         @climate_zone_ca_t24 = build_element.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text
       else
         @climate_zone_ca_t24 = nil
+      end
+      if @climate_zone_ca_t24.nil? && @climate_zone_ashrae.nil?
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Site.read_climate_zone', 'Could not find a climate zone in the BuildingSync file.')
       end
     end
 
@@ -167,7 +173,7 @@ module BuildingSync
     end
 
     def get_building_sections
-      return get_largest_building.building_subsections
+      return get_largest_building.building_sections
     end
 
     def determine_open_studio_standard(standard_to_be_used)
@@ -225,14 +231,14 @@ module BuildingSync
       end
     end
 
-    def generate_baseline_osm(epw_file_path, standard_to_be_used)
+    def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
       building = get_largest_building
       @climate_zone = @climate_zone_ashrae
       # for now we use the california climate zone if it is available
       if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
         @climate_zone = @climate_zone_ca_t24
       end
-      building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude, @weather_file_name, @weather_station_id, @state_name, @city_name)
+      building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude, ddy_file, @weather_file_name, @weather_station_id, @state_name, @city_name)
       building.generate_baseline_osm(standard_to_be_used)
     end
 

@@ -259,8 +259,8 @@ RSpec.describe 'FacilitySpec' do
             sites.tag!('auc:Site') do |site|
               site.tag!('auc:Buildings') do |builds|
                 builds.tag!('auc:Building') do |build|
-                  build.tag!('auc:Subsections') do |subsects|
-                    subsects.tag!('auc:Subsection') do |subsect|
+                  build.tag!('auc:Sections') do |subsects|
+                    subsects.tag!('auc:Section') do |subsect|
                       subsect.Perimeter 1325
                     end
                   end

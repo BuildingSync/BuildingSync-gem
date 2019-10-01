@@ -53,6 +53,10 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse the Golden Test File.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
-    test_baseline_and_scenario_creation('Golden Test File.xml', 1, ASHRAE90_1, 'CZ01RV2.epw')
+    begin
+      test_baseline_and_scenario_creation('Golden Test File.xml', 1, ASHRAE90_1, 'CZ01RV2.epw')
+    rescue StandardError => e
+      expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
+    end
   end
 end

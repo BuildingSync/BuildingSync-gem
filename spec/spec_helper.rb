@@ -48,16 +48,6 @@ rescue LoadError, StandardError
 
     # one or more file paths
     OPENSTUDIO_FILES = [].freeze
-
-    # max number of datapoints to run
-    # MAX_DATAPOINTS = Float::INFINITY
-    # MAX_DATAPOINTS = 2
-
-    # number of parallel jobs
-    # NUM_PARALLEL = 7
-
-    # do simulations
-    # DO_SIMULATIONS = false
   end
 end
 
@@ -81,10 +71,20 @@ RSpec.configure do |config|
   end
 
   def run_baseline_simulation(osm_name, epw_name)
+    basic_dir = File.dirname(osm_name)
+    file_name = File.basename(osm_name)
+
+    osm_baseline_dir = File.join(basic_dir, 'Baseline')
+    if !File.exist?(osm_baseline_dir)
+      FileUtils.mkdir_p(osm_baseline_dir)
+    end
+    osm_baseline_path = File.join(osm_baseline_dir, file_name)
+    FileUtils.cp(osm_name, osm_baseline_dir)
+    puts "osm_baseline_path: #{osm_baseline_path}"
     workflow = OpenStudio::WorkflowJSON.new
-    workflow.setSeedFile(osm_name)
-    workflow.setWeatherFile(epw_name)
-    osw_path = osm_name.gsub('.osm', '.osw')
+    workflow.setSeedFile(osm_baseline_path)
+    workflow.setWeatherFile(File.join('../../../weather', epw_name))
+    osw_path = osm_baseline_path.gsub('.osm', '.osw')
     workflow.saveAs(File.absolute_path(osw_path.to_s))
 
     if BuildingSync::Extension::DO_SIMULATIONS || BuildingSync::Extension::SIMULATE_BASELINE_ONLY
@@ -96,13 +96,13 @@ RSpec.configure do |config|
       # Run the sizing run
       OpenstudioStandards.run_command(cmd)
 
-      expect(File.exist?(osm_name.gsub('in.osm', 'run/eplusout.sql'))).to be true
+      expect(File.exist?(osm_baseline_path.gsub('in.osm', 'run/eplusout.sql'))).to be true
+      # expect(File.exist?(osm_name.gsub('in.osm', 'run/eplusout.sql'))).to be true
     end
   end
 
   def run_scenario_simulations(osw_files)
     cli_path = OpenStudio.getOpenStudioCLI
-
     if BuildingSync::Extension::DO_SIMULATIONS || !BuildingSync::Extension::SIMULATE_BASELINE_ONLY
       counter = 1
       Parallel.each(osw_files, in_threads: BuildingSync::Extension::NUM_PARALLEL) do |osw_file|
@@ -116,8 +116,8 @@ RSpec.configure do |config|
         sql_file = osw_file.gsub('in.osw', 'eplusout.sql')
         puts "Simulation not completed successfully for file: #{osw_file}" if !File.exist?(sql_file)
         expect(File.exist?(sql_file)).to be true
+        end
       end
-    end
   end
 
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
@@ -145,6 +145,98 @@ RSpec.configure do |config|
     puts "Looking for the following OSM file: #{out_path}/in.osm"
     expect(File.exist?("#{out_path}/in.osm")).to be true
     return "#{out_path}/in.osm"
+  end
+
+  def generated_baseline_idf_and_compare(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+    xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
+
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+    # expect(File.exist?(out_path)).not_to be true
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    epw_file_path = nil
+    if !epw_file_name.nil?
+      epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
+    end
+
+    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
+    translator.write_osm
+
+    base_file_name = File.basename(file_name, '.xml')
+    new_osm_file = "#{out_path}/#{base_file_name}.osm"
+    puts "Looking for the following OSM file: #{new_osm_file}"
+    expect(File.exist?(new_osm_file)).to be true
+
+    new_idf_file = "#{out_path}/#{base_file_name}.idf"
+    save_idf_from_osm(new_osm_file, new_idf_file)
+
+    osm_comparison_file_path = File.expand_path('files/filecomparison', File.dirname(__FILE__))
+    old_osm_file = "#{osm_comparison_file_path}/#{base_file_name}.osm"
+    puts "Looking for the following OSM file: #{old_osm_file}"
+    expect(File.exist?(old_osm_file)).to be true
+    old_idf_file = "#{osm_comparison_file_path}/#{base_file_name}.idf"
+    File.delete(old_idf_file) if File.exist?(old_idf_file)
+    save_idf_from_osm(old_osm_file, old_idf_file)
+
+    old_file_size = File.size(old_idf_file)
+    new_file_size = File.size(new_idf_file)
+    puts "original idf file size #{old_file_size} bytes versus new idf file size #{new_file_size} bytes"
+    expect((old_file_size - new_file_size).abs <= 1).to be true
+
+    line_not_match_counter = compare_two_idf_files(old_idf_file, new_idf_file)
+
+    expect(line_not_match_counter == 0).to be true
+  end
+
+  def compare_two_idf_files(old_idf_file, new_idf_file)
+    idf_file1 = File.open(old_idf_file)
+    idf_file2 = File.open(new_idf_file)
+
+    file1_lines = idf_file1.readlines
+    file2_lines = idf_file2.readlines
+
+    line_not_match_counter = 0
+    counter = 0
+    file1_lines.each do |line|
+      if !line.include?('Sub Surface') && !file2_lines[counter].eql?(line)
+        puts "This is the newly create idf file line : #{line} on line no : #{counter}"
+        puts "This is the original idf file line : #{file2_lines[counter]} on line no : #{counter}"
+        line_not_match_counter += 1
+      end
+      counter += 1
+    end
+    return line_not_match_counter
+  end
+
+  def generate_idf_file(model)
+    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(model)
+    new_file_path = "#{@osm_file_path}/in.idf"
+    # first delete idf file if exist
+    File.delete(new_file_path) if File.exist?(new_file_path)
+
+    # now create idf file.
+    p 'IDF file successfully saved' if workspace.save(new_file_path)
+
+    original_file_path = "#{@osm_file_path}/originalfiles"
+    oldModel = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
+    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
+    # first delete the file if exist
+    File.delete("#{original_file_path}/in.idf") if File.exist?("#{original_file_path}/in.idf")
+
+    p 'IDF file 2 successfully saved' if workspace.save("#{original_file_path}/in.idf")
+  end
+
+  def save_idf_from_osm(osm_file, idf_file)
+    model = OpenStudio::Model::Model.load(osm_file).get
+    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(model)
+    puts "IDF file (#{File.basename(idf_file)})successfully saved" if workspace.save(idf_file)
   end
 
   def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
@@ -184,7 +276,7 @@ RSpec.configure do |config|
     return osw_files - osw_sr_files
   end
 
-  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, ddy_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -193,7 +285,6 @@ RSpec.configure do |config|
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
     end
-    expect(File.exist?(out_path)).not_to be true
 
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
@@ -202,9 +293,13 @@ RSpec.configure do |config|
     if !epw_file_name.nil?
       epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
     end
+    ddy_file_path = nil
+    if !ddy_file_name.nil?
+      ddy_file_path = File.expand_path("./weather/#{ddy_file_name}", File.dirname(__FILE__))
+    end
 
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
-    translator.write_osm
+    translator.write_osm(ddy_file_path)
 
     expect(File.exist?("#{out_path}/in.osm")).to be true
 
@@ -226,7 +321,7 @@ RSpec.configure do |config|
     parent_dir_path = File.expand_path('..', dir_path)
 
     translator.gather_results(parent_dir_path)
-    translator.saveXML(File.join(parent_dir_path, 'results.xml'))
+    translator.save_xml(File.join(parent_dir_path, 'results.xml'))
   end
 
   def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)

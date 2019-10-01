@@ -96,7 +96,7 @@ module BuildingSync
     end
 
     # generating the OpenStudio model based on the imported BuildingSync Data
-    def generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)
+    def generate_baseline_osm(epw_file_path, output_path, standard_to_be_used, ddy_file = nil)
       if @sites.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', 'There are no sites attached to this facility in your BuildingSync file.')
         raise 'There are no sites attached to this facility in your BuildingSync file.'
@@ -106,7 +106,7 @@ module BuildingSync
       else
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.generate_baseline_osm', "Info: There is/are #{@sites.count} sites in this facility.")
       end
-      @sites[0].generate_baseline_osm(epw_file_path, standard_to_be_used)
+      @sites[0].generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file)
 
       create_building_systems(output_path)
       return true
@@ -318,6 +318,10 @@ module BuildingSync
         scenario_types = site.write_osm(dir, replace_whitespace)
       end
       return scenario_types
+    end
+
+    def get_model
+      return @sites[0].get_model
     end
 
     attr_reader :building_eui_benchmark, :building_eui, :auditor_contact_id, :annual_fuel_use_native_units, :audit_date, :benchmark_source, :contact_name, :energy_cost, :energy_resource,
