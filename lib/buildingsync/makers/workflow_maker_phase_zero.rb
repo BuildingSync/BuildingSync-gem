@@ -37,7 +37,6 @@
 require_relative '../workflow_maker'
 require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
-require 'openstudio-extension'
 require_relative '../../../lib/buildingsync/extension'
 
 module BuildingSync
@@ -399,7 +398,10 @@ module BuildingSync
       month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }
 
       # write an osw for each scenario
+
+      # @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
@@ -409,13 +411,16 @@ module BuildingSync
 
         # cleanup large files
         path = File.join(osw_dir, 'eplusout.sql')
-        FileUtils.rm_f(path) if File.exist?(path)
-
+        FileUtils.rm_f(path) if File.exists?(path)
         path = File.join(osw_dir, 'data_point.zip')
-        FileUtils.rm_f(path) if File.exist?(path)
+        FileUtils.rm_f(path) if File.exists?(path)
 
         path = File.join(osw_dir, 'eplusout.eso')
-        FileUtils.rm_f(path) if File.exist?(path)
+        FileUtils.rm_f(path) if File.exists?(path)
+
+        Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
+          FileUtils.rm_rf(path) if File.exists?(path)
+        end
 
         Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
           FileUtils.rm_rf(path) if File.exist?(path)
@@ -423,7 +428,7 @@ module BuildingSync
 
         # find the osw
         path = File.join(osw_dir, 'out.osw')
-        if !File.exist?(path)
+        if !File.exists?(path)
           puts "Cannot load results for scenario #{scenario_name}"
           next
         end
@@ -445,7 +450,7 @@ module BuildingSync
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
+        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) && BRICR::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
 
@@ -478,12 +483,13 @@ module BuildingSync
         end
 
         # preserve existing user defined fields if they exist
+        # KAF: there should no longer be any UDFs
         user_defined_fields = scenario.elements["#{@ns}:UserDefinedFields"]
         if user_defined_fields.nil?
           user_defined_fields = REXML::Element.new("#{@ns}:UserDefinedFields")
         end
 
-        # delete previous results
+        # delete previous results (if using an old schema)
         to_remove = []
         user_defined_fields.elements.each("#{@ns}:UserDefinedField") do |user_defined_field|
           name_element = user_defined_field.elements["#{@ns}:FieldName"]

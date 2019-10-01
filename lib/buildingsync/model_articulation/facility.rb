@@ -39,10 +39,12 @@ require_relative 'loads_system'
 require_relative 'envelope_system'
 require_relative 'hvac_system'
 require_relative 'service_hot_water_system'
+require_relative 'measure'
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio/extension/core/os_lib_geometry'
 require_relative '../helpers/Model.hvac'
 require_relative '../helpers/metered_energy'
+require_relative '../helpers/helper'
 
 module BuildingSync
   class Facility
@@ -54,6 +56,7 @@ module BuildingSync
       # code to initialize
       # an array that contains all the sites
       @sites = []
+      @measures = []
       @auditor_contact_id = nil
       @audit_date = nil
       @contact_name = nil
@@ -65,6 +68,8 @@ module BuildingSync
       @interval_reading_yearly = []
       @energy_resource = nil
       @benchmark_source = nil
+      @building_eui = nil
+      @building_eui_benchmark = nil
       @energy_cost = nil
       @annual_fuel_use_native_units = 0
 
@@ -76,6 +81,10 @@ module BuildingSync
     def read_xml(facility_xml, ns)
       facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
         @sites.push(Site.new(site_element, ns))
+      end
+
+      facility_xml.elements.each("#{ns}:Measures/#{ns}:Measure") do |measure_element|
+        @measures.push(Measure.new(measure_element, ns))
       end
 
       read_other_details(facility_xml, ns)
@@ -146,64 +155,34 @@ module BuildingSync
     end
 
     def read_other_details(facility_xml, ns)
-      if facility_xml.elements["#{ns}:Report/#{ns}:AuditorContactID"]
-        @auditor_contact_id = facility_xml.elements["#{ns}:Report/#{ns}:AuditorContactID"].text
-      else
-        @auditor_contact_id = nil
+      @contact_name = BuildingSync::Helper.get_text_value(facility_xml.elements["#{ns}:Contacts/#{ns}:Contact/#{ns}:ContactName"])
+
+      report = facility_xml.elements["#{ns}:Report"]
+      if !report.nil?
+        @auditor_contact_id = BuildingSync::Helper.get_text_value(report.elements["#{ns}:AuditorContactID"])
+        @audit_date = BuildingSync::Helper.get_date_value(report.elements["#{ns}:AuditDate"])
+
+        # here we iterate over the scenarios to find the one "currentBuilding" and "benchmark"
+        report.elements.each("#{ns}:Scenarios/#{ns}:Scenario") do |scenario|
+          if scenario.elements["#{ns}:ScenarioType/#{ns}:CurrentBuilding"]
+            @building_eui = scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text
+            @annual_fuel_use_native_units = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"])
+            @energy_cost = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"])
+          elsif scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark"]
+            @building_eui_benchmark = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"])
+            @benchmark_source = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"])
+          end
+        end
       end
 
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"]
-        @benchmark_source = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"].text
-      else
-        @benchmark_source = nil
-      end
-
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"]
-        @annual_fuel_use_native_units = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"].text
-      else
-        @annual_fuel_use_native_units = nil
-      end
-
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"]
-        @energy_cost = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"].text
-      else
-        @energy_cost = nil
-      end
-
-      if facility_xml.elements["#{ns}:Report/#{ns}:AuditDate"]
-        @auditor_contact_id = Date.parse(facility_xml.elements["#{ns}:Report/#{ns}:AuditDate"].text)
-      else
-        @auditor_contact_id = nil
-      end
-
-      if facility_xml.elements["#{ns}:Contacts/#{ns}:Contact/#{ns}:ContactName"]
-        @contact_name = facility_xml.elements["#{ns}:Contacts/#{ns}:Contact/#{ns}:ContactName"].text
-      else
-        @contact_name = nil
-      end
-
-      if facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:UtilityName"]
-        @utility_name = facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:UtilityName"].text
-      else
-        @utility_name = nil
-      end
-
-      if facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:MeteringConfiguration"]
-        @metering_configuration = facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:MeteringConfiguration"].text
-      else
-        @metering_configuration = nil
-      end
-
-      if facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:RateSchedules"]
-        @rate_schedules = facility_xml.elements["#{ns}:Utilities/#{ns}:Utility/#{ns}:RateSchedules"].text
-      else
-        @rate_schedules = nil
-      end
-
-      if facility_xml.elements["#{ns}:Utilities/#{ns}:UtilityMeterNumbers/#{ns}:UtilityMeterNumber"]
-        @utility_meter_number = facility_xml.elements["#{ns}:Utilities/#{ns}:UtilityMeterNumbers/#{ns}:UtilityMeterNumber"].text
-      else
-        @utility_meter_number = nil
+      utilities = facility_xml.elements["#{ns}:Utilities"]
+      if utilities
+        @utility_meter_number = BuildingSync::Helper.get_text_value(utilities.elements["#{ns}:UtilityMeterNumbers/#{ns}:UtilityMeterNumber"])
+        utilities.elements.each("#{ns}:Utility") do |utility|
+          @utility_name = BuildingSync::Helper.get_text_value(utility.elements["#{ns}:UtilityName"])
+          @metering_configuration = BuildingSync::Helper.get_text_value(utility.elements["#{ns}:MeteringConfiguration"])
+          @rate_schedules = BuildingSync::Helper.get_text_value(utility.elements["#{ns}:RateSchedules"])
+        end
       end
     end
 
@@ -231,7 +210,7 @@ module BuildingSync
 
       # add internal loads to space types
       if add_space_type_loads
-        load_system.add_internal_loads(model, open_studio_system_standard, template, remove_objects)
+        load_system.add_internal_loads(model, open_studio_system_standard, template, @sites[0].get_building_sections, remove_objects)
       end
 
       # identify primary building type (used for construction, and ideally HVAC as well)
@@ -340,5 +319,8 @@ module BuildingSync
       end
       return scenario_types
     end
+
+    attr_reader :building_eui_benchmark, :building_eui, :auditor_contact_id, :annual_fuel_use_native_units, :audit_date, :benchmark_source, :contact_name, :energy_cost, :energy_resource,
+                :rate_schedules, :utility_meter_number, :utility_name, :metering_configuration
   end
 end

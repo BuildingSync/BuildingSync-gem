@@ -37,11 +37,11 @@
 module BuildingSync
   class HVACSystem < BuildingSystem
 
-    def initialize(system_element = '', ns = '')
+    def initialize(system_element = nil, ns = '')
       # code to initialize
       @primary_hvac_system_type = nil
 
-      read_xml(system_element, ns) if !system_element.empty?
+      read_xml(system_element, ns) if system_element
     end
 
     def read_xml(system_element, ns)
@@ -204,5 +204,7 @@ module BuildingSync
       end
       return true
     end
+
+    attr_reader :primary_hvac_system_type
   end
 end

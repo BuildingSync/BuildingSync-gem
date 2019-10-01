@@ -32,41 +32,59 @@
 							<auc:PremisesName>Building 151</auc:PremisesName>
 							<auc:PremisesNotes/>
 							<auc:PremisesIdentifiers>
-								<auc:PremisesIdentifier>
-									<auc:IdentifierLabel>Assessor parcel number</auc:IdentifierLabel>
-								<auc:IdentifierValue>PN 123</auc:IdentifierValue>
-								</auc:PremisesIdentifier>
-								<auc:PremisesIdentifier>
-									<auc:IdentifierLabel>Custom</auc:IdentifierLabel>
-									<auc:IdentifierCustomName>Custom ID 1</auc:IdentifierCustomName>
-									<auc:IdentifierValue>151</auc:IdentifierValue>
-								</auc:PremisesIdentifier>
-								<auc:PremisesIdentifier>
-									<auc:IdentifierLabel>Custom</auc:IdentifierLabel>
-									<auc:IdentifierCustomName>City Custom Building ID</auc:IdentifierCustomName>
-									<auc:IdentifierValue>151</auc:IdentifierValue>
-								</auc:PremisesIdentifier>
-							</auc:PremisesIdentifiers>
+									<auc:PremisesIdentifier>
+										<auc:IdentifierLabel>Assessor parcel number</auc:IdentifierLabel>
+									<auc:IdentifierValue>PN 123</auc:IdentifierValue>
+									</auc:PremisesIdentifier>
+									<auc:PremisesIdentifier>
+										<auc:IdentifierLabel>Custom</auc:IdentifierLabel>
+										<auc:IdentifierCustomName>Custom ID 1</auc:IdentifierCustomName>
+										<auc:IdentifierValue>151</auc:IdentifierValue>
+									</auc:PremisesIdentifier>
+									<auc:PremisesIdentifier>
+										<auc:IdentifierLabel>Custom</auc:IdentifierLabel>
+										<auc:IdentifierCustomName>City Custom Building ID</auc:IdentifierCustomName>
+										<auc:IdentifierValue>151</auc:IdentifierValue>
+									</auc:PremisesIdentifier>
+								</auc:PremisesIdentifiers>
 							<auc:FloorsAboveGrade>1</auc:FloorsAboveGrade>
 							<auc:FloorsBelowGrade>0</auc:FloorsBelowGrade>
 							<auc:FloorAreas>
-								<auc:FloorArea>
-									<auc:FloorAreaType>Gross</auc:FloorAreaType>
-									<auc:FloorAreaValue>69452</auc:FloorAreaValue>
-								</auc:FloorArea>
-								<auc:FloorArea>
-									<auc:FloorAreaType>Heated and Cooled</auc:FloorAreaType>
-									<auc:FloorAreaValue>69452</auc:FloorAreaValue>
-								</auc:FloorArea>
-								<auc:FloorArea>
-									<auc:FloorAreaType>Footprint</auc:FloorAreaType>
-									<auc:FloorAreaValue>73872.6457</auc:FloorAreaValue>
-								</auc:FloorArea>
-							</auc:FloorAreas>
+									<auc:FloorArea>
+										<auc:FloorAreaType>Gross</auc:FloorAreaType>
+										<auc:FloorAreaValue>69452</auc:FloorAreaValue>
+									</auc:FloorArea>
+									<auc:FloorArea>
+										<auc:FloorAreaType>Heated and Cooled</auc:FloorAreaType>
+										<auc:FloorAreaValue>69452</auc:FloorAreaValue>
+									</auc:FloorArea>
+									<auc:FloorArea>
+										<auc:FloorAreaType>Footprint</auc:FloorAreaType>
+										<auc:FloorAreaValue>73872.6457</auc:FloorAreaValue>
+									</auc:FloorArea>
+								</auc:FloorAreas>
 							<auc:AspectRatio>3.6732677131179763</auc:AspectRatio>
 							<auc:Perimeter>1325</auc:Perimeter>
 							<auc:YearOfConstruction>1954</auc:YearOfConstruction>
 							<auc:YearOfLastMajorRemodel>2003</auc:YearOfLastMajorRemodel>
+							<auc:YearOfLastEnergyAudit>2010</auc:YearOfLastEnergyAudit>
+							<auc:Ownership>The owner</auc:Ownership>
+							<auc:OccupancyClassification>Hospital</auc:OccupancyClassification>
+							<auc:PrimaryContactID>12345</auc:PrimaryContactID>
+							<auc:RetrocommissioningDate>1/1/2019</auc:RetrocommissioningDate>
+							<auc:BuildingAutomationSystem>true</auc:BuildingAutomationSystem>
+							<auc:HistoricalLandmark>true</auc:HistoricalLandmark>
+							<auc:PercentOccupiedByOwner>60</auc:PercentOccupiedByOwner>
+							<auc:OccupancyLevels>
+								<auc:OccupancyLevel>
+									<auc:OccupantQuantity>15</auc:OccupantQuantity>
+								</auc:OccupancyLevel>
+							</auc:OccupancyLevels>
+							<auc:SpatialUnits>
+								<auc:SpatialUnit>
+									<auc:NumberOfUnits>18</auc:NumberOfUnits>
+								</auc:SpatialUnit>
+							</auc:SpatialUnits>
 							<auc:Subsections>
 								<auc:Subsection ID="Default_Subsection">
 									<auc:OccupancyClassification>Retail</auc:OccupancyClassification>
@@ -100,6 +118,13 @@
 					</auc:Buildings>
 				</auc:Site>
 			</auc:Sites>
+			<auc:Systems>
+				<auc:HVACSystems>
+					<auc:HVACSystem>
+						<auc:PrimaryHVACSystemType>VAVwReheat</auc:PrimaryHVACSystemType>
+					</auc:HVACSystem>
+				</auc:HVACSystems>
+			</auc:Systems>
 			<auc:Measures>
 				<auc:Measure ID="Measure1">
 					<auc:SystemCategoryAffected>Lighting</auc:SystemCategoryAffected>
@@ -117,6 +142,11 @@
 					</auc:TechnologyCategories>
 					<auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
 					<auc:LongDescription>Retrofit with light emitting diode technologies</auc:LongDescription>
+					<auc:AnnualSavingsCost>26956</auc:AnnualSavingsCost>
+					<auc:AnnualSavingsByFuels>
+						<auc:SimplePayback>5</auc:SimplePayback>
+						<auc:MeasureRank>2</auc:MeasureRank>
+					</auc:AnnualSavingsByFuels>
 					<auc:MVCost>0</auc:MVCost>
 					<auc:UsefulLife>12</auc:UsefulLife>
 					<auc:MeasureTotalFirstCost>267390.2</auc:MeasureTotalFirstCost>
@@ -973,7 +1003,39 @@
 				</auc:Measure>
 			</auc:Measures>
 			<auc:Report>
+				<auc:AuditorContactID>123</auc:AuditorContactID>
+				<auc:AuditDate>5/1/2019</auc:AuditDate>
 				<auc:Scenarios>
+					<auc:Scenario>
+						<auc:ScenarioType>
+							<auc:CurrentBuilding/>
+						</auc:ScenarioType>
+						<auc:AllResourceTotals>
+							<auc:AllResourceTotal>
+								<auc:SiteEnergyUseIntensity>10.5</auc:SiteEnergyUseIntensity>
+								<auc:EnergyCost>1000</auc:EnergyCost>
+							</auc:AllResourceTotal>
+						</auc:AllResourceTotals>
+						<auc:ResourceUses>
+							<auc:ResourceUse>
+								<auc:AnnualFuelUseNativeUnits>kBtu/ft2</auc:AnnualFuelUseNativeUnits>
+							</auc:ResourceUse>
+						</auc:ResourceUses>
+					</auc:Scenario>
+					<auc:Scenario>
+						<auc:ScenarioType>
+							<auc:Benchmark>
+								<auc:BenchmarkType>
+									<auc:Other>Benchmark Type 1</auc:Other>
+								</auc:BenchmarkType>
+							</auc:Benchmark>
+						</auc:ScenarioType>
+						<auc:AllResourceTotals>
+							<auc:AllResourceTotal>
+								<auc:SiteEnergyUseIntensity>9.7</auc:SiteEnergyUseIntensity>
+							</auc:AllResourceTotal>
+						</auc:AllResourceTotals>
+					</auc:Scenario>
 					<auc:Scenario ID="Baseline">
 						<auc:ScenarioName>Baseline</auc:ScenarioName>
 						<auc:ScenarioType>
@@ -1622,6 +1684,21 @@
 					</auc:Scenario>
 				</auc:Scenarios>
 			</auc:Report>
+			<auc:Contacts>
+				<auc:Contact>
+					<auc:ContactName>a contact person</auc:ContactName>
+				</auc:Contact>
+			</auc:Contacts>
+			<auc:Utilities>
+				<auc:Utility>
+					<auc:UtilityName>an utility</auc:UtilityName>
+					<auc:MeteringConfiguration>metering config</auc:MeteringConfiguration>
+					<auc:RateSchedules>rate schedule</auc:RateSchedules>
+				</auc:Utility>
+				<auc:UtilityMeterNumbers>
+					<auc:UtilityMeterNumber>meter 1</auc:UtilityMeterNumber>
+				</auc:UtilityMeterNumbers>
+			</auc:Utilities>
 		</auc:Facility>
 	</auc:Facilities>
 </auc:BuildingSync>
