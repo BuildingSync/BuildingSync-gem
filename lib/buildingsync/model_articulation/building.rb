@@ -559,6 +559,8 @@ module BuildingSync
       stat_file = get_stat_file(epw_file)
       add_site_water_mains_temperature(stat_file) if !stat_file.nil?
 
+      set_climate_zone(climate_zone, standard_to_be_used, stat_file)
+
       # Remove all the Design Day objects that are in the file
       @model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each(&:remove)
 
@@ -594,8 +596,6 @@ module BuildingSync
           @model.addObject(d.clone)
         end
       end
-
-      set_climate_zone(climate_zone, standard_to_be_used, stat_file)
     end
 
     def get_stat_file(epw_file)

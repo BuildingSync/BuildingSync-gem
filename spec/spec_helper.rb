@@ -272,7 +272,7 @@ RSpec.configure do |config|
     return osw_files - osw_sr_files
   end
 
-  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, ddy_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -289,9 +289,13 @@ RSpec.configure do |config|
     if !epw_file_name.nil?
       epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
     end
+    ddy_file_path = nil
+    if !ddy_file_name.nil?
+      ddy_file_path = File.expand_path("./weather/#{ddy_file_name}", File.dirname(__FILE__))
+    end
 
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
-    translator.write_osm
+    translator.write_osm(ddy_file_path)
 
     expect(File.exist?("#{out_path}/in.osm")).to be true
 
