@@ -118,7 +118,6 @@ RSpec.configure do |config|
         expect(File.exist?(sql_file)).to be true
         end
       end
-    end
   end
 
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
