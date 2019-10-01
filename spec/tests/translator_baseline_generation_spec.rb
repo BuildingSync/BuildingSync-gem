@@ -71,25 +71,9 @@ RSpec.describe 'BuildingSync' do
     test_baseline_creation('BuildingSync Website Valid Schema.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
-  it 'should parse and write Golden Test File.xml (phase zero) with Title 24' do
-    begin
-    test_baseline_creation('Golden Test File.xml', CA_TITLE24, 'CZ01RV2.epw')
-    rescue StandardError => e
-      expect(e.message.include?("Did not find a class called 'CBES T24 2008_LargeOffice' to create in")).to be true
-    end
-  end
-
   it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1' do
     begin
       test_baseline_creation('Golden Test File.xml', ASHRAE90_1, 'CZ01RV2.epw')
-    rescue StandardError => e
-      expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
-    end
-  end
-
-  it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1 and without weather file' do
-    begin
-      test_baseline_creation('Golden Test File.xml', ASHRAE90_1)
     rescue StandardError => e
       expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
     end

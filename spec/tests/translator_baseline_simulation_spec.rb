@@ -73,15 +73,13 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write Golden Test File.xml (phase zero) with  Title 24 and perform a baseline simulation' do
-    osm_path = test_baseline_creation('Golden Test File.xml', CA_TITLE24, 'CZ01RV2.epw')
+    begin
+      osm_path = test_baseline_creation('Golden Test File.xml', CA_TITLE24, 'CZ01RV2.epw')
 
-    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
-  end
-
-  it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
-    osm_path = test_baseline_creation('Golden Test File.xml', ASHRAE90_1, 'CZ01RV2.epw')
-
-    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+      run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+    rescue StandardError => e
+      expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
+    end
   end
 
   it 'should parse and write AT_example_property_report_25.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
