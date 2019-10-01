@@ -391,7 +391,6 @@ module BuildingSync
     end
 
     def gather_results(dir)
-
       super
       results = {}
       monthly_results = {}
@@ -421,6 +420,10 @@ module BuildingSync
 
         Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
           FileUtils.rm_rf(path) if File.exists?(path)
+        end
+
+        Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
+          FileUtils.rm_rf(path) if File.exist?(path)
         end
 
         # find the osw
@@ -514,7 +517,7 @@ module BuildingSync
         weather_data_type.text = 'TMY3'
         modeled.add_element(weather_data_type)
         sim_completion_status = REXML::Element.new("#{@ns}:SimulationCompletionStatus")
-        sim_completion_status.text = result[:completed_status] === 'Success' ? 'Finished' : 'Failed'  # TODO: double check what these keys can be
+        sim_completion_status.text = result[:completed_status] == 'Success' ? 'Finished' : 'Failed' # TODO: double check what these keys can be
         modeled.add_element(sim_completion_status)
         calc_method.add_element(modeled)
         package_of_measures.add_element(calc_method)
@@ -803,10 +806,11 @@ module BuildingSync
           end
         end
       end
-
       return nil
     end
+
+    def failed_scenarios
+      return @failed_scenarios
+    end
   end
-
-
 end
