@@ -104,10 +104,10 @@ module BuildingSync
         section = BuildingSection.new(section_element, @occupancy_type, @total_floor_area, ns)
         if(section.section_type == 'Whole building')
           @building_sections_whole_building.push(section)
-        elsif(section.section_type == 'Space function')
+        elsif(section.section_type == 'Space function' || section.section_type.nil?)
           @building_sections.push(section)
         else
-          puts "Unknown section type found: #{section.section_type}"
+          puts "Unknown section type found:#{section.section_type}:"
         end
       end
 
