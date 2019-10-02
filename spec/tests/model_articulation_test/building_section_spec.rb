@@ -71,8 +71,8 @@ RSpec.describe 'BuildingSpec' do
     File.open(xml_file_path, 'r') do |file|
       doc = REXML::Document.new(file)
       ns = 'auc'
-      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building/#{ns}:Subsections/#{ns}:Subsection") do |building_section|
-        return BuildingSync::BuildingSubsection.new(building_section, 'Office', '20000', ns)
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building/#{ns}:Sections/#{ns}:Section") do |building_section|
+        return BuildingSync::BuildingSection.new(building_section, 'Office', '20000', ns)
       end
     end
   end
@@ -85,8 +85,8 @@ RSpec.describe 'BuildingSpec' do
     doc = create_xml_file_object(xml_path)
     building_xml = create_building_object(doc, ns)
 
-    building_xml.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |building_element|
-      sub_sections.push(BuildingSync::BuildingSubsection.new(building_element, occupancy_type, total_floor_area, ns))
+    building_xml.elements.each("#{ns}:Sections/#{ns}:Section") do |building_element|
+      sub_sections.push(BuildingSync::BuildingSection.new(building_element, occupancy_type, total_floor_area, ns))
     end
     return sub_sections
   end

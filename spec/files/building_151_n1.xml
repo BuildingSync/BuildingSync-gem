@@ -67,8 +67,8 @@
 							<n1:Perimeter>1325</n1:Perimeter>
 							<n1:YearOfConstruction>1954</n1:YearOfConstruction>
 							<n1:YearOfLastMajorRemodel>2003</n1:YearOfLastMajorRemodel>
-							<n1:Subsections>
-								<n1:Subsection ID="Default_Subsection">
+							<n1:Sections>
+								<n1:Section ID="Default_Section">
 									<n1:OccupancyClassification>Retail</n1:OccupancyClassification>
 									<n1:TypicalOccupantUsages>
 										<n1:TypicalOccupantUsage>
@@ -94,8 +94,8 @@
 											<n1:FloorAreaValue>0.0</n1:FloorAreaValue>
 										</n1:FloorArea>
 									</n1:FloorAreas>
-								</n1:Subsection>
-							</n1:Subsections>
+								</n1:Section>
+							</n1:Sections>
 						</n1:Building>
 					</n1:Buildings>
 				</n1:Site>
@@ -115,6 +115,7 @@
 							</n1:LightingImprovements>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Retrofit with light emitting diode technologies</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -124,12 +125,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure2">
 					<n1:SystemCategoryAffected>Plug Load</n1:SystemCategoryAffected>
@@ -145,6 +140,7 @@
 							</n1:PlugLoadReductions>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Replace with ENERGY STAR rated</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -154,12 +150,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure3">
 					<n1:SystemCategoryAffected>Wall</n1:SystemCategoryAffected>
@@ -175,6 +165,7 @@
 							</n1:BuildingEnvelopeModifications>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Air seal envelope</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -184,12 +175,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure4">
 					<n1:SystemCategoryAffected>Cooling System</n1:SystemCategoryAffected>
@@ -205,6 +190,7 @@
 							</n1:OtherHVAC>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Replace package units</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -214,12 +200,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure5">
 					<n1:SystemCategoryAffected>Heating System</n1:SystemCategoryAffected>
@@ -235,6 +215,7 @@
 							</n1:OtherHVAC>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Replace burner</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -244,12 +225,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure6">
 					<n1:SystemCategoryAffected>Lighting</n1:SystemCategoryAffected>
@@ -265,6 +240,7 @@
 							</n1:LightingImprovements>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Add daylight controls</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -274,12 +250,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure7">
 					<n1:SystemCategoryAffected>Lighting</n1:SystemCategoryAffected>
@@ -295,6 +265,7 @@
 							</n1:LightingImprovements>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Add occupancy sensors</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -304,12 +275,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure8">
 					<n1:SystemCategoryAffected>Plug Load</n1:SystemCategoryAffected>
@@ -325,6 +290,7 @@
 							</n1:PlugLoadReductions>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Install plug load controls</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -334,12 +300,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure9">
 					<n1:SystemCategoryAffected>Wall</n1:SystemCategoryAffected>
@@ -355,6 +315,7 @@
 							</n1:BuildingEnvelopeModifications>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Increase wall insulation</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -364,12 +325,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure10">
 					<n1:SystemCategoryAffected>Wall</n1:SystemCategoryAffected>
@@ -385,6 +340,7 @@
 							</n1:BuildingEnvelopeModifications>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Insulate thermal bypasses</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -394,12 +350,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure11">
 					<n1:SystemCategoryAffected>Roof</n1:SystemCategoryAffected>
@@ -424,12 +374,7 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 				</n1:Measure>
 				<n1:Measure ID="Measure12">
 					<n1:SystemCategoryAffected>Ceiling</n1:SystemCategoryAffected>
@@ -445,6 +390,7 @@
 							</n1:BuildingEnvelopeModifications>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Increase ceiling insulation</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -454,12 +400,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure13">
 					<n1:SystemCategoryAffected>Fenestration</n1:SystemCategoryAffected>
@@ -475,6 +415,7 @@
 							</n1:BuildingEnvelopeModifications>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Add window films</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -484,12 +425,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure14">
 					<n1:SystemCategoryAffected>General Controls and Operations</n1:SystemCategoryAffected>
@@ -505,6 +440,7 @@
 							</n1:OtherHVAC>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Upgrade operating protocols, calibration, and/or sequencing</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -514,12 +450,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure15">
 					<n1:SystemCategoryAffected>Domestic Hot Water</n1:SystemCategoryAffected>
@@ -535,6 +465,7 @@
 							</n1:ChilledWaterHotWaterAndSteamDistributionSystems>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Replace or upgrade water heater</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -544,12 +475,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure16">
 					<n1:SystemCategoryAffected>Refrigeration</n1:SystemCategoryAffected>
@@ -565,6 +490,7 @@
 							</n1:Refrigeration>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Replace ice/refrigeration equipment with high efficiency units</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -574,12 +500,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure17">
 					<n1:SystemCategoryAffected>Fenestration</n1:SystemCategoryAffected>
@@ -595,6 +515,7 @@
 							</n1:BuildingEnvelopeModifications>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Replace windows</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -604,12 +525,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure18">
 					<n1:SystemCategoryAffected>Heating System</n1:SystemCategoryAffected>
@@ -625,6 +540,7 @@
 							</n1:BoilerPlantImprovements>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Replace boiler</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -634,12 +550,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure19">
 					<n1:SystemCategoryAffected>Other HVAC</n1:SystemCategoryAffected>
@@ -655,6 +565,7 @@
 							</n1:OtherHVAC>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Replace AC and heating units with ground coupled heat pump systems</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -664,12 +575,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure20">
 					<n1:SystemCategoryAffected>Other HVAC</n1:SystemCategoryAffected>
@@ -685,6 +590,7 @@
 							</n1:OtherHVAC>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>VRF with DOAS</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -694,12 +600,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>Replace HVAC system type to VRF</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure21">
 					<n1:SystemCategoryAffected>Other HVAC</n1:SystemCategoryAffected>
@@ -715,6 +615,7 @@
 							</n1:OtherHVAC>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Replace HVAC system type to PZHP</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -724,12 +625,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>Replace HVAC system type to PZHP</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure22">
 					<n1:SystemCategoryAffected>Fan</n1:SystemCategoryAffected>
@@ -745,6 +640,7 @@
 							</n1:OtherElectricMotorsAndDrives>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Replace with higher efficiency</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -754,12 +650,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure23">
 					<n1:SystemCategoryAffected>Air Distribution</n1:SystemCategoryAffected>
@@ -775,6 +665,7 @@
 							</n1:OtherHVAC>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Improve ventilation fans</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -784,12 +675,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure24">
 					<n1:SystemCategoryAffected>Air Distribution</n1:SystemCategoryAffected>
@@ -805,6 +690,7 @@
 							</n1:OtherHVAC>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Install demand control ventilation</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -814,12 +700,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure25">
 					<n1:SystemCategoryAffected>Air Distribution</n1:SystemCategoryAffected>
@@ -835,6 +715,7 @@
 							</n1:OtherHVAC>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Add or repair economizer</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -844,12 +725,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure26">
 					<n1:SystemCategoryAffected>Heat Recovery</n1:SystemCategoryAffected>
@@ -865,6 +740,7 @@
 							</n1:OtherHVAC>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Add energy recovery</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -874,12 +750,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure27">
 					<n1:SystemCategoryAffected>Domestic Hot Water</n1:SystemCategoryAffected>
@@ -895,6 +765,7 @@
 							</n1:ChilledWaterHotWaterAndSteamDistributionSystems>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Add pipe insulation</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -904,12 +775,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure28">
 					<n1:SystemCategoryAffected>Domestic Hot Water</n1:SystemCategoryAffected>
@@ -925,6 +790,7 @@
 							</n1:ChilledWaterHotWaterAndSteamDistributionSystems>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Add recirculating pumps</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -934,12 +800,6 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 				<n1:Measure ID="Measure29">
 					<n1:SystemCategoryAffected>Water Use</n1:SystemCategoryAffected>
@@ -955,6 +815,7 @@
 							</n1:WaterAndSewerConservationSystems>
 						</n1:TechnologyCategory>
 					</n1:TechnologyCategories>
+					<n1:CustomMeasureName>TBD</n1:CustomMeasureName>
 					<n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
 					<n1:LongDescription>Install low-flow fn1ets and showerheads</n1:LongDescription>
 					<n1:MVCost>0</n1:MVCost>
@@ -964,14 +825,9 @@
 					<n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
 					<n1:Recommended>true</n1:Recommended>
 					<n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-					<n1:UserDefinedFields>
-						<n1:UserDefinedField>
-							<n1:FieldName>OpenStudioMeasureName</n1:FieldName>
-							<n1:FieldValue>TBD</n1:FieldValue>
-						</n1:UserDefinedField>
-					</n1:UserDefinedFields>
 				</n1:Measure>
 			</n1:Measures>
+			<n1:Reports>
 			<n1:Report>
 				<n1:Scenarios>
 					<n1:Scenario ID="Baseline">
@@ -1622,6 +1478,7 @@
 					</n1:Scenario>
 				</n1:Scenarios>
 			</n1:Report>
+			</n1:Reports>
 		</n1:Facility>
 	</n1:Facilities>
 </n1:BuildingSync>

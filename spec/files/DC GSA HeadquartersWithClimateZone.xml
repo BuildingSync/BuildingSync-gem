@@ -4,6 +4,7 @@
     <Facility ID="FirstFuel">
       <Sites>
         <Site ID="DC0021ZZ">
+          <ClimateZoneType><ASHRAE><ClimateZone>2B</ClimateZone></ASHRAE></ClimateZoneType>
           <PremisesName>DC0021ZZ GSA Headquarters</PremisesName>
           <OccupancyClassification>Office</OccupancyClassification>
           <Address>

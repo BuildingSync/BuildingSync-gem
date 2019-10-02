@@ -35,18 +35,11 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 module BuildingSync
-  class ModelMakerLevelOne < ModelMaker
+  class ModelMakerLevelOne < ModelMakerLevelZero
     # load the building sync file and chooses the correct workflow
-    def initialize(path)
-      # init
-    end
 
     def generate_baseline(dir)
       # generate the baseline open studio model
-    end
-
-    def write_osws(dir)
-      # create the OSWs for the scenarios
     end
   end
 end

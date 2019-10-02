@@ -82,17 +82,14 @@ module BuildingSync
         else
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.SpatialElement.generate_baseline_osm', "Unsupported floor area type found: #{floor_area_type}")
         end
-
-        if @total_floor_area.nil? && !@conditioned_floor_area.nil?
-          @total_floor_area = @conditioned_floor_area
-        else
-          if @total_floor_area.nil? && !@heated_and_cooled_floor_area.nil?
-            @total_floor_area = @heated_and_cooled_floor_area
-          end
-        end
-
-        raise 'Spatial element does not define gross floor area' if @total_floor_area.nil? && parent_total_floor_area.nil?
       end
+
+      if @total_floor_area.nil? && !@conditioned_floor_area.nil?
+        @total_floor_area = @conditioned_floor_area
+      elsif @total_floor_area.nil? && !@heated_and_cooled_floor_area.nil?
+        @total_floor_area = @heated_and_cooled_floor_area
+      end
+
       if @total_floor_area.nil?
         return parent_total_floor_area
       else
@@ -147,8 +144,6 @@ module BuildingSync
       max_floor_area_correct = false
       json[:"#{occupancy_type}"].each do |occ_type|
         if !occ_type[:bldg_type].nil?
-          puts "occ_type[:min_floor_area] #{occ_type[:min_floor_area]}"
-          puts "occ_type[:max_floor_area] #{occ_type[:max_floor_area]}"
           if occ_type[:min_floor_area] || occ_type[:max_floor_area]
             if occ_type[:min_floor_area] && occ_type[:min_floor_area].to_f < total_floor_area
               min_floor_area_correct = true
@@ -172,7 +167,6 @@ module BuildingSync
       end
     end
 
-
     def validate_positive_number_excluding_zero(name, value)
       if value <= 0
         puts "Error: parameter #{name} must be positive and not zero."
@@ -189,13 +183,19 @@ module BuildingSync
 
     # create space types
     def create_space_types(model, total_bldg_floor_area, standard_template, open_studio_standard)
-      # create space types from subsection type
+      # create space types from section type
       # mapping lookup_name name is needed for a few methods
       if @bldg_type.nil?
         set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false)
       end
       if open_studio_standard.nil?
-        open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
+        begin
+          open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
+        rescue
+          # if the combination of standard type and bldg type fails we try the standard type alone.
+          puts "could not find open studio standard for template #{standard_template} and bldg type: #{bldg_type}, trying the standard type alone"
+          open_studio_standard = Standard.build(standard_template)
+        end
       end
       lookup_name = open_studio_standard.model_get_lookup_name(@occupancy_type)
       puts " Building type: #{lookup_name} selected for occupancy type: #{@occupancy_type}"
