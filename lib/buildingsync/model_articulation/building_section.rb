@@ -50,6 +50,7 @@ module BuildingSync
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
       @occupant_quantity = nil
+      @section_type = nil
 
       # code to initialize
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
@@ -60,12 +61,21 @@ module BuildingSync
       @total_floor_area = read_floor_areas(section_element, bldg_total_floor_area, ns)
       # based on the occupancy type set building type, system type and bar division method
       read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
+      read_building_section_type(section_element, ns)
       read_building_section_other_detail(section_element, ns)
     end
 
     def read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
       @occupancy_type = read_occupancy_type(section_element, occ_type, ns)
       set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
+    end
+
+    def read_building_section_type(section_element, ns)
+      if section_element.elements["#{ns}:SectionType"]
+        @section_type = section_element.elements["#{ns}:SectionType"].text
+      else
+        @section_type = nil
+      end
     end
 
     def read_building_section_other_detail(section_element, ns)
@@ -86,7 +96,7 @@ module BuildingSync
       end
     end
 
-    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type
+    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type
     attr_accessor :fraction_area
   end
 end

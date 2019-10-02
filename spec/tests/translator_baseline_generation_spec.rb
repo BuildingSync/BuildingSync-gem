@@ -78,4 +78,20 @@ RSpec.describe 'BuildingSync' do
       expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
     end
   end
+
+    it 'should parse and write AT_example_property_report_25.xml (phase zero) with ASHRAE 90.1' do
+     begin
+        test_baseline_creation('AT_example_property_report_25.xml', ASHRAE90_1, 'CZ01RV2.epw')
+     rescue StandardError => e
+       expect(e.message.include?('Error: There is more than one (3) building attached to this site in your BuildingSync file.')).to be true
+     end
+    end
+
+  #  it 'should parse and write AT_example_report_332.xml (phase zero) with ASHRAE 90.1' do
+  #      test_baseline_creation('AT_example_report_332.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  #  end
+
+    it 'should parse and write report_478.xml (phase zero) with ASHRAE 90.1' do
+        test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
+    end
 end

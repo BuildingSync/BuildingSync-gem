@@ -51,6 +51,7 @@ module BuildingSync
     # initialize
     def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
       @building_sections = []
+      @building_sections_whole_building = []
       @standard_template = nil
       @single_floor_area = 0.0
       @building_rotation = 0.0
@@ -100,7 +101,14 @@ module BuildingSync
       @occupancy_type = read_occupancy_type(build_element, site_occupancy_type, ns)
 
       build_element.elements.each("#{ns}:Sections/#{ns}:Section") do |section_element|
-        @building_sections.push(BuildingSection.new(section_element, @occupancy_type, @total_floor_area, ns))
+        section = BuildingSection.new(section_element, @occupancy_type, @total_floor_area, ns)
+        if(section.section_type == 'Whole building')
+          @building_sections_whole_building.push(section)
+        elsif(section.section_type == 'Space function')
+          @building_sections.push(section)
+        else
+          puts "Unknown section type found: #{section.section_type}"
+        end
       end
 
       # floor areas
@@ -212,13 +220,31 @@ module BuildingSync
       # check that sum of fractions for b,c, and d is less than 1.0 (so something is left for primary building type)
       building_fraction = 1.0
       if @building_sections.count > 0
+        # first we check if the building sections do have a fraction
+        if @building_sections.count > 1
+          areas = []
+          floor_area = 0
+          @building_sections.each do |section|
+            if section.fraction_area.nil?
+              areas.push(section.total_floor_area)
+              floor_area += section.total_floor_area
+            end
+          end
+          i = 0
+          @building_sections.each do |section|
+            section.fraction_area = areas[i] / @total_floor_area
+            i += 1
+          end
+        end
         @building_sections.each do |section|
+          puts "section: #{section.section_type} has fraction: #{section.fraction_area}"
           next if section.fraction_area.nil?
           building_fraction -= section.fraction_area
         end
         if building_fraction <= 0.0
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
+          # TODO: should we also allow for the case where secions take all of the area? == 0
         end
         @building_sections[0].fraction_area = building_fraction
       end
