@@ -62,6 +62,18 @@ module BuildingSync
 
     # adding a site to the facility
     def read_xml(build_element, ns)
+      # first we check if the number of buildings is ok
+      number_of_buildings = 0
+      build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
+        number_of_buildings += 1
+      end
+      if number_of_buildings == 0
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
+        raise 'Error: There is no building attached to this site in your BuildingSync file.'
+      elsif number_of_buildings > 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file.")
+        raise "Error: There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file."
+      end
       # check occupancy type at the site level
       @occupancy_type = read_occupancy_type(build_element, nil, ns)
       # check floor areas at the site level
@@ -79,13 +91,6 @@ module BuildingSync
       # code to create a building
       build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
         @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, ns))
-      end
-      if @buildings.count == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
-        raise 'Error: There is no building attached to this site in your BuildingSync file.'
-      elsif @buildings.count > 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There is more than one (#{@buildings.count}) building attached to this site in your BuildingSync file.")
-        raise "Error: There is more than one (#{@buildings.count}) building attached to this site in your BuildingSync file."
       end
     end
 
