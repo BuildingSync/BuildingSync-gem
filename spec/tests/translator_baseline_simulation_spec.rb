@@ -100,6 +100,12 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
+  it 'should parse and write report_478.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+    osm_path = test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
+
+    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+  end
+
   it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24, perform a baseline simulation and gather results' do
     xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true

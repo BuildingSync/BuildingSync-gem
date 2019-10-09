@@ -87,10 +87,6 @@ RSpec.describe 'BuildingSync' do
      end
     end
 
-  #  it 'should parse and write AT_example_report_332.xml (phase zero) with ASHRAE 90.1' do
-  #      test_baseline_creation('AT_example_report_332.xml', ASHRAE90_1, 'CZ01RV2.epw')
-  #  end
-
     it 'should parse and write report_478.xml (phase zero) with ASHRAE 90.1' do
         test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
     end

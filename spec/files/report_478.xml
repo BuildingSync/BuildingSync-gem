@@ -114,7 +114,7 @@
                 </auc:Section>
                 <auc:Section ID="Section-70038506841980">
                   <auc:SectionType>Space function</auc:SectionType>
-                  <auc:OccupancyClassification>Multifamily</auc:OccupancyClassification>
+                  <auc:OccupancyClassification>MidriseApartment</auc:OccupancyClassification>
                   <auc:OccupancyLevels>
                     <auc:OccupancyLevel>
                       <auc:OccupantQuantityType>Peak total occupants</auc:OccupantQuantityType>
