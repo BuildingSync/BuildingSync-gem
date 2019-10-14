@@ -176,6 +176,24 @@ RSpec.describe 'FacilitySpec' do
 
   it 'Should generate osm and simulate baseline for all supported occupancy types' do
     run_minimum_facility('Retail', '1954', 'Gross', '69452', ASHRAE90_1)
+
+    run_minimum_facility('Office', '1964', 'Gross', '10000', ASHRAE90_1)
+    run_minimum_facility('Office', '1974', 'Gross', '40000', ASHRAE90_1)
+    run_minimum_facility('Office', '1984', 'Gross', '80000', ASHRAE90_1)
+
+    run_minimum_facility('StripMall', '1994', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('PrimarySchool', '2004', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('SecondarySchool', '2014', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('Outpatient', '2001', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('Hospital', '2002', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('SmallHotel', '2003', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('LargeHotel', '2005', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('QuickServiceRestaurant', '2006', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('FullServiceRestaurant', '2007', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('MidriseApartment', '2008', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('HighriseApartment', '2009', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('Warehouse', '2012', 'Gross', '50000', ASHRAE90_1)
+    run_minimum_facility('SuperMarket', '2018', 'Gross', '50000', ASHRAE90_1)
   end
 
   def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used)
