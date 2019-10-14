@@ -174,6 +174,21 @@ RSpec.describe 'FacilitySpec' do
     expect(facility.utility_meter_number == expected_value).to be true
   end
 
+  it 'Should generate osm and simulate baseline for all supported occupancy types' do
+    run_minimum_facility('Retail', '1954', 'Gross', '69452', ASHRAE90_1)
+  end
+
+  def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used)
+    facility = create_minimum_facility(occupancy_classification,  year_of_const, floor_area_type, floor_area_value)
+    facility.determine_open_studio_standard(standard_to_be_used)
+    epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
+    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
+    expect(facility.generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)).to be true
+    facility.write_osm(output_path)
+
+    run_baseline_simulation(output_path + '/in.osm', 'CZ01RV2.epw')
+  end
+
   def get_facility_from_file(xml_file_name, standard_to_be_used)
     xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
     File.open(xml_file_path, 'r') do |file|
