@@ -75,6 +75,7 @@ RSpec.describe 'BuildingSync' do
     begin
       test_baseline_creation('Golden Test File.xml', ASHRAE90_1, 'CZ01RV2.epw')
     rescue StandardError => e
+      puts "StandardError occured #{e.message}"
       expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
     end
   end
