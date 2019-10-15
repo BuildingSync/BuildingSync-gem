@@ -468,7 +468,7 @@ module BuildingSync
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         next if scenario_name == 'Measured'
-        next if defined?(BRICR::SIMULATE_BASELINE_ONLY) && BRICR::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
+        next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         results_counter += 1
         package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]

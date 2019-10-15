@@ -364,6 +364,7 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.BuildingSection.read_xml', e.message)
       end
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSection.read_xml', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
+      return @open_studio_standard
     end
 
     def update_name
@@ -917,16 +918,7 @@ module BuildingSync
       party_walls_array
     end
 
-    def write_osm(dir, replace_whitespace = false)
-      if replace_whitespace
-        spaces = @model.getSpaces
-        spaces.each do |space|
-          oldName = space.nameString
-          newName = space.nameString.gsub(/\s+/, '')
-          space.setName(newName)
-          puts "Removing whitespaces from space name: old: #{oldName} new: #{newName}"
-        end
-      end
+    def write_osm(dir)
       @model.save("#{dir}/in.osm", true)
     end
 
