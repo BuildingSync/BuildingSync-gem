@@ -52,6 +52,8 @@ module BuildingSync
       @occupant_quantity = nil
       @section_type = nil
       @footprint_shape = nil
+      @principal_hvac_type = nil
+      @principal_lighting_system_type = nil
 
       # code to initialize
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
@@ -65,11 +67,11 @@ module BuildingSync
       read_building_section_type(section_element, ns)
       read_building_section_other_detail(section_element, ns)
       read_footprint_shape(section_element, ns)
+      read_principal_hvac_type(section_element, ns)
     end
 
     def read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
       @occupancy_type = read_occupancy_type(section_element, occ_type, ns)
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
     end
 
     def read_building_section_type(section_element, ns)
@@ -112,6 +114,22 @@ module BuildingSync
           end
         end
       end
+    end
+
+    def read_principal_hvac_type(section_element, ns)
+     if section_element.elements["#{ns}:UserDefinedFields"]
+        section_element.elements.each("#{ns}:UserDefinedFields/#{ns}:UserDefinedField") do |user_defined_field|
+          if user_defined_field.elements["#{ns}:FieldName"].text == 'Principal HVAC System Type'
+            @principal_hvac_type = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Principal Lighting System Type'
+            @principal_lighting_system_type = user_defined_field.elements["#{ns}:FieldValue"].text
+          end
+        end
+      end
+    end
+
+    def set_bldg_and_system_type
+      super(@occupancy_type, @total_floor_area, false)
     end
 
     attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type

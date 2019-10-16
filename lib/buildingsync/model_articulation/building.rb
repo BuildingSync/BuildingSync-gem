@@ -111,6 +111,10 @@ module BuildingSync
         end
       end
 
+      @building_sections.each do |section|
+        section.set_bldg_and_system_type
+      end
+
       # floor areas
       @total_floor_area = read_floor_areas(build_element, site_total_floor_area, ns)
 
