@@ -312,10 +312,10 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building finished with #{model.getModelObjects.size} objects.")
     end
 
-    def write_osm(dir, replace_whitespace = false)
+    def write_osm(dir)
       scenario_types = {}
       @sites.each do |site|
-        scenario_types = site.write_osm(dir, replace_whitespace)
+        scenario_types = site.write_osm(dir)
       end
       return scenario_types
     end

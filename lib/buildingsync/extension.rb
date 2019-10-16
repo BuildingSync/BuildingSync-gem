@@ -34,6 +34,7 @@
 # *******************************************************************************
 
 require 'openstudio/model_articulation/version'
+require 'openstudio/extension'
 
 module BuildingSync
   class Extension < OpenStudio::Extension::Extension
