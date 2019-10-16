@@ -51,6 +51,7 @@ module BuildingSync
       @typical_occupant_usage_value_weeks = nil
       @occupant_quantity = nil
       @section_type = nil
+      @footprint_shape = nil
 
       # code to initialize
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
@@ -63,6 +64,7 @@ module BuildingSync
       read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
       read_building_section_type(section_element, ns)
       read_building_section_other_detail(section_element, ns)
+      read_footprint_shape(section_element, ns)
     end
 
     def read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
@@ -75,6 +77,14 @@ module BuildingSync
         @section_type = section_element.elements["#{ns}:SectionType"].text
       else
         @section_type = nil
+      end
+    end
+
+    def read_footprint_shape(section_element, ns)
+      if section_element.elements["#{ns}:FootprintShape"]
+        @footprint_shape = section_element.elements["#{ns}:FootprintShape"].text
+      else
+        @footprint_shape = nil
       end
     end
 
@@ -91,6 +101,14 @@ module BuildingSync
             @typical_occupant_usage_value_hours = occ_usage.elements["#{ns}:TypicalOccupantUsageValue"].text
           elsif occ_usage.elements["#{ns}:TypicalOccupantUsageUnits"].text == 'Weeks per year'
             @typical_occupant_usage_value_weeks = occ_usage.elements["#{ns}:TypicalOccupantUsageValue"].text
+          end
+        end
+      end
+
+      if section_element.elements["#{ns}:OccupancyLevels"]
+        section_element.elements.each("#{ns}:OccupancyLevels/#{ns}:OccupancyLevel") do |occ_level|
+          if occ_level.elements["#{ns}:OccupantQuantityType"].text == 'Peak total occupants'
+            @occupant_quantity = occ_level.elements["#{ns}:OccupantQuantity"].text
           end
         end
       end
