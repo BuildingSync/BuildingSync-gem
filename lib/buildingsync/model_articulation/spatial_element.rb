@@ -142,6 +142,11 @@ module BuildingSync
       puts "using occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}"
       min_floor_area_correct = false
       max_floor_area_correct = false
+      if json[:"#{occupancy_type}"].nil?
+        puts "Occupancy type #{occupancy_type} is not available in the bldg_and_system_types.json dictionary"
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.SpatialElement.process_bldg_and_system_type', "Occupancy type #{occupancy_type} is not available in the bldg_and_system_types.json dictionary")
+        raise  "Occupancy type #{occupancy_type} is not available in the bldg_and_system_types.json dictionary"
+      end
       json[:"#{occupancy_type}"].each do |occ_type|
         if !occ_type[:bldg_type].nil?
           if occ_type[:min_floor_area] || occ_type[:max_floor_area]
@@ -237,6 +242,6 @@ module BuildingSync
     end
 
     def validate_fraction; end
-    attr_reader :total_floor_area, :bldg_type, :system_type
+    attr_reader :total_floor_area, :bldg_type, :system_type, :space_types
   end
 end

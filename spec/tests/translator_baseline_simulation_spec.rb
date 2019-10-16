@@ -39,8 +39,6 @@ require_relative './../spec_helper'
 require 'fileutils'
 require 'parallel'
 
-test_new_files = false
-
 RSpec.describe 'BuildingSync' do
   it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and perform a baseline simulation' do
     osm_path = test_baseline_creation('building_151.xml', CA_TITLE24)
@@ -83,19 +81,29 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write AT_example_property_report_25.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
-    if test_new_files
+    begin
       osm_path = test_baseline_creation('AT_example_property_report_25.xml', ASHRAE90_1, 'CZ01RV2.epw')
 
       run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+    rescue StandardError => e
+      expect(e.message.include?('Error: There is more than one (3) building attached to this site in your BuildingSync file.')).to be true
     end
   end
 
   it 'should parse and write AT_example_report_332.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
-    if test_new_files
+    begin
       osm_path = test_baseline_creation('AT_example_report_332.xml', ASHRAE90_1, 'CZ01RV2.epw')
 
       run_baseline_simulation(osm_path, 'CZ01RV2.epw')
+    rescue StandardError => e
+      expect(e.message.include?('Occupancy type Food service is not available in the bldg_and_system_types.json dictionary')).to be true
     end
+  end
+
+  it 'should parse and write report_478.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+    osm_path = test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
+
+    run_baseline_simulation(osm_path, 'CZ01RV2.epw')
   end
 
   it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24, perform a baseline simulation and gather results' do

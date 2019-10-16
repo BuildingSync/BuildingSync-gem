@@ -75,6 +75,11 @@
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PTAC"
   }],
+  "Multifamily": [{
+    "bldg_type": "MidriseApartment",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PTAC"
+  }],
   "HighriseApartment": [{
     "bldg_type": "HighriseApartment",
     "bar_division_method": "Single Space Type - Core and Perimeter",

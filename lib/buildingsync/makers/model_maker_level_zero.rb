@@ -42,9 +42,10 @@ module BuildingSync
       super
 
       @facilities = []
+      read_xml()
     end
 
-    def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
+    def read_xml
       @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
         @facilities.push(Facility.new(facility_element, @ns))
       end
@@ -56,7 +57,9 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
         raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
       end
+    end
 
+    def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil, replace_whitespace = false)
       open_studio_standard = @facilities[0].determine_open_studio_standard(standard_to_be_used)
 
       @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used, ddy_file)
