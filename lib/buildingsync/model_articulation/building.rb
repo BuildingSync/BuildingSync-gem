@@ -111,14 +111,8 @@ module BuildingSync
         end
       end
 
-      @building_sections.each do |section|
-        section.set_bldg_and_system_type
-      end
-
       # floor areas
       @total_floor_area = read_floor_areas(build_element, site_total_floor_area, ns)
-
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
 
       # need to set those defaults after initializing the sections
       read_building_form_defaults
@@ -356,6 +350,14 @@ module BuildingSync
       # in case the model was not initialized before we create a new model if it is nil
       initialize_model
       return @model
+    end
+
+    def set_bldg_and_system_type_for_building_and_section
+      @building_sections.each do |section|
+        section.set_bldg_and_system_type
+      end
+
+      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
     end
 
     def determine_open_studio_standard(standard_to_be_used)

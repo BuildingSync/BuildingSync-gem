@@ -57,6 +57,10 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
         raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
       end
+
+      @facilities.each do |facility|
+        facility.set_bldg_and_system_type_for_building_and_section
+      end
     end
 
     def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil, replace_whitespace = false)

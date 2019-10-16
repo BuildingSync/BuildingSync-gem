@@ -54,6 +54,7 @@ module BuildingSync
       @footprint_shape = nil
       @principal_hvac_type = nil
       @principal_lighting_system_type = nil
+      @miscellaneous_electric_load = nil
 
       # code to initialize
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
@@ -123,6 +124,8 @@ module BuildingSync
             @principal_hvac_type = user_defined_field.elements["#{ns}:FieldValue"].text
           elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Principal Lighting System Type'
             @principal_lighting_system_type = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Miscellaneous Electric Load'
+            @miscellaneous_electric_load = user_defined_field.elements["#{ns}:FieldValue"].text
           end
         end
       end

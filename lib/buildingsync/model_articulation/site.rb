@@ -94,6 +94,12 @@ module BuildingSync
       end
     end
 
+    def set_bldg_and_system_type_for_building_and_section
+      @buildings.each do |building|
+        set_bldg_and_system_type_for_building_and_section
+      end
+    end
+
     def read_climate_zone(build_element, ns)
       if build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE"]
         @climate_zone_ashrae = build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text

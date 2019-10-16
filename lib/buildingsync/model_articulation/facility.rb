@@ -91,6 +91,12 @@ module BuildingSync
       read_interval_reading(facility_xml, ns)
     end
 
+    def set_bldg_and_system_type_for_building_and_section
+      @sites.each do |site|
+        site.set_bldg_and_system_type_for_building_and_section
+      end
+    end
+
     def determine_open_studio_standard(standard_to_be_used)
       return @sites[0].determine_open_studio_standard(standard_to_be_used)
     end
