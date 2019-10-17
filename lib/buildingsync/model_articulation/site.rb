@@ -55,6 +55,7 @@ module BuildingSync
       @street_address = nil
       @postal_code = nil
       @premises_notes = nil
+      @all_set = false
 
       # TM: just use the XML snippet to search for the buildings on the site
       read_xml(build_element, ns)
@@ -95,8 +96,11 @@ module BuildingSync
     end
 
     def set_all
-      @buildings.each do |building|
-        building.set_all
+      if !@all_set
+        @all_set = true
+        @buildings.each do |building|
+          building.set_all
+        end
       end
     end
 
@@ -243,6 +247,7 @@ module BuildingSync
     end
 
     def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
+      set_all
       building = get_largest_building
       @climate_zone = @climate_zone_ashrae
       # for now we use the california climate zone if it is available
