@@ -36,6 +36,12 @@
 # *******************************************************************************
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio-standards'
+require_relative 'fenestration_system_type'
+require_relative 'wall_system_type'
+require_relative 'exterior_floor_system_type'
+require_relative 'foundation_system_type'
+require_relative 'roof_system_type'
+
 module BuildingSync
   class BuildingSection < SpatialElement
     include OsLib_ModelGenerationBRICR
@@ -56,13 +62,13 @@ module BuildingSync
       @principal_lighting_system_type = nil
       @miscellaneous_electric_load = nil
 
-      @doors = {}
-      @walls = {}
-      @windows = {}
-      @roofs = {}
-      @skylights = {}
-      @exterior_floors = {}
-      @foundations = {}
+      @doorIDs = []
+      @wallIDs = []
+      @windowIDs = []
+      @roofIDs = []
+      @skylightIDs = []
+      @exterior_floorIDs = []
+      @foundationIDs = []
 
       # code to initialize
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
@@ -143,31 +149,31 @@ module BuildingSync
     def read_construction_types(section_element, ns)
       if section_element.elements["#{ns}:Sides"]
         section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:DoorID") do |door|
-          @doors.push(FenestrationSystemType.new(@doc, ns, door.attributes['IDref']))
+          @doorIDs.push(door.attributes['IDref'])
         end
         section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:WallID") do |wall|
-          @walls.push(WallSystemType.new(@doc, ns, wall.attributes['IDref']))
+          @wallIDs.push(wall.attributes['IDref'])
         end
         section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:WindowID") do |window|
-          @windows.push(FenestrationSystemType.new(@doc, ns, window.attributes['IDref']))
+          @windowIDs.push(window.attributes['IDref'])
         end
       end
       if section_element.elements["#{ns}:Roofs"]
         section_element.elements.each("#{ns}:Roofs/#{ns}:Roof/#{ns}:RoofID") do |roof|
-          @roofs.push(RoofSystemType.new(@doc, ns, roof.attributes['IDref']))
+          @roofIDs.push(roof.attributes['IDref'])
         end
         section_element.elements.each("#{ns}:Roofs/#{ns}:Roof/#{ns}:RoofID/#{ns}:SkylightIDs/#{ns}:SkylightID") do |skylight|
-          @skylights.push(FenestrationSystemType.new(@doc, ns, skylight.attributes['IDref']))
+          @skylightIDs.push(skylight.attributes['IDref'])
         end
       end
       if section_element.elements["#{ns}:ExteriorFloors"]
         section_element.elements.each("#{ns}:ExteriorFloors/#{ns}:ExteriorFloor/#{ns}:ExteriorFloorID ") do |floor|
-          @exterior_floors.push(ExteriorFloorSystemType.new(@doc, ns, floor.attributes['IDref']))
+          @exterior_floorIDs.push(floor.attributes['IDref'])
         end
       end
       if section_element.elements["#{ns}:Foundations"]
         section_element.elements.each("#{ns}:Foundations/#{ns}:Foundation/#{ns}:FoundationID  ") do |foundation|
-          @foundations.push(FoundationSystemType.new(@doc, ns, foundation.attributes['IDref']))
+          @foundationIDs.push(foundation.attributes['IDref'])
         end
       end
     end

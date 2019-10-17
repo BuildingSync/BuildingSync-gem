@@ -192,10 +192,12 @@ module BuildingSync
     end
 
     def determine_open_studio_standard(standard_to_be_used)
+      set_all
       return get_largest_building.determine_open_studio_standard(standard_to_be_used)
     end
 
     def determine_open_studio_system_standard
+      set_all
       return Standard.build(get_building_template)
     end
 
