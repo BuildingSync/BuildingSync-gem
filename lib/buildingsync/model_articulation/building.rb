@@ -78,6 +78,7 @@ module BuildingSync
       @percent_occupied_by_owner = nil
       @occupant_quantity = nil
       @number_of_units = nil
+      @all_set = false
 
       @fraction_area = 1.0
       # code to initialize
@@ -114,9 +115,6 @@ module BuildingSync
       # floor areas
       @total_floor_area = read_floor_areas(build_element, site_total_floor_area, ns)
 
-      # need to set those defaults after initializing the sections
-      read_building_form_defaults
-
       # generate building name
       read_building_name(build_element, ns)
 
@@ -124,6 +122,14 @@ module BuildingSync
 
       read_ownership(build_element, ns)
       read_other_building_details(build_element, ns)
+    end
+
+    def set_all
+      if !@all_set
+        @all_set = true
+        set_bldg_and_system_type_for_building_and_section
+        set_building_form_defaults
+      end
     end
 
     def read_width_and_length
@@ -183,6 +189,7 @@ module BuildingSync
     end
 
     def get_building_type
+      set_all
       # try to get the bldg type at the building level, if it is nil then look at the first section
       if @bldg_type.nil?
         if @building_sections.count == 0
@@ -196,7 +203,7 @@ module BuildingSync
       end
     end
 
-    def read_building_form_defaults
+    def set_building_form_defaults
       # if aspect ratio, story height or wwr have argument value of 0 then use smart building type defaults
       building_form_defaults = building_form_defaults(get_building_type)
       if @ns_to_ew_ratio == 0.0 && !building_form_defaults.nil?
@@ -361,6 +368,7 @@ module BuildingSync
     end
 
     def determine_open_studio_standard(standard_to_be_used)
+      set_all
       begin
         set_standard_template(standard_to_be_used, get_built_year)
         building_type = get_building_type
@@ -429,6 +437,7 @@ module BuildingSync
     end
 
     def get_system_type
+      set_all
       if !@system_type.nil?
         return @system_type
       else
@@ -678,7 +687,7 @@ module BuildingSync
       # 'party_wall_stories_south', 'party_wall_stories_east', 'party_wall_stories_west', 'single_floor_area' 0 =<= nil
 
       # TODO: we have not really defined a good logic what happens with multiple sites, versus multiple buildings, here we just take the first building on the first site
-      read_building_form_defaults
+      set_building_form_defaults
 
       # checking that the factions add up
       check_building_faction

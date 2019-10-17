@@ -56,6 +56,14 @@ module BuildingSync
       @principal_lighting_system_type = nil
       @miscellaneous_electric_load = nil
 
+      @doors = {}
+      @walls = {}
+      @windows = {}
+      @roofs = {}
+      @skylights = {}
+      @exterior_floors = {}
+      @foundations = {}
+
       # code to initialize
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
     end
@@ -69,6 +77,7 @@ module BuildingSync
       read_building_section_other_detail(section_element, ns)
       read_footprint_shape(section_element, ns)
       read_principal_hvac_type(section_element, ns)
+      read_construction_types(section_element, ns)
     end
 
     def read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
@@ -127,6 +136,38 @@ module BuildingSync
           elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Miscellaneous Electric Load'
             @miscellaneous_electric_load = user_defined_field.elements["#{ns}:FieldValue"].text
           end
+        end
+      end
+    end
+
+    def read_construction_types(section_element, ns)
+      if section_element.elements["#{ns}:Sides"]
+        section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:DoorID") do |door|
+          @doors.push(FenestrationSystemType.new(@doc, ns, door.attributes['IDref']))
+        end
+        section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:WallID") do |wall|
+          @walls.push(WallSystemType.new(@doc, ns, wall.attributes['IDref']))
+        end
+        section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:WindowID") do |window|
+          @windows.push(FenestrationSystemType.new(@doc, ns, window.attributes['IDref']))
+        end
+      end
+      if section_element.elements["#{ns}:Roofs"]
+        section_element.elements.each("#{ns}:Roofs/#{ns}:Roof/#{ns}:RoofID") do |roof|
+          @roofs.push(RoofSystemType.new(@doc, ns, roof.attributes['IDref']))
+        end
+        section_element.elements.each("#{ns}:Roofs/#{ns}:Roof/#{ns}:RoofID/#{ns}:SkylightIDs/#{ns}:SkylightID") do |skylight|
+          @skylights.push(FenestrationSystemType.new(@doc, ns, skylight.attributes['IDref']))
+        end
+      end
+      if section_element.elements["#{ns}:ExteriorFloors"]
+        section_element.elements.each("#{ns}:ExteriorFloors/#{ns}:ExteriorFloor/#{ns}:ExteriorFloorID ") do |floor|
+          @exterior_floors.push(ExteriorFloorSystemType.new(@doc, ns, floor.attributes['IDref']))
+        end
+      end
+      if section_element.elements["#{ns}:Foundations"]
+        section_element.elements.each("#{ns}:Foundations/#{ns}:Foundation/#{ns}:FoundationID  ") do |foundation|
+          @foundations.push(FoundationSystemType.new(@doc, ns, foundation.attributes['IDref']))
         end
       end
     end

@@ -91,9 +91,9 @@ module BuildingSync
       read_interval_reading(facility_xml, ns)
     end
 
-    def set_bldg_and_system_type_for_building_and_section
+    def set_all
       @sites.each do |site|
-        site.set_bldg_and_system_type_for_building_and_section
+        site.set_all
       end
     end
 

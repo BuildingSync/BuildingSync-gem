@@ -94,9 +94,9 @@ module BuildingSync
       end
     end
 
-    def set_bldg_and_system_type_for_building_and_section
+    def set_all
       @buildings.each do |building|
-        set_bldg_and_system_type_for_building_and_section
+        building.set_all
       end
     end
 
