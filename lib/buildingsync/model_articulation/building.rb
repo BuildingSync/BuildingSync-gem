@@ -118,8 +118,6 @@ module BuildingSync
       # generate building name
       read_building_name(build_element, ns)
 
-      read_width_and_length
-
       read_ownership(build_element, ns)
       read_other_building_details(build_element, ns)
     end
@@ -129,10 +127,11 @@ module BuildingSync
         @all_set = true
         set_bldg_and_system_type_for_building_and_section
         set_building_form_defaults
+        set_width_and_length
       end
     end
 
-    def read_width_and_length
+    def set_width_and_length
       footprint = nil
       # handle user-assigned single floor plate size condition
       if @single_floor_area > 0.0
@@ -701,7 +700,6 @@ module BuildingSync
       @model.getBuilding.setName(name)
 
       create_bldg_space_types(@model)
-
       # calculate length and width of bar
       # todo - update slicing to nicely handle aspect ratio less than 1
 
