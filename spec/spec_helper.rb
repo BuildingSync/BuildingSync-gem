@@ -144,7 +144,7 @@ RSpec.configure do |config|
 
     puts "Looking for the following OSM file: #{out_path}/in.osm"
     expect(File.exist?("#{out_path}/in.osm")).to be true
-    return "#{out_path}/in.osm"
+    return translator
   end
 
   def generated_baseline_idf_and_compare(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)

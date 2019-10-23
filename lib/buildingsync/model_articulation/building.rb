@@ -909,7 +909,6 @@ module BuildingSync
           end
 
         else # use long sides instead
-
           num_stories.ceil.times do |i|
             if i + 1 <= @num_stories_below_grade
               party_walls_array << []
