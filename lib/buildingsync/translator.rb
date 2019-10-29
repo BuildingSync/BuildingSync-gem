@@ -218,9 +218,23 @@ module BuildingSync
       workflow.saveAs(File.absolute_path(osw_path.to_s))
 
       extension = OpenStudio::Extension::Extension.new
-      runner_options = { run_simulations: true }
+      runner_options = { run_simulations: true, verbose: false}
       runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
       return runner.run_osw(osw_path, osm_baseline_dir)
+    end
+
+    def run_osws()
+      osw_files = []
+      osw_sr_files = []
+      Dir.glob("#{@output_dir}/**/*.osw") { |osw| osw_files << osw }
+      Dir.glob("#{@output_dir}/SR/*.osw") { |osw| osw_sr_files << osw }
+
+
+      extension = OpenStudio::Extension::Extension.new
+      runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY}
+      runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
+      puts "osw_files - osw_sr_files #{osw_files - osw_sr_files}"
+      return runner.run_osws(osw_files - osw_sr_files)
     end
 
     private

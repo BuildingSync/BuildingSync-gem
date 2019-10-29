@@ -50,9 +50,6 @@ module BuildingSync
     # number of parallel BuildingSync files to run
     NUM_BUILDINGS_PARALLEL = 2
 
-    # overwrite the value of the constant defined in the openstudio-extension-gem
-    DO_SIMULATIONS = true
-
     # Override the base class
     # The Extension class contains both the instance of the BuildingSync file (in XML) and the
     # helper methods from the OpenStudio::Extension gem to support managing measures that are related
