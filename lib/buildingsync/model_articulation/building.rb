@@ -70,9 +70,9 @@ module BuildingSync
       @ownership = nil
       @occupancy_classification = nil
       @primary_contact_id = nil
-      @major_remodel_year = nil
+      @year_major_remodel = nil
       @year_of_last_energy_audit = nil
-      @retro_commissioning_date = nil
+      @year_last_commissioning = nil
       @building_automation_system = nil
       @historical_landmark = nil
       @percent_occupied_by_owner = nil
@@ -153,12 +153,18 @@ module BuildingSync
       @built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_i
 
       if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
-        @major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_i
-        @built_year = @major_remodel_year if @major_remodel_year > @built_year
+        @year_major_remodel = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_i
+        @built_year = @year_major_remodel if @year_major_remodel > @built_year
       end
 
       if build_element.elements["#{ns}:YearOfLastEnergyAudit"]
         @year_of_last_energy_audit = build_element.elements["#{ns}:YearOfLastEnergyAudit"].text.to_i
+      end
+
+      if build_element.elements["#{ns}:RetrocommissioningDate"]
+        @year_last_commissioning = Date.parse build_element.elements["#{ns}:RetrocommissioningDate"].text
+      else
+        @year_last_commissioning = nil
       end
     end
 
@@ -273,12 +279,6 @@ module BuildingSync
         @primary_contact_id = building_element.elements["#{ns}:PrimaryContactID"].text
       else
         @primary_contact_id = nil
-      end
-
-      if building_element.elements["#{ns}:RetrocommissioningDate"]
-        @retro_commissioning_date = Date.parse building_element.elements["#{ns}:RetrocommissioningDate"].text
-      else
-        @retro_commissioning_date = nil
       end
 
       if building_element.elements["#{ns}:BuildingAutomationSystem"]
@@ -939,7 +939,7 @@ module BuildingSync
     end
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr, :year_of_last_energy_audit, :ownership,
-                :occupancy_classification, :primary_contact_id, :retro_commissioning_date, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
-                :occupant_quantity, :number_of_units, :built_year, :major_remodel_year, :building_sections
+                :occupancy_classification, :primary_contact_id, :year_last_commissioning, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
+                :occupant_quantity, :number_of_units, :built_year, :year_major_remodel, :building_sections
   end
 end
