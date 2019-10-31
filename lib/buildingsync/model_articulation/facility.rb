@@ -78,6 +78,8 @@ module BuildingSync
       @annual_fuel_use_native_units = 0
       @audit_notes = nil
       @audit_team_notes = nil
+      @spaces_excluded_from_gross_floor_area = nil
+      @premises_notes_for_not_applicable = nil
 
       # reading the xml
       read_xml(facility_xml, ns)
@@ -209,6 +211,10 @@ module BuildingSync
             @audit_team_notes = user_defined_field.elements["#{ns}:FieldValue"].text
           elsif user_defined_field.elements["#{ns}:FieldName"].text == "Auditor Years Of Experience"
             @auditor_years_experience = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == "Spaces Excluded From Gross Floor Area"
+            @spaces_excluded_from_gross_floor_area = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == "Premises Notes For Not Applicable"
+            @premises_notes_for_not_applicable = user_defined_field.elements["#{ns}:FieldValue"].text
           end
         end
       end

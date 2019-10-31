@@ -171,15 +171,20 @@ module BuildingSync
     def read_stories_above_and_below_grade(build_element, ns)
       if build_element.elements["#{ns}:FloorsAboveGrade"]
         @num_stories_above_grade = build_element.elements["#{ns}:FloorsAboveGrade"].text.to_f
-        if @num_stories_above_grade == 0
-          @num_stories_above_grade = 1.0
-        end
+      elsif build_element.elements["#{ns}:ConditionedFloorsAboveGrade"]
+        @num_stories_above_grade = build_element.elements["#{ns}:ConditionedFloorsAboveGrade"].text.to_f
       else
         @num_stories_above_grade = 1.0 # setDefaultValue
       end
 
+      if @num_stories_above_grade == 0
+        @num_stories_above_grade = 1.0
+      end
+
       if build_element.elements["#{ns}:FloorsBelowGrade"]
         @num_stories_below_grade = build_element.elements["#{ns}:FloorsBelowGrade"].text.to_f
+      elsif build_element.elements["#{ns}:ConditionedFloorsBelowGrade"]
+        @num_stories_below_grade = build_element.elements["#{ns}:ConditionedFloorsBelowGrade"].text.to_f
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
