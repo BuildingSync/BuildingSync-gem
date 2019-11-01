@@ -71,7 +71,7 @@ module BuildingSync
         standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
 
         # here we adjust the people schedules according to user input of hours per week and weeks per year
-        if building_sections.size > 0
+        if !building_sections.empty?
           adjust_people_schedule(space_type, get_building_section(building_sections, space_type.standardsBuildingType, space_type.standardsSpaceType), model)
         end
         # extend space type name to include the template. Consider this as well for load defs
@@ -125,11 +125,11 @@ module BuildingSync
         param_Schedules = OsLib_Parametric_Schedules.new(model)
         param_Schedules.override_hours_per_week(building_section.typical_occupant_usage_value_hours.to_f)
 
-        param_Schedules.pre_process_space_types()
+        param_Schedules.pre_process_space_types
 
-        param_Schedules.create_default_schedule_set()
+        param_Schedules.create_default_schedule_set
 
-        param_Schedules.create_schedules_and_apply_default_schedule_set()
+        param_Schedules.create_schedules_and_apply_default_schedule_set
       end
     end
 

@@ -33,6 +33,3 @@ end
 
 # simplecov has an unneccesary dependency on native json gem, use fork that does not require this
 gem 'simplecov', github: 'NREL/simplecov'
-
-
-

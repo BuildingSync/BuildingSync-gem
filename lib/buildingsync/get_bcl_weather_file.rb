@@ -37,7 +37,6 @@ require 'json'
 module BuildingSync
   class GetBCLWeatherFile
     def download_weather_file_from_city_name(state, city)
-
       weather_file_name = get_weather_file_from_city_and_state(city)
 
       if !weather_file_name.empty?
@@ -74,41 +73,40 @@ module BuildingSync
     end
 
     def download_weather_file_from_weather_id(weather_id)
-
       weather_file_name = get_weather_file_from_weatherid(weather_id)
 
       if !weather_file_name.empty?
         return File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
       else
-      wmo_no = 0
-      remote = OpenStudio::RemoteBCL.new
+        wmo_no = 0
+        remote = OpenStudio::RemoteBCL.new
 
-      # Search for weather files
-      responses = remote.searchComponentLibrary(weather_id, 'Weather File')
+        # Search for weather files
+        responses = remote.searchComponentLibrary(weather_id, 'Weather File')
 
-      choices = OpenStudio::StringVector.new
+        choices = OpenStudio::StringVector.new
 
-      responses.each do |response|
-        if response.name.include? 'TMY3'
-          choices << response.uid
+        responses.each do |response|
+          if response.name.include? 'TMY3'
+            choices << response.uid
 
-          response.attributes.each do |attribute|
-            if attribute.name == 'WMO'
-              wmo_no = attribute.valueAsDouble
+            response.attributes.each do |attribute|
+              if attribute.name == 'WMO'
+                wmo_no = attribute.valueAsDouble
+              end
             end
           end
         end
-      end
 
-      if choices.count == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file_from_weather_id',
-                           "Error, could not find uid for #{weather_id}.  Please try a different weather file.")
-        return false
-      end
+        if choices.count == 0
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file_from_weather_id',
+                             "Error, could not find uid for #{weather_id}.  Please try a different weather file.")
+          return false
+        end
 
-      epw_path = download_weather_file(remote, choices)
-      download_design_day_file(wmo_no, epw_path)
-      return epw_path
+        epw_path = download_weather_file(remote, choices)
+        download_design_day_file(wmo_no, epw_path)
+        return epw_path
         end
     end
 
@@ -233,7 +231,6 @@ module BuildingSync
       weather_json[:weather_id] << weather_id
 
       File.open(weather_file_path, 'w') { |f| f.write(weather_json.to_json) }
-
     end
 
     def read_json_file

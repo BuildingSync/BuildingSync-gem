@@ -195,7 +195,7 @@ module BuildingSync
       if open_studio_standard.nil?
         begin
           open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
-        rescue
+        rescue StandardError
           # if the combination of standard type and bldg type fails we try the standard type alone.
           puts "could not find open studio standard for template #{standard_template} and bldg type: #{bldg_type}, trying the standard type alone"
           open_studio_standard = Standard.build(standard_template)

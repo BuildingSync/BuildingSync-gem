@@ -116,7 +116,7 @@ RSpec.configure do |config|
         sql_file = osw_file.gsub('in.osw', 'eplusout.sql')
         puts "Simulation not completed successfully for file: #{osw_file}" if !File.exist?(sql_file)
         expect(File.exist?(sql_file)).to be true
-        end
+      end
       end
   end
 
