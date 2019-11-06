@@ -37,7 +37,6 @@
 
 module BuildingSync
   class Measure
-
     # initialize
     def initialize(measure_element, ns)
       @field_value = nil
@@ -58,7 +57,6 @@ module BuildingSync
     end
 
     def read_measure_other_detail(measure_element, ns)
-
       if measure_element.elements["#{ns}:AnnualSavingsCost"]
         @annual_savings_cost = measure_element.elements["#{ns}:AnnualSavingsCost"].text
       else

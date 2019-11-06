@@ -393,11 +393,11 @@ module BuildingSync
       puts 'starting to gather results'
       results_counter = 0
       super
-     # begin
-      results = {}
-      monthly_results = {}
+      begin
+        results = {}
+        monthly_results = {}
 
-      month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }
+        month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }
 
       scenarios_found = false
       # write an osw for each scenario
@@ -538,7 +538,7 @@ module BuildingSync
           baseline_total_site_eui_kbtu_ft2 = getMeasureResult(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
 
           # temporary hack to get source energy
-          eplustbl_path = File.join(dir, 'Baseline', 'eplustbl.htm')
+          eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
           source_energy = getSourceEnergyArray(eplustbl_path)
           total_source_energy_kbtu = source_energy[0]
           total_source_eui_kbtu_ft2 = source_energy[1]
@@ -782,9 +782,9 @@ module BuildingSync
       end
 
       puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
-     # rescue StandardError => e
-     #   puts "An error occurred while processing results in #{dir}: #{e.message}"
-     # end
+      rescue StandardError
+        puts "An error occured while processing results in #{dir}"
+      end
 
       if results_counter > 0
         puts "#{results_counter} scenarios successfully simulated and results processed"

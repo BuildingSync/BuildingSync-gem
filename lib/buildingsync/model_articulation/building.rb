@@ -485,7 +485,6 @@ module BuildingSync
     end
 
     def set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
-
       climate_zone_standard_string = climate_zone
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone_from_climate_zone', "climate zone: #{climate_zone}")
       if standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
@@ -564,7 +563,7 @@ module BuildingSync
       return false
     end
 
-    def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file = nil )
+    def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file = nil)
       epw_file = OpenStudio::Weather::Epw.load(epw_file_path)
 
       weather_lat = epw_file.lat

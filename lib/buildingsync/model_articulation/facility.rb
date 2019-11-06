@@ -161,11 +161,10 @@ module BuildingSync
       end
 
       if interval_frequency == 'Month'
-      @interval_reading_monthly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
+        @interval_reading_monthly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
       elsif interval_frequency == 'Year'
         @interval_reading_yearly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
       end
-
     end
 
     def read_other_details(facility_xml, ns)
