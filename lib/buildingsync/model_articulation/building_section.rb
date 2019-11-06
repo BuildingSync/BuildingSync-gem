@@ -34,7 +34,6 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-
 require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio-standards'
 require_relative 'fenestration_system_type'
@@ -53,6 +52,7 @@ module BuildingSync
       @fraction_area = nil
       @bldg_type = {}
       @occupancy_classification = nil
+      @occupancy_classification_original = nil
       @floor_area_value = nil
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
@@ -62,6 +62,9 @@ module BuildingSync
       @principal_hvac_type = nil
       @principal_lighting_system_type = nil
       @miscellaneous_electric_load = nil
+      @spaces_conditioned_percent = nil
+      @dwelling_quantity = nil
+      @dwellings_occupied_percent = nil
 
       @doorIDs = []
       @wallIDs = []
@@ -142,6 +145,14 @@ module BuildingSync
             @principal_lighting_system_type = user_defined_field.elements["#{ns}:FieldValue"].text
           elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Miscellaneous Electric Load'
             @miscellaneous_electric_load = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Original Occupancy Classification'
+            @occupancy_classification_original = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Percentage Dwellings Occupied'
+            @spaces_conditioned_percent = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Quantity Of Dwellings'
+            @dwelling_quantity = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Percentage Dwellings Occupied'
+            @dwellings_occupied_percent = user_defined_field.elements["#{ns}:FieldValue"].text
           end
         end
       end
