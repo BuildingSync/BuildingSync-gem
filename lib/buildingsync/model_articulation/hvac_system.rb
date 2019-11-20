@@ -36,7 +36,6 @@
 # *******************************************************************************
 module BuildingSync
   class HVACSystem < BuildingSystem
-
     def initialize(system_element = nil, ns = '')
       # code to initialize
       @primary_hvac_system_type = nil
@@ -162,9 +161,7 @@ module BuildingSync
             end
           end
         end
-
       else
-
         # Group the zones by story
         story_groups = standard.model_group_zones_by_story(model, model.getThermalZones)
 
@@ -173,7 +170,6 @@ module BuildingSync
         story_groups.each do |zones|
           model.add_cbecs_hvac_system(standard, system_type, zones)
         end
-
       end
       return true
     end

@@ -70,14 +70,15 @@ module BuildingSync
       @ownership = nil
       @occupancy_classification = nil
       @primary_contact_id = nil
-      @major_remodel_year = nil
+      @year_major_remodel = nil
       @year_of_last_energy_audit = nil
-      @retro_commissioning_date = nil
+      @year_last_commissioning = nil
       @building_automation_system = nil
       @historical_landmark = nil
       @percent_occupied_by_owner = nil
       @occupant_quantity = nil
       @number_of_units = nil
+      @all_set = false
 
       @fraction_area = 1.0
       # code to initialize
@@ -114,21 +115,23 @@ module BuildingSync
       # floor areas
       @total_floor_area = read_floor_areas(build_element, site_total_floor_area, ns)
 
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
-
-      # need to set those defaults after initializing the sections
-      read_building_form_defaults
-
       # generate building name
       read_building_name(build_element, ns)
-
-      read_width_and_length
 
       read_ownership(build_element, ns)
       read_other_building_details(build_element, ns)
     end
 
-    def read_width_and_length
+    def set_all
+      if !@all_set
+        @all_set = true
+        set_bldg_and_system_type_for_building_and_section
+        set_building_form_defaults
+        set_width_and_length
+      end
+    end
+
+    def set_width_and_length
       footprint = nil
       # handle user-assigned single floor plate size condition
       if @single_floor_area > 0.0
@@ -150,27 +153,38 @@ module BuildingSync
       @built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_i
 
       if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
-        @major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_i
-        @built_year = @major_remodel_year if @major_remodel_year > @built_year
+        @year_major_remodel = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_i
+        @built_year = @year_major_remodel if @year_major_remodel > @built_year
       end
 
       if build_element.elements["#{ns}:YearOfLastEnergyAudit"]
         @year_of_last_energy_audit = build_element.elements["#{ns}:YearOfLastEnergyAudit"].text.to_i
+      end
+
+      if build_element.elements["#{ns}:RetrocommissioningDate"]
+        @year_last_commissioning = Date.parse build_element.elements["#{ns}:RetrocommissioningDate"].text
+      else
+        @year_last_commissioning = nil
       end
     end
 
     def read_stories_above_and_below_grade(build_element, ns)
       if build_element.elements["#{ns}:FloorsAboveGrade"]
         @num_stories_above_grade = build_element.elements["#{ns}:FloorsAboveGrade"].text.to_f
-        if @num_stories_above_grade == 0
-          @num_stories_above_grade = 1.0
-        end
+      elsif build_element.elements["#{ns}:ConditionedFloorsAboveGrade"]
+        @num_stories_above_grade = build_element.elements["#{ns}:ConditionedFloorsAboveGrade"].text.to_f
       else
         @num_stories_above_grade = 1.0 # setDefaultValue
       end
 
+      if @num_stories_above_grade == 0
+        @num_stories_above_grade = 1.0
+      end
+
       if build_element.elements["#{ns}:FloorsBelowGrade"]
         @num_stories_below_grade = build_element.elements["#{ns}:FloorsBelowGrade"].text.to_f
+      elsif build_element.elements["#{ns}:ConditionedFloorsBelowGrade"]
+        @num_stories_below_grade = build_element.elements["#{ns}:ConditionedFloorsBelowGrade"].text.to_f
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
@@ -185,6 +199,7 @@ module BuildingSync
     end
 
     def get_building_type
+      set_all
       # try to get the bldg type at the building level, if it is nil then look at the first section
       if @bldg_type.nil?
         if @building_sections.count == 0
@@ -198,7 +213,7 @@ module BuildingSync
       end
     end
 
-    def read_building_form_defaults
+    def set_building_form_defaults
       # if aspect ratio, story height or wwr have argument value of 0 then use smart building type defaults
       building_form_defaults = building_form_defaults(get_building_type)
       if @ns_to_ew_ratio == 0.0 && !building_form_defaults.nil?
@@ -269,12 +284,6 @@ module BuildingSync
         @primary_contact_id = building_element.elements["#{ns}:PrimaryContactID"].text
       else
         @primary_contact_id = nil
-      end
-
-      if building_element.elements["#{ns}:RetrocommissioningDate"]
-        @retro_commissioning_date = Date.parse building_element.elements["#{ns}:RetrocommissioningDate"].text
-      else
-        @retro_commissioning_date = nil
       end
 
       if building_element.elements["#{ns}:BuildingAutomationSystem"]
@@ -354,7 +363,16 @@ module BuildingSync
       return @model
     end
 
+    def set_bldg_and_system_type_for_building_and_section
+      @building_sections.each do |section|
+        section.set_bldg_and_system_type
+      end
+
+      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
+    end
+
     def determine_open_studio_standard(standard_to_be_used)
+      set_all
       begin
         set_standard_template(standard_to_be_used, get_built_year)
         building_type = get_building_type
@@ -364,6 +382,7 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.BuildingSection.read_xml', e.message)
       end
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSection.read_xml', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
+      return @open_studio_standard
     end
 
     def update_name
@@ -422,6 +441,7 @@ module BuildingSync
     end
 
     def get_system_type
+      set_all
       if !@system_type.nil?
         return @system_type
       else
@@ -465,7 +485,6 @@ module BuildingSync
     end
 
     def set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
-
       climate_zone_standard_string = climate_zone
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone_from_climate_zone', "climate zone: #{climate_zone}")
       if standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
@@ -544,7 +563,7 @@ module BuildingSync
       return false
     end
 
-    def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file = nil )
+    def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file = nil)
       epw_file = OpenStudio::Weather::Epw.load(epw_file_path)
 
       weather_lat = epw_file.lat
@@ -671,7 +690,7 @@ module BuildingSync
       # 'party_wall_stories_south', 'party_wall_stories_east', 'party_wall_stories_west', 'single_floor_area' 0 =<= nil
 
       # TODO: we have not really defined a good logic what happens with multiple sites, versus multiple buildings, here we just take the first building on the first site
-      read_building_form_defaults
+      set_building_form_defaults
 
       # checking that the factions add up
       check_building_faction
@@ -685,7 +704,6 @@ module BuildingSync
       @model.getBuilding.setName(name)
 
       create_bldg_space_types(@model)
-
       # calculate length and width of bar
       # todo - update slicing to nicely handle aspect ratio less than 1
 
@@ -895,7 +913,6 @@ module BuildingSync
           end
 
         else # use long sides instead
-
           num_stories.ceil.times do |i|
             if i + 1 <= @num_stories_below_grade
               party_walls_array << []
@@ -917,16 +934,7 @@ module BuildingSync
       party_walls_array
     end
 
-    def write_osm(dir, replace_whitespace = false)
-      if replace_whitespace
-        spaces = @model.getSpaces
-        spaces.each do |space|
-          oldName = space.nameString
-          newName = space.nameString.gsub(/\s+/, '')
-          space.setName(newName)
-          puts "Removing whitespaces from space name: old: #{oldName} new: #{newName}"
-        end
-      end
+    def write_osm(dir)
       @model.save("#{dir}/in.osm", true)
     end
 
@@ -935,7 +943,7 @@ module BuildingSync
     end
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr, :year_of_last_energy_audit, :ownership,
-                :occupancy_classification, :primary_contact_id, :retro_commissioning_date, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
-                :occupant_quantity, :number_of_units, :built_year, :major_remodel_year, :building_sections
+                :occupancy_classification, :primary_contact_id, :year_last_commissioning, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
+                :occupant_quantity, :number_of_units, :built_year, :year_major_remodel, :building_sections
   end
 end

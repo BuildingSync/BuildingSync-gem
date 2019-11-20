@@ -55,6 +55,7 @@ module BuildingSync
       @street_address = nil
       @postal_code = nil
       @premises_notes = nil
+      @all_set = false
 
       # TM: just use the XML snippet to search for the buildings on the site
       read_xml(build_element, ns)
@@ -91,6 +92,15 @@ module BuildingSync
       # code to create a building
       build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
         @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, ns))
+      end
+    end
+
+    def set_all
+      if !@all_set
+        @all_set = true
+        @buildings.each do |building|
+          building.set_all
+        end
       end
     end
 
@@ -182,10 +192,12 @@ module BuildingSync
     end
 
     def determine_open_studio_standard(standard_to_be_used)
+      set_all
       return get_largest_building.determine_open_studio_standard(standard_to_be_used)
     end
 
     def determine_open_studio_system_standard
+      set_all
       return Standard.build(get_building_template)
     end
 
@@ -237,6 +249,7 @@ module BuildingSync
     end
 
     def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
+      set_all
       building = get_largest_building
       @climate_zone = @climate_zone_ashrae
       # for now we use the california climate zone if it is available
@@ -247,9 +260,9 @@ module BuildingSync
       building.generate_baseline_osm(standard_to_be_used)
     end
 
-    def write_osm(dir, replace_whitespace = false)
+    def write_osm(dir)
       building = get_largest_building
-      building.write_osm(dir, replace_whitespace)
+      building.write_osm(dir)
       scenario_types = {}
       scenario_types['system_type'] = get_system_type
       scenario_types['bldg_type'] = get_building_type

@@ -29,7 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-checkstyle_formatter', '~> 0.4.0'
 
   spec.add_dependency 'multipart-post', '2.1.1'
-  spec.add_dependency 'openstudio-extension', '~> 0.1.0'
-  spec.add_dependency 'openstudio-model-articulation', '~> 0.0.1'
-  spec.add_dependency 'openstudio_measure_tester', '~> 0.1.0'
+  spec.add_dependency 'openstudio-model-articulation', '~> 0.1.0'
 end

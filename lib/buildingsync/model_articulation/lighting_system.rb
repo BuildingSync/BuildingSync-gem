@@ -35,13 +35,29 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-class MeteredEnergy
-  def initialize(energy_resource, interval_frequency, reading_type, interval_readings)
-    @energy_resource = energy_resource
-    @interval_frequency = interval_frequency
-    @reading_type = reading_type
-    @interval_readings = interval_readings
-  end
+module BuildingSync
+  class LightingSystemType
 
-  attr_reader :energy_resource, :interval_frequency, :reading_type, :interval_reading
+    def initialize(doc, ns, ref)
+      @lighting_type = nil
+      @ballast_type = nil
+
+      doc.elements.each("#{ns}:Systems/#{ns}:LightingSystems/#{ns}:LightingSystem") do |lighting_system|
+        if lighting_system.attributes["ID"] == ref
+          read(lighting_system, ns)
+        end
+      end
+    end
+
+    def read(section_element, ns)
+      if section_element.elements["#{ns}:LampType/#{ns}:SolidStateLighting/#{ns}:LampLabel"]
+        @lighting_type = section_element.elements["#{ns}:LampType/#{ns}:SolidStateLighting/#{ns}:LampLabel"].text
+      end
+      if section_element.elements["#{ns}:BallastType"]
+        @ballast_type = section_element.elements["#{ns}:BallastType"].text
+      end
+    end
+  end
 end
+
+

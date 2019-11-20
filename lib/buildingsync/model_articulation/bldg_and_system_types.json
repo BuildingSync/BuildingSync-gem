@@ -94,15 +94,5 @@
     "bldg_type": "SuperMarket",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PSZ-AC with gas coil heat"
-  }],
-  "Lodging": [{
-    "bldg_type": "Lodging",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PSZ-AC with gas coil heat"
-  }],
-  "Laboratory-Testing": [{
-    "bldg_type": "Laboratory",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "tbd"
   }]
 }

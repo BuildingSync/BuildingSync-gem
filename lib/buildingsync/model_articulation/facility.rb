@@ -58,8 +58,12 @@ module BuildingSync
       @sites = []
       @measures = []
       @auditor_contact_id = nil
-      @audit_date = nil
-      @contact_name = nil
+      @audit_date_level_1 = nil
+      @audit_date_level_2 = nil
+      @audit_date_level_3 = nil
+      @contact_auditor_name = nil
+      @contact_owner_name = nil
+      @auditor_years_experience = nil
       @utility_name = nil
       @utility_meter_number = nil
       @metering_configuration = nil
@@ -72,6 +76,10 @@ module BuildingSync
       @building_eui_benchmark = nil
       @energy_cost = nil
       @annual_fuel_use_native_units = 0
+      @audit_notes = nil
+      @audit_team_notes = nil
+      @spaces_excluded_from_gross_floor_area = nil
+      @premises_notes_for_not_applicable = nil
 
       # reading the xml
       read_xml(facility_xml, ns)
@@ -89,6 +97,12 @@ module BuildingSync
 
       read_other_details(facility_xml, ns)
       read_interval_reading(facility_xml, ns)
+    end
+
+    def set_all
+      @sites.each do |site|
+        site.set_all
+      end
     end
 
     def determine_open_studio_standard(standard_to_be_used)
@@ -147,30 +161,62 @@ module BuildingSync
       end
 
       if interval_frequency == 'Month'
-      @interval_reading_monthly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
+        @interval_reading_monthly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
       elsif interval_frequency == 'Year'
         @interval_reading_yearly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
       end
-
     end
 
     def read_other_details(facility_xml, ns)
-      @contact_name = BuildingSync::Helper.get_text_value(facility_xml.elements["#{ns}:Contacts/#{ns}:Contact/#{ns}:ContactName"])
+      facility_xml.elements.each("#{ns}:Contacts/#{ns}:Contact") do |contact|
+        contact.elements.each("#{ns}:ContactRoles/#{ns}:ContactRole") do |role|
+          if role.text == 'Energy Auditor'
+            @contact_auditor_name = contact.elements["#{ns}:ContactName"].text
+          elsif role.text == 'Owner'
+            @contact_owner_name = contact.elements["#{ns}:ContactName"].text
+          end
+        end
+      end
 
-      report = facility_xml.elements["#{ns}:Report"]
+      report = facility_xml.elements["#{ns}:Reports/#{ns}:Report"]
       if !report.nil?
         @auditor_contact_id = BuildingSync::Helper.get_text_value(report.elements["#{ns}:AuditorContactID"])
-        @audit_date = BuildingSync::Helper.get_date_value(report.elements["#{ns}:AuditDate"])
+        report.elements.each("#{ns}:AuditDates/#{ns}:AuditDate") do |audit_date|
+          if audit_date.elements["#{ns}:CustomDateType"].text == 'Level 1: Walk-through'
+            @audit_date_level_1 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
+            @audit_date = @audit_date_level_1
+          elsif audit_date.elements["#{ns}:CustomDateType"].text == 'Level 2: Energy Survey and Analysis'
+            @audit_date_level_2 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
+            @audit_date = @audit_date_level_2
+          elsif audit_date.elements["#{ns}:CustomDateType"].text == 'Level 3: Detailed Survey and Analysis'
+            @audit_date_level_3 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
+            @audit_date = @audit_date_level_3
+          end
+        end
 
         # here we iterate over the scenarios to find the one "currentBuilding" and "benchmark"
         report.elements.each("#{ns}:Scenarios/#{ns}:Scenario") do |scenario|
           if scenario.elements["#{ns}:ScenarioType/#{ns}:CurrentBuilding"]
-            @building_eui = scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text
+            @building_eui = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"])
             @annual_fuel_use_native_units = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"])
             @energy_cost = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"])
           elsif scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark"]
             @building_eui_benchmark = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"])
             @benchmark_source = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"])
+          end
+        end
+
+        report.elements.each("#{ns}:UserDefinedFields/#{ns}:UserDefinedField") do |user_defined_field|
+          if user_defined_field.elements["#{ns}:FieldName"].text == 'Audit Notes'
+            @audit_notes = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Audit Team Notes'
+            @audit_team_notes = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Auditor Years Of Experience'
+            @auditor_years_experience = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Spaces Excluded From Gross Floor Area'
+            @spaces_excluded_from_gross_floor_area = user_defined_field.elements["#{ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Premises Notes For Not Applicable'
+            @premises_notes_for_not_applicable = user_defined_field.elements["#{ns}:FieldValue"].text
           end
         end
       end
@@ -312,10 +358,10 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building finished with #{model.getModelObjects.size} objects.")
     end
 
-    def write_osm(dir, replace_whitespace = false)
+    def write_osm(dir)
       scenario_types = {}
       @sites.each do |site|
-        scenario_types = site.write_osm(dir, replace_whitespace)
+        scenario_types = site.write_osm(dir)
       end
       return scenario_types
     end
@@ -324,7 +370,7 @@ module BuildingSync
       return @sites[0].get_model
     end
 
-    attr_reader :building_eui_benchmark, :building_eui, :auditor_contact_id, :annual_fuel_use_native_units, :audit_date, :benchmark_source, :contact_name, :energy_cost, :energy_resource,
+    attr_reader :building_eui_benchmark, :building_eui, :auditor_contact_id, :annual_fuel_use_native_units, :audit_date, :benchmark_source, :contact_auditor_name, :energy_cost, :energy_resource,
                 :rate_schedules, :utility_meter_number, :utility_name, :metering_configuration
   end
 end

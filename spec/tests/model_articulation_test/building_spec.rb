@@ -119,8 +119,8 @@ RSpec.describe 'BuildingSpec' do
   it 'Should return RetrocommissioningDate' do
     building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
     expected_value = Date.parse '1/1/2019'
-    puts "expected retro_commissioning_date: #{expected_value} but got: #{building.retro_commissioning_date} " if building.retro_commissioning_date != expected_value
-    expect(building.retro_commissioning_date == expected_value).to be true
+    puts "expected retro_commissioning_date: #{expected_value} but got: #{building.year_last_commissioning} " if building.year_last_commissioning != expected_value
+    expect(building.year_last_commissioning == expected_value).to be true
   end
 
   it 'Should return BuildingAutomationSystem' do
@@ -168,8 +168,8 @@ RSpec.describe 'BuildingSpec' do
   it 'Should return major_remodel_year' do
     building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
     expected_value = Integer('2003')
-    puts "expected major_remodel_year: #{expected_value} but got: #{building.major_remodel_year} " if building.major_remodel_year != expected_value
-    expect(building.major_remodel_year == expected_value).to be true
+    puts "expected major_remodel_year: #{expected_value} but got: #{building.year_major_remodel} " if building.year_major_remodel != expected_value
+    expect(building.year_major_remodel == expected_value).to be true
   end
 
   it 'Should return year_of_last_energy_audit' do

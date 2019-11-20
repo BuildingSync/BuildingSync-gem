@@ -59,11 +59,14 @@ module BuildingSync
       end
     end
 
-    def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil, replace_whitespace = false)
+    def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
+      @facilities.each do |facility|
+        facility.set_all
+      end
       open_studio_standard = @facilities[0].determine_open_studio_standard(standard_to_be_used)
 
       @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used, ddy_file)
-      return write_osm(dir, replace_whitespace)
+      return write_osm(dir)
     end
 
     def get_space_types
@@ -76,8 +79,8 @@ module BuildingSync
 
     private
 
-    def write_osm(dir, replace_whitespace = false)
-      @@facility = @facilities[0].write_osm(dir, replace_whitespace)
+    def write_osm(dir)
+      @@facility = @facilities[0].write_osm(dir)
     end
   end
 end
