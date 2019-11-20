@@ -170,31 +170,34 @@ module BuildingSync
     def read_other_details(facility_xml, ns)
       facility_xml.elements.each("#{ns}:Contacts/#{ns}:Contact") do |contact|
         contact.elements.each("#{ns}:ContactRoles/#{ns}:ContactRole") do |role|
-          if role.text == "Energy Auditor"
+          if role.text == 'Energy Auditor'
             @contact_auditor_name = contact.elements["#{ns}:ContactName"].text
-          elsif role.text == "Owner"
+          elsif role.text == 'Owner'
             @contact_owner_name = contact.elements["#{ns}:ContactName"].text
           end
         end
       end
 
-      report = facility_xml.elements["#{ns}:Report"]
+      report = facility_xml.elements["#{ns}:Reports/#{ns}:Report"]
       if !report.nil?
         @auditor_contact_id = BuildingSync::Helper.get_text_value(report.elements["#{ns}:AuditorContactID"])
         report.elements.each("#{ns}:AuditDates/#{ns}:AuditDate") do |audit_date|
-          if audit_date.elements["#{ns}:CustomDateType"].text == "Level 1: Walk-through"
+          if audit_date.elements["#{ns}:CustomDateType"].text == 'Level 1: Walk-through'
             @audit_date_level_1 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
-          elsif audit_date.elements["#{ns}:CustomDateType"].text == "Level 2: Energy Survey and Analysis"
+            @audit_date = @audit_date_level_1
+          elsif audit_date.elements["#{ns}:CustomDateType"].text == 'Level 2: Energy Survey and Analysis'
             @audit_date_level_2 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
-          elsif audit_date.elements["#{ns}:CustomDateType"].text == "Level 3: Detailed Survey and Analysis"
+            @audit_date = @audit_date_level_2
+          elsif audit_date.elements["#{ns}:CustomDateType"].text == 'Level 3: Detailed Survey and Analysis'
             @audit_date_level_3 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
+            @audit_date = @audit_date_level_3
           end
         end
 
         # here we iterate over the scenarios to find the one "currentBuilding" and "benchmark"
         report.elements.each("#{ns}:Scenarios/#{ns}:Scenario") do |scenario|
           if scenario.elements["#{ns}:ScenarioType/#{ns}:CurrentBuilding"]
-            @building_eui = scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text
+            @building_eui = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"])
             @annual_fuel_use_native_units = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"])
             @energy_cost = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"])
           elsif scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark"]
@@ -204,15 +207,15 @@ module BuildingSync
         end
 
         report.elements.each("#{ns}:UserDefinedFields/#{ns}:UserDefinedField") do |user_defined_field|
-          if user_defined_field.elements["#{ns}:FieldName"].text == "Audit Notes"
+          if user_defined_field.elements["#{ns}:FieldName"].text == 'Audit Notes'
             @audit_notes = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == "Audit Team Notes"
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Audit Team Notes'
             @audit_team_notes = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == "Auditor Years Of Experience"
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Auditor Years Of Experience'
             @auditor_years_experience = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == "Spaces Excluded From Gross Floor Area"
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Spaces Excluded From Gross Floor Area'
             @spaces_excluded_from_gross_floor_area = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == "Premises Notes For Not Applicable"
+          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Premises Notes For Not Applicable'
             @premises_notes_for_not_applicable = user_defined_field.elements["#{ns}:FieldValue"].text
           end
         end
