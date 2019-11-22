@@ -45,7 +45,6 @@ module BuildingSync
     def initialize(section_element, occ_type, bldg_total_floor_area, ns)
       @fraction_area = nil
       @bldg_type = {}
-      @occupancy_classification = nil
       @floor_area_value = nil
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
@@ -69,12 +68,6 @@ module BuildingSync
     end
 
     def read_building_section_other_detail(section_element, ns)
-      if section_element.elements["#{ns}:OccupancyClassification"]
-        @occupancy_classification = section_element.elements["#{ns}:OccupancyClassification"].text
-      else
-        @occupancy_classification = nil
-      end
-
       if section_element.elements["#{ns}:TypicalOccupantUsages"]
         section_element.elements.each("#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage") do |occ_usage|
           if occ_usage.elements["#{ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'
