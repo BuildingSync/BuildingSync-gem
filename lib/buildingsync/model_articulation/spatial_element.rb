@@ -132,14 +132,6 @@ module BuildingSync
       end
     end
 
-    def set_bldg_and_system_type_for_office_bldg_type(occ_type, total_floor_area)
-      if ((total_floor_area > 0) && (total_floor_area < 20000) && occ_type[:condition] == '0-2000') || ((total_floor_area >= 20000) && (total_floor_area < 75000) && occ_type[:condition] == '2000-75000') || occ_type[:condition] == ''
-        @bldg_type = occ_type[:bldg_type]
-        @bar_division_method = occ_type[:bar_division_method]
-        @system_type = occ_type[:system_type]
-      end
-    end
-
     def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
       # DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb
       # SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient
