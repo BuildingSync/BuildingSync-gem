@@ -55,6 +55,8 @@ module BuildingSync
       @single_floor_area = 0.0
       @building_rotation = 0.0
       @floor_height = 0.0
+      @width = 0.0
+      @length = 0.0
       @wwr = 0.0
       @name = nil
       @model = nil
@@ -666,8 +668,8 @@ module BuildingSync
       # create envelope
       # populate bar_hash and create envelope with data from envelope_data_hash and user arguments
       bar_hash = {}
-      bar_hash[:length] = length
-      bar_hash[:width] =  width
+      bar_hash[:length] = @length
+      bar_hash[:width] =  @width
       bar_hash[:num_stories_below_grade] = num_stories_below_grade.to_i
       bar_hash[:num_stories_above_grade] = num_stories_above_grade.to_i
       bar_hash[:floor_height] = floor_height
@@ -787,19 +789,19 @@ module BuildingSync
         # orientation of long and short side of building will vary based on building rotation
 
         # full story ext wall area
-        typical_length_facade_area = length * floor_height
-        typical_width_facade_area = width * floor_height
+        typical_length_facade_area = @length * floor_height
+        typical_width_facade_area = @width * floor_height
 
         # top story ext wall area, may be partial story
         partial_story_multiplier = (1.0 - @num_stories_above_grade.ceil + @num_stories_above_grade)
         area_multiplier = partial_story_multiplier
         edge_multiplier = Math.sqrt(area_multiplier)
-        top_story_length = length * edge_multiplier
-        top_story_width = width * edge_multiplier
+        top_story_length = @length * edge_multiplier
+        top_story_width = @width * edge_multiplier
         top_story_length_facade_area = top_story_length * floor_height
         top_story_width_facade_area = top_story_width * floor_height
 
-        total_exterior_wall_area = 2 * (length + width) * (@num_stories_above_grade.ceil - 1.0) * floor_height + 2 * (top_story_length + top_story_width) * floor_height
+        total_exterior_wall_area = 2 * (@length + @width) * (@num_stories_above_grade.ceil - 1.0) * floor_height + 2 * (top_story_length + top_story_width) * floor_height
         target_party_wall_area = total_exterior_wall_area * @party_wall_fraction
 
         width_counter = 0

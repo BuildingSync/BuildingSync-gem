@@ -49,10 +49,13 @@ module BuildingSync
       @space_types = {}
       @fraction_area = nil
       @space_types_floor_area = nil
-      @heated_only_floor_area = nil
-      @cooled_only_floor_area = nil
-      @custom_conditioned_above_grade_floor_area = nil
-      @custom_conditioned_below_grade_floor_area = nil
+      @heated_and_cooled_floor_area = 0
+      @heated_only_floor_area = 0
+      @cooled_only_floor_area = 0
+      @conditioned_floor_area = 0
+      @footprint_floor_area = 0
+      @custom_conditioned_above_grade_floor_area = 0
+      @custom_conditioned_below_grade_floor_area = 0
     end
 
     def read_floor_areas(build_element, parent_total_floor_area, ns)
@@ -68,7 +71,7 @@ module BuildingSync
         elsif floor_area_type == 'Footprint'
           @footprint_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@footprint_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Conditioned'
-          @conditioned_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@@conditioned_floor_area', floor_area), 'ft^2', 'm^2').get
+          @conditioned_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@conditioned_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Heated Only'
           @heated_only_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@heated_only_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Cooled Only'
@@ -84,13 +87,36 @@ module BuildingSync
         end
       end
 
-      if @total_floor_area.nil? && !@conditioned_floor_area.nil?
-        @total_floor_area = @conditioned_floor_area
-      elsif @total_floor_area.nil? && !@heated_and_cooled_floor_area.nil?
-        @total_floor_area = @heated_and_cooled_floor_area
+      if @total_floor_area.nil? || @total_floor_area == 0
+        # if the total floor area is null, we try to calculate the total area, from various conditioned areas
+        running_floor_area = 0
+        if !@cooled_only_floor_area.nil? && @cooled_only_floor_area > 0
+          running_floor_area += @cooled_only_floor_area
+        end
+        if !@heated_only_floor_area.nil? && @heated_only_floor_area > 0
+          running_floor_area += @heated_only_floor_area
+        end
+        if !@conditioned_floor_area.nil? && @conditioned_floor_area > 0
+          running_floor_area += @conditioned_floor_area
+        end
+        if running_floor_area > 0
+          @total_floor_area = running_floor_area
+        else
+          # if the conditions floor areas are null, we look at the conditioned above and below grade areas
+          if !@custom_conditioned_above_grade_floor_area.nil? && @custom_conditioned_above_grade_floor_area > 0
+            running_floor_area += @custom_conditioned_above_grade_floor_area
+          end
+          if !@custom_conditioned_below_grade_floor_area.nil? && @custom_conditioned_below_grade_floor_area > 0
+            running_floor_area += @custom_conditioned_below_grade_floor_area
+          end
+          if running_floor_area > 0
+            @total_floor_area = running_floor_area
+          end
+        end
       end
 
-      if @total_floor_area.nil?
+      # if we did not find any area we get the parent one
+      if @total_floor_area.nil? || @total_floor_area == 0
         return parent_total_floor_area
       else
         return @total_floor_area
@@ -103,14 +129,6 @@ module BuildingSync
         return occ_element.text
       else
         return occupancy_type
-      end
-    end
-
-    def set_bldg_and_system_type_for_office_bldg_type(occ_type, total_floor_area)
-      if ((total_floor_area > 0) && (total_floor_area < 20000) && occ_type[:condition] == '0-2000') || ((total_floor_area >= 20000) && (total_floor_area < 75000) && occ_type[:condition] == '2000-75000') || occ_type[:condition] == ''
-        @bldg_type = occ_type[:bldg_type]
-        @bar_division_method = occ_type[:bar_division_method]
-        @system_type = occ_type[:system_type]
       end
     end
 
@@ -152,7 +170,8 @@ module BuildingSync
               if occ_type[:max_floor_area] && occ_type[:max_floor_area].to_f > total_floor_area
                 max_floor_area_correct = true
               end
-              if (min_floor_area_correct && max_floor_area_correct) || (occ_type[:min_floor_area] && max_floor_area_correct) || (min_floor_area_correct && occ_type[:max_floor_area])
+              if (min_floor_area_correct && max_floor_area_correct) || (!occ_type[:min_floor_area] && max_floor_area_correct) || (min_floor_area_correct && !occ_type[:max_floor_area])
+                puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
                 @bldg_type = occ_type[:bldg_type]
                 @bar_division_method = occ_type[:bar_division_method]
                 @system_type = occ_type[:system_type]
@@ -160,6 +179,7 @@ module BuildingSync
               end
             else
               # otherwise we assume the first one is correct and we select this
+              puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
               @bldg_type = occ_type[:bldg_type]
               @bar_division_method = occ_type[:bar_division_method]
               @system_type = occ_type[:system_type]
@@ -195,10 +215,11 @@ module BuildingSync
       if open_studio_standard.nil?
         begin
           open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
-        rescue StandardError
+        rescue StandardError => e
           # if the combination of standard type and bldg type fails we try the standard type alone.
           puts "could not find open studio standard for template #{standard_template} and bldg type: #{bldg_type}, trying the standard type alone"
           open_studio_standard = Standard.build(standard_template)
+          raise(e)
         end
       end
       lookup_name = open_studio_standard.model_get_lookup_name(@occupancy_type)
