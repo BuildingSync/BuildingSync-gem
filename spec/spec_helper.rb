@@ -240,6 +240,40 @@ RSpec.configure do |config|
   end
 
   def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+
+    translator = test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used , epw_file_name)
+
+    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
+    osw_files = []
+    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
+
+    translator.run_osws
+
+    dir_path = File.dirname(osw_files[0])
+    parent_dir_path = File.expand_path('..', dir_path)
+
+    translator.gather_results(parent_dir_path)
+    translator.save_xml(File.join(parent_dir_path, 'results.xml'))
+  end
+
+  def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+
+    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
+
+    translator = test_baseline_creation(file_name, standard_to_be_used, epw_file_name)
+    translator.write_osws
+
+    osw_files = []
+    osw_sr_files = []
+    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
+    Dir.glob("#{out_path}/SR/*.osw") { |osw| osw_sr_files << osw }
+
+    # we compare the counts, by also considering the two potential osw files in the SR directory
+    expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
+    return translator
+  end
+
+  def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -262,23 +296,7 @@ RSpec.configure do |config|
 
     expect(File.exist?("#{out_path}/in.osm")).to be true
 
-    translator.write_osws
-
-    osw_files = []
-    osw_sr_files = []
-    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
-    Dir.glob("#{out_path}/SR/*.osw") { |osw| osw_sr_files << osw }
-
-    # we compare the counts, by also considering the two potential osw files in the SR directory
-    expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
-
-    translator.run_osws
-
-    dir_path = File.dirname(osw_files[0])
-    parent_dir_path = File.expand_path('..', dir_path)
-
-    translator.gather_results(parent_dir_path)
-    translator.save_xml(File.join(parent_dir_path, 'results.xml'))
+    return translator
   end
 
   def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
