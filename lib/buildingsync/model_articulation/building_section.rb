@@ -111,12 +111,6 @@ module BuildingSync
     end
 
     def read_building_section_other_detail(section_element, ns)
-      if section_element.elements["#{ns}:OccupancyClassification"]
-        @occupancy_classification = section_element.elements["#{ns}:OccupancyClassification"].text
-      else
-        @occupancy_classification = nil
-      end
-
       if section_element.elements["#{ns}:TypicalOccupantUsages"]
         section_element.elements.each("#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage") do |occ_usage|
           if occ_usage.elements["#{ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'
