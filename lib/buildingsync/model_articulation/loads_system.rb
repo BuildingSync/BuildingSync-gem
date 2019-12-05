@@ -71,7 +71,7 @@ module BuildingSync
         standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
 
         # here we adjust the people schedules according to user input of hours per week and weeks per year
-        if building_sections.size > 0
+        if !building_sections.empty?
           adjust_people_schedule(space_type, get_building_section(building_sections, space_type.standardsBuildingType, space_type.standardsSpaceType), model)
         end
         # extend space type name to include the template. Consider this as well for load defs
@@ -93,16 +93,12 @@ module BuildingSync
     end
 
     def get_building_section(building_sections, standard_building_type, standard_space_type)
-      puts "building_sections: #{building_sections}"
-      puts "standard_building_type: #{standard_building_type}"
-      puts "standard_space_type: #{standard_space_type}"
       if building_sections.count == 1
         return building_sections[0]
       end
       building_sections.each do |section|
-        puts "section #{section}"
-        puts "section.occupancy_type #{section.occupancy_type}"
-        if section.occupancy_type == standard_building_type
+        if section.occupancy_type.to_s == standard_building_type.to_s
+          return section if section.space_types
           section.space_types.each do |space_type_name, hash|
             if space_type_name == standard_space_type
               puts "space_type_name #{space_type_name}"
@@ -125,11 +121,11 @@ module BuildingSync
         param_Schedules = OsLib_Parametric_Schedules.new(model)
         param_Schedules.override_hours_per_week(building_section.typical_occupant_usage_value_hours.to_f)
 
-        param_Schedules.pre_process_space_types()
+        param_Schedules.pre_process_space_types
 
-        param_Schedules.create_default_schedule_set()
+        param_Schedules.create_default_schedule_set
 
-        param_Schedules.create_schedules_and_apply_default_schedule_set()
+        param_Schedules.create_schedules_and_apply_default_schedule_set
       end
     end
 

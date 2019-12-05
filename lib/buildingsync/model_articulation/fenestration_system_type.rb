@@ -34,14 +34,27 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+module BuildingSync
+  class FenestrationSystemType
 
-class MeteredEnergy
-  def initialize(energy_resource, interval_frequency, reading_type, interval_readings)
-    @energy_resource = energy_resource
-    @interval_frequency = interval_frequency
-    @reading_type = reading_type
-    @interval_readings = interval_readings
+    def initialize(doc, ns, ref)
+      @fenestration_type = nil
+
+      doc.elements.each("#{ns}:Systems/#{ns}:FenestrationSystems/#{ns}:FenestrationSystem") do |fenestration_system|
+        if fenestration_system.attributes["ID"] == ref
+          read_fenestration_type(fenestration_system, ns)
+        end
+      end
+    end
+
+    def read_fenestration_type(section_element, ns)
+      if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
+        @fenestration_type = "Door"
+      elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
+        @fenestration_type = "Skylight"
+      elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
+        @fenestration_type = "Window"
+      end
+    end
   end
-
-  attr_reader :energy_resource, :interval_frequency, :reading_type, :interval_reading
 end

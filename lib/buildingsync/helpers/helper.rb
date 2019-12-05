@@ -36,7 +36,6 @@
 # *******************************************************************************
 module BuildingSync
   class Helper
-
     def self.get_text_value(xml_element)
       if xml_element
         return xml_element.text

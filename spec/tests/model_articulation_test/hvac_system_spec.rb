@@ -86,5 +86,4 @@ RSpec.describe 'HVACSystemSpec' do
       end
     end
   end
-
 end

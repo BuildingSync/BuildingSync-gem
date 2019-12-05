@@ -40,7 +40,7 @@ RSpec.describe 'LoadSystemSpec' do
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref Pre-1980')
     load_system = BuildingSync::LoadsSystem.new
-    puts 'expected add internal loads : true but got: false} ' if load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', nil,false) != true
+    puts 'expected add internal loads : true but got: false} ' if load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', nil, false) != true
     expect(load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', nil, false)).to be true
   end
 

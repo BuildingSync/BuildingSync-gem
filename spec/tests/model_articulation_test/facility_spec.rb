@@ -133,17 +133,17 @@ RSpec.describe 'FacilitySpec' do
   end
 
   it 'Should return audit_date' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = Date.parse('5/1/2019')
-    puts "expected auditor_contact_id: #{expected_value} but got: #{facility.audit_date} " if facility.audit_date != expected_value
+    facility = get_facility_from_file('report_478.xml', ASHRAE90_1)
+    expected_value = Date.parse('26/10/2019')
+    puts "expected audit_date: #{expected_value} but got: #{facility.audit_date} " if facility.audit_date != expected_value
     expect(facility.audit_date == expected_value).to be true
   end
 
   it 'Should return contact_name' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = 'a contact person'
-    puts "expected contact_name: #{expected_value} but got: #{facility.contact_name} " if facility.contact_name != expected_value
-    expect(facility.contact_name == expected_value).to be true
+    facility = get_facility_from_file('report_478.xml', ASHRAE90_1)
+    expected_value = 'John Doe'
+    puts "expected contact_name: #{expected_value} but got: #{facility.contact_auditor_name} " if facility.contact_auditor_name != expected_value
+    expect(facility.contact_auditor_name == expected_value).to be true
   end
 
   it 'Should return utility_name' do
