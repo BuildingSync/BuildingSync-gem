@@ -96,6 +96,7 @@ RSpec.describe 'BuildingSync' do
       expect(translator.run_osm('CZ01RV2.epw')).to be true
       expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
     rescue StandardError => e
+      puts "e.message #{e.message}"
       expect(e.message.include?('Occupancy type Food service is not available in the bldg_and_system_types.json dictionary')).to be true
     end
   end

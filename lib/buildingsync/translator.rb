@@ -37,8 +37,8 @@
 require 'rexml/document'
 
 require_relative 'model_articulation/spatial_element'
-require_relative 'makers/model_maker_level_zero'
-require_relative 'makers/workflow_maker_phase_zero'
+require_relative 'makers/model_maker'
+require_relative 'makers/workflow_maker'
 require_relative 'selection_tool'
 require_relative 'extension'
 
@@ -241,7 +241,7 @@ module BuildingSync
 
     def choose_model_maker
       # for now there is only one model maker
-      @model_maker = ModelMakerLevelZero.new(@doc, @ns)
+      @model_maker = ModelMaker.new(@doc, @ns)
     end
 
     public

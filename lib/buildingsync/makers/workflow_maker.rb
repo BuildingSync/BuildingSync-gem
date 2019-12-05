@@ -41,7 +41,7 @@ require_relative '../../../lib/buildingsync/extension'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
-  class PhaseZeroWorkflowMaker < WorkflowMaker
+  class WorkflowMaker < WorkflowMakerBase
     @@facility = nil
     def initialize(doc, ns)
       super

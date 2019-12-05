@@ -34,19 +34,51 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require 'fileutils'
-require 'json'
-
+require_relative '../model_articulation/facility'
+require_relative 'workflow_maker'
 module BuildingSync
-  # base class for objects that will configure model maker based on building sync files
-  class ModelMaker
+  class ModelMaker < WorkflowMaker
     def initialize(doc, ns)
-      @doc = doc
-      @ns = ns
+      super
+
+      @facilities = []
+      read_xml
     end
 
-    def generate_baseline; end
+    def read_xml
+      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
+        @facilities.push(Facility.new(facility_element, @ns))
+      end
 
-    def write_osm; end
+      if @facilities.count == 0
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', 'There are no facilities in your BuildingSync file.')
+        raise 'Error: There are no facilities in your BuildingSync file.'
+      elsif @facilities.count > 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
+        raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
+      end
+    end
+
+    def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
+      @facilities.each(&:set_all)
+      open_studio_standard = @facilities[0].determine_open_studio_standard(standard_to_be_used)
+
+      @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used, ddy_file)
+      return write_osm(dir)
+    end
+
+    def get_space_types
+      return @facilities[0].get_space_types
+    end
+
+    def get_model
+      return @facilities[0].get_model
+    end
+
+    private
+
+    def write_osm(dir)
+      @@facility = @facilities[0].write_osm(dir)
+    end
   end
 end

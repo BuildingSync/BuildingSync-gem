@@ -189,9 +189,11 @@ module BuildingSync
             @bldg_type = occ_type[:bldg_type]
             @bar_division_method = occ_type[:bar_division_method]
             @system_type = occ_type[:system_type]
+            return
           end
         end
       end
+      raise "Occupancy type #{occupancy_type} is not available in the bldg_and_system_types.json dictionary"
     end
 
     def validate_positive_number_excluding_zero(name, value)
