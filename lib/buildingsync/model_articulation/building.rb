@@ -52,6 +52,11 @@ module BuildingSync
     def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
       @building_sections = []
       @building_sections_whole_building = []
+      @model = nil
+      @primary_contact_id = nil
+      @all_set = false
+
+      # parameter to read and write.
       @standard_template = nil
       @single_floor_area = 0.0
       @building_rotation = 0.0
@@ -60,7 +65,6 @@ module BuildingSync
       @length = 0.0
       @wwr = 0.0
       @name = nil
-      @model = nil
       # variables not used during read xml for now
       @party_wall_stories_north = 0
       @party_wall_stories_south = 0
@@ -71,7 +75,6 @@ module BuildingSync
       @open_studio_standard = nil
       @ownership = nil
       @occupancy_classification = nil
-      @primary_contact_id = nil
       @year_major_remodel = nil
       @year_of_last_energy_audit = nil
       @year_last_commissioning = nil
@@ -80,8 +83,6 @@ module BuildingSync
       @percent_occupied_by_owner = nil
       @occupant_quantity = nil
       @number_of_units = nil
-      @all_set = false
-
       @fraction_area = 1.0
       # code to initialize
       read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
