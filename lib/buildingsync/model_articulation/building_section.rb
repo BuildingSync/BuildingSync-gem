@@ -49,6 +49,16 @@ module BuildingSync
 
     # initialize
     def initialize(section_element, occ_type, bldg_total_floor_area, ns)
+      @doorIDs = []
+      @wallIDs = []
+      @windowIDs = []
+      @roofIDs = []
+      @skylightIDs = []
+      @exterior_floorIDs = []
+      @foundationIDs = []
+
+
+      # parameter to read and write.
       @fraction_area = nil
       @bldg_type = {}
       @occupancy_classification = nil
@@ -65,14 +75,6 @@ module BuildingSync
       @spaces_conditioned_percent = nil
       @dwelling_quantity = nil
       @dwellings_occupied_percent = nil
-
-      @doorIDs = []
-      @wallIDs = []
-      @windowIDs = []
-      @roofIDs = []
-      @skylightIDs = []
-      @exterior_floorIDs = []
-      @foundationIDs = []
 
       # code to initialize
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
