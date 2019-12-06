@@ -37,11 +37,12 @@
 require_relative '../model_articulation/facility'
 require_relative 'workflow_maker'
 module BuildingSync
-  class ModelMaker < WorkflowMaker
+  class ModelMaker < ModelMakerBase
     def initialize(doc, ns)
       super
 
       @facilities = []
+      @facility = nil
       read_xml
     end
 
@@ -57,6 +58,10 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
         raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
       end
+    end
+
+    def get_facility
+      return @facility
     end
 
     def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
@@ -78,7 +83,7 @@ module BuildingSync
     private
 
     def write_osm(dir)
-      @@facility = @facilities[0].write_osm(dir)
+      @facility = @facilities[0].write_osm(dir)
     end
   end
 end
