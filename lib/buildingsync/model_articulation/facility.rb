@@ -70,16 +70,18 @@ module BuildingSync
       @rate_schedules = nil
       @interval_reading_monthly = []
       @interval_reading_yearly = []
+      @audit_notes = nil
+      @audit_team_notes = nil
+      @spaces_excluded_from_gross_floor_area = nil
+      @premises_notes_for_not_applicable = nil
+
+      # parameter to read and write.
       @energy_resource = nil
       @benchmark_source = nil
       @building_eui = nil
       @building_eui_benchmark = nil
       @energy_cost = nil
       @annual_fuel_use_native_units = 0
-      @audit_notes = nil
-      @audit_team_notes = nil
-      @spaces_excluded_from_gross_floor_area = nil
-      @premises_notes_for_not_applicable = nil
 
       # reading the xml
       read_xml(facility_xml, ns)
