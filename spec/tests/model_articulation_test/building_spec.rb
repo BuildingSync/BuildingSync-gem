@@ -102,7 +102,7 @@ RSpec.describe 'BuildingSpec' do
     expect(building.ownership == expected_value).to be true
   end
 
-  it 'Should return OccupancyClassification' do
+  it 'Should return occupancy_classification' do
     building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
     expected_value = 'Hospital'
     puts "expected occupancy_classification: #{expected_value} but got: #{building.occupancy_classification} " if building.occupancy_classification != expected_value

@@ -52,13 +52,19 @@ module BuildingSync
     def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
       @building_sections = []
       @building_sections_whole_building = []
+      @model = nil
+      @primary_contact_id = nil
+      @all_set = false
+
+      # parameter to read and write.
       @standard_template = nil
       @single_floor_area = 0.0
       @building_rotation = 0.0
       @floor_height = 0.0
+      @width  = 0.0
+      @length = 0.0
       @wwr = 0.0
       @name = nil
-      @model = nil
       # variables not used during read xml for now
       @party_wall_stories_north = 0
       @party_wall_stories_south = 0
@@ -69,7 +75,6 @@ module BuildingSync
       @open_studio_standard = nil
       @ownership = nil
       @occupancy_classification = nil
-      @primary_contact_id = nil
       @year_major_remodel = nil
       @year_of_last_energy_audit = nil
       @year_last_commissioning = nil
@@ -78,8 +83,6 @@ module BuildingSync
       @percent_occupied_by_owner = nil
       @occupant_quantity = nil
       @number_of_units = nil
-      @all_set = false
-
       @fraction_area = 1.0
       # code to initialize
       read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
@@ -256,7 +259,7 @@ module BuildingSync
           next if section.fraction_area.nil?
           building_fraction -= section.fraction_area
         end
-        if building_fraction <= 0.0
+        if building_fraction < 0.0
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
           # TODO: should we also allow for the case where secions take all of the area? == 0
@@ -710,8 +713,8 @@ module BuildingSync
       # create envelope
       # populate bar_hash and create envelope with data from envelope_data_hash and user arguments
       bar_hash = {}
-      bar_hash[:length] = length
-      bar_hash[:width] =  width
+      bar_hash[:length] = @length
+      bar_hash[:width] =  @width
       bar_hash[:num_stories_below_grade] = num_stories_below_grade.to_i
       bar_hash[:num_stories_above_grade] = num_stories_above_grade.to_i
       bar_hash[:floor_height] = floor_height
@@ -831,19 +834,19 @@ module BuildingSync
         # orientation of long and short side of building will vary based on building rotation
 
         # full story ext wall area
-        typical_length_facade_area = length * floor_height
-        typical_width_facade_area = width * floor_height
+        typical_length_facade_area = @length * floor_height
+        typical_width_facade_area = @width * floor_height
 
         # top story ext wall area, may be partial story
         partial_story_multiplier = (1.0 - @num_stories_above_grade.ceil + @num_stories_above_grade)
         area_multiplier = partial_story_multiplier
         edge_multiplier = Math.sqrt(area_multiplier)
-        top_story_length = length * edge_multiplier
-        top_story_width = width * edge_multiplier
+        top_story_length = @length * edge_multiplier
+        top_story_width = @width * edge_multiplier
         top_story_length_facade_area = top_story_length * floor_height
         top_story_width_facade_area = top_story_width * floor_height
 
-        total_exterior_wall_area = 2 * (length + width) * (@num_stories_above_grade.ceil - 1.0) * floor_height + 2 * (top_story_length + top_story_width) * floor_height
+        total_exterior_wall_area = 2 * (@length + @width) * (@num_stories_above_grade.ceil - 1.0) * floor_height + 2 * (top_story_length + top_story_width) * floor_height
         target_party_wall_area = total_exterior_wall_area * @party_wall_fraction
 
         width_counter = 0

@@ -37,8 +37,8 @@
 require 'rexml/document'
 
 require_relative 'model_articulation/spatial_element'
-require_relative 'makers/model_maker_level_zero'
-require_relative 'makers/workflow_maker_phase_zero'
+require_relative 'makers/model_maker'
+require_relative 'makers/workflow_maker'
 require_relative 'selection_tool'
 require_relative 'extension'
 
@@ -111,8 +111,17 @@ module BuildingSync
       choose_model_maker
     end
 
+    def write_parameters_to_xml(xml_file_path = nil)
+
+    end
+
     def write_osm(ddy_file = nil)
       @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
+    end
+
+    def gather_results_and_save_xml(dir, baseline_only = false)
+      gather_results(dir, baseline_only)
+      saveXML(File.join(dir, 'results.xml'))
     end
 
     def gather_results(dir, baseline_only = false)
@@ -120,19 +129,19 @@ module BuildingSync
       dir_split = dir.split(File::SEPARATOR)
       puts "dir_split: #{dir_split}"
       puts "dir_split[]: #{dir_split[dir_split.length - 1]}"
-      if(dir_split[dir_split.length - 1] == "Baseline")
+      if(dir_split[dir_split.length - 1] == 'Baseline')
         dir = dir.gsub('/Baseline','')
       end
       puts "dir: #{dir}"
-      @model_maker.gather_results(dir, baseline_only)
+      @workflow_maker.gather_results(dir, baseline_only)
     end
 
     def save_xml(filename)
-      @model_maker.saveXML(filename)
+      @workflow_maker.saveXML(filename)
     end
 
     def write_osws
-      @model_maker.write_osws(@output_dir)
+      @workflow_maker.write_osws(@model_maker.get_facility, @output_dir)
     end
 
     def clear_all_measures
@@ -180,39 +189,6 @@ module BuildingSync
       workflow = OpenStudio::WorkflowJSON.new
       workflow.setSeedFile(@osm_baseline_path)
       workflow.setWeatherFile(File.join('../../../weather', epw_name))
-      # add open studio results measure
-    #  common_measures_instance = OpenStudio::CommonMeasures::Extension.new
-    #  measure = BCLMeasure.new(File.expand_path(common_measures_instance.root_dir, 'lib/measures/openstudio_results'))
-    #  measure.addAttribute(Attribute.new("__SKIP__", false))
-    #  args_hash = {
-    #      "__SKIP__": false,
-    #      "building_summary_section": true,
-    #      "annual_overview_section": true,
-    #      "monthly_overview_section": true,
-    #      "utility_bills_rates_section": true,
-    #      "envelope_section_section": true,
-    #      "space_type_breakdown_section": true,
-    #      "space_type_details_section": true,
-    #      "interior_lighting_section": true,
-    #      "plug_loads_section": true,
-    #      "exterior_light_section": true,
-    #      "water_use_section": true,
-    #      "hvac_load_profile": true,
-    #      "zone_condition_section": true,
-    #      "zone_summary_section": true,
-    #      "zone_equipment_detail_section": true,
-    #      "air_loops_detail_section": true,
-    #      "plant_loops_detail_section": true,
-    #      "outdoor_air_section": true,
-    #      "cost_summary_section": true,
-    #      "source_energy_section": true,
-    #      "schedules_overview_section": true,
-    #      "reg_monthly_details": true
-    #  }
-    #  new_step = {}
-    #  new_step['measure_dir_name'] = "openstudio_results"
-    #  new_step['arguments'] = args_hash
-    #  workflow.addMeasure(measure)
 
       osw_path = osm_baseline_path.gsub('.osm', '.osw')
       workflow.saveAs(File.absolute_path(osw_path.to_s))
@@ -223,28 +199,32 @@ module BuildingSync
       return runner.run_osw(osw_path, osm_baseline_dir)
     end
 
-    def run_osws()
+    def run_osws(runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
       osw_files = []
       osw_sr_files = []
       Dir.glob("#{@output_dir}/**/*.osw") { |osw| osw_files << osw }
       Dir.glob("#{@output_dir}/SR/*.osw") { |osw| osw_sr_files << osw }
 
-
       extension = OpenStudio::Extension::Extension.new
-      runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY}
       runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
       puts "osw_files - osw_sr_files #{osw_files - osw_sr_files}"
       return runner.run_osws(osw_files - osw_sr_files)
+    end
+
+    def get_failed_scenarios
+      return @workflow_maker.get_failed_scenarios
     end
 
     private
 
     def choose_model_maker
       # for now there is only one model maker
-      @model_maker = ModelMakerLevelZero.new(@doc, @ns)
+      @model_maker = ModelMaker.new(@doc, @ns)
+      @workflow_maker = WorkflowMaker.new(@doc, @ns)
     end
 
     public
+
     attr_reader :osm_baseline_path
   end
 end

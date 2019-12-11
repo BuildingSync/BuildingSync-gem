@@ -49,6 +49,16 @@ module BuildingSync
 
     # initialize
     def initialize(section_element, occ_type, bldg_total_floor_area, ns)
+      @doorIDs = []
+      @wallIDs = []
+      @windowIDs = []
+      @roofIDs = []
+      @skylightIDs = []
+      @exterior_floorIDs = []
+      @foundationIDs = []
+
+
+      # parameter to read and write.
       @fraction_area = nil
       @bldg_type = {}
       @occupancy_classification = nil
@@ -65,14 +75,6 @@ module BuildingSync
       @spaces_conditioned_percent = nil
       @dwelling_quantity = nil
       @dwellings_occupied_percent = nil
-
-      @doorIDs = []
-      @wallIDs = []
-      @windowIDs = []
-      @roofIDs = []
-      @skylightIDs = []
-      @exterior_floorIDs = []
-      @foundationIDs = []
 
       # code to initialize
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
@@ -111,12 +113,6 @@ module BuildingSync
     end
 
     def read_building_section_other_detail(section_element, ns)
-      if section_element.elements["#{ns}:OccupancyClassification"]
-        @occupancy_classification = section_element.elements["#{ns}:OccupancyClassification"].text
-      else
-        @occupancy_classification = nil
-      end
-
       if section_element.elements["#{ns}:TypicalOccupantUsages"]
         section_element.elements.each("#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage") do |occ_usage|
           if occ_usage.elements["#{ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'

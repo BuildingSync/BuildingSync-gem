@@ -43,6 +43,11 @@ module BuildingSync
       # an array that contains all the buildings
       @buildings = []
       @largest_building = nil
+      @premises_notes = nil
+      @all_set = false
+
+
+      # parameter to read and write.
       @climate_zone = nil
       @climate_zone_ashrae = nil
       @climate_zone_ca_t24 = nil
@@ -54,8 +59,7 @@ module BuildingSync
       @longitude = nil
       @street_address = nil
       @postal_code = nil
-      @premises_notes = nil
-      @all_set = false
+
 
       # TM: just use the XML snippet to search for the buildings on the site
       read_xml(build_element, ns)

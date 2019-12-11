@@ -43,6 +43,10 @@ RSpec.describe 'BuildingSync' do
     test_baseline_creation('building_151.xml', ASHRAE90_1)
   end
 
+  #it 'should parse and write L100.xml (phase zero) with auc namespace for ASHRAE 90.1' do
+  #  test_baseline_creation('L100_Instance1.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  #end
+
   it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace for Title24' do
     test_baseline_creation('building_151_n1.xml', CA_TITLE24)
   end
@@ -51,6 +55,7 @@ RSpec.describe 'BuildingSync' do
     begin
       test_baseline_creation('DC GSA Headquarters.xml', CA_TITLE24, 'CZ01RV2.epw')
     rescue StandardError => e
+      puts "rescued StandardError: #{e.message}"
       expect(e.message.include?("Did not find a class called 'CBES Pre-1978_LargeOffice' to create in")).to be true
     end
   end
@@ -80,15 +85,15 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
-    it 'should parse and write AT_example_property_report_25.xml (phase zero) with ASHRAE 90.1' do
-     begin
-        test_baseline_creation('AT_example_property_report_25.xml', ASHRAE90_1, 'CZ01RV2.epw')
-     rescue StandardError => e
-       expect(e.message.include?('Error: There is more than one (3) building attached to this site in your BuildingSync file.')).to be true
-     end
+  it 'should parse and write AT_example_property_report_25.xml (phase zero) with ASHRAE 90.1' do
+    begin
+      test_baseline_creation('AT_example_property_report_25.xml', ASHRAE90_1, 'CZ01RV2.epw')
+    rescue StandardError => e
+      expect(e.message.include?('Error: There is more than one (3) building attached to this site in your BuildingSync file.')).to be true
     end
+  end
 
-    it 'should parse and write report_478.xml (phase zero) with ASHRAE 90.1' do
-        test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
-    end
+  #it 'should parse and write report_478.xml (phase zero) with ASHRAE 90.1' do
+  #  test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  #end
 end

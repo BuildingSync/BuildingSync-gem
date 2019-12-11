@@ -1002,7 +1002,8 @@
 					</auc:UserDefinedFields>
 				</auc:Measure>
 			</auc:Measures>
-			<auc:Report>
+			<auc:Reports>
+				<auc:Report>
 				<auc:AuditorContactID>123</auc:AuditorContactID>
 				<auc:AuditDate>5/1/2019</auc:AuditDate>
 				<auc:Scenarios>
@@ -1684,6 +1685,7 @@
 					</auc:Scenario>
 				</auc:Scenarios>
 			</auc:Report>
+			</auc:Reports>
 			<auc:Contacts>
 				<auc:Contact>
 					<auc:ContactName>a contact person</auc:ContactName>
