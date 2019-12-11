@@ -124,7 +124,7 @@ module BuildingSync
       saveXML(File.join(dir, 'results.xml'))
     end
 
-    def gather_results(dir, baseline_only = false)
+    def gather_results_and_save_xml(dir, filename, baseline_only = false)
       puts "dir: #{dir}"
       dir_split = dir.split(File::SEPARATOR)
       puts "dir_split: #{dir_split}"
@@ -134,9 +134,6 @@ module BuildingSync
       end
       puts "dir: #{dir}"
       @workflow_maker.gather_results(dir, baseline_only)
-    end
-
-    def save_xml(filename)
       @workflow_maker.saveXML(filename)
     end
 
