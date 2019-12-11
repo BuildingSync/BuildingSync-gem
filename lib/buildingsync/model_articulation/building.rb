@@ -23,7 +23,7 @@
 # specific prior written permission from Alliance for Sustainable Energy, LLC.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER(S) AND ANY CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO
 # THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 # ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER(S), ANY CONTRIBUTORS, THE
 # UNITED STATES GOVERNMENT, OR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
@@ -367,9 +367,7 @@ module BuildingSync
     end
 
     def set_bldg_and_system_type_for_building_and_section
-      @building_sections.each do |section|
-        section.set_bldg_and_system_type
-      end
+      @building_sections.each(&:set_bldg_and_system_type)
 
       set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
     end
@@ -939,6 +937,32 @@ module BuildingSync
 
     def write_osm(dir)
       @model.save("#{dir}/in.osm", true)
+    end
+
+    def write_parameters_to_xml(ns, xml_file_path = nil)
+      doc = read_xml_file_document(xml_file_path)
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building|
+
+        building.elements["#{ns}:PremisesName"].text = @name
+        building.elements["#{ns}:YearOfConstruction"].text = @built_year
+        building.elements["#{ns}:Ownership"].text = @ownership
+        building.elements["#{ns}:OccupancyClassification"].text = @occupancy_classification
+        building.elements["#{ns}:YearOfLastMajorRemodel"].text = @year_major_remodel
+        building.elements["#{ns}:YearOfLastEnergyAudit"].text = @year_of_last_energy_audit
+        building.elements["#{ns}:RetrocommissioningDate"].text = @year_last_commissioning
+        building.elements["#{ns}:BuildingAutomationSystem"].text = @building_automation_system
+        building.elements["#{ns}:HistoricalLandmark"].text = @historical_landmark
+        building.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity
+        building.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text = @number_of_units
+      end
+    end
+
+    def read_xml_file_document(xml_file_path)
+      doc = nil
+      File.open(xml_file_path, 'r') do |file|
+        doc = REXML::Document.new(file)
+      end
+      return doc
     end
 
     def get_space_types

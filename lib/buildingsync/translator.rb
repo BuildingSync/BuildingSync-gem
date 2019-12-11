@@ -88,9 +88,7 @@ module BuildingSync
         puts "File '#{xml_file_path}' was not validated against the BuildingSync schema"
       end
 
-      File.open(xml_file_path, 'r') do |file|
-        @doc = REXML::Document.new(file)
-      end
+      @doc = read_xml_file_document(xml_file_path)
 
       # test for the namespace
       @ns = 'auc'
@@ -112,6 +110,7 @@ module BuildingSync
     end
 
     def write_parameters_to_xml(xml_file_path = nil)
+      doc = read_xml_file_document(xml_file_path)
 
     end
 
@@ -119,13 +118,21 @@ module BuildingSync
       @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
     end
 
+    def read_xml_file_document(xml_file_path)
+      doc = nil
+      File.open(xml_file_path, 'r') do |file|
+        doc = REXML::Document.new(file)
+      end
+      return doc
+    end
+
     def gather_results(dir, baseline_only = false)
       puts "dir: #{dir}"
       dir_split = dir.split(File::SEPARATOR)
       puts "dir_split: #{dir_split}"
       puts "dir_split[]: #{dir_split[dir_split.length - 1]}"
-      if(dir_split[dir_split.length - 1] == "Baseline")
-        dir = dir.gsub('/Baseline','')
+      if(dir_split[dir_split.length - 1] == 'Baseline')
+        dir = dir.gsub('/Baseline', '')
       end
       puts "dir: #{dir}"
       @model_maker.gather_results(dir, baseline_only)
