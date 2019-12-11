@@ -67,23 +67,11 @@ RSpec.describe 'BuildingSync' do
 
     expect(osw_files.size).to eq 32
 
-    if BuildingSync::Extension::DO_SIMULATIONS
-      num_sims = 0
-      Parallel.each(osw_files, in_threads: [BuildingSync::Extension::NUM_PARALLEL, BuildingSync::Extension::MAX_DATAPOINTS].min) do |osw|
-        break if num_sims > BuildingSync::Extension::MAX_DATAPOINTS
+    translator.run_osws
 
-        cmd = "\"#{BuildingSync::OPENSTUDIO_EXE}\" run -w \"#{osw}\""
-        puts "Running cmd: #{cmd}"
-        result = system(cmd)
-        expect(result).to be true
+    translator.gather_results(out_path)
+    translator.save_xml(File.join(out_path, 'results.xml'))
 
-        num_sims += 1
-      end
-
-      translator.gather_results(out_path)
-      translator.save_xml(File.join(out_path, 'results.xml'))
-
-      expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
-    end
+    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
   end
 end

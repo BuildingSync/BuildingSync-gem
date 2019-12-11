@@ -42,7 +42,7 @@ require_relative 'model_maker_base'
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class WorkflowMakerBase < ModelMakerBase
-    def write_osws(dir)
+    def write_osws(facility, dir)
       FileUtils.mkdir_p(dir)
     end
 
