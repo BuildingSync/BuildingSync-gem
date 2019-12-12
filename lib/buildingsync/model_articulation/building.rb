@@ -56,6 +56,7 @@ module BuildingSync
       @primary_contact_id = nil
       @all_set = false
 
+
       # parameter to read and write.
       @standard_template = nil
       @single_floor_area = 0.0
@@ -974,6 +975,9 @@ module BuildingSync
         end
         if !@number_of_units.nil?
           building.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text = @number_of_units
+        end
+        if !@percent_occupied_by_owner.nil?
+          building.elements["#{ns}:PercentOccupiedByOwner"].text = @percent_occupied_by_owner
         end
       end
     end
