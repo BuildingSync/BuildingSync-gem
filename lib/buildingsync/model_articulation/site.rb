@@ -102,9 +102,7 @@ module BuildingSync
     def set_all
       if !@all_set
         @all_set = true
-        @buildings.each do |building|
-          building.set_all
-        end
+        @buildings.each(&:set_all)
       end
     end
 
@@ -272,6 +270,50 @@ module BuildingSync
       scenario_types['bldg_type'] = get_building_type
       scenario_types['template'] = get_building_template
       return scenario_types
+    end
+
+    def write_parameters_to_xml(ns, xml_file_path = nil)
+      doc = read_xml_file_document(xml_file_path)
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site") do |site|
+          if !@climate_zone_ashrae.nil?
+            site.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text = @climate_zone_ashrae
+          end
+          if !@climate_zone_ca_t24.nil?
+            site.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text = @climate_zone_ca_t24
+          end
+          if !@weather_file_name.nil?
+            site.elements["#{ns}:WeatherStationName"].text = @weather_file_name
+          end
+          if !@weather_station_id.nil?
+            site.elements["#{ns}:WeatherDataStationID"].text = @weather_station_id
+          end
+          if !@city_name.nil?
+            site.elements["#{ns}:Address/#{ns}:City"].text = @city_name
+          end
+          if !@state_name.nil?
+            site.elements["#{ns}:Address/#{ns}:State"].text = @state_name
+          end
+          if !@street_address.nil?
+            site.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"].text = @street_address
+          end
+          if !@postal_code.nil?
+            site.elements["#{ns}:Address/#{ns}:PostalCode"].text = @postal_code
+          end
+          if !@latitude.nil?
+            site.elements["#{ns}:Latitude"].text = @latitude
+          end
+          if !@longitude.nil?
+            site.elements["#{ns}:Longitude"].text = @longitude
+          end
+        end
+    end
+
+    def read_xml_file_document(xml_file_path)
+      doc = nil
+      File.open(xml_file_path, 'r') do |file|
+        doc = REXML::Document.new(file)
+      end
+      return doc
     end
   end
 end
