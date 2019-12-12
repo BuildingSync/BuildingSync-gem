@@ -942,18 +942,39 @@ module BuildingSync
     def write_parameters_to_xml(ns, xml_file_path = nil)
       doc = read_xml_file_document(xml_file_path)
       doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building|
-
-        building.elements["#{ns}:PremisesName"].text = @name
-        building.elements["#{ns}:YearOfConstruction"].text = @built_year
-        building.elements["#{ns}:Ownership"].text = @ownership
-        building.elements["#{ns}:OccupancyClassification"].text = @occupancy_classification
-        building.elements["#{ns}:YearOfLastMajorRemodel"].text = @year_major_remodel
-        building.elements["#{ns}:YearOfLastEnergyAudit"].text = @year_of_last_energy_audit
-        building.elements["#{ns}:RetrocommissioningDate"].text = @year_last_commissioning
-        building.elements["#{ns}:BuildingAutomationSystem"].text = @building_automation_system
-        building.elements["#{ns}:HistoricalLandmark"].text = @historical_landmark
-        building.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity
-        building.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text = @number_of_units
+        if !@name.nil?
+          building.elements["#{ns}:PremisesName"].text = @name
+        end
+        if !@built_year.nil?
+          building.elements["#{ns}:YearOfConstruction"].text = @built_year
+        end
+        if !@ownership.nil?
+          building.elements["#{ns}:Ownership"].text = @ownership
+        end
+        if !@occupancy_classification.nil?
+          building.elements["#{ns}:OccupancyClassification"].text = @occupancy_classification
+        end
+        if !@year_major_remodel.nil?
+          building.elements["#{ns}:YearOfLastMajorRemodel"].text = @year_major_remodel
+        end
+        if !@year_of_last_energy_audit.nil?
+          building.elements["#{ns}:YearOfLastEnergyAudit"].text = @year_of_last_energy_audit
+        end
+        if !@year_last_commissioning.nil?
+          building.elements["#{ns}:RetrocommissioningDate"].text = @year_last_commissioning
+        end
+        if !@building_automation_system.nil?
+          building.elements["#{ns}:BuildingAutomationSystem"].text = @building_automation_system
+        end
+        if !@historical_landmark.nil?
+          building.elements["#{ns}:HistoricalLandmark"].text = @historical_landmark
+        end
+        if !@occupant_quantity.nil?
+          building.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity
+        end
+        if !@number_of_units.nil?
+          building.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text = @number_of_units
+        end
       end
     end
 
