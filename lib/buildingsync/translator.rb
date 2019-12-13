@@ -105,8 +105,9 @@ module BuildingSync
         raise 'BuildingSync file must have exactly 1 facility'
       end
 
-      # choose the correct model maker based on xml
-      choose_model_maker
+      # we use only one model maker and one workflow maker that we set init here
+      @model_maker = ModelMaker.new(@doc, @ns)
+      @workflow_maker = WorkflowMaker.new(@doc, @ns)
     end
 
     def write_parameters_to_xml(xml_file_path = nil)
@@ -152,27 +153,27 @@ module BuildingSync
     end
 
     def clear_all_measures
-      @model_maker.clear_all_measures
+      @workflow_maker.clear_all_measures
     end
 
     def add_measure_path(measure_path)
-      @model_maker.add_measure_path(measure_path)
+      @workflow_maker.add_measure_path(measure_path)
     end
 
     def insert_energyplus_measure(measure_dir, position = 0, args_hash = {})
-      @model_maker.insert_energyplus_measure(measure_dir, position, args_hash)
+      @workflow_maker.insert_energyplus_measure(measure_dir, position, args_hash)
     end
 
     def insert_model_measure(measure_dir, position = 0, args_hash = {})
-      @model_maker.insert_model_measure(measure_dir, position, args_hash)
+      @workflow_maker.insert_model_measure(measure_dir, position, args_hash)
     end
 
     def insert_reporting_measure(measure_dir, position = 0, args_hash = {})
-      @model_maker.insert_reporting_measure(measure_dir, position, args_hash)
+      @workflow_maker.insert_reporting_measure(measure_dir, position, args_hash)
     end
 
     def get_workflow
-      @model_maker.get_workflow
+      @workflow_maker.get_workflow
     end
 
     def get_space_types
@@ -220,14 +221,6 @@ module BuildingSync
 
     def get_failed_scenarios
       return @workflow_maker.get_failed_scenarios
-    end
-
-    private
-
-    def choose_model_maker
-      # for now there is only one model maker
-      @model_maker = ModelMaker.new(@doc, @ns)
-      @workflow_maker = WorkflowMaker.new(@doc, @ns)
     end
 
     public
