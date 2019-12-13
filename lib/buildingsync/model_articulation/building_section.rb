@@ -184,8 +184,57 @@ module BuildingSync
       end
     end
 
+    def write_parameters_to_xml(ns, xml_file_path = nil)
+      doc = read_xml_file_document(xml_file_path)
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building/#{ns}:Sections/#{ns}:Section") do |buildingSection|
+
+        buildingSection.elements["#{ns}:fraction_area"].text = @fraction_area
+        if !@occupancy_classification_original.nil?
+        buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @occupancy_classification_original
+        end
+        if !@principal_hvac_type.nil?
+          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_hvac_type
+        end
+        if !@principal_lighting_system_type.nil?
+          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_lighting_system_type
+        end
+        if !@miscellaneous_electric_load.nil?
+          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @miscellaneous_electric_load
+        end
+        if !@spaces_conditioned_percent.nil?
+          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @spaces_conditioned_percent
+        end
+        if !@dwelling_quantity.nil?
+          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwelling_quantity
+        end
+        if !@dwellings_occupied_percent.nil?
+          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwellings_occupied_percent
+        end
+        if !@typical_occupant_usage_value_hours.nil?
+          buildingSection.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_hours
+        end
+        if !@typical_occupant_usage_value_weeks.nil?
+          buildingSection.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_weeks
+        end
+        if !@occupant_quantity.nil?
+          buildingSection.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity
+          end
+        if !@footprint_shape.nil?
+          buildingSection.elements["#{ns}:FootprintShape"].text = @footprint_shape
+        end
+      end
+    end
+
     def set_bldg_and_system_type
       super(@occupancy_type, @total_floor_area, false)
+    end
+
+    def read_xml_file_document(xml_file_path)
+      doc = nil
+      File.open(xml_file_path, 'r') do |file|
+        doc = REXML::Document.new(file)
+      end
+      return doc
     end
 
     attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type

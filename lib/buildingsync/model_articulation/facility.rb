@@ -368,6 +368,42 @@ module BuildingSync
       return scenario_types
     end
 
+    def write_parameters_to_xml(ns, xml_file_path = nil)
+      doc = read_xml_file_document(xml_file_path)
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility|
+        report = facility.elements["#{ns}:Reports/#{ns}:Report"]
+        report.elements.each("#{ns}:Scenarios/#{ns}:Scenario") do |scenario|
+          if !@energy_resource.nil?
+            scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"].text = @energy_resource
+          end
+          if !@benchmark_source.nil?
+            scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"].text = @benchmark_source
+          end
+          if !@building_eui.nil?
+            scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text = @building_eui
+          end
+          if !@building_eui_benchmark.nil?
+            scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text = @building_eui_benchmark
+          end
+          if !@energy_cost.nil?
+            scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"].text = @energy_cost
+          end
+          if !@annual_fuel_use_native_units.nil?
+            scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"].text = @annual_fuel_use_native_units
+          end
+          end
+
+      end
+    end
+
+    def read_xml_file_document(xml_file_path)
+      doc = nil
+      File.open(xml_file_path, 'r') do |file|
+        doc = REXML::Document.new(file)
+      end
+      return doc
+    end
+
     def get_model
       return @sites[0].get_model
     end
