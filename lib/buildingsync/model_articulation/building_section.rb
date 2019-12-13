@@ -61,9 +61,7 @@ module BuildingSync
       # parameter to read and write.
       @fraction_area = nil
       @bldg_type = {}
-      @occupancy_classification = nil
       @occupancy_classification_original = nil
-      @floor_area_value = nil
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
       @occupant_quantity = nil

@@ -58,7 +58,6 @@ module BuildingSync
 
       # parameter to read and write.
       @standard_template = nil
-      @single_floor_area = 0.0
       @building_rotation = 0.0
       @floor_height = 0.0
       @width  = 0.0
@@ -135,14 +134,7 @@ module BuildingSync
     end
 
     def set_width_and_length
-      footprint = nil
-      # handle user-assigned single floor plate size condition
-      if @single_floor_area > 0.0
-        footprint = OpenStudio.convert(@single_floor_area, 'ft2', 'm2')
-        @total_floor_area = footprint * num_stories.to_f
-      else
-        footprint = @total_floor_area / num_stories.to_f
-      end
+      footprint = @total_floor_area / num_stories.to_f
       @width = Math.sqrt(footprint / @ns_to_ew_ratio)
       @length = footprint / @width
     end
@@ -700,7 +692,7 @@ module BuildingSync
 
       # set building rotation
       initial_rotation = @model.getBuilding.northAxis
-      if building_rotation != initial_rotation
+      if @building_rotation != initial_rotation
         @model.getBuilding.setNorthAxis(building_rotation)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "Set Building Rotation to #{@model.getBuilding.northAxis}")
       end
@@ -788,7 +780,7 @@ module BuildingSync
       # test for excessive exterior roof area (indication of problem with intersection and or surface matching)
       ext_roof_area = @model.getBuilding.exteriorSurfaceArea - @model.getBuilding.exteriorWallArea
       expected_roof_area = total_floor_area / num_stories.to_f
-      if ext_roof_area > expected_roof_area && @single_floor_area == 0.0 # only test if using whole-building area input
+      if ext_roof_area > expected_roof_area # only test if using whole-building area input
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', 'Roof area larger than expected, may indicate problem with inter-floor surface intersection or matching.')
         return false
       end
