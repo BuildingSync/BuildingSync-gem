@@ -53,7 +53,6 @@ module BuildingSync
       @model_maker = nil
       @workflow_maker = nil
       @output_dir = output_dir
-      @scenario_types = nil
       @standard_to_be_used = standard_to_be_used
       @epw_path = epw_file_path
       @osm_baseline_path = nil

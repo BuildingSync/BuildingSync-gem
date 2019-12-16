@@ -12,6 +12,7 @@ matrix:
     - env: FAVOR_LOCAL_GEMS=1 OPENSTUDIO_VERSION=2.9.0 OPENSTUDIO_SHA=801faa459c RUBYLIB=/usr/local/openstudio-2.9.0/Ruby:/usr/Ruby
 before_install:
   - gem install bundler -v '~> 1.17'
+  - bundle -v
   - sudo rm /usr/local/bin/docker-compose
 install: 
   - bundle install
