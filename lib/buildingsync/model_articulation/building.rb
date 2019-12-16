@@ -54,8 +54,8 @@ module BuildingSync
       @building_sections_whole_building = []
       @model = nil
       @primary_contact_id = nil
+      @ID = nil
       @all_set = false
-
 
       # parameter to read and write.
       @standard_template = nil
@@ -93,6 +93,10 @@ module BuildingSync
     end
 
     def read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
+      # building ID
+      if build_element.attributes['ID']
+        @ID = build_element.attributes['ID']
+      end
       # floor areas
       read_floor_areas(build_element, site_total_floor_area, ns)
       # standard template

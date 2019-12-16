@@ -39,7 +39,7 @@ module BuildingSync
     def initialize(system_element = nil, ns = '')
       # code to initialize
       @primary_hvac_system_type = nil
-
+      @linked_building_part = nil
       read_xml(system_element, ns) if system_element
     end
 
@@ -48,6 +48,10 @@ module BuildingSync
         @primary_hvac_system_type = system_element.elements["#{ns}:PrimaryHVACSystemType"].text
       else
         @primary_hvac_system_type = nil
+      end
+
+      if system_element.elements["#{ns}:LinkedPremises"] && system_element.elements["#{ns}:LinkedPremises/#{ns}:Building"]
+        @linked_building_part = system_element.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref']
       end
     end
 
@@ -104,6 +108,10 @@ module BuildingSync
       # remove HVAC objects
       if remove_objects
         standard.model_remove_prm_hvac(model)
+      end
+
+      if @primary_hvac_system_type.nil?
+        system_type = @primary_hvac_system_type
       end
 
       case system_type
