@@ -57,6 +57,7 @@ module BuildingSync
       @standard_to_be_used = standard_to_be_used
       @epw_path = epw_file_path
       @osm_baseline_path = nil
+      @facilities = []
 
       # to further reduce the log messages we can change the log level with this command
       # OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Error)
@@ -97,10 +98,14 @@ module BuildingSync
       end
 
       # validate the doc
-      facilities = []
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") { |facility| facilities << facility }
+      facilities_arr = []
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
+        facilities_arr << facility
+        @facilities.push(Facility.new(facility, @ns))
+      end
+
       # raise 'BuildingSync file must have exactly 1 facility' if facilities.size != 1
-      if facilities.size != 1
+      if facilities_arr.size != 1
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', 'BuildingSync file must have exactly 1 facility')
         raise 'BuildingSync file must have exactly 1 facility'
       end
@@ -111,8 +116,9 @@ module BuildingSync
     end
 
     def write_parameters_to_xml(xml_file_path = nil)
-      doc = read_xml_file_document(xml_file_path)
-
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
+        @facilities[0].write_parameters_to_xml(@ns, facility)
+      end
     end
 
     def write_osm(ddy_file = nil)

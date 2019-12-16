@@ -934,6 +934,7 @@ module BuildingSync
 
     def write_parameters_to_xml(ns, xml_file_path = nil)
       doc = read_xml_file_document(xml_file_path)
+
       doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building|
         if !@name.nil?
           building.elements["#{ns}:PremisesName"].text = @name
@@ -971,6 +972,20 @@ module BuildingSync
         if !@percent_occupied_by_owner.nil?
           building.elements["#{ns}:PercentOccupiedByOwner"].text = @percent_occupied_by_owner
         end
+
+        # Add new element in the XML file
+        add_element_in_xml_file(building, ns, 'StandardTemplate', @standard_template)
+        add_element_in_xml_file(building, ns, 'BuildingRotation', @building_rotation)
+        add_element_in_xml_file(building, ns, 'FloorHeight', @floor_height)
+        add_element_in_xml_file(building, ns, 'WindowWallRatio', @wwr)
+        add_element_in_xml_file(building, ns, 'PartyWallStoriesNorth', @party_wall_stories_north)
+        add_element_in_xml_file(building, ns, 'PartyWallStoriesSouth', @party_wall_stories_south)
+        add_element_in_xml_file(building, ns, 'PartyWallStoriesEast', @party_wall_stories_east)
+        add_element_in_xml_file(building, ns, 'PartyWallStoriesWest', @party_wall_stories_west)
+        add_element_in_xml_file(building, ns, 'Width', @width)
+        add_element_in_xml_file(building, ns, 'Length', @length)
+        add_element_in_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
+        add_element_in_xml_file(building, ns, 'FractionArea', @fraction_area)
       end
     end
 
@@ -979,7 +994,28 @@ module BuildingSync
       File.open(xml_file_path, 'r') do |file|
         doc = REXML::Document.new(file)
       end
-      return doc
+      doc
+    end
+
+    def add_element_in_xml_file(building_element, ns, field_name, field_value)
+      user_defined_fields = REXML::Element.new("#{ns}:UserDefinedFields")
+      user_defined_field = REXML::Element.new("#{ns}:UserDefinedField")
+      field_name_element = REXML::Element.new("#{ns}:FieldName")
+      field_value_element = REXML::Element.new("#{ns}:FieldValue")
+
+      if !field_value.nil?
+        if !building_element.elements["#{ns}:UserDefinedFields"]
+          user_defined_fields.add_element(user_defined_field)
+          building_element.add_element(user_defined_fields)
+        end
+
+        usr_def_field = building_element.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedFields"]
+        field_name_element.text = field_name
+        field_value_element.text = field_value
+
+        usr_def_field.add_element(field_name_element)
+        usr_def_field.add_element(field_value_element)
+      end
     end
 
     def get_space_types
