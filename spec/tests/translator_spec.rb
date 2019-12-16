@@ -108,7 +108,7 @@ RSpec.describe 'BuildingSync' do
     epw_file_path = nil
 
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, CA_TITLE24)
-    translator.insert_reporting_measure('hourly_consumption_by_fuel_to_csv', 0)
+    translator.insert_reporting_measure('openstudio_results', 0)
     translator.write_osm
     translator.write_osws
     osw_files = []
