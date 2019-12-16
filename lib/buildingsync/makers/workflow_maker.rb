@@ -52,7 +52,7 @@ module BuildingSync
 
       # log failed scenarios
       @failed_scenarios = []
-      @scenario_types = nil
+      @scenarios = nil
 
       # select base osw for standalone, small office, medium office
       base_osw = 'phase_zero_base.osw'
@@ -70,7 +70,7 @@ module BuildingSync
       common_measures_instance = OpenStudio::CommonMeasures::Extension.new
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
       bldg_sync_instance = BuildingSync::Extension.new
-      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir]
+      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, 'R:\NREL\edv-experiment-1\.bundle\install\ruby\2.2.0\gems\openstudio-standards-0.2.9\lib']
     end
 
     def insert_energyplus_measure(measure_dir, item = 0, args_hash = {})
@@ -285,23 +285,42 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_for_scenario', "#{measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{measure_ids}") if num_measures != measure_ids.size
     end
 
+    def get_scenarios
+      if @scenarios.nil?
+        @scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"].to_a.select { |element| element.is_a? REXML::Element }
+        puts "Scenarios 1: #{@scenarios}"
+        if @scenarios.nil?
+          @scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility#{@ns}:Report/#{@ns}:Scenarios"].to_a.select { |element| element.is_a? REXML::Element }
+          puts "Scenarios 2: #{@scenarios}"
+        end
+        if @scenarios.nil?
+          puts 'No scenarios found in your BuildingSync XML file!'
+        end
+      end
+      return @scenarios
+    end
+
     def write_osws(facility, dir)
       super
 
       @facility = facility
+      scenarios = get_scenarios
       # ensure there is a 'Baseline' scenario
+      puts 'Looking for the baseline scenario ...'
       found_baseline = false
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      scenarios.each do |scenario|
+        puts "scenario in write osws #{scenario}"
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+        puts "scenario with name #{scenario_name} found"
         if scenario_name == 'Baseline'
           found_baseline = true
+          puts '.....found the baseline scenario'
           break
         end
       end
 
       if !found_baseline
-        scenarios_element = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"]
-        if !scenarios_element.nil?
+        if !scenarios.nil?
           scenario_element = REXML::Element.new("#{@ns}:Scenario")
           scenario_element.attributes['ID'] = 'Baseline'
 
@@ -317,12 +336,13 @@ module BuildingSync
           scenario_type_element.add_element(package_of_measures_element)
           scenario_element.add_element(scenario_type_element)
 
-          scenarios_element.add_element(scenario_element)
+          scenarios.add_element(scenario_element)
+          puts '.....adding a new baseline scenario'
         end
       end
 
       found_baseline = false
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      scenarios.each do |scenario|
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         if scenario_name == 'Baseline'
           found_baseline = true
@@ -336,11 +356,10 @@ module BuildingSync
       end
 
       # write an osw for each scenario
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+      scenarios.each do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         next if scenario_name == 'Measured'
-        next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
         # deep clone
         osw = JSON.load(JSON.generate(@workflow))
@@ -403,7 +422,7 @@ module BuildingSync
 
         scenarios_found = false
         # write an osw for each scenario
-        @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+        get_scenarios.each do |scenario|
           scenarios_found = true
           # get information about the scenario
           scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
@@ -435,7 +454,6 @@ module BuildingSync
           File.open(path, 'r') do |file|
             results[scenario_name] = JSON.parse(file.read, symbolize_names: true)
           end
-  
           # open results.json to get monthly timeseries
           # just grabbed openstudio_results
           path2 = File.join(osw_dir, 'results.json')
@@ -446,17 +464,17 @@ module BuildingSync
         end
 
         if !baseline_only
-          @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+          get_scenarios.each do |scenario|
             scenarios_found = true
             # get information about the scenario
             scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
             next if scenario_name == 'Measured'
             next if scenario_name == 'Baseline'
-  
+
             puts "scenario_name #{scenario_name} should not be Baseline here!!"
             results_counter += 1
             package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
-  
+
             # delete previous results
             package_of_measures.elements.delete("#{@ns}:AnnualSavingsSiteEnergy")
             package_of_measures.elements.delete("#{@ns}:AnnualSavingsCost")
@@ -465,10 +483,10 @@ module BuildingSync
             scenario.elements.delete("#{@ns}AllResourceTotals")
             scenario.elements.delete("#{@ns}RsourceUses")
             scenario.elements.delete("#{@ns}AnnualSavingsByFuels")
-  
+
             result = results[scenario_name]
             baseline = results['Baseline']
-  
+
             if result.nil?
               puts "Cannot load results for scenario #{scenario_name}, because the result is nil"
               @failed_scenarios << scenario_name
@@ -777,8 +795,8 @@ module BuildingSync
         end
 
         puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
-      rescue StandardError
-        puts "An error occured while processing results in #{dir}"
+      rescue StandardError => e
+        puts "The following error occurred #{e.message} while processing results in #{dir}"
       end
 
       if results_counter > 0
