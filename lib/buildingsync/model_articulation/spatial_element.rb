@@ -138,18 +138,13 @@ module BuildingSync
       field_value_element = REXML::Element.new("#{ns}:FieldValue")
 
       if !field_value.nil?
-        if !building_element.elements["#{ns}:UserDefinedFields"]
-          user_defined_fields.add_element(user_defined_field)
-          building_element.add_element(user_defined_fields)
-        end
-
-        usr_def_field = building_element.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField"]
+        user_defined_fields.add_element(user_defined_field)
+        building_element.add_element(user_defined_fields)
+        user_defined_field.add_element(field_name_element)
+        user_defined_field.add_element(field_value_element)
 
         field_name_element.text = field_name
         field_value_element.text = field_value
-
-        usr_def_field.add_element(field_name_element)
-        usr_def_field.add_element(field_value_element)
       end
     end
 
