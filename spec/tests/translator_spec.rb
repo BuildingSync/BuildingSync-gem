@@ -115,4 +115,25 @@ RSpec.describe 'BuildingSync' do
     Dir.glob("#{out_path}/Baseline/in.osw") { |osw| osw_files << osw }
     run_scenario_simulations(osw_files)
   end
+
+  it 'should write parameter value into XML' do
+    xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path('./../output/building_151/', File.dirname(__FILE__))
+
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    epw_file_path = nil
+
+    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, CA_TITLE24)
+    translator.write_osm
+    translator.write_osws
+    translator.write_parameters_to_xml(File.join(out_path, 'results.xml'))
+  end
 end

@@ -131,7 +131,7 @@ module BuildingSync
     end
 
     def read_principal_hvac_type(section_element, ns)
-     if section_element.elements["#{ns}:UserDefinedFields"]
+      if section_element.elements["#{ns}:UserDefinedFields"]
         section_element.elements.each("#{ns}:UserDefinedFields/#{ns}:UserDefinedField") do |user_defined_field|
           if user_defined_field.elements["#{ns}:FieldName"].text == 'Principal HVAC System Type'
             @principal_hvac_type = user_defined_field.elements["#{ns}:FieldValue"].text
@@ -149,7 +149,7 @@ module BuildingSync
             @dwellings_occupied_percent = user_defined_field.elements["#{ns}:FieldValue"].text
           end
         end
-      end
+       end
     end
 
     def read_construction_types(section_element, ns)
@@ -184,45 +184,25 @@ module BuildingSync
       end
     end
 
-    def write_parameters_to_xml(ns, xml_file_path = nil)
-      doc = read_xml_file_document(xml_file_path)
-      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building/#{ns}:Sections/#{ns}:Section") do |buildingSection|
+    def write_parameters_to_xml(ns, buildingSection)
+      buildingSection.elements["#{ns}:fraction_area"].text = @fraction_area
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_hvac_type if !@principal_hvac_type.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_lighting_system_type if !@principal_lighting_system_type.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @miscellaneous_electric_load if !@miscellaneous_electric_load.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @spaces_conditioned_percent if !@spaces_conditioned_percent.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwelling_quantity if !@dwelling_quantity.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwellings_occupied_percent if !@dwellings_occupied_percent.nil?
+      buildingSection.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_hours if !@typical_occupant_usage_value_hours.nil?
+      buildingSection.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_weeks if !@typical_occupant_usage_value_weeks.nil?
+      buildingSection.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
+      buildingSection.elements["#{ns}:FootprintShape"].text = @footprint_shape if !@footprint_shape.nil?
+      buildingSection.elements["#{ns}:SectionType"].text = @section_type if !@section_type.nil?
 
-        buildingSection.elements["#{ns}:fraction_area"].text = @fraction_area
-        if !@occupancy_classification_original.nil?
-        buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @occupancy_classification_original
-        end
-        if !@principal_hvac_type.nil?
-          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_hvac_type
-        end
-        if !@principal_lighting_system_type.nil?
-          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_lighting_system_type
-        end
-        if !@miscellaneous_electric_load.nil?
-          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @miscellaneous_electric_load
-        end
-        if !@spaces_conditioned_percent.nil?
-          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @spaces_conditioned_percent
-        end
-        if !@dwelling_quantity.nil?
-          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwelling_quantity
-        end
-        if !@dwellings_occupied_percent.nil?
-          buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwellings_occupied_percent
-        end
-        if !@typical_occupant_usage_value_hours.nil?
-          buildingSection.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_hours
-        end
-        if !@typical_occupant_usage_value_weeks.nil?
-          buildingSection.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_weeks
-        end
-        if !@occupant_quantity.nil?
-          buildingSection.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity
-          end
-        if !@footprint_shape.nil?
-          buildingSection.elements["#{ns}:FootprintShape"].text = @footprint_shape
-        end
-      end
+      # Add new element in the XML file
+      add_element_in_xml_file(buildingSection, ns, 'BuildingType', @bldg_type)
+      add_element_in_xml_file(buildingSection, ns, 'OriginalOccupancyClassification', @occupancy_classification_original)
+      add_element_in_xml_file(buildingSection, ns, 'FractionArea', @fraction_area)
     end
 
     def set_bldg_and_system_type

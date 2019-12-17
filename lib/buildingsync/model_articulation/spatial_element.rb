@@ -131,6 +131,28 @@ module BuildingSync
       end
     end
 
+    def add_element_in_xml_file(building_element, ns, field_name, field_value)
+      user_defined_fields = REXML::Element.new("#{ns}:UserDefinedFields")
+      user_defined_field = REXML::Element.new("#{ns}:UserDefinedField")
+      field_name_element = REXML::Element.new("#{ns}:FieldName")
+      field_value_element = REXML::Element.new("#{ns}:FieldValue")
+
+      if !field_value.nil?
+        if !building_element.elements["#{ns}:UserDefinedFields"]
+          user_defined_fields.add_element(user_defined_field)
+          building_element.add_element(user_defined_fields)
+        end
+
+        usr_def_field = building_element.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField"]
+
+        field_name_element.text = field_name
+        field_value_element.text = field_value
+
+        usr_def_field.add_element(field_name_element)
+        usr_def_field.add_element(field_value_element)
+      end
+    end
+
     def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
       # DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb
       # SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient

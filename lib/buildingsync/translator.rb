@@ -114,12 +114,6 @@ module BuildingSync
       @workflow_maker = WorkflowMaker.new(@doc, @ns)
     end
 
-    def write_parameters_to_xml(xml_file_path = nil)
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
-        @facilities[0].write_parameters_to_xml(@ns, facility)
-      end
-    end
-
     def write_osm(ddy_file = nil)
       @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
     end
@@ -142,7 +136,7 @@ module BuildingSync
       dir_split = dir.split(File::SEPARATOR)
       puts "dir_split: #{dir_split}"
       puts "dir_split[]: #{dir_split[dir_split.length - 1]}"
-      if(dir_split[dir_split.length - 1] == 'Baseline')
+      if (dir_split[dir_split.length - 1] == 'Baseline')
         dir = dir.gsub('/Baseline', '')
       end
       puts "dir: #{dir}"
@@ -207,7 +201,7 @@ module BuildingSync
       workflow.saveAs(File.absolute_path(osw_path.to_s))
 
       extension = OpenStudio::Extension::Extension.new
-      runner_options = { run_simulations: true, verbose: false}
+      runner_options = { run_simulations: true, verbose: false }
       runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
       return runner.run_osw(osw_path, osm_baseline_dir)
     end
@@ -226,6 +220,14 @@ module BuildingSync
 
     def get_failed_scenarios
       return @workflow_maker.get_failed_scenarios
+    end
+
+    def write_parameters_to_xml(xml_file_path = nil)
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
+        @facilities[0].write_parameters_to_xml(@ns, facility)
+      end
+
+      save_xml(xml_file_path) if !xml_file_path.nil?
     end
 
     public

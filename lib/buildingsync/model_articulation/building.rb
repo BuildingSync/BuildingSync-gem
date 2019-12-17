@@ -936,90 +936,33 @@ module BuildingSync
       @model.save("#{dir}/in.osm", true)
     end
 
-    def write_parameters_to_xml(ns, xml_file_path = nil)
-      doc = read_xml_file_document(xml_file_path)
+    def write_parameters_to_xml(ns, building)
+      building.elements["#{ns}:PremisesName"].text = @name if !@name.nil?
+      building.elements["#{ns}:YearOfConstruction"].text = @built_year if !@built_year.nil?
+      building.elements["#{ns}:Ownership"].text = @ownership if !@ownership.nil?
+      building.elements["#{ns}:OccupancyClassification"].text = @occupancy_classification if !@occupancy_classification.nil?
+      building.elements["#{ns}:YearOfLastMajorRemodel"].text = @year_major_remodel if !@year_major_remodel.nil?
+      building.elements["#{ns}:YearOfLastEnergyAudit"].text = @year_of_last_energy_audit if !@year_of_last_energy_audit.nil?
+      building.elements["#{ns}:RetrocommissioningDate"].text = @year_last_commissioning if !@year_last_commissioning.nil?
+      building.elements["#{ns}:BuildingAutomationSystem"].text = @building_automation_system if !@building_automation_system.nil?
+      building.elements["#{ns}:HistoricalLandmark"].text = @historical_landmark if !@historical_landmark.nil?
+      building.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
+      building.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text = @number_of_units if !@number_of_units.nil?
+      building.elements["#{ns}:PercentOccupiedByOwner"].text = @percent_occupied_by_owner if !@percent_occupied_by_owner.nil?
 
-      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building|
-        if !@name.nil?
-          building.elements["#{ns}:PremisesName"].text = @name
-        end
-        if !@built_year.nil?
-          building.elements["#{ns}:YearOfConstruction"].text = @built_year
-        end
-        if !@ownership.nil?
-          building.elements["#{ns}:Ownership"].text = @ownership
-        end
-        if !@occupancy_classification.nil?
-          building.elements["#{ns}:OccupancyClassification"].text = @occupancy_classification
-        end
-        if !@year_major_remodel.nil?
-          building.elements["#{ns}:YearOfLastMajorRemodel"].text = @year_major_remodel
-        end
-        if !@year_of_last_energy_audit.nil?
-          building.elements["#{ns}:YearOfLastEnergyAudit"].text = @year_of_last_energy_audit
-        end
-        if !@year_last_commissioning.nil?
-          building.elements["#{ns}:RetrocommissioningDate"].text = @year_last_commissioning
-        end
-        if !@building_automation_system.nil?
-          building.elements["#{ns}:BuildingAutomationSystem"].text = @building_automation_system
-        end
-        if !@historical_landmark.nil?
-          building.elements["#{ns}:HistoricalLandmark"].text = @historical_landmark
-        end
-        if !@occupant_quantity.nil?
-          building.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity
-        end
-        if !@number_of_units.nil?
-          building.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text = @number_of_units
-        end
-        if !@percent_occupied_by_owner.nil?
-          building.elements["#{ns}:PercentOccupiedByOwner"].text = @percent_occupied_by_owner
-        end
-
-        # Add new element in the XML file
-        add_element_in_xml_file(building, ns, 'StandardTemplate', @standard_template)
-        add_element_in_xml_file(building, ns, 'BuildingRotation', @building_rotation)
-        add_element_in_xml_file(building, ns, 'FloorHeight', @floor_height)
-        add_element_in_xml_file(building, ns, 'WindowWallRatio', @wwr)
-        add_element_in_xml_file(building, ns, 'PartyWallStoriesNorth', @party_wall_stories_north)
-        add_element_in_xml_file(building, ns, 'PartyWallStoriesSouth', @party_wall_stories_south)
-        add_element_in_xml_file(building, ns, 'PartyWallStoriesEast', @party_wall_stories_east)
-        add_element_in_xml_file(building, ns, 'PartyWallStoriesWest', @party_wall_stories_west)
-        add_element_in_xml_file(building, ns, 'Width', @width)
-        add_element_in_xml_file(building, ns, 'Length', @length)
-        add_element_in_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
-        add_element_in_xml_file(building, ns, 'FractionArea', @fraction_area)
-      end
-    end
-
-    def read_xml_file_document(xml_file_path)
-      doc = nil
-      File.open(xml_file_path, 'r') do |file|
-        doc = REXML::Document.new(file)
-      end
-      doc
-    end
-
-    def add_element_in_xml_file(building_element, ns, field_name, field_value)
-      user_defined_fields = REXML::Element.new("#{ns}:UserDefinedFields")
-      user_defined_field = REXML::Element.new("#{ns}:UserDefinedField")
-      field_name_element = REXML::Element.new("#{ns}:FieldName")
-      field_value_element = REXML::Element.new("#{ns}:FieldValue")
-
-      if !field_value.nil?
-        if !building_element.elements["#{ns}:UserDefinedFields"]
-          user_defined_fields.add_element(user_defined_field)
-          building_element.add_element(user_defined_fields)
-        end
-
-        usr_def_field = building_element.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedFields"]
-        field_name_element.text = field_name
-        field_value_element.text = field_value
-
-        usr_def_field.add_element(field_name_element)
-        usr_def_field.add_element(field_value_element)
-      end
+      # Add new element in the XML file
+      add_element_in_xml_file(building, ns, 'StandardTemplate', @standard_template)
+      add_element_in_xml_file(building, ns, 'BuildingRotation', @building_rotation)
+      add_element_in_xml_file(building, ns, 'FloorHeight', @floor_height)
+      add_element_in_xml_file(building, ns, 'WindowWallRatio', @wwr)
+      add_element_in_xml_file(building, ns, 'PartyWallStoriesNorth', @party_wall_stories_north)
+      add_element_in_xml_file(building, ns, 'PartyWallStoriesSouth', @party_wall_stories_south)
+      add_element_in_xml_file(building, ns, 'PartyWallStoriesEast', @party_wall_stories_east)
+      add_element_in_xml_file(building, ns, 'PartyWallStoriesWest', @party_wall_stories_west)
+      add_element_in_xml_file(building, ns, 'Width', @width)
+      add_element_in_xml_file(building, ns, 'Length', @length)
+      add_element_in_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
+      add_element_in_xml_file(building, ns, 'FractionArea', @fraction_area)
     end
 
     def get_space_types
