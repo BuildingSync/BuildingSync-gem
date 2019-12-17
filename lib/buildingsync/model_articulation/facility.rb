@@ -81,7 +81,7 @@ module BuildingSync
       @building_eui = nil
       @building_eui_benchmark = nil
       @energy_cost = nil
-      @annual_fuel_use_native_units = 0
+      @annual_fuel_use_native_units = nil
 
       # reading the xml
       read_xml(facility_xml, ns)
@@ -369,27 +369,14 @@ module BuildingSync
     end
 
     def write_parameters_to_xml(ns, facility)
-
       report = facility.elements["#{ns}:Reports/#{ns}:Report"]
       report.elements.each("#{ns}:Scenarios/#{ns}:Scenario") do |scenario|
-        if !@energy_resource.nil?
-          scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"].text = @energy_resource
-        end
-        if !@benchmark_source.nil?
-          scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"].text = @benchmark_source
-        end
-        if !@building_eui.nil?
-          scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text = @building_eui
-        end
-        if !@building_eui_benchmark.nil?
-          scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text = @building_eui_benchmark
-        end
-        if !@energy_cost.nil?
-          scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"].text = @energy_cost
-        end
-        if !@annual_fuel_use_native_units.nil?
-          scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"].text = @annual_fuel_use_native_units
-        end
+        scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"].text = @energy_resource if !@energy_resource.nil?
+        scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"].text = @benchmark_source if !@benchmark_source.nil?
+        scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text = @building_eui if !@building_eui.nil?
+        scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text = @building_eui_benchmark if !@building_eui_benchmark.nil?
+        scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"].text = @energy_cost if !@energy_cost.nil?
+        scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"].text = @annual_fuel_use_native_units if !@annual_fuel_use_native_units.nil?
       end
       facility.elements.each("#{ns}:Sites/#{ns}:Site") do |site|
         @sites[0].write_parameters_to_xml(ns, site)

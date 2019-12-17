@@ -255,9 +255,7 @@ module BuildingSync
       building = get_largest_building
       @climate_zone = @climate_zone_ashrae
       # for now we use the california climate zone if it is available
-      if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
-        @climate_zone = @climate_zone_ca_t24
-      end
+      @climate_zone = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
       building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude, ddy_file, @weather_file_name, @weather_station_id, @state_name, @city_name)
       building.generate_baseline_osm(standard_to_be_used)
     end
@@ -273,42 +271,20 @@ module BuildingSync
     end
 
     def write_parameters_to_xml(ns, site)
-      if !@climate_zone_ashrae.nil?
-        site.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text = @climate_zone_ashrae
-      end
-      if !@climate_zone_ca_t24.nil?
-        site.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text = @climate_zone_ca_t24
-      end
-      if !@weather_file_name.nil?
-        site.elements["#{ns}:WeatherStationName"].text = @weather_file_name
-      end
-      if !@weather_station_id.nil?
-        site.elements["#{ns}:WeatherDataStationID"].text = @weather_station_id
-      end
-      if !@city_name.nil?
-        site.elements["#{ns}:Address/#{ns}:City"].text = @city_name
-      end
-      if !@state_name.nil?
-        site.elements["#{ns}:Address/#{ns}:State"].text = @state_name
-      end
-      if !@street_address.nil?
-        site.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"].text = @street_address
-      end
-      if !@postal_code.nil?
-        site.elements["#{ns}:Address/#{ns}:PostalCode"].text = @postal_code
-      end
-      if !@latitude.nil?
-        site.elements["#{ns}:Latitude"].text = @latitude
-      end
+      site.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text = @climate_zone_ashrae if !@climate_zone_ashrae.nil?
+      site.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil?
+      site.elements["#{ns}:WeatherStationName"].text = @weather_file_name if !@weather_file_name.nil?
+      site.elements["#{ns}:WeatherDataStationID"].text = @weather_station_id if !@weather_station_id.nil?
+      site.elements["#{ns}:Address/#{ns}:City"].text = @city_name if !@city_name.nil?
+      site.elements["#{ns}:Address/#{ns}:State"].text = @state_name if !@state_name.nil?
+      site.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"].text = @street_address if !@street_address.nil?
+      site.elements["#{ns}:Address/#{ns}:PostalCode"].text = @postal_code if !@postal_code.nil?
+      site.elements["#{ns}:Latitude"].text = @latitude if !@latitude.nil?
       site.elements["#{ns}:Longitude"].text = @longitude if !@longitude.nil?
-    end
 
-    def read_xml_file_document(xml_file_path)
-      doc = nil
-      File.open(xml_file_path, 'r') do |file|
-        doc = REXML::Document.new(file)
+      site.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
+        @buildings[0].write_parameters_to_xml(ns, buildings_element)
       end
-      return doc
     end
   end
 end
