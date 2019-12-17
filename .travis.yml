@@ -35,7 +35,7 @@ script:
   - bundle exec rspec spec/tests/model_articulation_test/site_spec.rb
 #  - bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb  // fails sometimes due to connection issues, so we exclude it here
   - bundle exec rspec spec/tests/translator_baseline_generation_spec.rb
-  - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb
+#  - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb
   - bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
 #  - bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb // this takes too long, had do exclude it from here
 

@@ -34,16 +34,40 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative './../spec_helper'
-
-require 'fileutils'
-require 'parallel'
-require 'openstudio-extension'
-
 RSpec.describe 'BuildingSync' do
-  it 'should have a version' do
-    expect(BuildingSync::VERSION).not_to be_nil
+
+  # from building sync spec.rb
+  it 'should parse and write building_151.xml (phase zero) with n1 namespace and run all simulations' do
+    # create_osw_file('building_151.xml')
+    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    out_path = File.expand_path('../output/phase0_building_151/', File.dirname(__FILE__))
+    if File.exist?(out_path)
+      FileUtils.rm_rf(out_path)
+    end
+
+    FileUtils.mkdir_p(out_path)
+    expect(File.exist?(out_path)).to be true
+
+    translator = BuildingSync::Translator.new(xml_path, out_path)
+    translator.write_osm
+    translator.write_osws
+
+    osw_files = []
+    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
+
+    expect(osw_files.size).to eq 32
+
+    translator.run_osws
+
+    translator.gather_results(out_path)
+    translator.save_xml(File.join(out_path, 'results.xml'))
+
+    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
   end
 
-
+  it 'should parse and write report_478.xml (phase zero) with ASHRAE 90.1' do
+    test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  end
 end
