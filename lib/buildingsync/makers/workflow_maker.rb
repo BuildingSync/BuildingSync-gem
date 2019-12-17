@@ -52,7 +52,7 @@ module BuildingSync
 
       # log failed scenarios
       @failed_scenarios = []
-      @scenarios = nil
+      @scenarios = []
 
       # select base osw for standalone, small office, medium office
       base_osw = 'phase_zero_base.osw'
@@ -285,26 +285,34 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_for_scenario', "#{measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{measure_ids}") if num_measures != measure_ids.size
     end
 
-    def get_scenarios
-      if @scenarios.nil?
-        @scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"].to_a.select { |element| element.is_a? REXML::Element }
-        puts "Scenarios 1: #{@scenarios}"
-        if @scenarios.nil?
-          @scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility#{@ns}:Report/#{@ns}:Scenarios"].to_a.select { |element| element.is_a? REXML::Element }
-          puts "Scenarios 2: #{@scenarios}"
+    def get_scenario_elements
+      if @scenarios.empty?
+        get_scenarios.elements.each("#{@ns}:Scenario") do |scenario|
+          if scenario.is_a? REXML::Element
+            @scenarios.push(scenario)
+          end
         end
-        if @scenarios.nil?
+        puts "Scenarios: #{@scenarios}"
+        if @scenarios.empty?
           puts 'No scenarios found in your BuildingSync XML file!'
         end
       end
       return @scenarios
     end
 
+    def get_scenarios
+      scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"]
+      if scenarios.nil?
+        scenarios =  @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios"]
+      end
+      return scenarios
+    end
+
     def write_osws(facility, dir)
       super
 
       @facility = facility
-      scenarios = get_scenarios
+      scenarios = get_scenario_elements
       # ensure there is a 'Baseline' scenario
       puts 'Looking for the baseline scenario ...'
       found_baseline = false
@@ -336,7 +344,7 @@ module BuildingSync
           scenario_type_element.add_element(package_of_measures_element)
           scenario_element.add_element(scenario_type_element)
 
-          scenarios.add_element(scenario_element)
+          get_scenarios.add_element(scenario_element)
           puts '.....adding a new baseline scenario'
         end
       end
@@ -422,7 +430,7 @@ module BuildingSync
 
         scenarios_found = false
         # write an osw for each scenario
-        get_scenarios.each do |scenario|
+        get_scenario_elements.each do |scenario|
           scenarios_found = true
           # get information about the scenario
           scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
@@ -464,7 +472,7 @@ module BuildingSync
         end
 
         if !baseline_only
-          get_scenarios.each do |scenario|
+          get_scenario_elements.each do |scenario|
             scenarios_found = true
             # get information about the scenario
             scenario_name = scenario.elements["#{@ns}:ScenarioName"].text

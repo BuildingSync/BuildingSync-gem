@@ -110,7 +110,10 @@ module BuildingSync
         standard.model_remove_prm_hvac(model)
       end
 
-      if @primary_hvac_system_type.nil?
+      puts "system_type #{system_type}"
+      puts "@primary_hvac_system_type #{@primary_hvac_system_type}"
+      if !@primary_hvac_system_type.nil?
+        puts "replaceing system_type #{system_type} with primary system type #{@primary_hvac_system_type}"
         system_type = @primary_hvac_system_type
       end
 
