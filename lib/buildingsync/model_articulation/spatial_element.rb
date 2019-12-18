@@ -124,7 +124,11 @@ module BuildingSync
 
     def read_occupancy_type(xml_element, occupancy_type, ns)
       occ_element = xml_element.elements["#{ns}:OccupancyClassification"]
-      !occ_element.nil? ? return occ_element.text : return occupancy_type
+      if !occ_element.nil?
+        return occ_element.text
+      else
+        return occupancy_type
+      end
     end
 
     def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
