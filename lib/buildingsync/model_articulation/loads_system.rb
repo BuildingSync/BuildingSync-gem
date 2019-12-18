@@ -93,16 +93,12 @@ module BuildingSync
     end
 
     def get_building_section(building_sections, standard_building_type, standard_space_type)
-      puts "building_sections: #{building_sections}"
-      puts "standard_building_type: #{standard_building_type}"
-      puts "standard_space_type: #{standard_space_type}"
       if building_sections.count == 1
         return building_sections[0]
       end
       building_sections.each do |section|
-        puts "section #{section}"
-        puts "section.occupancy_type #{section.occupancy_type}"
-        if section.occupancy_type == standard_building_type
+        if section.occupancy_type.to_s == standard_building_type.to_s
+          return section if section.space_types
           section.space_types.each do |space_type_name, hash|
             if space_type_name == standard_space_type
               puts "space_type_name #{space_type_name}"

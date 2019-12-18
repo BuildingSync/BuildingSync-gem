@@ -51,11 +51,12 @@ module BuildingSync
     # initialize
     def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
       @building_sections = []
+      @building_sections_whole_building = []
       @standard_template = nil
       @single_floor_area = 0.0
       @building_rotation = 0.0
       @floor_height = 0.0
-      @width = 0.0
+      @width  = 0.0
       @length = 0.0
       @wwr = 0.0
       @name = nil
@@ -71,14 +72,15 @@ module BuildingSync
       @ownership = nil
       @occupancy_classification = nil
       @primary_contact_id = nil
-      @major_remodel_year = nil
+      @year_major_remodel = nil
       @year_of_last_energy_audit = nil
-      @retro_commissioning_date = nil
+      @year_last_commissioning = nil
       @building_automation_system = nil
       @historical_landmark = nil
       @percent_occupied_by_owner = nil
       @occupant_quantity = nil
       @number_of_units = nil
+      @all_set = false
 
       @fraction_area = 1.0
       # code to initialize
@@ -102,27 +104,36 @@ module BuildingSync
       @occupancy_type = read_occupancy_type(build_element, site_occupancy_type, ns)
 
       build_element.elements.each("#{ns}:Sections/#{ns}:Section") do |section_element|
-        @building_sections.push(BuildingSection.new(section_element, @occupancy_type, @total_floor_area, ns))
+        section = BuildingSection.new(section_element, @occupancy_type, @total_floor_area, ns)
+        if(section.section_type == 'Whole building')
+          @building_sections_whole_building.push(section)
+        elsif(section.section_type == 'Space function' || section.section_type.nil?)
+          @building_sections.push(section)
+        else
+          puts "Unknown section type found:#{section.section_type}:"
+        end
       end
 
       # floor areas
       @total_floor_area = read_floor_areas(build_element, site_total_floor_area, ns)
 
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
-
-      # need to set those defaults after initializing the sections
-      read_building_form_defaults
-
       # generate building name
       read_building_name(build_element, ns)
-
-      read_width_and_length
 
       read_ownership(build_element, ns)
       read_other_building_details(build_element, ns)
     end
 
-    def read_width_and_length
+    def set_all
+      if !@all_set
+        @all_set = true
+        set_bldg_and_system_type_for_building_and_section
+        set_building_form_defaults
+        set_width_and_length
+      end
+    end
+
+    def set_width_and_length
       footprint = nil
       # handle user-assigned single floor plate size condition
       if @single_floor_area > 0.0
@@ -144,27 +155,38 @@ module BuildingSync
       @built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_i
 
       if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
-        @major_remodel_year = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_i
-        @built_year = @major_remodel_year if @major_remodel_year > @built_year
+        @year_major_remodel = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_i
+        @built_year = @year_major_remodel if @year_major_remodel > @built_year
       end
 
       if build_element.elements["#{ns}:YearOfLastEnergyAudit"]
         @year_of_last_energy_audit = build_element.elements["#{ns}:YearOfLastEnergyAudit"].text.to_i
+      end
+
+      if build_element.elements["#{ns}:RetrocommissioningDate"]
+        @year_last_commissioning = Date.parse build_element.elements["#{ns}:RetrocommissioningDate"].text
+      else
+        @year_last_commissioning = nil
       end
     end
 
     def read_stories_above_and_below_grade(build_element, ns)
       if build_element.elements["#{ns}:FloorsAboveGrade"]
         @num_stories_above_grade = build_element.elements["#{ns}:FloorsAboveGrade"].text.to_f
-        if @num_stories_above_grade == 0
-          @num_stories_above_grade = 1.0
-        end
+      elsif build_element.elements["#{ns}:ConditionedFloorsAboveGrade"]
+        @num_stories_above_grade = build_element.elements["#{ns}:ConditionedFloorsAboveGrade"].text.to_f
       else
         @num_stories_above_grade = 1.0 # setDefaultValue
       end
 
+      if @num_stories_above_grade == 0
+        @num_stories_above_grade = 1.0
+      end
+
       if build_element.elements["#{ns}:FloorsBelowGrade"]
         @num_stories_below_grade = build_element.elements["#{ns}:FloorsBelowGrade"].text.to_f
+      elsif build_element.elements["#{ns}:ConditionedFloorsBelowGrade"]
+        @num_stories_below_grade = build_element.elements["#{ns}:ConditionedFloorsBelowGrade"].text.to_f
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
@@ -179,6 +201,7 @@ module BuildingSync
     end
 
     def get_building_type
+      set_all
       # try to get the bldg type at the building level, if it is nil then look at the first section
       if @bldg_type.nil?
         if @building_sections.count == 0
@@ -192,7 +215,7 @@ module BuildingSync
       end
     end
 
-    def read_building_form_defaults
+    def set_building_form_defaults
       # if aspect ratio, story height or wwr have argument value of 0 then use smart building type defaults
       building_form_defaults = building_form_defaults(get_building_type)
       if @ns_to_ew_ratio == 0.0 && !building_form_defaults.nil?
@@ -214,13 +237,31 @@ module BuildingSync
       # check that sum of fractions for b,c, and d is less than 1.0 (so something is left for primary building type)
       building_fraction = 1.0
       if @building_sections.count > 0
+        # first we check if the building sections do have a fraction
+        if @building_sections.count > 1
+          areas = []
+          floor_area = 0
+          @building_sections.each do |section|
+            if section.fraction_area.nil?
+              areas.push(section.total_floor_area)
+              floor_area += section.total_floor_area
+            end
+          end
+          i = 0
+          @building_sections.each do |section|
+            section.fraction_area = areas[i] / @total_floor_area
+            i += 1
+          end
+        end
         @building_sections.each do |section|
+          puts "section: #{section.section_type} has fraction: #{section.fraction_area}"
           next if section.fraction_area.nil?
           building_fraction -= section.fraction_area
         end
         if building_fraction <= 0.0
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
+          # TODO: should we also allow for the case where secions take all of the area? == 0
         end
         @building_sections[0].fraction_area = building_fraction
       end
@@ -245,12 +286,6 @@ module BuildingSync
         @primary_contact_id = building_element.elements["#{ns}:PrimaryContactID"].text
       else
         @primary_contact_id = nil
-      end
-
-      if building_element.elements["#{ns}:RetrocommissioningDate"]
-        @retro_commissioning_date = Date.parse building_element.elements["#{ns}:RetrocommissioningDate"].text
-      else
-        @retro_commissioning_date = nil
       end
 
       if building_element.elements["#{ns}:BuildingAutomationSystem"]
@@ -330,7 +365,16 @@ module BuildingSync
       return @model
     end
 
+    def set_bldg_and_system_type_for_building_and_section
+      @building_sections.each do |section|
+        section.set_bldg_and_system_type
+      end
+
+      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
+    end
+
     def determine_open_studio_standard(standard_to_be_used)
+      set_all
       begin
         set_standard_template(standard_to_be_used, get_built_year)
         building_type = get_building_type
@@ -399,6 +443,7 @@ module BuildingSync
     end
 
     def get_system_type
+      set_all
       if !@system_type.nil?
         return @system_type
       else
@@ -647,7 +692,7 @@ module BuildingSync
       # 'party_wall_stories_south', 'party_wall_stories_east', 'party_wall_stories_west', 'single_floor_area' 0 =<= nil
 
       # TODO: we have not really defined a good logic what happens with multiple sites, versus multiple buildings, here we just take the first building on the first site
-      read_building_form_defaults
+      set_building_form_defaults
 
       # checking that the factions add up
       check_building_faction
@@ -661,7 +706,6 @@ module BuildingSync
       @model.getBuilding.setName(name)
 
       create_bldg_space_types(@model)
-
       # calculate length and width of bar
       # todo - update slicing to nicely handle aspect ratio less than 1
 
@@ -871,7 +915,6 @@ module BuildingSync
           end
 
         else # use long sides instead
-
           num_stories.ceil.times do |i|
             if i + 1 <= @num_stories_below_grade
               party_walls_array << []
@@ -902,7 +945,7 @@ module BuildingSync
     end
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr, :year_of_last_energy_audit, :ownership,
-                :occupancy_classification, :primary_contact_id, :retro_commissioning_date, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
-                :occupant_quantity, :number_of_units, :built_year, :major_remodel_year, :building_sections
+                :occupancy_classification, :primary_contact_id, :year_last_commissioning, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
+                :occupant_quantity, :number_of_units, :built_year, :year_major_remodel, :building_sections
   end
 end

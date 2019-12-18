@@ -34,29 +34,30 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative './../spec_helper'
 
-require 'fileutils'
-require 'parallel'
+module BuildingSync
+  class LightingSystemType
 
-RSpec.describe 'BuildingSync' do
-  it 'should parse the building_151.xml (phase zero) with auc namespace for CA Title 24 and generate baseline and scenarios' do
-    test_baseline_and_scenario_creation_with_simulation('building_151.xml', 30, ASHRAE90_1, nil, false)
-  end
+    def initialize(doc, ns, ref)
+      @lighting_type = nil
+      @ballast_type = nil
 
-  it 'should parse the DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
-    test_baseline_and_scenario_creation_with_simulation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw', false)
-  end
+      doc.elements.each("#{ns}:Systems/#{ns}:LightingSystems/#{ns}:LightingSystem") do |lighting_system|
+        if lighting_system.attributes["ID"] == ref
+          read(lighting_system, ns)
+        end
+      end
+    end
 
-  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with CA Title 24 and generate baseline and scenarios' do
-    test_baseline_and_scenario_creation_with_simulation('BuildingSync Website Valid Schema.xml', 30, CA_TITLE24, 'CZ01RV2.epw', false)
-  end
-
-  it 'should parse the Golden Test File.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
-    begin
-      test_baseline_and_scenario_creation_with_simulation('Golden Test File.xml', 1, ASHRAE90_1, 'CZ01RV2.epw', false)
-    rescue StandardError => e
-      expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
+    def read(section_element, ns)
+      if section_element.elements["#{ns}:LampType/#{ns}:SolidStateLighting/#{ns}:LampLabel"]
+        @lighting_type = section_element.elements["#{ns}:LampType/#{ns}:SolidStateLighting/#{ns}:LampLabel"].text
+      end
+      if section_element.elements["#{ns}:BallastType"]
+        @ballast_type = section_element.elements["#{ns}:BallastType"].text
+      end
     end
   end
 end
+
+

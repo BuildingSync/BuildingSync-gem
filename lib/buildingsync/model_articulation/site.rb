@@ -55,6 +55,7 @@ module BuildingSync
       @street_address = nil
       @postal_code = nil
       @premises_notes = nil
+      @all_set = false
 
       # TM: just use the XML snippet to search for the buildings on the site
       read_xml(build_element, ns)
@@ -62,6 +63,18 @@ module BuildingSync
 
     # adding a site to the facility
     def read_xml(build_element, ns)
+      # first we check if the number of buildings is ok
+      number_of_buildings = 0
+      build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
+        number_of_buildings += 1
+      end
+      if number_of_buildings == 0
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
+        raise 'Error: There is no building attached to this site in your BuildingSync file.'
+      elsif number_of_buildings > 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file.")
+        raise "Error: There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file."
+      end
       # check occupancy type at the site level
       @occupancy_type = read_occupancy_type(build_element, nil, ns)
       # check floor areas at the site level
@@ -80,12 +93,14 @@ module BuildingSync
       build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
         @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, ns))
       end
-      if @buildings.count == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
-        raise 'Error: There is no building attached to this site in your BuildingSync file.'
-      elsif @buildings.count > 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There is more than one (#{@buildings.count}) building attached to this site in your BuildingSync file.")
-        raise "Error: There is more than one (#{@buildings.count}) building attached to this site in your BuildingSync file."
+    end
+
+    def set_all
+      if !@all_set
+        @all_set = true
+        @buildings.each do |building|
+          building.set_all
+        end
       end
     end
 
@@ -177,10 +192,12 @@ module BuildingSync
     end
 
     def determine_open_studio_standard(standard_to_be_used)
+      set_all
       return get_largest_building.determine_open_studio_standard(standard_to_be_used)
     end
 
     def determine_open_studio_system_standard
+      set_all
       return Standard.build(get_building_template)
     end
 
@@ -232,6 +249,7 @@ module BuildingSync
     end
 
     def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
+      set_all
       building = get_largest_building
       @climate_zone = @climate_zone_ashrae
       # for now we use the california climate zone if it is available

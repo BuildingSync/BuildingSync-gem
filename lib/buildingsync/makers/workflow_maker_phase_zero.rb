@@ -389,7 +389,7 @@ module BuildingSync
       end
     end
 
-    def gather_results(dir)
+    def gather_results(dir, baseline_only = false)
       puts 'starting to gather results'
       results_counter = 0
       super
@@ -425,6 +425,10 @@ module BuildingSync
           end
           puts "osw_dir: #{osw_dir}"
 
+          Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
+            FileUtils.rm_rf(path) if File.exist?(path)
+          end
+
           # cleanup large files
           path = File.join(osw_dir, 'eplusout.sql')
           FileUtils.rm_f(path) if File.exist?(path)
@@ -434,42 +438,15 @@ module BuildingSync
           path = File.join(osw_dir, 'eplusout.eso')
           FileUtils.rm_f(path) if File.exist?(path)
 
-          Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-            FileUtils.rm_rf(path) if File.exist?(path)
-          end
-
-          Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-            FileUtils.rm_rf(path) if File.exist?(path)
-          end
-
-          # find the osw
-          path = File.join(osw_dir, 'out.osw')
-          if !File.exist?(path)
-            puts "Cannot load results for scenario #{scenario_name}, because the osw files does not exist #{path}"
-            next
-          end
-
-          workflow = nil
-          File.open(path, 'r') do |file|
-            results[scenario_name] = JSON.parse(file.read, symbolize_names: true)
-          end
-
-          # open results.json to get monthly timeseries
-          # just grabbed openstudio_results
-          path2 = File.join(osw_dir, 'results.json')
-          File.open(path2, 'r') do |file|
-            temp_res = JSON.parse(file.read, symbolize_names: true)
-            monthly_results[scenario_name] = temp_res[:OpenStudioResults]
-          end
-        end
-
+      if !baseline_only
         @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
           scenarios_found = true
           # get information about the scenario
           scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
           next if scenario_name == 'Measured'
-          next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
+          next if scenario_name == 'Baseline'
 
+          puts "scenario_name #{scenario_name} should not be Baseline here!!"
           results_counter += 1
           package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
 
@@ -792,6 +769,7 @@ module BuildingSync
         end
 
         puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
+
       rescue StandardError
         puts "An error occured while processing results in #{dir}"
       end

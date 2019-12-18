@@ -144,7 +144,7 @@ RSpec.configure do |config|
 
     puts "Looking for the following OSM file: #{out_path}/in.osm"
     expect(File.exist?("#{out_path}/in.osm")).to be true
-    return "#{out_path}/in.osm"
+    return translator
   end
 
   def generated_baseline_idf_and_compare(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
@@ -239,7 +239,7 @@ RSpec.configure do |config|
     puts "IDF file (#{File.basename(idf_file)})successfully saved" if workspace.save(idf_file)
   end
 
-  def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, run_simulation = true)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -248,7 +248,6 @@ RSpec.configure do |config|
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
     end
-    expect(File.exist?(out_path)).not_to be true
 
     FileUtils.mkdir_p(out_path)
     expect(File.exist?(out_path)).to be true
@@ -273,55 +272,15 @@ RSpec.configure do |config|
     # we compare the counts, by also considering the two potential osw files in the SR directory
     expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
 
-    return osw_files - osw_sr_files
-  end
+    if run_simulation
+      translator.run_osws
 
-  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, ddy_file_name = nil)
-    xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
+      dir_path = File.dirname(osw_files[0])
+      parent_dir_path = File.expand_path('..', dir_path)
 
-    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
-
-    if File.exist?(out_path)
-      FileUtils.rm_rf(out_path)
+      translator.gather_results(parent_dir_path)
+      translator.save_xml(File.join(parent_dir_path, 'results.xml'))
     end
-
-    FileUtils.mkdir_p(out_path)
-    expect(File.exist?(out_path)).to be true
-
-    epw_file_path = nil
-    if !epw_file_name.nil?
-      epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
-    end
-    ddy_file_path = nil
-    if !ddy_file_name.nil?
-      ddy_file_path = File.expand_path("./weather/#{ddy_file_name}", File.dirname(__FILE__))
-    end
-
-    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
-    translator.write_osm(ddy_file_path)
-
-    expect(File.exist?("#{out_path}/in.osm")).to be true
-
-    translator.write_osws
-
-    osw_files = []
-    osw_sr_files = []
-    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
-    Dir.glob("#{out_path}/SR/*.osw") { |osw| osw_sr_files << osw }
-
-    # we compare the counts, by also considering the two potential osw files in the SR directory
-    expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
-
-    osw_paths = osw_files - osw_sr_files
-
-    run_scenario_simulations(osw_paths)
-
-    dir_path = File.dirname(osw_paths[0])
-    parent_dir_path = File.expand_path('..', dir_path)
-
-    translator.gather_results(parent_dir_path)
-    translator.save_xml(File.join(parent_dir_path, 'results.xml'))
   end
 
   def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
