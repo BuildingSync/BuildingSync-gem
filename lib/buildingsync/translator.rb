@@ -223,10 +223,7 @@ module BuildingSync
     end
 
     def write_parameters_to_xml(xml_file_path = nil)
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
-        @facilities[0].write_parameters_to_xml(@ns, facility)
-      end
-
+      @model_maker.write_parameters_to_xml
       save_xml(xml_file_path) if !xml_file_path.nil?
     end
 
