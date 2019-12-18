@@ -80,6 +80,12 @@ module BuildingSync
       return @facilities[0].get_model
     end
 
+    def write_parameters_to_xml
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
+        @facilities[0].write_parameters_to_xml(@ns, facility)
+      end
+    end
+
     private
 
     def write_osm(dir)
