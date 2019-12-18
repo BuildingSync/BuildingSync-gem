@@ -963,6 +963,8 @@ module BuildingSync
       add_element_in_xml_file(building, ns, 'Length', @length)
       add_element_in_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
       add_element_in_xml_file(building, ns, 'FractionArea', @fraction_area)
+
+      write_parameters_to_xml_for_spatial_element(ns, site)
     end
 
     def get_space_types

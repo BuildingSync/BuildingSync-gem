@@ -203,6 +203,8 @@ module BuildingSync
       add_element_in_xml_file(buildingSection, ns, 'BuildingType', @bldg_type)
       add_element_in_xml_file(buildingSection, ns, 'OriginalOccupancyClassification', @occupancy_classification_original)
       add_element_in_xml_file(buildingSection, ns, 'FractionArea', @fraction_area)
+
+      write_parameters_to_xml_for_spatial_element(ns, site)
     end
 
     def set_bldg_and_system_type

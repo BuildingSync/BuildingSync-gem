@@ -282,6 +282,8 @@ module BuildingSync
       site.elements["#{ns}:Latitude"].text = @latitude if !@latitude.nil?
       site.elements["#{ns}:Longitude"].text = @longitude if !@longitude.nil?
 
+      write_parameters_to_xml_for_spatial_element(ns, site)
+
       site.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
         @buildings[0].write_parameters_to_xml(ns, buildings_element)
       end
