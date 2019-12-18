@@ -89,9 +89,15 @@ module BuildingSync
       if @total_floor_area.nil? || @total_floor_area == 0
         # if the total floor area is null, we try to calculate the total area, from various conditioned areas
         running_floor_area = 0
-        running_floor_area += @cooled_only_floor_area if !@cooled_only_floor_area.nil? && @cooled_only_floor_area > 0
-        running_floor_area += @heated_only_floor_area if !@heated_only_floor_area.nil? && @heated_only_floor_area > 0
-        running_floor_area += @conditioned_floor_area if !@conditioned_floor_area.nil? && @conditioned_floor_area > 0
+        if !@conditioned_floor_area_cooled_only.nil? && @conditioned_floor_area_cooled_only > 0
+          running_floor_area += @conditioned_floor_area_cooled_only
+        end
+        if !@conditioned_floor_area_heated_only.nil? && @conditioned_floor_area_heated_only > 0
+          running_floor_area += @conditioned_floor_area_heated_only
+        end
+        if !@conditioned_floor_area_heated_cooled.nil? && @conditioned_floor_area_heated_cooled > 0
+          running_floor_area += @conditioned_floor_area_heated_cooled
+        end
         if running_floor_area > 0
           @total_floor_area = running_floor_area
         else
