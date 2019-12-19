@@ -183,7 +183,7 @@ module BuildingSync
       return @model_maker.get_model
     end
 
-    def run_osm(epw_name)
+    def run_osm(epw_name, runner_options = { run_simulations: true, verbose: false, num_parallel: 1, max_to_run: Float::INFINITY })
       file_name = 'in.osm'
 
       osm_baseline_dir = File.join(@output_dir, 'Baseline')
@@ -201,7 +201,6 @@ module BuildingSync
       workflow.saveAs(File.absolute_path(osw_path.to_s))
 
       extension = OpenStudio::Extension::Extension.new
-      runner_options = { run_simulations: true, verbose: false }
       runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
       return runner.run_osw(osw_path, osm_baseline_dir)
     end
