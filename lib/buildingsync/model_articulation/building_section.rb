@@ -49,6 +49,7 @@ module BuildingSync
 
     # initialize
     def initialize(section_element, occ_type, bldg_total_floor_area, ns)
+      @ID = nil
       @doorIDs = []
       @wallIDs = []
       @windowIDs = []
@@ -79,6 +80,9 @@ module BuildingSync
     end
 
     def read_xml(section_element, occ_type, bldg_total_floor_area, ns)
+      if section_element.attributes['ID']
+        @ID = section_element.attributes['ID']
+      end
       # floor areas
       @total_floor_area = read_floor_areas(section_element, bldg_total_floor_area, ns)
       # based on the occupancy type set building type, system type and bar division method
@@ -219,7 +223,7 @@ module BuildingSync
       return doc
     end
 
-    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type
+    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type, :ID
     attr_accessor :fraction_area
   end
 end

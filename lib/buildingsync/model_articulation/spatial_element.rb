@@ -59,6 +59,7 @@ module BuildingSync
 
     def read_floor_areas(build_element, parent_total_floor_area, ns)
       build_element.elements.each("#{ns}:FloorAreas/#{ns}:FloorArea") do |floor_area_element|
+        next if !floor_area_element.elements["#{ns}:FloorAreaValue"]
         floor_area = floor_area_element.elements["#{ns}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
 

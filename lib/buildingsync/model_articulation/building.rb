@@ -250,9 +250,12 @@ module BuildingSync
             section.fraction_area = areas[i] / @total_floor_area
             i += 1
           end
+        elsif @building_sections.count == 1
+          # only if we have just one section the section fraction is set to the building fraction (1)
+          @building_sections[0].fraction_area = building_fraction
         end
         @building_sections.each do |section|
-          puts "section: #{section.section_type} has fraction: #{section.fraction_area}"
+          puts "section with ID: #{section.ID} and type: '#{section.section_type}' has fraction: #{section.fraction_area}"
           next if section.fraction_area.nil?
           building_fraction -= section.fraction_area
         end
@@ -261,7 +264,6 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
         end
-        @building_sections[0].fraction_area = building_fraction
       end
     end
 
