@@ -104,6 +104,30 @@ module BuildingSync
       return true
     end
 
+    def map_primary_hvac_system_type_to_cbecs_system_type(building_sync_primary_hvac_system_type, system_type)
+      case building_sync_primary_hvac_system_type
+      when "Packaged Terminal Air Conditioner"
+        return "PTAC with hot water heat"
+      when "Packaged Terminal Heat Pump"
+        return "PTHP"
+      when "Packaged Rooftop Air Conditioner"
+        return "PSZ-AC with gas coil heat"
+      when "Packaged Rooftop Heat Pump"
+        return "PSZ-HP"
+      when "Packaged Rooftop VAV with Hot Water Reheat"
+        return "PVAV with reheat"
+      when "Packaged Rooftop VAV with Electric Reheat"
+        return "PVAV with PFP boxes"
+      when "VAV with Hot Water Reheat"
+        return "VAV with reheat"
+      when "VAV with Electric Reheat"
+        return "VAV with PFP boxes"
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.HVACSystem.map_primary_hvac_system_type_to_cbecs_system_type', "building_sync_primary_hvac_system_type: #{building_sync_primary_hvac_system_type} does not have a mapping to the CBECS system type, using the system type from standards: #{system_type}")
+        return system_type
+      end
+    end
+
     def add_hvac(model, standard, system_type, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity', remove_objects = false)
       # remove HVAC objects
       if remove_objects
@@ -114,7 +138,7 @@ module BuildingSync
       puts "@primary_hvac_system_type #{@primary_hvac_system_type}"
       if !@primary_hvac_system_type.nil?
         puts "replaceing system_type #{system_type} with primary system type #{@primary_hvac_system_type}"
-        system_type = @primary_hvac_system_type
+        system_type = map_primary_hvac_system_type_to_cbecs_system_type(@primary_hvac_system_type, system_type)
       end
 
       case system_type
