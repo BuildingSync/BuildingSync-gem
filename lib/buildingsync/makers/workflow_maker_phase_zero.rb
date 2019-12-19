@@ -437,6 +437,7 @@ module BuildingSync
 
           path = File.join(osw_dir, 'eplusout.eso')
           FileUtils.rm_f(path) if File.exist?(path)
+        end
 
       if !baseline_only
         @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
@@ -769,8 +770,8 @@ module BuildingSync
         end
 
         puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
-
-      rescue StandardError
+      end
+        rescue StandardError
         puts "An error occured while processing results in #{dir}"
       end
 
