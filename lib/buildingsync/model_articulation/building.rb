@@ -256,10 +256,10 @@ module BuildingSync
           next if section.fraction_area.nil?
           building_fraction -= section.fraction_area
         end
-        if building_fraction < 0.0
+        if building_fraction.round(3) < 0.0
+          puts "building fraction is #{ building_fraction }"
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
-          # TODO: should we also allow for the case where secions take all of the area? == 0
         end
         @building_sections[0].fraction_area = building_fraction
       end
