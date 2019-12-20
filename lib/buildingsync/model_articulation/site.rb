@@ -181,6 +181,10 @@ module BuildingSync
       end
     end
 
+    def build_zone_hash
+      return get_largest_building.build_zone_hash
+    end
+
     def get_model
       return get_largest_building.get_model
     end

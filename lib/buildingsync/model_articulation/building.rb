@@ -334,6 +334,34 @@ module BuildingSync
       end
     end
 
+    def build_zone_hash
+      zone_hash = Hash.new
+      if @space_types
+        zone_list = []
+        @space_types.each do |space_type|
+          zone_list << get_zones_per_space_type(space_type)
+        end
+        zone_hash[ID] = zone_list
+      end
+      @building_sections.each do |bldg_subsec|
+        zone_list = []
+        bldg_subsec.space_types_floor_area.each do |space_type, hash|
+          zone_list.concat(get_zones_per_space_type(space_type))
+        end
+        zone_hash[bldg_subsec.ID] = zone_list
+      end
+      return zone_hash
+    end
+
+    def get_zones_per_space_type(space_type)
+      list_of_zones = []
+      model_space_type = @model.getSpaceTypeByName(space_type.name.get).get
+      model_space_type.spaces.each do |space|
+        list_of_zones << space.thermalZone.get
+      end
+      return list_of_zones
+    end
+
     def bldg_space_types_floor_area_hash
       new_hash = {}
       if @building_sections.count > 0
@@ -344,8 +372,8 @@ module BuildingSync
         end
         # if we have no sections we need to do the same just for the building
       elsif @building_sections.count == 0
-        space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
-        puts " Space types: #{space_types} selected for building type: #{@bldg_type} and standard template: #{@standard_template}"
+        @space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
+        puts " Space types: #{@space_types} selected for building type: #{@bldg_type} and standard template: #{@standard_template}"
         space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @open_studio_standard)
         space_types_floor_area.each do |space_type, hash|
           new_hash[space_type] = hash

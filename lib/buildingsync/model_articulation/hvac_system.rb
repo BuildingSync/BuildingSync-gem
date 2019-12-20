@@ -38,20 +38,27 @@ module BuildingSync
   class HVACSystem < BuildingSystem
     def initialize(system_element = nil, ns = '')
       # code to initialize
-      @primary_hvac_system_type = nil
-      @linked_building_part = nil
+      @primary_hvac_system_type = Hash.new
       read_xml(system_element, ns) if system_element
     end
 
     def read_xml(system_element, ns)
-      if system_element.elements["#{ns}:PrimaryHVACSystemType"]
-        @primary_hvac_system_type = system_element.elements["#{ns}:PrimaryHVACSystemType"].text
-      else
-        @primary_hvac_system_type = nil
-      end
-
-      if system_element.elements["#{ns}:LinkedPremises"] && system_element.elements["#{ns}:LinkedPremises/#{ns}:Building"]
-        @linked_building_part = system_element.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref']
+      system_element.elements.each("#{ns}:HVACSystem") do |hvac_system|
+        system_type = nil
+        if hvac_system.elements["#{ns}:PrimaryHVACSystemType"]
+          system_type = hvac_system.elements["#{ns}:PrimaryHVACSystemType"].text
+        end
+        if hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"]
+          linked_building = hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref']
+          puts "found primary system type: #{system_type} for linked building: #{linked_building}"
+          @primary_hvac_system_type[linked_building] = system_type
+        elsif hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"]
+          linked_section = hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"].attributes['IDref']
+          puts "found primary system type: #{system_type} for linked section: #{linked_section}"
+          @primary_hvac_system_type[linked_section] = system_type
+        elsif system_type
+          puts "primary_hvac_system_type: #{system_type} is not linked to a building or section "
+        end
       end
     end
 
@@ -128,17 +135,15 @@ module BuildingSync
       end
     end
 
-    def add_hvac(model, standard, system_type, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity', remove_objects = false)
+    def add_hvac(model, zone_hash, standard, system_type, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity', remove_objects = false)
       # remove HVAC objects
       if remove_objects
         standard.model_remove_prm_hvac(model)
       end
 
-      puts "system_type #{system_type}"
-      puts "@primary_hvac_system_type #{@primary_hvac_system_type}"
-      if !@primary_hvac_system_type.nil?
-        puts "replaceing system_type #{system_type} with primary system type #{@primary_hvac_system_type}"
-        system_type = map_primary_hvac_system_type_to_cbecs_system_type(@primary_hvac_system_type, system_type)
+      puts "system_type derived from standards: #{system_type} and primary hvac system type override is: #{@primary_hvac_system_type}"
+      if !@primary_hvac_system_type.empty?
+        system_type = map_primary_hvac_system_type_to_cbecs_system_type(@primary_hvac_system_type.first.first, system_type)
       end
 
       case system_type
@@ -203,10 +208,24 @@ module BuildingSync
         # Add the user specified HVAC system for each story.
         # Single-zone systems will get one per zone.
         story_groups.each do |zones|
-          model.add_cbecs_hvac_system(standard, system_type, zones)
+          new_system_type = get_system_type_from_zone(zone_hash, zones, system_type)
+          puts "setting system: #{new_system_type} for zone names: #{BuildingSync::Helper.get_zone_name_list(zones)}"
+          model.add_cbecs_hvac_system(standard, new_system_type, zones)
         end
       end
       return true
+    end
+
+    def get_system_type_from_zone(zone_hash, zones, system_type)
+      zone_hash.each do |id, zone_list|
+        zone_name_list = BuildingSync::Helper.get_zone_name_list(zone_list)
+        zones.each do |zone|
+          if zone_name_list.include? zone.name.get
+            return map_primary_hvac_system_type_to_cbecs_system_type(@primary_hvac_system_type[id], system_type)
+          end
+        end
+      end
+      return system_type
     end
 
     def apply_sizing_and_assumptions(model, output_path, standard, primary_bldg_type, system_type, climate_zone)

@@ -83,6 +83,9 @@ module BuildingSync
       @energy_cost = nil
       @annual_fuel_use_native_units = nil
 
+      @load_system = nil
+      @hvac_system = nil
+
       # reading the xml
       read_xml(facility_xml, ns)
     end
@@ -99,6 +102,7 @@ module BuildingSync
 
       read_other_details(facility_xml, ns)
       read_interval_reading(facility_xml, ns)
+      read_systems(facility_xml, ns)
     end
 
     def set_all
@@ -124,8 +128,13 @@ module BuildingSync
       end
       @sites[0].generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file)
 
-      create_building_systems(output_path)
+      zone_hash = build_zone_hash(@sites[0])
+      create_building_systems(output_path, zone_hash)
       return true
+    end
+
+    def build_zone_hash(site)
+      return site.build_zone_hash
     end
 
     def get_sites
@@ -167,6 +176,13 @@ module BuildingSync
       elsif interval_frequency == 'Year'
         @interval_reading_yearly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
       end
+    end
+
+    def read_systems(facility_xml, ns)
+      systems_xml = facility_xml.elements["#{ns}:Systems"]
+
+      @load_system = LoadsSystem.new(systems_xml.elements["#{ns}:PlugLoads"], ns)
+      @hvac_system = HVACSystem.new(systems_xml.elements["#{ns}:HVACSystems"], ns)
     end
 
     def read_other_details(facility_xml, ns)
@@ -234,7 +250,7 @@ module BuildingSync
       end
     end
 
-    def create_building_systems(output_path, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity',
+    def create_building_systems(output_path, zone_hash = nil, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity',
                                 add_space_type_loads = true, add_constructions = true, add_elevators = false, add_exterior_lights = false,
                                 add_exhaust = true, add_swh = true, add_hvac = true, add_thermostat = true, remove_objects = false)
       model = @sites[0].get_model
@@ -249,16 +265,14 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
 
-      load_system = LoadsSystem.new
-      hvac_system = HVACSystem.new
-
+      # todo: systems_xml.elements["#{ns}:LightingSystems"]
       # Make the open_studio_system_standard applier
       open_studio_system_standard = determine_open_studio_system_standard
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Building Standard with template: #{template}.")
 
       # add internal loads to space types
       if add_space_type_loads
-        load_system.add_internal_loads(model, open_studio_system_standard, template, @sites[0].get_building_sections, remove_objects)
+        @load_system.add_internal_loads(model, open_studio_system_standard, template, @sites[0].get_building_sections, remove_objects)
       end
 
       # identify primary building type (used for construction, and ideally HVAC as well)
@@ -289,17 +303,17 @@ module BuildingSync
 
       # add elevators (returns ElectricEquipment object)
       if add_elevators
-        load_system.add_elevator(model, open_studio_system_standard)
+        @load_system.add_elevator(model, open_studio_system_standard)
       end
 
       # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
       if add_exterior_lights
-        load_system.add_exterior_lights(model, open_studio_system_standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
+        @load_system.add_exterior_lights(model, open_studio_system_standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
       end
 
       # add_exhaust
       if add_exhaust
-        hvac_system.add_exhaust(model, open_studio_system_standard, 'Adjacent', remove_objects)
+        @hvac_system.add_exhaust(model, open_studio_system_standard, 'Adjacent', remove_objects)
       end
 
       # add service water heating demand and supply
@@ -308,7 +322,7 @@ module BuildingSync
         serviceHotWaterSystem.add(model, open_studio_system_standard, remove_objects)
       end
 
-      load_system.add_day_lighting_controls(model, open_studio_system_standard, template)
+      @load_system.add_day_lighting_controls(model, open_studio_system_standard, template)
 
       # TODO: - add refrigeration
       # remove refrigeration equipment
@@ -331,12 +345,12 @@ module BuildingSync
       # works by switching some fraction of electric loads to gas if requested (assuming base load is electric)
       # add thermostats
       if add_thermostat
-        hvac_system.add_thermostats(model, open_studio_system_standard, remove_objects)
+        @hvac_system.add_thermostats(model, open_studio_system_standard, remove_objects)
       end
 
       # add hvac system
       if add_hvac
-        hvac_system.add_hvac(model, open_studio_system_standard, system_type, hvac_delivery_type, htg_src, clg_src, remove_objects)
+        @hvac_system.add_hvac(model, zone_hash, open_studio_system_standard, system_type, hvac_delivery_type, htg_src, clg_src, remove_objects)
       end
 
       # TODO: - hours of operation customization (initially using existing measure downstream of this one)
@@ -344,7 +358,7 @@ module BuildingSync
 
       # set hvac controls and efficiencies (this should be last model articulation element)
       if add_hvac
-        hvac_system.apply_sizing_and_assumptions(model, output_path, open_studio_system_standard, primary_bldg_type, system_type, climate_zone)
+        @hvac_system.apply_sizing_and_assumptions(model, output_path, open_studio_system_standard, primary_bldg_type, system_type, climate_zone)
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)
