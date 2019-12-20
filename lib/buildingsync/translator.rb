@@ -128,7 +128,7 @@ module BuildingSync
 
     def gather_results_and_save_xml(dir, baseline_only = false)
       gather_results(dir, baseline_only)
-      saveXML(File.join(dir, 'results.xml'))
+      save_xml(File.join(dir, 'results.xml'))
     end
 
     def gather_results(dir, baseline_only = false)
