@@ -180,9 +180,13 @@ module BuildingSync
 
     def read_systems(facility_xml, ns)
       systems_xml = facility_xml.elements["#{ns}:Systems"]
-
-      @load_system = LoadsSystem.new(systems_xml.elements["#{ns}:PlugLoads"], ns)
-      @hvac_system = HVACSystem.new(systems_xml.elements["#{ns}:HVACSystems"], ns)
+      if systems_xml
+        @load_system = LoadsSystem.new(systems_xml.elements["#{ns}:PlugLoads"], ns)
+        @hvac_system = HVACSystem.new(systems_xml.elements["#{ns}:HVACSystems"], ns)
+      else
+        @load_system = LoadsSystem.new
+        @hvac_system = HVACSystem.new
+      end
     end
 
     def read_other_details(facility_xml, ns)
