@@ -338,10 +338,10 @@ module BuildingSync
       zone_hash = Hash.new
       if @space_types
         zone_list = []
-        @space_types.each do |space_type|
-          zone_list << get_zones_per_space_type(space_type)
+        @space_types.each do |space_type, hash|
+          zone_list << get_zones_per_space_type(hash[:space_type])
         end
-        zone_hash[ID] = zone_list
+        zone_hash[@ID] = zone_list
       end
       @building_sections.each do |bldg_subsec|
         zone_list = []
@@ -355,8 +355,7 @@ module BuildingSync
 
     def get_zones_per_space_type(space_type)
       list_of_zones = []
-      model_space_type = @model.getSpaceTypeByName(space_type.name.get).get
-      model_space_type.spaces.each do |space|
+      space_type.spaces.each do |space|
         list_of_zones << space.thermalZone.get
       end
       return list_of_zones
@@ -719,7 +718,6 @@ module BuildingSync
 
       # TODO: we have not really defined a good logic what happens with multiple sites, versus multiple buildings, here we just take the first building on the first site
       set_building_form_defaults
-
       # checking that the factions add up
       check_building_faction
 
