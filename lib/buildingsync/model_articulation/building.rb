@@ -368,6 +368,25 @@ module BuildingSync
       return zone_hash
     end
 
+    def build_space_type_hash
+      space_type_hash = Hash.new
+      if @space_types
+        space_type_list = []
+        @space_types.each do |space_name, space_type|
+          space_type_list << space_type[:space_type]
+        end
+        space_type_hash[@ID] = space_type_list
+      end
+      @building_sections.each do |bldg_subsec|
+        space_type_list = []
+        bldg_subsec.space_types_floor_area.each do |space_type, hash|
+          space_type_list << space_type
+        end
+        space_type_hash[bldg_subsec.ID] = space_type_list
+      end
+      return space_type_hash
+    end
+
     def get_zones_per_space_type(space_type)
       list_of_zones = []
       model_space_type = @model.getSpaceTypeByName(space_type.name.get).get
@@ -1029,20 +1048,25 @@ module BuildingSync
     end
 
     def get_peak_occupancy
-      peak_occupancy = 0.0
-      peak_occupancy += @occupant_quantity.to_f if @occupant_quantity
+      peak_occupancy = Hash.new
+      if @occupant_quantity
+        peak_occupancy[@ID] = @occupant_quantity.to_f
+        return peak_occupancy
+      end
       @building_sections.each do |section|
-          peak_occupancy += section.get_peak_occupancy.to_f if section.get_peak_occupancy
+          peak_occupancy[section.ID] = section.get_peak_occupancy.to_f if section.get_peak_occupancy
       end
       return peak_occupancy
     end
 
     def get_floor_area
-      return @total_floor_area if @total_floor_area
-      floor_area = 0.0
+      floor_area = Hash.new
+      if @total_floor_area
+        floor_area[@ID] = @total_floor_area.to_f
+      end
       @building_sections.each do |section|
         if section.get_floor_area
-          floor_area += section.get_floor_area
+          floor_area[section.ID] = section.get_floor_area
         end
       end
       return floor_area

@@ -219,6 +219,10 @@ module BuildingSync
       return get_largest_building.get_building_template
     end
 
+    def get_space_types_from_hash(id)
+      return get_largest_building.build_space_type_hash[id]
+    end
+
     def get_system_type
       return get_largest_building.get_system_type
     end
