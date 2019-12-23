@@ -1003,7 +1003,7 @@ module BuildingSync
 
     def get_peak_occupancy
       peak_occupancy = 0.0
-      peak_occupancy += @occupant_quantity if @occupant_quantity
+      peak_occupancy += @occupant_quantity.to_f if @occupant_quantity
       @building_sections.each do |section|
           peak_occupancy += section.get_peak_occupancy.to_f if section.get_peak_occupancy
       end
@@ -1011,7 +1011,8 @@ module BuildingSync
     end
 
     def get_floor_area
-      floor_area = @total_floor_area
+      return @total_floor_area if @total_floor_area
+      floor_area = 0.0
       @building_sections.each do |section|
         if section.get_floor_area
           floor_area += section.get_floor_area

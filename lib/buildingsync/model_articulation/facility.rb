@@ -280,7 +280,7 @@ module BuildingSync
         new_occupancy_peak = @sites[0].get_peak_occupancy
         floor_area = @sites[0].get_floor_area
         if new_occupancy_peak && floor_area && floor_area > 0.0
-          puts "new peak occupancy value found: absolute occupancy: #{new_occupancy_peak} occupancy per area: #{new_occupancy_peak.to_f / floor_area.to_f}"
+          puts "new peak occupancy value found: absolute occupancy: #{new_occupancy_peak} occupancy per area: #{new_occupancy_peak.to_f / floor_area.to_f} and area: #{floor_area} m2"
           @load_system.adjust_occupancy_peak(model, new_occupancy_peak, floor_area, get_space_types)
         end
       end

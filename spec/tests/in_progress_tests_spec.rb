@@ -86,14 +86,4 @@ RSpec.describe 'BuildingSync' do
   it 'should parse and write SFO_Hotel.xml (phase zero) and perform a baseline simulation and gather results' do
     test_baseline_creation_and_simulation('SFO_Hotel.xml',  ASHRAE90_1, 'CZ01RV2.epw')
   end
-
-  def test_baseline_creation_and_simulation(filename, standard_to_be_used, epw_file)
-    translator = test_baseline_creation(filename, standard_to_be_used, epw_file)
-    expect(translator.run_osm(epw_file)).to be true
-    expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
-    out_path = File.dirname(translator.osm_baseline_path)
-    translator.gather_results(out_path, true)
-    translator.save_xml(File.join(out_path, 'results.xml'))
-    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
-  end
 end

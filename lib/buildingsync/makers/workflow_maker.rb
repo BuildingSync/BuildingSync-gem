@@ -316,7 +316,6 @@ module BuildingSync
       puts 'Looking for the baseline scenario ...'
       found_baseline = false
       scenarios.each do |scenario|
-        puts "scenario in write osws #{scenario}"
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         puts "scenario with name #{scenario_name} found"
         if scenario_name == 'Baseline'

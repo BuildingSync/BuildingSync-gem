@@ -251,6 +251,16 @@ RSpec.configure do |config|
     translator.save_xml(File.join(parent_dir_path, 'results.xml'))
   end
 
+  def test_baseline_creation_and_simulation(filename, standard_to_be_used, epw_file)
+    translator = test_baseline_creation(filename, standard_to_be_used, epw_file)
+    expect(translator.run_osm(epw_file)).to be true
+    expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
+    out_path = File.dirname(translator.osm_baseline_path)
+    translator.gather_results(out_path, true)
+    translator.save_xml(File.join(out_path, 'results.xml'))
+    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
+  end
+
   def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
 
     out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
