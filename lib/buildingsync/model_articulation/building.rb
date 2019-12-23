@@ -23,7 +23,7 @@
 # specific prior written permission from Alliance for Sustainable Energy, LLC.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER(S) AND ANY CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO
 # THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 # ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER(S), ANY CONTRIBUTORS, THE
 # UNITED STATES GOVERNMENT, OR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
@@ -52,15 +52,19 @@ module BuildingSync
     def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
       @building_sections = []
       @building_sections_whole_building = []
+      @model = nil
+      @primary_contact_id = nil
+      @ID = nil
+      @all_set = false
+
+      # parameter to read and write.
       @standard_template = nil
-      @single_floor_area = 0.0
       @building_rotation = 0.0
       @floor_height = 0.0
       @width  = 0.0
       @length = 0.0
       @wwr = 0.0
       @name = nil
-      @model = nil
       # variables not used during read xml for now
       @party_wall_stories_north = 0
       @party_wall_stories_south = 0
@@ -71,7 +75,6 @@ module BuildingSync
       @open_studio_standard = nil
       @ownership = nil
       @occupancy_classification = nil
-      @primary_contact_id = nil
       @year_major_remodel = nil
       @year_of_last_energy_audit = nil
       @year_last_commissioning = nil
@@ -80,8 +83,6 @@ module BuildingSync
       @percent_occupied_by_owner = nil
       @occupant_quantity = nil
       @number_of_units = nil
-      @all_set = false
-
       @fraction_area = 1.0
       # code to initialize
       read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
@@ -92,6 +93,12 @@ module BuildingSync
     end
 
     def read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
+      # building ID
+      if build_element.attributes['ID']
+        @ID = build_element.attributes['ID']
+      end
+      # city and state
+      read_city_and_state_name(build_element, ns)
       # floor areas
       read_floor_areas(build_element, site_total_floor_area, ns)
       # standard template
@@ -134,14 +141,7 @@ module BuildingSync
     end
 
     def set_width_and_length
-      footprint = nil
-      # handle user-assigned single floor plate size condition
-      if @single_floor_area > 0.0
-        footprint = OpenStudio.convert(@single_floor_area, 'ft2', 'm2')
-        @total_floor_area = footprint * num_stories.to_f
-      else
-        footprint = @total_floor_area / num_stories.to_f
-      end
+      footprint = @total_floor_area / num_stories.to_f
       @width = Math.sqrt(footprint / @ns_to_ew_ratio)
       @length = footprint / @width
     end
@@ -200,6 +200,19 @@ module BuildingSync
       end
     end
 
+    def read_city_and_state_name(build_element, ns)
+      if build_element.elements["#{ns}:Address/#{ns}:City"]
+        @city_name = build_element.elements["#{ns}:Address/#{ns}:City"].text
+      else
+        @city_name = nil
+      end
+      if build_element.elements["#{ns}:Address/#{ns}:State"]
+        @state_name = build_element.elements["#{ns}:Address/#{ns}:State"].text
+      else
+        @state_name = nil
+      end
+    end
+
     def get_building_type
       set_all
       # try to get the bldg type at the building level, if it is nil then look at the first section
@@ -252,18 +265,20 @@ module BuildingSync
             section.fraction_area = areas[i] / @total_floor_area
             i += 1
           end
+        elsif @building_sections.count == 1
+          # only if we have just one section the section fraction is set to the building fraction (1)
+          @building_sections[0].fraction_area = building_fraction
         end
         @building_sections.each do |section|
-          puts "section: #{section.section_type} has fraction: #{section.fraction_area}"
+          puts "section with ID: #{section.ID} and type: '#{section.section_type}' has fraction: #{section.fraction_area}"
           next if section.fraction_area.nil?
           building_fraction -= section.fraction_area
         end
-        if building_fraction <= 0.0
+        if building_fraction.round(3) < 0.0
+          puts "building fraction is #{ building_fraction }"
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
-          # TODO: should we also allow for the case where secions take all of the area? == 0
         end
-        @building_sections[0].fraction_area = building_fraction
       end
     end
 
@@ -334,6 +349,53 @@ module BuildingSync
       end
     end
 
+    def build_zone_hash
+      zone_hash = Hash.new
+      if @space_types
+        zone_list = []
+        @space_types.each do |space_name, space_type|
+          zone_list.concat(get_zones_per_space_type(space_type[:space_type]))
+        end
+        zone_hash[@ID] = zone_list
+      end
+      @building_sections.each do |bldg_subsec|
+        zone_list = []
+        bldg_subsec.space_types_floor_area.each do |space_type, hash|
+          zone_list.concat(get_zones_per_space_type(space_type))
+        end
+        zone_hash[bldg_subsec.ID] = zone_list
+      end
+      return zone_hash
+    end
+
+    def build_space_type_hash
+      space_type_hash = Hash.new
+      if @space_types
+        space_type_list = []
+        @space_types.each do |space_name, space_type|
+          space_type_list << space_type[:space_type]
+        end
+        space_type_hash[@ID] = space_type_list
+      end
+      @building_sections.each do |bldg_subsec|
+        space_type_list = []
+        bldg_subsec.space_types_floor_area.each do |space_type, hash|
+          space_type_list << space_type
+        end
+        space_type_hash[bldg_subsec.ID] = space_type_list
+      end
+      return space_type_hash
+    end
+
+    def get_zones_per_space_type(space_type)
+      list_of_zones = []
+      model_space_type = @model.getSpaceTypeByName(space_type.name.get).get
+      model_space_type.spaces.each do |space|
+        list_of_zones << space.thermalZone.get
+      end
+      return list_of_zones
+    end
+
     def bldg_space_types_floor_area_hash
       new_hash = {}
       if @building_sections.count > 0
@@ -344,8 +406,8 @@ module BuildingSync
         end
         # if we have no sections we need to do the same just for the building
       elsif @building_sections.count == 0
-        space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
-        puts " Space types: #{space_types} selected for building type: #{@bldg_type} and standard template: #{@standard_template}"
+        @space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
+        puts " Space types: #{@space_types} selected for building type: #{@bldg_type} and standard template: #{@standard_template}"
         space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @open_studio_standard)
         space_types_floor_area.each do |space_type, hash|
           new_hash[space_type] = hash
@@ -366,9 +428,7 @@ module BuildingSync
     end
 
     def set_bldg_and_system_type_for_building_and_section
-      @building_sections.each do |section|
-        section.set_bldg_and_system_type
-      end
+      @building_sections.each(&:set_bldg_and_system_type)
 
       set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
     end
@@ -467,8 +527,20 @@ module BuildingSync
           puts "case 2.1: weather_station_id is not nil #{weather_station_id}"
           epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
         elsif !city_name.nil? && !state_name.nil?
-          puts "case 2.2: city_name and state_name is not nil #{city_name} #{state_name}"
+          puts "case 2.2: SITE LEVEL city_name and state_name is not nil #{city_name} #{state_name}"
           epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
+        elsif !@city_name.nil? && !@state_name.nil?
+          puts "case 2.3: BUILDING LEVEL city_name and state_name is not nil #{@city_name} #{@state_name}"
+          epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(@state_name, @city_name)
+        end
+
+        # Ensure a file path gets set, else raise error
+        if epw_file_path.nil?
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path is nil and no way to set from Site or Building parameters.')
+          raise 'Error : epw_file_path is nil and no way to set from Site or Building parameters.'
+        elsif !File.exist?(epw_file_path)
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path file does not exist.')
+          raise 'Error : epw_file_path file does not exist.'
         end
 
         set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
@@ -699,7 +771,7 @@ module BuildingSync
 
       # set building rotation
       initial_rotation = @model.getBuilding.northAxis
-      if building_rotation != initial_rotation
+      if @building_rotation != initial_rotation
         @model.getBuilding.setNorthAxis(building_rotation)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "Set Building Rotation to #{@model.getBuilding.northAxis}")
       end
@@ -787,7 +859,7 @@ module BuildingSync
       # test for excessive exterior roof area (indication of problem with intersection and or surface matching)
       ext_roof_area = @model.getBuilding.exteriorSurfaceArea - @model.getBuilding.exteriorWallArea
       expected_roof_area = total_floor_area / num_stories.to_f
-      if ext_roof_area > expected_roof_area && @single_floor_area == 0.0 # only test if using whole-building area input
+      if ext_roof_area > expected_roof_area # only test if using whole-building area input
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', 'Roof area larger than expected, may indicate problem with inter-floor surface intersection or matching.')
         return false
       end
@@ -940,8 +1012,64 @@ module BuildingSync
       @model.save("#{dir}/in.osm", true)
     end
 
+    def write_parameters_to_xml(ns, building)
+      building.elements["#{ns}:PremisesName"].text = @name if !@name.nil?
+      building.elements["#{ns}:YearOfConstruction"].text = @built_year if !@built_year.nil?
+      building.elements["#{ns}:Ownership"].text = @ownership if !@ownership.nil?
+      building.elements["#{ns}:OccupancyClassification"].text = @occupancy_classification if !@occupancy_classification.nil?
+      building.elements["#{ns}:YearOfLastMajorRemodel"].text = @year_major_remodel if !@year_major_remodel.nil?
+      building.elements["#{ns}:YearOfLastEnergyAudit"].text = @year_of_last_energy_audit if !@year_of_last_energy_audit.nil?
+      building.elements["#{ns}:RetrocommissioningDate"].text = @year_last_commissioning if !@year_last_commissioning.nil?
+      building.elements["#{ns}:BuildingAutomationSystem"].text = @building_automation_system if !@building_automation_system.nil?
+      building.elements["#{ns}:HistoricalLandmark"].text = @historical_landmark if !@historical_landmark.nil?
+      building.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
+      building.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text = @number_of_units if !@number_of_units.nil?
+      building.elements["#{ns}:PercentOccupiedByOwner"].text = @percent_occupied_by_owner if !@percent_occupied_by_owner.nil?
+
+      # Add new element in the XML file
+      add_element_in_xml_file(building, ns, 'StandardTemplate', @standard_template)
+      add_element_in_xml_file(building, ns, 'BuildingRotation', @building_rotation)
+      add_element_in_xml_file(building, ns, 'FloorHeight', @floor_height)
+      add_element_in_xml_file(building, ns, 'WindowWallRatio', @wwr)
+      add_element_in_xml_file(building, ns, 'PartyWallStoriesNorth', @party_wall_stories_north)
+      add_element_in_xml_file(building, ns, 'PartyWallStoriesSouth', @party_wall_stories_south)
+      add_element_in_xml_file(building, ns, 'PartyWallStoriesEast', @party_wall_stories_east)
+      add_element_in_xml_file(building, ns, 'PartyWallStoriesWest', @party_wall_stories_west)
+      add_element_in_xml_file(building, ns, 'Width', @width)
+      add_element_in_xml_file(building, ns, 'Length', @length)
+      add_element_in_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
+      add_element_in_xml_file(building, ns, 'FractionArea', @fraction_area)
+
+      write_parameters_to_xml_for_spatial_element(ns, building)
+    end
+
     def get_space_types
       return @model.getSpaceTypes
+    end
+
+    def get_peak_occupancy
+      peak_occupancy = Hash.new
+      if @occupant_quantity
+        peak_occupancy[@ID] = @occupant_quantity.to_f
+        return peak_occupancy
+      end
+      @building_sections.each do |section|
+          peak_occupancy[section.ID] = section.get_peak_occupancy.to_f if section.get_peak_occupancy
+      end
+      return peak_occupancy
+    end
+
+    def get_floor_area
+      floor_area = Hash.new
+      if @total_floor_area
+        floor_area[@ID] = @total_floor_area.to_f
+      end
+      @building_sections.each do |section|
+        if section.get_floor_area
+          floor_area[section.ID] = section.get_floor_area
+        end
+      end
+      return floor_area
     end
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr, :year_of_last_energy_audit, :ownership,

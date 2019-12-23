@@ -87,37 +87,32 @@ RSpec.configure do |config|
     osw_path = osm_baseline_path.gsub('.osm', '.osw')
     workflow.saveAs(File.absolute_path(osw_path.to_s))
 
-    if BuildingSync::Extension::DO_SIMULATIONS || BuildingSync::Extension::SIMULATE_BASELINE_ONLY
-      cli_path = OpenStudio.getOpenStudioCLI
-      cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
-      # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_path}\""
-      puts cmd
+    cli_path = OpenStudio.getOpenStudioCLI
+    cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
+    # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_path}\""
+    puts cmd
 
+    # Run the sizing run
+    OpenstudioStandards.run_command(cmd)
+
+    expect(File.exist?(osm_baseline_path.gsub('in.osm', 'run/eplusout.sql'))).to be true
+   end
+
+  def run_scenario_simulations(osw_files, num_of_threads = 7)
+    cli_path = OpenStudio.getOpenStudioCLI
+    counter = 1
+    Parallel.each(osw_files, in_threads: num_of_threads) do |osw_file|
+      cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
+      # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
+      puts "#{counter}) #{cmd}"
+      counter += 1
       # Run the sizing run
       OpenstudioStandards.run_command(cmd)
 
-      expect(File.exist?(osm_baseline_path.gsub('in.osm', 'run/eplusout.sql'))).to be true
-      # expect(File.exist?(osm_name.gsub('in.osm', 'run/eplusout.sql'))).to be true
+      sql_file = osw_file.gsub('in.osw', 'eplusout.sql')
+      puts "Simulation not completed successfully for file: #{osw_file}" if !File.exist?(sql_file)
+      expect(File.exist?(sql_file)).to be true
     end
-  end
-
-  def run_scenario_simulations(osw_files)
-    cli_path = OpenStudio.getOpenStudioCLI
-    if BuildingSync::Extension::DO_SIMULATIONS || !BuildingSync::Extension::SIMULATE_BASELINE_ONLY
-      counter = 1
-      Parallel.each(osw_files, in_threads: BuildingSync::Extension::NUM_PARALLEL) do |osw_file|
-        cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
-        # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
-        puts "#{counter}) #{cmd}"
-        counter += 1
-        # Run the sizing run
-        OpenstudioStandards.run_command(cmd)
-
-        sql_file = osw_file.gsub('in.osw', 'eplusout.sql')
-        puts "Simulation not completed successfully for file: #{osw_file}" if !File.exist?(sql_file)
-        expect(File.exist?(sql_file)).to be true
-      end
-      end
   end
 
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
@@ -239,7 +234,51 @@ RSpec.configure do |config|
     puts "IDF file (#{File.basename(idf_file)})successfully saved" if workspace.save(idf_file)
   end
 
-  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, run_simulation = true)
+  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+
+    translator = test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used , epw_file_name)
+
+    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
+    osw_files = []
+    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
+
+    translator.run_osws
+
+    dir_path = File.dirname(osw_files[0])
+    parent_dir_path = File.expand_path('..', dir_path)
+
+    translator.gather_results(parent_dir_path)
+    translator.save_xml(File.join(parent_dir_path, 'results.xml'))
+  end
+
+  def test_baseline_creation_and_simulation(filename, standard_to_be_used, epw_file)
+    translator = test_baseline_creation(filename, standard_to_be_used, epw_file)
+    expect(translator.run_osm(epw_file)).to be true
+    expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
+    out_path = File.dirname(translator.osm_baseline_path)
+    translator.gather_results(out_path, true)
+    translator.save_xml(File.join(out_path, 'results.xml'))
+    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
+  end
+
+  def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+
+    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
+
+    translator = test_baseline_creation(file_name, standard_to_be_used, epw_file_name)
+    translator.write_osws
+
+    osw_files = []
+    osw_sr_files = []
+    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
+    Dir.glob("#{out_path}/SR/*.osw") { |osw| osw_sr_files << osw }
+
+    # we compare the counts, by also considering the two potential osw files in the SR directory
+    expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
+    return translator
+  end
+
+  def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
@@ -262,25 +301,7 @@ RSpec.configure do |config|
 
     expect(File.exist?("#{out_path}/in.osm")).to be true
 
-    translator.write_osws
-
-    osw_files = []
-    osw_sr_files = []
-    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
-    Dir.glob("#{out_path}/SR/*.osw") { |osw| osw_sr_files << osw }
-
-    # we compare the counts, by also considering the two potential osw files in the SR directory
-    expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
-
-    if run_simulation
-      translator.run_osws
-
-      dir_path = File.dirname(osw_files[0])
-      parent_dir_path = File.expand_path('..', dir_path)
-
-      translator.gather_results(parent_dir_path)
-      translator.save_xml(File.join(parent_dir_path, 'results.xml'))
-    end
+    return translator
   end
 
   def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)

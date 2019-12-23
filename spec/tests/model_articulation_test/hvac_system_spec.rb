@@ -55,8 +55,8 @@ RSpec.describe 'HVACSystemSpec' do
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref 1980-2004')
     hvac_system = BuildingSync::HVACSystem.new
-    puts 'expected : true but got: false} ' if hvac_system.add_hvac(model, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true) != true
-    expect(hvac_system.add_hvac(model, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true)).to be true
+    puts 'expected : true but got: false} ' if hvac_system.add_hvac(model, nil, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true) != true
+    expect(hvac_system.add_hvac(model, nil, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true)).to be true
   end
 
   it 'Should apply sizing and assumptions in HVAC System' do
@@ -72,8 +72,9 @@ RSpec.describe 'HVACSystemSpec' do
   it 'Should return typical_occupant_usage_value_weeks ' do
     hvac_system = get_hvac_system_from_file('building_151_level1.xml', ASHRAE90_1)
     expected_value = 'VAVwReheat'
-    puts "expected primary_hvac_system_type : #{expected_value} but got: #{hvac_system.primary_hvac_system_type} " if hvac_system.primary_hvac_system_type != expected_value
-    expect(hvac_system.primary_hvac_system_type == expected_value).to be true
+    puts "hvac_system #{hvac_system}"
+    puts "expected primary_hvac_system_type : #{expected_value} but got: #{hvac_system.get_primary_hvac_system_type} " if hvac_system.get_primary_hvac_system_type != expected_value
+    expect(hvac_system.get_primary_hvac_system_type == expected_value).to be true
   end
 
   def get_hvac_system_from_file(xml_file_name, standard_to_be_used)
@@ -81,7 +82,7 @@ RSpec.describe 'HVACSystemSpec' do
     File.open(xml_file_path, 'r') do |file|
       doc = REXML::Document.new(file)
       ns = 'auc'
-      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Systems/#{ns}:HVACSystems/#{ns}:HVACSystem") do |hvac_system|
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Systems/#{ns}:HVACSystems") do |hvac_system|
         return BuildingSync::HVACSystem.new(hvac_system, ns)
       end
     end

@@ -34,12 +34,19 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-module BuildingSync
-  class ModelMakerLevelOne < ModelMakerLevelZero
-    # load the building sync file and chooses the correct workflow
+require 'fileutils'
+require 'json'
 
-    def generate_baseline(dir)
-      # generate the baseline open studio model
+module BuildingSync
+  # base class for objects that will configure model maker based on building sync files
+  class ModelMakerBase
+    def initialize(doc, ns)
+      @doc = doc
+      @ns = ns
     end
+
+    def generate_baseline; end
+
+    def write_osm; end
   end
 end

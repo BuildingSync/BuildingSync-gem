@@ -49,5 +49,14 @@ module BuildingSync
       end
       return nil
     end
+
+    def self.get_zone_name_list(zones)
+      names = []
+      zones.each do |zone|
+        names << zone.name.get
+      end
+      return names
+    end
+
   end
 end

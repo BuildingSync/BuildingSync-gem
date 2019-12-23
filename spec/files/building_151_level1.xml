@@ -77,7 +77,7 @@
 							<auc:PercentOccupiedByOwner>60</auc:PercentOccupiedByOwner>
 							<auc:OccupancyLevels>
 								<auc:OccupancyLevel>
-									<auc:OccupantQuantity>15</auc:OccupantQuantity>
+									<auc:OccupantQuantity>15000</auc:OccupantQuantity>
 								</auc:OccupancyLevel>
 							</auc:OccupancyLevels>
 							<auc:SpatialUnits>
@@ -122,6 +122,11 @@
 				<auc:HVACSystems>
 					<auc:HVACSystem>
 						<auc:PrimaryHVACSystemType>VAVwReheat</auc:PrimaryHVACSystemType>
+						<auc:LinkedPremises>
+							<auc:Building>
+								<auc:LinkedBuildingID IDref="Building151"></auc:LinkedBuildingID>
+							</auc:Building>
+						</auc:LinkedPremises>
 					</auc:HVACSystem>
 				</auc:HVACSystems>
 			</auc:Systems>

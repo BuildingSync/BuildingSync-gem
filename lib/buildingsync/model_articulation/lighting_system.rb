@@ -38,23 +38,41 @@
 module BuildingSync
   class LightingSystemType
 
-    def initialize(doc, ns, ref)
-      @lighting_type = nil
-      @ballast_type = nil
+    def initialize(doc, ns)
+      @lighting_type = Hash.new
+      @ballast_type = Hash.new
+      @primary_lighting_system_type = Hash.new
 
       doc.elements.each("#{ns}:Systems/#{ns}:LightingSystems/#{ns}:LightingSystem") do |lighting_system|
-        if lighting_system.attributes["ID"] == ref
           read(lighting_system, ns)
         end
-      end
     end
 
     def read(section_element, ns)
+      primary_lighting_type = nil
+      if section_element.elements["#{ns}:PrimaryLightingSystemType"]
+        primary_lighting_type = section_element.elements["#{ns}:PrimaryLightingSystemType"].text
+      end
       if section_element.elements["#{ns}:LampType/#{ns}:SolidStateLighting/#{ns}:LampLabel"]
-        @lighting_type = section_element.elements["#{ns}:LampType/#{ns}:SolidStateLighting/#{ns}:LampLabel"].text
+        lighting_type = section_element.elements["#{ns}:LampType/#{ns}:SolidStateLighting/#{ns}:LampLabel"].text
       end
       if section_element.elements["#{ns}:BallastType"]
-        @ballast_type = section_element.elements["#{ns}:BallastType"].text
+        ballast_type = section_element.elements["#{ns}:BallastType"].text
+      end
+      if section_element.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"]
+         linked_building = section_element.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref']
+         puts "found primary lighting type: #{primary_lighting_type} for linked building: #{linked_building}"
+         @primary_lighting_system_type[linked_building] = primary_lighting_type
+         @lighting_type[linked_building] = lighting_type
+         @ballast_type[linked_building] = ballast_type
+      elsif section_element.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"]
+         linked_section = section_element.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"].attributes['IDref']
+         puts "found primary lighting type: #{primary_lighting_type} for linked section: #{linked_section}"
+         @primary_lighting_system_type[linked_section] = primary_lighting_type
+         @lighting_type[linked_section] = lighting_type
+         @ballast_type[linked_section] = ballast_type
+      elsif primary_lighting_type
+         puts "primary_lighting_system_type: #{primary_lighting_type} is not linked to a building or section "
       end
     end
   end

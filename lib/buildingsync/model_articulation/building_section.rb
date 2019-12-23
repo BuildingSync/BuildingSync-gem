@@ -50,11 +50,20 @@ module BuildingSync
 
     # initialize
     def initialize(section_element, occ_type, bldg_total_floor_area, ns)
+      @ID = nil
+      @doorIDs = []
+      @wallIDs = []
+      @windowIDs = []
+      @roofIDs = []
+      @skylightIDs = []
+      @exterior_floorIDs = []
+      @foundationIDs = []
+
+
+      # parameter to read and write.
       @fraction_area = nil
       @bldg_type = {}
-      @occupancy_classification = nil
       @occupancy_classification_original = nil
-      @floor_area_value = nil
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
       @occupant_quantity = nil
@@ -67,19 +76,14 @@ module BuildingSync
       @dwelling_quantity = nil
       @dwellings_occupied_percent = nil
 
-      @doorIDs = []
-      @wallIDs = []
-      @windowIDs = []
-      @roofIDs = []
-      @skylightIDs = []
-      @exterior_floorIDs = []
-      @foundationIDs = []
-
       # code to initialize
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
     end
 
     def read_xml(section_element, occ_type, bldg_total_floor_area, ns)
+      if section_element.attributes['ID']
+        @ID = section_element.attributes['ID']
+      end
       # floor areas
       @total_floor_area = read_floor_areas(section_element, bldg_total_floor_area, ns)
       # based on the occupancy type set building type, system type and bar division method
@@ -89,6 +93,12 @@ module BuildingSync
       read_footprint_shape(section_element, ns)
       read_principal_hvac_type(section_element, ns)
       read_construction_types(section_element, ns)
+
+      if section_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"]
+        @occupant_quantity = section_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text
+      else
+        @occupant_quantity = nil
+      end
     end
 
     def read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
@@ -132,7 +142,7 @@ module BuildingSync
     end
 
     def read_principal_hvac_type(section_element, ns)
-     if section_element.elements["#{ns}:UserDefinedFields"]
+      if section_element.elements["#{ns}:UserDefinedFields"]
         section_element.elements.each("#{ns}:UserDefinedFields/#{ns}:UserDefinedField") do |user_defined_field|
           if user_defined_field.elements["#{ns}:FieldName"].text == 'Principal HVAC System Type'
             @principal_hvac_type = user_defined_field.elements["#{ns}:FieldValue"].text
@@ -150,7 +160,7 @@ module BuildingSync
             @dwellings_occupied_percent = user_defined_field.elements["#{ns}:FieldValue"].text
           end
         end
-      end
+       end
     end
 
     def read_construction_types(section_element, ns)
@@ -185,11 +195,50 @@ module BuildingSync
       end
     end
 
+    def write_parameters_to_xml(ns, buildingSection)
+      buildingSection.elements["#{ns}:fraction_area"].text = @fraction_area
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_hvac_type if !@principal_hvac_type.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_lighting_system_type if !@principal_lighting_system_type.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @miscellaneous_electric_load if !@miscellaneous_electric_load.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @spaces_conditioned_percent if !@spaces_conditioned_percent.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwelling_quantity if !@dwelling_quantity.nil?
+      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwellings_occupied_percent if !@dwellings_occupied_percent.nil?
+      buildingSection.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_hours if !@typical_occupant_usage_value_hours.nil?
+      buildingSection.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_weeks if !@typical_occupant_usage_value_weeks.nil?
+      buildingSection.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
+      buildingSection.elements["#{ns}:FootprintShape"].text = @footprint_shape if !@footprint_shape.nil?
+      buildingSection.elements["#{ns}:SectionType"].text = @section_type if !@section_type.nil?
+
+      # Add new element in the XML file
+      add_element_in_xml_file(buildingSection, ns, 'BuildingType', @bldg_type)
+      add_element_in_xml_file(buildingSection, ns, 'OriginalOccupancyClassification', @occupancy_classification_original)
+      add_element_in_xml_file(buildingSection, ns, 'FractionArea', @fraction_area)
+
+      write_parameters_to_xml_for_spatial_element(ns, buildingSection)
+    end
+
     def set_bldg_and_system_type
       super(@occupancy_type, @total_floor_area, false)
     end
 
-    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type
+    def read_xml_file_document(xml_file_path)
+      doc = nil
+      File.open(xml_file_path, 'r') do |file|
+        doc = REXML::Document.new(file)
+      end
+      return doc
+    end
+
+    def get_peak_occupancy
+      return @occupant_quantity
+    end
+
+    def get_floor_area
+      return @total_floor_area
+    end
+
+    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type, :ID
     attr_accessor :fraction_area
   end
 end

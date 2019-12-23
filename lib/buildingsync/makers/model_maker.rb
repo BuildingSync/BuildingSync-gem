@@ -34,81 +34,62 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-
-require 'fileutils'
-require 'json'
-require_relative 'model_maker'
-
+require_relative '../model_articulation/facility'
+require_relative 'workflow_maker'
 module BuildingSync
-  # base class for objects that will configure workflows based on building sync files
-  class WorkflowMaker < ModelMaker
-    def write_osws(dir)
-      FileUtils.mkdir_p(dir)
+  class ModelMaker < ModelMakerBase
+    def initialize(doc, ns)
+      super
+
+      @facilities = []
+      @facility = nil
+      read_xml
     end
 
-    def gather_results(dir, baseline_only = false); end
+    def read_xml
+      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
+        @facilities.push(Facility.new(facility_element, @ns))
+      end
 
-    def failed_scenarios
-      return []
-    end
-
-    def save_xml(filename)
-      File.open(filename, 'w') do |file|
-        @doc.write(file)
+      if @facilities.count == 0
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', 'There are no facilities in your BuildingSync file.')
+        raise 'Error: There are no facilities in your BuildingSync file.'
+      elsif @facilities.count > 1
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
+        raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
       end
     end
 
-    def set_measure_path(osw, measures_dir)
-      osw['measure_paths'] = [measures_dir]
+    def get_facility
+      return @facility
     end
 
-    def set_measure_paths(osw, measures_dir_array)
-      osw['measure_paths'] = measures_dir_array
+    def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
+      @facilities.each(&:set_all)
+      open_studio_standard = @facilities[0].determine_open_studio_standard(standard_to_be_used)
+
+      @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used, ddy_file)
+      return write_osm(dir)
     end
 
-    def clear_all_measures
-      @workflow.delete('steps')
-      @workflow['steps'] = []
+    def get_space_types
+      return @facilities[0].get_space_types
     end
 
-    def add_measure_path(measures_dir)
-      @workflow['measure_paths'].each do |dir|
-        if dir == measures_dir
-          return false
-        end
+    def get_model
+      return @facilities[0].get_model
+    end
+
+    def write_parameters_to_xml
+      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
+        @facilities[0].write_parameters_to_xml(@ns, facility)
       end
-      @workflow['measure_paths'] << measures_dir
-      return true
     end
 
-    def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
-      result = false
-      osw['steps'].each do |step|
-        if step['measure_dir_name'] == measure_dir_name
-          step['arguments'][argument_name] = argument_value
-          result = true
-        end
-      end
+    private
 
-      if !result
-        raise "Could not set '#{argument_name}' to '#{argument_value}' for measure '#{measure_dir_name}'"
-      end
-
-      return result
-    end
-
-    def add_new_measure(osw, measure_dir_name)
-      # first we check if the measure already exists
-      osw['steps'].each do |step|
-        if step['measure_dir_name'] == measure_dir_name
-          return false
-        end
-      end
-      # if it does not exist we add it
-      new_step = {}
-      new_step['measure_dir_name'] = measure_dir_name
-      osw['steps'].unshift(new_step)
-      return true
+    def write_osm(dir)
+      @facility = @facilities[0].write_osm(dir)
     end
   end
 end

@@ -146,7 +146,7 @@ RSpec.describe 'BuildingSpec' do
 
   it 'Should return OccupantQuantity' do
     building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = '15'
+    expected_value = '15000'
     puts "expected occupant_quantity: #{expected_value} but got: #{building.occupant_quantity} " if building.occupant_quantity != expected_value
     expect(building.occupant_quantity == expected_value).to be true
   end

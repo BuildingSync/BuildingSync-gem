@@ -40,6 +40,11 @@
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "VAV with reheat"
   }],
+  "Assembly-Convention center": [{
+    "bldg_type": "SecondarySchool",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "VAV with reheat"
+  }],
   "Outpatient": [{
     "bldg_type": "Outpatient",
     "bar_division_method": "Single Space Type - Core and Perimeter",
@@ -60,12 +65,27 @@
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "VAV with reheat"
   }],
+  "Lodging with extended amenities": [{
+    "bldg_type": "LargeHotel",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "VAV with reheat"
+  }],
   "QuickServiceRestaurant": [{
     "bldg_type": "QuickServiceRestaurant",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PSZ-AC with gas coil heat"
   }],
   "FullServiceRestaurant": [{
+    "bldg_type": "FullServiceRestaurant",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-AC with gas coil heat"
+  }],
+  "Restaurant": [{
+    "bldg_type": "FullServiceRestaurant",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PSZ-AC with gas coil heat"
+  }],
+  "Food service": [{
     "bldg_type": "FullServiceRestaurant",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PSZ-AC with gas coil heat"

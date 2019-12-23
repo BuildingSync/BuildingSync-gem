@@ -12,6 +12,7 @@
 /spec/output/
 /SR1
 /SRvt
+.DS_Store
 
 # rspec failure tracking
 .rspec_status

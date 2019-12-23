@@ -42,7 +42,7 @@ module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpatialElement
     def initialize
-      @total_floor_area = nil  # gross floor area
+      @total_floor_area = nil # gross floor area
       @bldg_type = nil
       @system_type = nil
       @bar_division_method = nil
@@ -59,6 +59,7 @@ module BuildingSync
 
     def read_floor_areas(build_element, parent_total_floor_area, ns)
       build_element.elements.each("#{ns}:FloorAreas/#{ns}:FloorArea") do |floor_area_element|
+        next if !floor_area_element.elements["#{ns}:FloorAreaValue"]
         floor_area = floor_area_element.elements["#{ns}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
 
@@ -89,14 +90,14 @@ module BuildingSync
       if @total_floor_area.nil? || @total_floor_area == 0
         # if the total floor area is null, we try to calculate the total area, from various conditioned areas
         running_floor_area = 0
-        if !@cooled_only_floor_area.nil? && @cooled_only_floor_area > 0
-          running_floor_area += @cooled_only_floor_area
+        if !@conditioned_floor_area_cooled_only.nil? && @conditioned_floor_area_cooled_only > 0
+          running_floor_area += @conditioned_floor_area_cooled_only
         end
-        if !@heated_only_floor_area.nil? && @heated_only_floor_area > 0
-          running_floor_area += @heated_only_floor_area
+        if !@conditioned_floor_area_heated_only.nil? && @conditioned_floor_area_heated_only > 0
+          running_floor_area += @conditioned_floor_area_heated_only
         end
-        if !@conditioned_floor_area.nil? && @conditioned_floor_area > 0
-          running_floor_area += @conditioned_floor_area
+        if !@conditioned_floor_area_heated_cooled.nil? && @conditioned_floor_area_heated_cooled > 0
+          running_floor_area += @conditioned_floor_area_heated_cooled
         end
         if running_floor_area > 0
           @total_floor_area = running_floor_area
@@ -189,22 +190,20 @@ module BuildingSync
             @bldg_type = occ_type[:bldg_type]
             @bar_division_method = occ_type[:bar_division_method]
             @system_type = occ_type[:system_type]
+            return
           end
         end
       end
+      raise "Occupancy type #{occupancy_type} is not available in the bldg_and_system_types.json dictionary"
     end
 
     def validate_positive_number_excluding_zero(name, value)
-      if value <= 0
-        puts "Error: parameter #{name} must be positive and not zero."
-      end
+      puts "Error: parameter #{name} must be positive and not zero." if value <= 0
       return value
     end
 
     def validate_positive_number_including_zero(name, value)
-      if value < 0
-        puts "Error: parameter #{name} must be positive or zero."
-      end
+      puts "Error: parameter #{name} must be positive or zero." if value < 0
       return value
     end
 
@@ -212,9 +211,7 @@ module BuildingSync
     def create_space_types(model, total_bldg_floor_area, standard_template, open_studio_standard)
       # create space types from section type
       # mapping lookup_name name is needed for a few methods
-      if @bldg_type.nil?
-        set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false)
-      end
+      set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false) if @bldg_type.nil?
       if open_studio_standard.nil?
         begin
           open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
@@ -242,9 +239,7 @@ module BuildingSync
 
         # set color
         test = open_studio_standard.space_type_apply_rendering_color(space_type) # this uses openstudio-standards
-        if !test
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', "Warning: Could not find color for #{space_type.name}")
-        end
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', "Warning: Could not find color for #{space_type.name}") if !test
         # extend hash to hold new space type object
         hash[:space_type] = space_type
 
@@ -262,6 +257,38 @@ module BuildingSync
         @space_types_floor_area[hash[:space_type]] = { floor_area: final_floor_area }
       end
       return @space_types_floor_area
+    end
+
+    def add_element_in_xml_file(building_element, ns, field_name, field_value)
+      user_defined_fields = REXML::Element.new("#{ns}:UserDefinedFields")
+      user_defined_field = REXML::Element.new("#{ns}:UserDefinedField")
+      field_name_element = REXML::Element.new("#{ns}:FieldName")
+      field_value_element = REXML::Element.new("#{ns}:FieldValue")
+
+      if !field_value.nil?
+        user_defined_fields.add_element(user_defined_field)
+        building_element.add_element(user_defined_fields)
+        user_defined_field.add_element(field_name_element)
+        user_defined_field.add_element(field_value_element)
+
+        field_name_element.text = field_name
+        field_value_element.text = field_value
+      end
+    end
+
+    def write_parameters_to_xml_for_spatial_element(ns, xml_element)
+      add_element_in_xml_file(xml_element, ns, 'TotalFloorArea', @total_floor_area)
+      add_element_in_xml_file(xml_element, ns, 'BuildingType', @bldg_type)
+      add_element_in_xml_file(xml_element, ns, 'SystemType', @system_type)
+      add_element_in_xml_file(xml_element, ns, 'BarDivisionMethod', @bar_division_method)
+      add_element_in_xml_file(xml_element, ns, 'FractionArea', @fraction_area)
+      add_element_in_xml_file(xml_element, ns, 'SpaceTypesFloorArea', @space_types_floor_area)
+      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaHeatedOnly', @conditioned_floor_area_heated_only)
+      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaCooledOnly', @conditioned_floor_area_cooled_only)
+      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaHeatedCooled', @conditioned_floor_area_heated_cooled)
+      add_element_in_xml_file(xml_element, ns, 'ConditionedBelowGradeFloorArea', @conditioned_below_grade_floor_area)
+      add_element_in_xml_file(xml_element, ns, 'CustomConditionedAboveGradeFloorArea', @custom_conditioned_above_grade_floor_area)
+      add_element_in_xml_file(xml_element, ns, 'CustomConditionedBelowGradeFloorArea', @custom_conditioned_below_grade_floor_area)
     end
 
     def validate_fraction; end

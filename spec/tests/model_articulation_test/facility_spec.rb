@@ -69,7 +69,7 @@ RSpec.describe 'FacilitySpec' do
     facility.determine_open_studio_standard(ASHRAE90_1)
     output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
     facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
-    facility.create_building_systems(output_path, 'Forced Air', 'Electricity', 'Electricity',
+    facility.create_building_systems(output_path, nil, 'Forced Air', 'Electricity', 'Electricity',
                                      true, true, true, true,
                                      true, true, true, true, true)
   end

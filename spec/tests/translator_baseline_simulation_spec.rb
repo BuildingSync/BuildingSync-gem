@@ -46,6 +46,12 @@ RSpec.describe 'BuildingSync' do
     expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
   end
 
+  it 'should parse and write building_151_level1.xml (phase zero) with auc namespace for ASHRAE 90.1 and perform a baseline simulation' do
+    translator = test_baseline_creation('building_151_level1.xml', ASHRAE90_1)
+    expect(translator.run_osm('CZ01RV2.epw')).to be true
+    expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
+  end
+
   it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1 and perform a baseline simulation' do
     translator = test_baseline_creation('building_151.xml', ASHRAE90_1)
     expect(translator.run_osm('CZ01RV2.epw')).to be true
@@ -96,6 +102,7 @@ RSpec.describe 'BuildingSync' do
       expect(translator.run_osm('CZ01RV2.epw')).to be true
       expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
     rescue StandardError => e
+      puts "e.message #{e.message}"
       expect(e.message.include?('Occupancy type Food service is not available in the bldg_and_system_types.json dictionary')).to be true
     end
   end
@@ -113,7 +120,33 @@ RSpec.describe 'BuildingSync' do
     out_path = File.dirname(translator.osm_baseline_path)
     translator.gather_results(out_path, true)
     translator.save_xml(File.join(out_path, 'results.xml'))
+    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
+  end
 
-    # expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
+  it 'should parse and write L100.xml (phase zero) with auc namespace for ASHRAE 90.1' do
+    translator = test_baseline_creation('L100_Instance1.xml', ASHRAE90_1, 'CZ01RV2.epw')
+    expect(translator.run_osm('CZ01RV2.epw')).to be true
+    expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
+
+    out_path = File.dirname(translator.osm_baseline_path)
+    translator.gather_results(out_path, true)
+    translator.save_xml(File.join(out_path, 'results.xml'))
+    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
+  end
+
+  it 'should parse and write L000_Instance1.xml (phase zero) and perform a baseline simulation and gather results' do
+    test_baseline_creation_and_simulation('L000_Instance1.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write L000_Instance2.xml (phase zero) and perform a baseline simulation and gather results' do
+    test_baseline_creation_and_simulation('L000_Instance2.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write L100_Instance1.xml (phase zero) and perform a baseline simulation and gather results' do
+    test_baseline_creation_and_simulation('L100_Instance1.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write Office_Carolina.xml (phase zero) and perform a baseline simulation and gather results' do
+    test_baseline_creation_and_simulation('Office_Carolina.xml',  ASHRAE90_1, 'CZ01RV2.epw')
   end
 end

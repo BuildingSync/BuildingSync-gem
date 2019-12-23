@@ -12,6 +12,7 @@ matrix:
     - env: FAVOR_LOCAL_GEMS=1 OPENSTUDIO_VERSION=2.9.0 OPENSTUDIO_SHA=801faa459c RUBYLIB=/usr/local/openstudio-2.9.0/Ruby:/usr/Ruby
 before_install:
   - gem install bundler -v '~> 1.17'
+  - bundle -v
   - sudo rm /usr/local/bin/docker-compose
 install: 
   - bundle install
@@ -20,7 +21,10 @@ before_script:
   - chmod +x install_openstudio.sh
   - sudo ./install_openstudio.sh $OPENSTUDIO_VERSION $OPENSTUDIO_SHA
 script:
-#  - bundle exec rspec spec/tests/selection_tool_spec.rb
+#  - bundle exec rspec spec/tests/selection_tool_spec.rb  // selection tool is not working with ASHRAE level 1.5 yet
+  - bundle exec rspec spec/tests/building_sync_spec.rb
+  - bundle exec rspec spec/tests/translator_spec.rb
+  - bundle exec rspec spec/tests/epw_test_spec.rb
   - bundle exec rspec spec/tests/model_articulation_test/building_spec.rb
   - bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb
   - bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb
@@ -29,11 +33,9 @@ script:
   - bundle exec rspec spec/tests/model_articulation_test/loads_system_spec.rb
   - bundle exec rspec spec/tests/model_articulation_test/service_hot_water_system_spec.rb
   - bundle exec rspec spec/tests/model_articulation_test/site_spec.rb
-#  - bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb
+#  - bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb  // fails sometimes due to connection issues, so we exclude it here
   - bundle exec rspec spec/tests/translator_baseline_generation_spec.rb
-  - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb
+#  - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb
   - bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
-
-# the scenario simulations seem to take too much time, is there are way around this??
-#  - bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb
+#  - bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb // this takes too long, had do exclude it from here
 
