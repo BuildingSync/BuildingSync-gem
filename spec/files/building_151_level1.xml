@@ -77,7 +77,7 @@
 							<auc:PercentOccupiedByOwner>60</auc:PercentOccupiedByOwner>
 							<auc:OccupancyLevels>
 								<auc:OccupancyLevel>
-									<auc:OccupantQuantity>15</auc:OccupantQuantity>
+									<auc:OccupantQuantity>15000</auc:OccupantQuantity>
 								</auc:OccupancyLevel>
 							</auc:OccupancyLevels>
 							<auc:SpatialUnits>

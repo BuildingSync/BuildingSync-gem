@@ -1001,6 +1001,25 @@ module BuildingSync
       return @model.getSpaceTypes
     end
 
+    def get_peak_occupancy
+      peak_occupancy = 0.0
+      peak_occupancy += @occupant_quantity if @occupant_quantity
+      @building_sections.each do |section|
+          peak_occupancy += section.get_peak_occupancy.to_f if section.get_peak_occupancy
+      end
+      return peak_occupancy
+    end
+
+    def get_floor_area
+      floor_area = @total_floor_area
+      @building_sections.each do |section|
+        if section.get_floor_area
+          floor_area += section.get_floor_area
+        end
+      end
+      return floor_area
+    end
+
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr, :year_of_last_energy_audit, :ownership,
                 :occupancy_classification, :primary_contact_id, :year_last_commissioning, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
                 :occupant_quantity, :number_of_units, :built_year, :year_major_remodel, :building_sections
