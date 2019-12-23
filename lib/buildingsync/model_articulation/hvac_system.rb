@@ -62,6 +62,13 @@ module BuildingSync
       end
     end
 
+    def get_primary_hvac_system_type
+      if @primary_hvac_system_type
+        return @primary_hvac_system_type.values[0]
+      end
+      return nil
+    end
+
     def add_exhaust(model, standard, kitchen_makeup, remove_objects)
       # remove exhaust objects
       if remove_objects
@@ -217,11 +224,13 @@ module BuildingSync
     end
 
     def get_system_type_from_zone(zone_hash, zones, system_type)
-      zone_hash.each do |id, zone_list|
-        zone_name_list = BuildingSync::Helper.get_zone_name_list(zone_list)
-        zones.each do |zone|
-          if zone_name_list.include? zone.name.get
-            return map_primary_hvac_system_type_to_cbecs_system_type(@primary_hvac_system_type[id], system_type)
+      if zone_hash
+        zone_hash.each do |id, zone_list|
+          zone_name_list = BuildingSync::Helper.get_zone_name_list(zone_list)
+          zones.each do |zone|
+            if zone_name_list.include? zone.name.get
+              return map_primary_hvac_system_type_to_cbecs_system_type(@primary_hvac_system_type[id], system_type)
+            end
           end
         end
       end
