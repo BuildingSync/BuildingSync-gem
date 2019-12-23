@@ -145,4 +145,8 @@ RSpec.describe 'BuildingSync' do
   it 'should parse and write L100_Instance1.xml (phase zero) and perform a baseline simulation and gather results' do
     test_baseline_creation_and_simulation('L100_Instance1.xml',  ASHRAE90_1, 'CZ01RV2.epw')
   end
+
+  it 'should parse and write Office_Carolina.xml (phase zero) and perform a baseline simulation and gather results' do
+    test_baseline_creation_and_simulation('Office_Carolina.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+  end
 end

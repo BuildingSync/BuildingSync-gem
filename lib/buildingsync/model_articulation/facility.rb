@@ -363,9 +363,6 @@ module BuildingSync
         @hvac_system.add_hvac(model, zone_hash, open_studio_system_standard, system_type, hvac_delivery_type, htg_src, clg_src, remove_objects)
       end
 
-      # TODO: - hours of operation customization (initially using existing measure downstream of this one)
-      # not clear yet if this is altering existing schedules, or additional inputs when schedules first requested
-
       # set hvac controls and efficiencies (this should be last model articulation element)
       if add_hvac
         @hvac_system.apply_sizing_and_assumptions(model, output_path, open_studio_system_standard, primary_bldg_type, system_type, climate_zone)
