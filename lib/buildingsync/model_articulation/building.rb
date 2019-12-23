@@ -338,10 +338,10 @@ module BuildingSync
       zone_hash = Hash.new
       if @space_types
         zone_list = []
-        @space_types.each do |space_type|
-          zone_list << get_zones_per_space_type(space_type)
+        @space_types.each do |space_name, space_type|
+          zone_list.concat(get_zones_per_space_type(space_type[:space_type]))
         end
-        zone_hash[ID] = zone_list
+        zone_hash[@ID] = zone_list
       end
       @building_sections.each do |bldg_subsec|
         zone_list = []
