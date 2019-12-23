@@ -92,6 +92,34 @@ module BuildingSync
       return true
     end
 
+    def adjust_occupancy_peak(model, new_occupancy_peak, area, space_types)
+      # we assume that the standard always generate people per area
+      sum_of_people_per_area = 0.0
+      sorted_space_types = model.getSpaceTypes.sort
+      sorted_space_types.each do |space_type|
+        if space_types.include? space_type
+          peoples = space_type.people
+          peoples.each do |people|
+            sum_of_people_per_area += people.peoplePerFloorArea.get
+          end
+        end
+      end
+      puts "existing occupancy: #{sum_of_people_per_area} new target value: #{new_occupancy_peak.to_f / area.to_f}"
+      new_sum_of_people_per_area = 0.0
+      sorted_space_types.each do |space_type|
+        if space_types.include? space_type
+          peoples = space_type.people
+          peoples.each do |people|
+            new_value = people.peoplePerFloorArea.get.to_f / sum_of_people_per_area.to_f * new_occupancy_peak.to_f / area.to_f
+            puts "adjusting occupancy per area value from: #{people.peoplePerFloorArea.get} to #{new_value}"
+            people.peopleDefinition.setPeopleperSpaceFloorArea(new_value)
+            new_sum_of_people_per_area += new_value
+          end
+        end
+      end
+      puts "resulting total absolute occupancy value: #{new_sum_of_people_per_area * area.to_f} occupancy per area value: #{new_sum_of_people_per_area}"
+    end
+
     def get_building_section(building_sections, standard_building_type, standard_space_type)
       if building_sections.count == 1
         return building_sections[0]

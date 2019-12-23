@@ -68,27 +68,11 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write report_478.xml (phase zero) with ASHRAE 90.1' do
-    test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
+    test_baseline_creation_and_simulation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
   it 'should parse and write ATT_report_7905.xml (phase zero) with ASHRAE 90.1' do
-    test_baseline_creation('ATT_report_7905.xml', ASHRAE90_1, 'CZ01RV2.epw')
-  end
-
-  it 'should parse and write L000_Instance1.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('L000_Instance1.xml',  ASHRAE90_1, 'CZ01RV2.epw')
-  end
-
-  it 'should parse and write L000_Instance2.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('L000_Instance2.xml',  ASHRAE90_1, 'CZ01RV2.epw')
-  end
-
-  it 'should parse and write L100_Instance1.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('L100_Instance1.xml',  ASHRAE90_1, 'CZ01RV2.epw')
-  end
-
-  it 'should parse and write Office_Carolina.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('Office_Carolina.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+    test_baseline_creation_and_simulation('ATT_report_7905.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
   it 'should parse and write PSZ Example.xml (phase zero) and perform a baseline simulation and gather results' do

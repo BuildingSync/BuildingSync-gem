@@ -92,6 +92,12 @@ module BuildingSync
       read_footprint_shape(section_element, ns)
       read_principal_hvac_type(section_element, ns)
       read_construction_types(section_element, ns)
+
+      if section_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"]
+        @occupant_quantity = section_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text
+      else
+        @occupant_quantity = nil
+      end
     end
 
     def read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
@@ -221,6 +227,14 @@ module BuildingSync
         doc = REXML::Document.new(file)
       end
       return doc
+    end
+
+    def get_peak_occupancy
+      return @occupant_quantity
+    end
+
+    def get_floor_area
+      return @total_floor_area
     end
 
     attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type, :ID

@@ -193,6 +193,14 @@ module BuildingSync
       return get_largest_building.get_space_types
     end
 
+    def get_peak_occupancy
+      return get_largest_building.get_peak_occupancy
+    end
+
+    def get_floor_area
+      return get_largest_building.get_floor_area
+    end
+
     def get_building_sections
       return get_largest_building.building_sections
     end

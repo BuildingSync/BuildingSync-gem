@@ -277,6 +277,12 @@ module BuildingSync
       # add internal loads to space types
       if add_space_type_loads
         @load_system.add_internal_loads(model, open_studio_system_standard, template, @sites[0].get_building_sections, remove_objects)
+        new_occupancy_peak = @sites[0].get_peak_occupancy
+        floor_area = @sites[0].get_floor_area
+        if new_occupancy_peak && floor_area && floor_area > 0.0
+          puts "new peak occupancy value found: absolute occupancy: #{new_occupancy_peak} occupancy per area: #{new_occupancy_peak.to_f / floor_area.to_f}"
+          @load_system.adjust_occupancy_peak(model, new_occupancy_peak, floor_area, get_space_types)
+        end
       end
 
       # identify primary building type (used for construction, and ideally HVAC as well)
@@ -356,9 +362,6 @@ module BuildingSync
       if add_hvac
         @hvac_system.add_hvac(model, zone_hash, open_studio_system_standard, system_type, hvac_delivery_type, htg_src, clg_src, remove_objects)
       end
-
-      # TODO: - hours of operation customization (initially using existing measure downstream of this one)
-      # not clear yet if this is altering existing schedules, or additional inputs when schedules first requested
 
       # set hvac controls and efficiencies (this should be last model articulation element)
       if add_hvac

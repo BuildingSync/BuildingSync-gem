@@ -292,7 +292,6 @@ module BuildingSync
             @scenarios.push(scenario)
           end
         end
-        puts "Scenarios: #{@scenarios}"
         if @scenarios.empty?
           puts 'No scenarios found in your BuildingSync XML file!'
         end
@@ -433,7 +432,11 @@ module BuildingSync
         get_scenario_elements.each do |scenario|
           scenarios_found = true
           # get information about the scenario
-          scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+          if scenario.elements["#{@ns}:ScenarioName"]
+            scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+          else
+            scenario_name = scenario.attributes['ID']
+          end
           next if scenario_name == 'Measured'
           next if baseline_only && (scenario_name != 'Baseline')
 
