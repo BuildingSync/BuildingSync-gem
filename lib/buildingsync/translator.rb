@@ -208,12 +208,10 @@ module BuildingSync
     def run_osws(runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
       osw_files = []
       osw_sr_files = []
-      Dir.glob("#{@output_dir}/**/*.osw") { |osw| osw_files << osw }
-      Dir.glob("#{@output_dir}/SR/*.osw") { |osw| osw_sr_files << osw }
+      Dir.glob("#{@output_dir}/**/in.osw") { |osw| osw_files << osw }
+      Dir.glob("#{@output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
 
-      extension = OpenStudio::Extension::Extension.new
-      runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
-      puts "osw_files - osw_sr_files #{osw_files - osw_sr_files}"
+      runner = OpenStudio::Extension::Runner.new(dirname=Dir.pwd, bundle_without=[], options=runner_options)
       return runner.run_osws(osw_files - osw_sr_files)
     end
 
