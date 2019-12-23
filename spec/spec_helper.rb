@@ -234,7 +234,7 @@ RSpec.configure do |config|
     puts "IDF file (#{File.basename(idf_file)})successfully saved" if workspace.save(idf_file)
   end
 
-  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, simulate = true)
 
     translator = test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used , epw_file_name)
 
@@ -242,13 +242,15 @@ RSpec.configure do |config|
     osw_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
 
-    translator.run_osws
+    if simulate
+      translator.run_osws
 
-    dir_path = File.dirname(osw_files[0])
-    parent_dir_path = File.expand_path('..', dir_path)
+      dir_path = File.dirname(osw_files[0])
+      parent_dir_path = File.expand_path('..', dir_path)
 
-    translator.gather_results(parent_dir_path)
-    translator.save_xml(File.join(parent_dir_path, 'results.xml'))
+      translator.gather_results(parent_dir_path)
+      translator.save_xml(File.join(parent_dir_path, 'results.xml'))
+    end
   end
 
   def test_baseline_creation_and_simulation(filename, standard_to_be_used, epw_file)

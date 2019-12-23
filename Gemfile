@@ -27,7 +27,7 @@ allow_local = ENV['FAVOR_LOCAL_GEMS']
 
 if allow_local && File.exist?('../openstudio-model-articulation-gem')
   gem 'openstudio-model-articulation', path: '../openstudio-model-articulation-gem'
-elsif allow_local
+else
   gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', branch: 'DA'
 end
 
