@@ -97,6 +97,8 @@ module BuildingSync
       if build_element.attributes['ID']
         @ID = build_element.attributes['ID']
       end
+      # city and state
+      read_city_and_state_name(build_element, ns)
       # floor areas
       read_floor_areas(build_element, site_total_floor_area, ns)
       # standard template
@@ -195,6 +197,19 @@ module BuildingSync
         @ns_to_ew_ratio = build_element.elements["#{ns}:AspectRatio"].text.to_f
       else
         @ns_to_ew_ratio = 0.0 # setDefaultValue
+      end
+    end
+
+    def read_city_and_state_name(build_element, ns)
+      if build_element.elements["#{ns}:Address/#{ns}:City"]
+        @city_name = build_element.elements["#{ns}:Address/#{ns}:City"].text
+      else
+        @city_name = nil
+      end
+      if build_element.elements["#{ns}:Address/#{ns}:State"]
+        @state_name = build_element.elements["#{ns}:Address/#{ns}:State"].text
+      else
+        @state_name = nil
       end
     end
 
@@ -493,8 +508,20 @@ module BuildingSync
           puts "case 2.1: weather_station_id is not nil #{weather_station_id}"
           epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
         elsif !city_name.nil? && !state_name.nil?
-          puts "case 2.2: city_name and state_name is not nil #{city_name} #{state_name}"
+          puts "case 2.2: SITE LEVEL city_name and state_name is not nil #{city_name} #{state_name}"
           epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
+        elsif !@city_name.nil? && !@state_name.nil?
+          puts "case 2.3: BUILDING LEVEL city_name and state_name is not nil #{@city_name} #{@state_name}"
+          epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(@state_name, @city_name)
+        end
+
+        # Ensure a file path gets set, else raise error
+        if epw_file_path.nil?
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path is nil and no way to set from Site or Building parameters.')
+          raise 'Error : epw_file_path is nil and no way to set from Site or Building parameters.'
+        elsif !File.exist?(epw_file_path)
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path file does not exist.')
+          raise 'Error : epw_file_path file does not exist.'
         end
 
         set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
