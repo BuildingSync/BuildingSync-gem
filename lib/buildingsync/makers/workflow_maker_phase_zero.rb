@@ -399,56 +399,45 @@ module BuildingSync
 
         month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }
 
-      scenarios_found = false
-      # write an osw for each scenario
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
-        scenarios_found = true
-        # get information about the scenario
-        scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if scenario_name == 'Measured'
-        next if baseline_only && (scenario_name != 'Baseline')
+        scenarios_found = false
+        # write an osw for each scenario
+        @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+          scenarios_found = true
+          # get information about the scenario
+          scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+          next if scenario_name == 'Measured'
+          next if defined?(BuildingSync::Extension::SIMULATE_BASELINE_ONLY) && BuildingSync::Extension::SIMULATE_BASELINE_ONLY && (scenario_name != 'Baseline')
 
-        puts "processing scenario with name #{scenario_name}"
-        # dir for the osw
-        osw_dir = File.join(dir, scenario_name)
+          puts "processing scenario with name #{scenario_name}"
+          # dir for the osw
+          osw_dir = File.join(dir, scenario_name)
 
-        # cleanup large files
-        path = File.join(osw_dir, 'eplusout.sql')
-        FileUtils.rm_f(path) if File.exist?(path)
-        path = File.join(osw_dir, 'data_point.zip')
-        FileUtils.rm_f(path) if File.exist?(path)
+          if scenario_name == 'Baseline'
+            if !File.exist?(File.join(osw_dir, 'eplusout.sql'))
+              if File.exist?(File.join(dir, 'eplusout.sql'))
+                osw_dir = dir
+              elsif File.exist?(File.join(dir, '/run/eplusout.sql'))
+                osw_dir = "#{dir}/run"
+              elsif File.exist?(File.join(dir, '/Baseline/run/eplusout.sql'))
+                osw_dir = "#{dir}/Baseline/run"
+              end
+            end
+          end
+          puts "osw_dir: #{osw_dir}"
 
-        path = File.join(osw_dir, 'eplusout.eso')
-        FileUtils.rm_f(path) if File.exist?(path)
+          Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
+            FileUtils.rm_rf(path) if File.exist?(path)
+          end
 
-        Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-          FileUtils.rm_rf(path) if File.exist?(path)
+          # cleanup large files
+          path = File.join(osw_dir, 'eplusout.sql')
+          FileUtils.rm_f(path) if File.exist?(path)
+          path = File.join(osw_dir, 'data_point.zip')
+          FileUtils.rm_f(path) if File.exist?(path)
+
+          path = File.join(osw_dir, 'eplusout.eso')
+          FileUtils.rm_f(path) if File.exist?(path)
         end
-
-        Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-          FileUtils.rm_rf(path) if File.exist?(path)
-        end
-
-        # find the osw
-        path = File.join(osw_dir, 'out.osw')
-        if !File.exist?(path)
-          puts "Cannot load results for scenario #{scenario_name}, because the osw files does not exist #{path}"
-          next
-        end
-
-        workflow = nil
-        File.open(path, 'r') do |file|
-          results[scenario_name] = JSON.parse(file.read, symbolize_names: true)
-        end
-
-        # open results.json to get monthly timeseries
-        # just grabbed openstudio_results
-        path2 = File.join(osw_dir, 'results.json')
-        File.open(path2, 'r') do |file|
-          temp_res = JSON.parse(file.read, symbolize_names: true)
-          monthly_results[scenario_name] = temp_res[:OpenStudioResults]
-        end
-      end
 
       if !baseline_only
         @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
@@ -619,7 +608,7 @@ module BuildingSync
           package_of_measures.add_element(annual_savings)
 
           res_uses = REXML::Element.new("#{@ns}:ResourceUses")
-          scenario_name_ns = scenario_name.gsub(' ', '_').gsub(/[^0-9a-z_]/i, '')
+          scenario_name_ns = scenario_name.tr(' ', '_').gsub(/[^0-9a-z_]/i, '')
           # ELECTRICITY
           res_use = REXML::Element.new("#{@ns}:ResourceUse")
           res_use.add_attribute('ID', scenario_name_ns + '_Electricity')
@@ -779,10 +768,10 @@ module BuildingSync
           # no longer using user defined fields
           scenario.elements.delete("#{@ns}:UserDefinedFields")
         end
-      end
 
-      puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
-      rescue StandardError
+        puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
+      end
+        rescue StandardError
         puts "An error occured while processing results in #{dir}"
       end
 
