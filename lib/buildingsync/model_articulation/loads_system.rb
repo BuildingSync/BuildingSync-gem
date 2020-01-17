@@ -96,32 +96,36 @@ module BuildingSync
       # we assume that the standard always generate people per area
       sum_of_people_per_area = 0.0
       count = 0
-      sorted_space_types = model.getSpaceTypes.sort
-      sorted_space_types.each do |space_type|
-        if space_types.include? space_type
-          peoples = space_type.people
-          peoples.each do |people|
-            sum_of_people_per_area += people.peoplePerFloorArea.get
-            count += 1
-          end
-        end
-      end
-      average_people_per_area = sum_of_people_per_area / count
-      puts "existing occupancy: #{average_people_per_area} new target value: #{new_occupancy_peak.to_f / area.to_f}"
-      new_sum_of_people_per_area = 0.0
-      sorted_space_types.each do |space_type|
-        if space_types.include? space_type
-          peoples = space_type.people
-          peoples.each do |people|
-            ratio = people.peoplePerFloorArea.get.to_f / average_people_per_area.to_f
-            new_value = ratio * new_occupancy_peak.to_f / area.to_f
-            puts "adjusting occupancy per area value from: #{people.peoplePerFloorArea.get} by ratio #{ratio} to #{new_value}"
-            people.peopleDefinition.setPeopleperSpaceFloorArea(new_value)
-            new_sum_of_people_per_area += new_value
-          end
-        end
-      end
-      puts "resulting total absolute occupancy value: #{new_sum_of_people_per_area * area.to_f} occupancy per area value: #{new_sum_of_people_per_area / count}"
+	  if !space_types.nil? 
+		  sorted_space_types = model.getSpaceTypes.sort
+		  sorted_space_types.each do |space_type|
+			if space_types.include? space_type
+			  peoples = space_type.people
+			  peoples.each do |people|
+				sum_of_people_per_area += people.peoplePerFloorArea.get
+				count += 1
+			  end
+			end
+		  end
+		  average_people_per_area = sum_of_people_per_area / count
+		  puts "existing occupancy: #{average_people_per_area} new target value: #{new_occupancy_peak.to_f / area.to_f}"
+		  new_sum_of_people_per_area = 0.0
+		  sorted_space_types.each do |space_type|
+			if space_types.include? space_type
+			  peoples = space_type.people
+			  peoples.each do |people|
+				ratio = people.peoplePerFloorArea.get.to_f / average_people_per_area.to_f
+				new_value = ratio * new_occupancy_peak.to_f / area.to_f
+				puts "adjusting occupancy per area value from: #{people.peoplePerFloorArea.get} by ratio #{ratio} to #{new_value}"
+				people.peopleDefinition.setPeopleperSpaceFloorArea(new_value)
+				new_sum_of_people_per_area += new_value
+			  end
+			end
+		  end
+		  puts "resulting total absolute occupancy value: #{new_sum_of_people_per_area * area.to_f} occupancy per area value: #{new_sum_of_people_per_area / count}"
+		else
+		  puts "space types are empty"
+		end
     end
 
     def get_building_section(building_sections, standard_building_type, standard_space_type)
