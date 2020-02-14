@@ -478,8 +478,8 @@ module BuildingSync
             scenarios_found = true
             # get information about the scenario
             scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-            next if scenario_name == 'Measured'
-            next if scenario_name == 'Baseline'
+            #next if scenario_name == 'Measured'
+            next if baseline_only && (scenario_name != 'Baseline')
 
             puts "scenario_name #{scenario_name} should not be Baseline here!!"
             results_counter += 1
