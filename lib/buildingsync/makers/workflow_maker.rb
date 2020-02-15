@@ -416,7 +416,11 @@ module BuildingSync
       end
     end
 
-    def gather_results(dir, baseline_only = false)
+    def gather_results(dir, baseline_only)
+	  ####################################################################
+	  puts "################CHECKPOINT: baseline_only = #{baseline_only}################"
+	  ####################################################################
+	
       puts 'starting to gather results'
       results_counter = 0
       super
@@ -473,13 +477,18 @@ module BuildingSync
           end
         end
 
-        if !baseline_only
+        #if !baseline_only
           get_scenario_elements.each do |scenario|
             scenarios_found = true
             # get information about the scenario
             scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-            #next if scenario_name == 'Measured'
+			
+			####################################################################
+            next if scenario_name == 'Measured'
+            #next if scenario_name == 'Baseline'
             next if baseline_only && (scenario_name != 'Baseline')
+			puts "################CHECKPOINT: if statement next passed!!"
+			####################################################################
 
             puts "scenario_name #{scenario_name} should not be Baseline here!!"
             results_counter += 1
@@ -802,7 +811,7 @@ module BuildingSync
             # no longer using user defined fields
             scenario.elements.delete("#{@ns}:UserDefinedFields")
           end
-        end
+        #end
 
         puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
       rescue StandardError => e

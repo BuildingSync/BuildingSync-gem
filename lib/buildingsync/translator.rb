@@ -131,7 +131,7 @@ module BuildingSync
       save_xml(File.join(dir, 'results.xml'))
     end
 
-    def gather_results(dir, baseline_only = false)
+    def gather_results(dir, baseline_only)
       puts "dir: #{dir}"
       dir_split = dir.split(File::SEPARATOR)
       puts "dir_split: #{dir_split}"
