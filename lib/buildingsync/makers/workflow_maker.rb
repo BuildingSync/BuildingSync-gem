@@ -708,14 +708,14 @@ module BuildingSync
             ts_quantity = REXML::Element.new("#{@ns}:TimeSeriesReadingQuantity")
             ts_quantity.text = 'Energy'
             timeseries.add_element(ts_quantity)
-            start_time = REXML::Element.new("#{@ns}:StartTimeStamp")
+            start_time = REXML::Element.new("#{@ns}:StartTimestamp")
             if month < 10
               start_time.text = '2017-0' + month.to_s + '-01T00:00:00'
             else
               start_time.text = '2017-' + month.to_s + '-01T00:00:00'
             end
             timeseries.add_element(start_time)
-            end_time = REXML::Element.new("#{@ns}:EndTimeStamp")
+            end_time = REXML::Element.new("#{@ns}:EndTimestamp")
             if month < 9
               end_time.text = '2017-0' + (month + 1).to_s + '-01T00:00:00'
             elsif month < 12
@@ -751,14 +751,14 @@ module BuildingSync
             ts_quantity = REXML::Element.new("#{@ns}:TimeSeriesReadingQuantity")
             ts_quantity.text = 'Energy'
             timeseries.add_element(ts_quantity)
-            start_time = REXML::Element.new("#{@ns}:StartTimeStamp")
+            start_time = REXML::Element.new("#{@ns}:StartTimestamp")
             if month < 10
               start_time.text = '2017-0' + month.to_s + '-01T00:00:00'
             else
               start_time.text = '2017-' + month.to_s + '-01T00:00:00'
             end
             timeseries.add_element(start_time)
-            end_time = REXML::Element.new("#{@ns}:EndTimeStamp")
+            end_time = REXML::Element.new("#{@ns}:EndTimestamp")
             if month < 9
               end_time.text = '2017-0' + (month + 1).to_s + '-01T00:00:00'
             elsif month < 12
