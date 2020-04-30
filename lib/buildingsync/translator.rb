@@ -205,14 +205,20 @@ module BuildingSync
       return runner.run_osw(osw_path, osm_baseline_dir)
     end
 
-    def run_osws(runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
+    def run_osws(baseline_only = false, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
       osw_files = []
       osw_sr_files = []
-      Dir.glob("#{@output_dir}/**/in.osw") { |osw| osw_files << osw }
-      Dir.glob("#{@output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
-
       runner = OpenStudio::Extension::Runner.new(dirname=Dir.pwd, bundle_without=[], options=runner_options)
-      return runner.run_osws(osw_files - osw_sr_files)
+      final_osw_files = []
+      if baseline_only
+        Dir.glob("#{@output_dir}/Baseline/in.osw") { |osw| final_osw_files << osw }
+      else
+        Dir.glob("#{@output_dir}/**/in.osw") { |osw| osw_files << osw }
+        Dir.glob("#{@output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
+        final_osw_files = osw_files - osw_sr_files
+      end
+
+      return runner.run_osws(final_osw_files)
     end
 
     def get_failed_scenarios
