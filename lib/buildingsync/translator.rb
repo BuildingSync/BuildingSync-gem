@@ -132,10 +132,7 @@ module BuildingSync
     end
 
     def gather_results(dir, baseline_only)
-      puts "dir: #{dir}"
       dir_split = dir.split(File::SEPARATOR)
-      puts "dir_split: #{dir_split}"
-      puts "dir_split[]: #{dir_split[dir_split.length - 1]}"
       if (dir_split[dir_split.length - 1] == 'Baseline')
         dir = dir.gsub('/Baseline', '')
       end
