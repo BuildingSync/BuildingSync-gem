@@ -47,7 +47,7 @@ module BuildingSync
       @hash_response = nil
       url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
 
-      params = { 'schema_version' => '1.0.0' }
+      params = { 'schema_version' => '2.0.0' }
       params[:file] = UploadIO.new(xml_path, 'text/xml', File.basename(xml_path))
 
       request = Net::HTTP::Post::Multipart.new(url.path, params)
@@ -57,17 +57,17 @@ module BuildingSync
       response = http.request(request)
 
       @hash_response = JSON.parse(response.read_body)
-      p @hash_response
+      # p @hash_response
     end
 
-    def validate_use_case
-      if !@hash_response['validation_results']['use_cases']['BRICR']['valid']
-        @hash_response['validation_results']['use_cases']['BRICR']['errors'].each do |error|
+    def validate_use_case(use_case)
+      if !@hash_response['validation_results']['use_cases'][use_case]['valid']
+        @hash_response['validation_results']['use_cases'][use_case]['errors'].each do |error|
           p "#{error['path']} => #{error['message']}"
         end
       end
 
-      return @hash_response['validation_results']['use_cases']['BRICR']['valid']
+      return @hash_response['validation_results']['use_cases'][use_case]['valid']
     end
 
     def validate_schema
