@@ -38,11 +38,13 @@ require 'json'
 
 module BuildingSync
   class GetBCLWeatherFile
+    $weather_file_path_prefix = "../data/weather/".freeze
+
     def download_weather_file_from_city_name(state, city)
       weather_file_name = get_weather_file_from_city_and_state(city)
 
       if !weather_file_name.empty?
-        return File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
+        return File.expand_path("#{$weather_file_path_prefix}#{weather_file_name}", File.dirname(__FILE__))
       else
         wmo_no = 0
         remote = OpenStudio::RemoteBCL.new
@@ -78,7 +80,7 @@ module BuildingSync
       weather_file_name = get_weather_file_from_weatherid(weather_id)
 
       if !weather_file_name.empty?
-        return File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
+        return File.expand_path("#{$weather_file_path_prefix}#{weather_file_name}", File.dirname(__FILE__))
       else
         wmo_no = 0
         remote = OpenStudio::RemoteBCL.new
@@ -109,7 +111,7 @@ module BuildingSync
         epw_path = download_weather_file(remote, choices)
         download_design_day_file(wmo_no, epw_path)
         return epw_path
-        end
+      end
     end
 
     def download_weather_file(remote, choices)
@@ -139,12 +141,12 @@ module BuildingSync
         dir_path = File.dirname(epw_weather_file_path)
         weather_file_name = File.basename(epw_weather_file_path)
 
-        epw_path = File.expand_path('../../spec/weather', File.dirname(__FILE__))
+        epw_path = File.expand_path("#{$weather_file_path_prefix}", File.dirname(__FILE__))
 
         Dir.glob("#{dir_path}/**/*.*").each do |filename|
           FileUtils.mv(filename, epw_path)
         end
-        epw_path = File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
+        epw_path = File.expand_path("#{$weather_file_path_prefix}/#{weather_file_name}", File.dirname(__FILE__))
       end
 
       puts "Successfully set weather file to #{epw_path}"
@@ -187,8 +189,12 @@ module BuildingSync
           raise "Error, cannot find local component for: #{uid}.  Please try a different weather file."
         end
       end
+
+      puts "Successfully downloaded ddy file to #{epw_path}"
       create_ddy_file(idf_path_collection, epw_path)
+      puts "Successfully combined design day files to ddy file in #{epw_path}"
       update_json_file(epw_path)
+      puts "JSON file updated"
     end
 
     def create_ddy_file(idf_path_collection, epw_path)
@@ -219,7 +225,7 @@ module BuildingSync
       state_code = location[2]
       weather_id = location[5]
 
-      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      weather_file_path = File.expand_path("#{$weather_file_path_prefix}/weather_file.json", File.dirname(__FILE__))
 
       if !File.exist?(weather_file_path)
         create_json_file(weather_file_path)
@@ -236,7 +242,7 @@ module BuildingSync
     end
 
     def read_json_file
-      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      weather_file_path = File.expand_path("#{$weather_file_path_prefix}/weather_file.json", File.dirname(__FILE__))
       File.open(weather_file_path) do |f|
         str = f.gets
         p str
@@ -291,22 +297,23 @@ module BuildingSync
     end
 
     def get_weather_json_data
-      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      weather_file_path = File.expand_path("#{$weather_file_path_prefix}/weather_file.json", File.dirname(__FILE__))
       create_json_file(weather_file_path) if !File.exist?(weather_file_path)
 
       return eval(File.read(weather_file_path))
     end
 
     def create_json_file(weather_file_path)
-      weather_file_folder = File.expand_path('../../spec/weather', File.dirname(__FILE__))
+      weather_file_folder = File.expand_path("#{$weather_file_path_prefix}", File.dirname(__FILE__))
+      FileUtils.mkdir_p weather_file_folder
       weather_file = File.new("#{weather_file_folder}/weather_file.json", 'w')
 
       arr = []
       weather_detail = {
-        'weather_file_name' => arr,
-        'city_name' => arr,
-        'state_code' => arr,
-        'weather_id' => arr
+          'weather_file_name' => arr,
+          'city_name' => arr,
+          'state_code' => arr,
+          'weather_id' => arr
       }
 
       File.open(weather_file_path, 'w') { |f| f.write(weather_detail.to_json) }
