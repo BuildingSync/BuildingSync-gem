@@ -73,10 +73,10 @@ module BuildingSync
         number_of_buildings += 1
       end
       if number_of_buildings == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', 'There is no building attached to this site in your BuildingSync file.')
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.read_xml', 'There is no building attached to this site in your BuildingSync file.')
         raise 'Error: There is no building attached to this site in your BuildingSync file.'
       elsif number_of_buildings > 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file.")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.read_xml', "There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file.")
         raise "Error: There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file."
       end
       # check occupancy type at the site level
