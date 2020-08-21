@@ -112,9 +112,9 @@ module BuildingSync
 
       build_element.elements.each("#{ns}:Sections/#{ns}:Section") do |section_element|
         section = BuildingSection.new(section_element, @occupancy_type, @total_floor_area, ns)
-        if(section.section_type == 'Whole building')
+        if section.section_type == 'Whole building'
           @building_sections_whole_building.push(section)
-        elsif(section.section_type == 'Space function' || section.section_type.nil?)
+        elsif section.section_type == 'Space function' || section.section_type.nil?
           @building_sections.push(section)
         else
           puts "Unknown section type found:#{section.section_type}:"
@@ -275,7 +275,7 @@ module BuildingSync
           building_fraction -= section.fraction_area
         end
         if building_fraction.round(3) < 0.0
-          puts "building fraction is #{ building_fraction }"
+          puts "building fraction is #{building_fraction}"
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
         end

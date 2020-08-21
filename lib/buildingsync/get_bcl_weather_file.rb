@@ -38,7 +38,7 @@ require 'json'
 
 module BuildingSync
   class GetBCLWeatherFile
-    $weather_file_path_prefix = "../data/weather/".freeze
+    $weather_file_path_prefix = '../data/weather/'.freeze
 
     def download_weather_file_from_city_name(state, city)
       weather_file_name = get_weather_file_from_city_and_state(city)
@@ -194,7 +194,7 @@ module BuildingSync
       create_ddy_file(idf_path_collection, epw_path)
       puts "Successfully combined design day files to ddy file in #{epw_path}"
       if update_json_file(epw_path)
-        puts "JSON file updated"
+        puts 'JSON file updated'
       else
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.update_json_file',
                            "Error, cannot write JSON file for downloaded weather file #{epw_path}.  The format of the weather file seems incorrect.")
@@ -317,10 +317,10 @@ module BuildingSync
 
       arr = []
       weather_detail = {
-          'weather_file_name' => arr,
-          'city_name' => arr,
-          'state_code' => arr,
-          'weather_id' => arr
+        'weather_file_name' => arr,
+        'city_name' => arr,
+        'state_code' => arr,
+        'weather_id' => arr
       }
 
       File.open(weather_file_path, 'w') { |f| f.write(weather_detail.to_json) }

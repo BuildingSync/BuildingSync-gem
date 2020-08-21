@@ -57,6 +57,5 @@ module BuildingSync
       end
       return names
     end
-
   end
 end
