@@ -42,7 +42,7 @@ module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpatialElement
     def initialize
-      @total_floor_area = nil # gross floor area
+      @total_floor_area = nil
       @bldg_type = nil
       @system_type = nil
       @bar_division_method = nil
