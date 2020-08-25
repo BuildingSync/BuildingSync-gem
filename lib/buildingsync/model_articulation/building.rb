@@ -638,31 +638,31 @@ module BuildingSync
     end
 
     def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file = nil)
-      epw_file = OpenStudio::Weather::Epw.load(epw_file_path)
+      epw_file = OpenStudio::EpwFile.new(epw_file_path)
 
-      weather_lat = epw_file.lat
+      weather_lat = epw_file.latitude
       if !latitude.nil?
         weather_lat = latitude.to_f
       end
-      weather_lon = epw_file.lon
+      weather_lon = epw_file.longitude
       if !longitude.nil?
         weather_lon = longitude.to_f
       end
 
       weather_file = @model.getWeatherFile
       weather_file.setCity(epw_file.city)
-      weather_file.setStateProvinceRegion(epw_file.state)
+      weather_file.setStateProvinceRegion(epw_file.stateProvinceRegion)
       weather_file.setCountry(epw_file.country)
-      weather_file.setDataSource(epw_file.data_type)
-      weather_file.setWMONumber(epw_file.wmo.to_s)
+      weather_file.setDataSource(epw_file.dataSource)
+      weather_file.setWMONumber(epw_file.wmoNumber.to_s)
       weather_file.setLatitude(weather_lat)
       weather_file.setLongitude(weather_lon)
-      weather_file.setTimeZone(epw_file.gmt)
+      weather_file.setTimeZone(epw_file.timeZone)
       weather_file.setElevation(epw_file.elevation)
-      weather_file.setString(10, "file:///#{epw_file.filename}")
+      weather_file.setString(10, "file:///#{epw_file.path}")
 
-      weather_name = "#{epw_file.city}_#{epw_file.state}_#{epw_file.country}"
-      weather_time = epw_file.gmt
+      weather_name = "#{epw_file.city}_#{epw_file.stateProvinceRegion}_#{epw_file.country}"
+      weather_time = epw_file.timeZone
       weather_elev = epw_file.elevation
 
       # Add or update site data
@@ -673,7 +673,7 @@ module BuildingSync
       site.setTimeZone(weather_time)
       site.setElevation(weather_elev)
 
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{epw_file.city}. State is #{epw_file.state}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{epw_file.city}. State is #{epw_file.stateProvinceRegion}")
 
       stat_file = get_stat_file(epw_file)
       add_site_water_mains_temperature(stat_file) if !stat_file.nil?
@@ -684,9 +684,9 @@ module BuildingSync
       @model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each(&:remove)
 
       # find the ddy files
-      ddy_file = "#{File.join(File.dirname(epw_file.filename), File.basename(epw_file.filename, '.*'))}.ddy" if ddy_file.nil?
+      ddy_file = "#{File.join(File.dirname(epw_file.path.to_s), File.basename(epw_file.path.to_s, '.*'))}.ddy" if ddy_file.nil?
       unless File.exist? ddy_file
-        ddy_files = Dir["#{File.dirname(epw_file.filename)}/*.ddy"]
+        ddy_files = Dir["#{File.dirname(epw_file.path.to_s)}/*.ddy"]
         if ddy_files.size > 1
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'More than one ddy file in the EPW directory')
           return false
@@ -719,10 +719,10 @@ module BuildingSync
 
     def get_stat_file(epw_file)
       # Add SiteWaterMainsTemperature -- via parsing of STAT file.
-      stat_file = "#{File.join(File.dirname(epw_file.filename), File.basename(epw_file.filename, '.*'))}.stat"
+      stat_file = "#{File.join(File.dirname(epw_file.path.to_s), File.basename(epw_file.path.to_s, '.*'))}.stat"
       unless File.exist? stat_file
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find STAT file by filename, looking in the directory')
-        stat_files = Dir["#{File.dirname(epw_file.filename)}/*.stat"]
+        stat_files = Dir["#{File.dirname(epw_file.path.to_s)}/*.stat"]
         if stat_files.size > 1
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'More than one stat file in the EPW directory')
           return nil
