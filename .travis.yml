@@ -8,8 +8,7 @@ matrix:
   include:
     # For now use local checkout of model articulation to use the DA branch. This should be removed once
     # model articulation is released with the bricr model generation file.
-    - env: FAVOR_LOCAL_GEMS=1 OPENSTUDIO_VERSION=2.9.1 OPENSTUDIO_SHA=6914d4f590 RUBYLIB=/usr/local/openstudio-2.9.1/Ruby:/usr/Ruby
-    - env: FAVOR_LOCAL_GEMS=1 OPENSTUDIO_VERSION=3.0.0 OPENSTUDIO_SHA=3472e8b799 RUBYLIB=/usr/local/openstudio-3.0.0/Ruby:/usr/Ruby
+    - env: FAVOR_LOCAL_GEMS=1 OPENSTUDIO_VERSION=3.0.1 OPENSTUDIO_SHA=3472e8b799 RUBYLIB=/usr/local/openstudio-3.0.1/Ruby:/usr/Ruby
 before_install:
   - gem install bundler
   - bundle -v
