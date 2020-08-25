@@ -8,7 +8,6 @@ matrix:
   include:
     # For now use local checkout of model articulation to use the DA branch. This should be removed once
     # model articulation is released with the bricr model generation file.
-    - env: FAVOR_LOCAL_GEMS=1 OPENSTUDIO_VERSION=2.9.1 OPENSTUDIO_SHA=3472e8b799 RUBYLIB=/usr/local/openstudio-2.9.1/Ruby:/usr/Ruby
     - env: FAVOR_LOCAL_GEMS=1 OPENSTUDIO_VERSION=3.0.1 OPENSTUDIO_SHA=09b7c8a554 RUBYLIB=/usr/local/openstudio-3.0.1/Ruby:/usr/Ruby
 before_install:
   - gem install bundler
@@ -17,7 +16,7 @@ before_install:
 install: 
   - bundle install
 before_script:
-  - curl -sLO https://raw.githubusercontent.com/NREL/OpenStudio-server/2.9.X-LTS/docker/deployment/scripts/install_openstudio.sh
+  - curl -LO https://raw.githubusercontent.com/NREL/OpenStudio-server/2.9.X-LTS/docker/deployment/scripts/install_openstudio.sh
   - chmod +x install_openstudio.sh
   - sudo ./install_openstudio.sh $OPENSTUDIO_VERSION $OPENSTUDIO_SHA
 script:
