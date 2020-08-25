@@ -36,15 +36,15 @@
 # *******************************************************************************
 require_relative 'building_section'
 require_relative '../../../lib/buildingsync/get_bcl_weather_file'
+require_relative '../../../lib/buildingsync/tmp_os_lib_model_generation_bricr'
 require 'date'
 require 'openstudio/extension/core/os_lib_helper_methods'
-require 'openstudio/model_articulation/os_lib_model_generation_bricr'
-require 'measures/ChangeBuildingLocation/resources/epw'
-require 'measures/ChangeBuildingLocation/resources/stat_file'
+#require 'measures/ChangeBuildingLocation/resources/epw'
+#require 'measures/ChangeBuildingLocation/resources/stat_file'
 
 module BuildingSync
   class Building < SpatialElement
-    include OsLib_ModelGenerationBRICR
+    include Tmp_OsLib_ModelGenerationBRICR
     include OsLib_HelperMethods
     include EnergyPlus
 
