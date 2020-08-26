@@ -35,8 +35,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative '../workflow_maker_base'
-require 'openstudio/model_articulation'
 require 'openstudio/common_measures'
+require 'openstudio/model_articulation'
 require_relative '../../../lib/buildingsync/extension'
 
 module BuildingSync
