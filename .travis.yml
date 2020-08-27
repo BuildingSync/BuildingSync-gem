@@ -1,9 +1,9 @@
 ---
 sudo: false
-dist: xenial
+dist: bionic
 language: ruby
 rvm:
-  - 2.5.8
+  - 2.5.5
 matrix:
   include:
     # For now use local checkout of model articulation to use the DA branch. This should be removed once
@@ -12,13 +12,11 @@ matrix:
 before_install:
   - gem install bundler
   - bundle -v
-  - sudo rm /usr/local/bin/docker-compose
-install: 
+install:
   - bundle install
 before_script:
-  - curl -LO https://raw.githubusercontent.com/NREL/OpenStudio-server/2.9.X-LTS/docker/deployment/scripts/install_openstudio.sh
-  - chmod +x install_openstudio.sh
-  - sudo ./install_openstudio.sh $OPENSTUDIO_VERSION $OPENSTUDIO_SHA
+  - curl -LO https://github.com/NREL/OpenStudio/releases/download/v3.0.1/OpenStudio-3.0.1+09b7c8a554-Linux.deb
+  - sudo apt install ./OpenStudio-3.0.1+09b7c8a554-Linux.deb
 script:
 #  - bundle exec rspec spec/tests/selection_tool_spec.rb  // selection tool is not working with ASHRAE level 1.5 yet
   - bundle exec rspec spec/tests/building_sync_spec.rb
