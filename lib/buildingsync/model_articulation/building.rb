@@ -36,15 +36,17 @@
 # *******************************************************************************
 require_relative 'building_section'
 require_relative '../../../lib/buildingsync/get_bcl_weather_file'
-require_relative '../../../lib/buildingsync/tmp_os_lib_model_generation_bricr'
+# require_relative '../../../lib/buildingsync/tmp_os_lib_model_generation_bricr'
 require 'date'
 require 'openstudio/extension/core/os_lib_helper_methods'
+require 'openstudio/extension/core/os_lib_model_generation'
 
 module BuildingSync
   class Building < SpatialElement
-    include Tmp_OsLib_ModelGenerationBRICR
+    #    include Tmp_OsLib_ModelGenerationBRICR
     include OsLib_HelperMethods
     include EnergyPlus
+    include OsLib_ModelGeneration
 
     # initialize
     def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
