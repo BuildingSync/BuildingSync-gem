@@ -416,6 +416,21 @@ module BuildingSync
       end
     end
 
+    def cleanup_larger_files(osw_dir)
+      path = File.join(osw_dir, 'eplusout.sql')
+      FileUtils.rm_f(path) if File.exist?(path)
+      path = File.join(osw_dir, 'data_point.zip')
+      FileUtils.rm_f(path) if File.exist?(path)
+      path = File.join(osw_dir, 'eplusout.eso')
+      FileUtils.rm_f(path) if File.exist?(path)
+      Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
+        FileUtils.rm_rf(path) if File.exist?(path)
+      end
+      Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
+        FileUtils.rm_rf(path) if File.exist?(path)
+      end
+    end
+
     def gather_results(dir, baseline_only = false)
       puts 'starting to gather results'
       results_counter = 0
@@ -443,18 +458,8 @@ module BuildingSync
           # dir for the osw
           osw_dir = File.join(dir, scenario_name)
           # cleanup large files
-          path = File.join(osw_dir, 'eplusout.sql')
-          FileUtils.rm_f(path) if File.exist?(path)
-          path = File.join(osw_dir, 'data_point.zip')
-          FileUtils.rm_f(path) if File.exist?(path)
-          path = File.join(osw_dir, 'eplusout.eso')
-          FileUtils.rm_f(path) if File.exist?(path)
-          Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-            FileUtils.rm_rf(path) if File.exist?(path)
-          end
-          Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-            FileUtils.rm_rf(path) if File.exist?(path)
-          end
+          cleanup_larger_files(osw_dir)
+
           # find the osw
           path = File.join(osw_dir, 'out.osw')
           if !File.exist?(path)
