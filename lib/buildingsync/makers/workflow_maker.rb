@@ -553,7 +553,7 @@ module BuildingSync
             weather_data_type.text = 'TMY3'
             modeled.add_element(weather_data_type)
             sim_completion_status = REXML::Element.new("#{@ns}:SimulationCompletionStatus")
-            sim_completion_status.text = result[:completed_status] == 'Success' ? 'Finished' : 'Failed' # TODO: double check what these keys can be
+            sim_completion_status.text = result[:completed_status] == 'Success' ? 'Finished' : 'Failed'
             modeled.add_element(sim_completion_status)
             calc_method.add_element(modeled)
             package_of_measures.add_element(calc_method)
