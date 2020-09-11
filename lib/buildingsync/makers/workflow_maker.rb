@@ -567,12 +567,12 @@ module BuildingSync
   
             # temporary hack to get source energy
             eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
-            source_energy = getSourceEnergyArray(eplustbl_path)
+            source_energy = get_source_energy_array(eplustbl_path)
             total_source_energy_kbtu = source_energy[0]
             total_source_eui_kbtu_ft2 = source_energy[1]
   
             baseline_eplustbl_path = File.join(dir, 'Baseline', 'eplustbl.htm')
-            baseline_source_energy = getSourceEnergyArray(baseline_eplustbl_path)
+            baseline_source_energy = get_source_energy_array(baseline_eplustbl_path)
             baseline_total_source_energy_kbtu = baseline_source_energy[0]
             baseline_total_source_eui_kbtu_ft2 = baseline_source_energy[1]
             # end hack
@@ -821,7 +821,7 @@ module BuildingSync
 
     # DLM: total hack because these are not reported in the out.osw
     # output is array of [source_energy, source_eui] in kBtu and kBtu/ft2
-    def getSourceEnergyArray(eplustbl_path)
+    def get_source_energy_array(eplustbl_path)
       result = []
       File.open(eplustbl_path, 'r') do |f|
         while line = f.gets
