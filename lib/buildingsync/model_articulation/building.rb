@@ -244,7 +244,7 @@ module BuildingSync
       end
     end
 
-    def check_building_faction
+    def check_building_fraction
       # check that sum of fractions for b,c, and d is less than 1.0 (so something is left for primary building type)
       building_fraction = 1.0
       if @building_sections.count > 0
@@ -765,7 +765,7 @@ module BuildingSync
       set_building_form_defaults
 
       # checking that the factions add up
-      check_building_faction
+      check_building_fraction
 
       # set building rotation
       initial_rotation = @model.getBuilding.northAxis
