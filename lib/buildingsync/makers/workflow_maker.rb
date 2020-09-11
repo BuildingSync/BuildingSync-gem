@@ -559,11 +559,11 @@ module BuildingSync
             package_of_measures.add_element(calc_method)
   
             # Check out.osw "openstudio_results" for output variables
-            total_site_energy_kbtu = getMeasureResult(result, 'openstudio_results', 'total_site_energy') # in kBtu
-            baseline_total_site_energy_kbtu = getMeasureResult(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
+            total_site_energy_kbtu = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
+            baseline_total_site_energy_kbtu = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
   
-            total_site_eui_kbtu_ft2 = getMeasureResult(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-            baseline_total_site_eui_kbtu_ft2 = getMeasureResult(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
+            total_site_eui_kbtu_ft2 = get_measure_result(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
+            baseline_total_site_eui_kbtu_ft2 = get_measure_result(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
   
             # temporary hack to get source energy
             eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
@@ -577,17 +577,17 @@ module BuildingSync
             baseline_total_source_eui_kbtu_ft2 = baseline_source_energy[1]
             # end hack
   
-            fuel_electricity_kbtu = getMeasureResult(result, 'openstudio_results', 'fuel_electricity') # in kBtu
-            baseline_fuel_electricity_kbtu = getMeasureResult(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
+            fuel_electricity_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_electricity') # in kBtu
+            baseline_fuel_electricity_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
   
-            fuel_natural_gas_kbtu = getMeasureResult(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
-            baseline_fuel_natural_gas_kbtu = getMeasureResult(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
+            fuel_natural_gas_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
+            baseline_fuel_natural_gas_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
   
-            annual_peak_electric_demand_kw = getMeasureResult(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
-            baseline_annual_peak_electric_demand_kw = getMeasureResult(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
+            annual_peak_electric_demand_kw = get_measure_result(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
+            baseline_annual_peak_electric_demand_kw = get_measure_result(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
   
-            annual_utility_cost = getMeasureResult(result, 'openstudio_results', 'annual_utility_cost') # in $
-            baseline_annual_utility_cost = getMeasureResult(baseline, 'openstudio_results', 'annual_utility_cost') # in $
+            annual_utility_cost = get_measure_result(result, 'openstudio_results', 'annual_utility_cost') # in $
+            baseline_annual_utility_cost = get_measure_result(baseline, 'openstudio_results', 'annual_utility_cost') # in $
   
             total_site_energy_savings_mmbtu = 0
             if baseline_total_site_energy_kbtu && total_site_energy_kbtu
@@ -839,7 +839,7 @@ module BuildingSync
       return result
     end
 
-    def getMeasureResult(result, measure_dir_name, result_name)
+    def get_measure_result(result, measure_dir_name, result_name)
       result[:steps].each do |step|
         if step[:measure_dir_name] == measure_dir_name
           if step[:result] && step[:result][:step_values]
