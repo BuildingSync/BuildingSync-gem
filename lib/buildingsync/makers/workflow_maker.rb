@@ -410,7 +410,7 @@ module BuildingSync
       return @failed_scenarios
     end
 
-    def saveXML(filename)
+    def save_xml(filename)
       File.open(filename, 'w') do |file|
         @doc.write(file)
       end

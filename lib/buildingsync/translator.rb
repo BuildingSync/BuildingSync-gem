@@ -144,7 +144,7 @@ module BuildingSync
     end
 
     def save_xml(filename)
-      @workflow_maker.saveXML(filename)
+      @workflow_maker.save_xml(filename)
     end
 
     def write_osws
