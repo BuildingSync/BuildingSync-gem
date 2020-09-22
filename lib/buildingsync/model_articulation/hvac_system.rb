@@ -39,6 +39,7 @@ module BuildingSync
     def initialize(system_element = nil, ns = '')
       # code to initialize
       @primary_hvac_system_type = Hash.new
+      @systems = system_element
       read_xml(system_element, ns) if system_element
     end
 
@@ -67,6 +68,41 @@ module BuildingSync
         return @primary_hvac_system_type.values[0]
       end
       return nil
+    end
+
+    # adding the principal hvac system type to the hvac systems, overwrite existing values or create new elements if none are present
+    def add_primary_system_type(id, principal_hvac_type)
+      if @systems.nil?
+        @systems = REXML::Element.new("#{ns}:HVACSystems")
+      end
+      hvac_system = nil
+      if @systems.elements["#{ns}:HVACSystem"].nil?
+        hvac_system = REXML::Element.new("#{ns}:HVACSystem")
+      else
+        @systems.elements["#{ns}:HVACSystem"].each do |system|
+          if system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"]
+            if system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref'] = id
+              hvac_system = system
+              break
+            end
+          elsif system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"]
+            if system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"].attributes['IDref'] = id
+              hvac_system = system
+              break
+            end
+          end
+        end
+        if hvac_system.nil? and @systems.elements["#{ns}:HVACSystem"].size = 1
+          hvac_system = @systems.elements["#{ns}:HVACSystem"][0]
+        end
+      end
+
+      if hvac_system.elements["#{ns}:PrimaryHVACSystemType"].nil?
+        primary_hvac_system_type = REXML::Element.new("#{ns}:PrimaryHVACSystemType")
+      else
+        primary_hvac_system_type = hvac_system.elements["#{ns}:PrimaryHVACSystemType"]
+      end
+      primary_hvac_system_type.text = principal_hvac_type
     end
 
     def add_exhaust(model, standard, kitchen_makeup, remove_objects)
@@ -265,5 +301,7 @@ module BuildingSync
     end
 
     attr_reader :primary_hvac_system_type
+
+
   end
 end

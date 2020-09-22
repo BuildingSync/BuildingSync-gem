@@ -263,7 +263,7 @@ module BuildingSync
       return @space_types_floor_area
     end
 
-    def add_element_in_xml_file(building_element, ns, field_name, field_value)
+    def add_user_defined_field_to_xml_file(building_element, ns, field_name, field_value)
       user_defined_fields = REXML::Element.new("#{ns}:UserDefinedFields")
       user_defined_field = REXML::Element.new("#{ns}:UserDefinedField")
       field_name_element = REXML::Element.new("#{ns}:FieldName")
@@ -281,18 +281,18 @@ module BuildingSync
     end
 
     def write_parameters_to_xml_for_spatial_element(ns, xml_element)
-      add_element_in_xml_file(xml_element, ns, 'TotalFloorArea', @total_floor_area)
-      add_element_in_xml_file(xml_element, ns, 'BuildingType', @bldg_type)
-      add_element_in_xml_file(xml_element, ns, 'SystemType', @system_type)
-      add_element_in_xml_file(xml_element, ns, 'BarDivisionMethod', @bar_division_method)
-      add_element_in_xml_file(xml_element, ns, 'FractionArea', @fraction_area)
-      add_element_in_xml_file(xml_element, ns, 'SpaceTypesFloorArea', @space_types_floor_area)
-      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaHeatedOnly', @conditioned_floor_area_heated_only)
-      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaCooledOnly', @conditioned_floor_area_cooled_only)
-      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaHeatedCooled', @conditioned_floor_area_heated_cooled)
-      add_element_in_xml_file(xml_element, ns, 'ConditionedBelowGradeFloorArea', @conditioned_below_grade_floor_area)
-      add_element_in_xml_file(xml_element, ns, 'CustomConditionedAboveGradeFloorArea', @custom_conditioned_above_grade_floor_area)
-      add_element_in_xml_file(xml_element, ns, 'CustomConditionedBelowGradeFloorArea', @custom_conditioned_below_grade_floor_area)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'TotalFloorArea', @total_floor_area)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'BuildingType', @bldg_type)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'SystemType', @system_type)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'BarDivisionMethod', @bar_division_method)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'FractionArea', @fraction_area)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'SpaceTypesFloorArea', @space_types_floor_area)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'ConditionedFloorAreaHeatedOnly', @conditioned_floor_area_heated_only)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'ConditionedFloorAreaCooledOnly', @conditioned_floor_area_cooled_only)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'ConditionedFloorAreaHeatedCooled', @conditioned_floor_area_heated_cooled)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'ConditionedBelowGradeFloorArea', @conditioned_below_grade_floor_area)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'CustomConditionedAboveGradeFloorArea', @custom_conditioned_above_grade_floor_area)
+      add_user_defined_field_to_xml_file(xml_element, ns, 'CustomConditionedBelowGradeFloorArea', @custom_conditioned_below_grade_floor_area)
     end
 
     def validate_fraction; end

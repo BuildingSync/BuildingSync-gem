@@ -193,10 +193,44 @@ module BuildingSync
       end
     end
 
+    def add_principal_hvac_type(buildingSection)
+      # code here
+      buildingSections = buildingSection.parent
+      building = buildingSections.parent
+      buildings = building.parent
+      site = buildings.parent
+      sites = site.parent
+      facility = sites.parent
+
+      if facility.elements["#{ns}:Systems"].nil?
+        systems = REXML::Element.new("#{ns}:Systems")
+        facility.add_element(systems)
+      else
+        systems = facility.elements["#{ns}:Systems"]
+      end
+
+      if systems.elements["#{ns}:HVACSystems"].nil?
+        hvac_systems = REXML::Element.new("#{ns}:HVACSystems")
+        systems.add_element(hvac_systems)
+      else
+        hvac_systems = facility.elements["#{ns}:HVACSystems"]
+      end
+
+      if hvac_systems.elements["#{ns}:HVACSystem"].nil?
+        hvac_system = BuildingSync::HVACSystem.new
+      else
+        hvac_system = facility.elements["#{ns}:HVACSystem"]
+      end
+
+      hvac_system.add_primary_system_type(@ID, @principal_hvac_type)
+    end
+
     def write_parameters_to_xml(ns, buildingSection)
       buildingSection.elements["#{ns}:fraction_area"].text = @fraction_area
       buildingSection.elements["#{ns}:OriginalOccupancyClassification"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
-      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_hvac_type if !@principal_hvac_type.nil?
+
+      add_principal_hvac_type(buildingSection) if !@principal_hvac_type.nil?
+
       buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_lighting_system_type if !@principal_lighting_system_type.nil?
       buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @miscellaneous_electric_load if !@miscellaneous_electric_load.nil?
       buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @spaces_conditioned_percent if !@spaces_conditioned_percent.nil?
@@ -209,8 +243,8 @@ module BuildingSync
       buildingSection.elements["#{ns}:SectionType"].text = @section_type if !@section_type.nil?
 
       # Add new element in the XML file
-      add_element_in_xml_file(buildingSection, ns, 'BuildingType', @bldg_type)
-      add_element_in_xml_file(buildingSection, ns, 'FractionArea', @fraction_area)
+      add_user_defined_field_to_xml_file(buildingSection, ns, 'BuildingType', @bldg_type)
+      add_user_defined_field_to_xml_file(buildingSection, ns, 'FractionArea', @fraction_area)
 
       write_parameters_to_xml_for_spatial_element(ns, buildingSection)
     end

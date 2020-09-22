@@ -1025,18 +1025,18 @@ module BuildingSync
       building.elements["#{ns}:PercentOccupiedByOwner"].text = @percent_occupied_by_owner if !@percent_occupied_by_owner.nil?
 
       # Add new element in the XML file
-      add_element_in_xml_file(building, ns, 'StandardTemplate', @standard_template)
-      add_element_in_xml_file(building, ns, 'BuildingRotation', @building_rotation)
-      add_element_in_xml_file(building, ns, 'FloorHeight', @floor_height)
-      add_element_in_xml_file(building, ns, 'WindowWallRatio', @wwr)
-      add_element_in_xml_file(building, ns, 'PartyWallStoriesNorth', @party_wall_stories_north)
-      add_element_in_xml_file(building, ns, 'PartyWallStoriesSouth', @party_wall_stories_south)
-      add_element_in_xml_file(building, ns, 'PartyWallStoriesEast', @party_wall_stories_east)
-      add_element_in_xml_file(building, ns, 'PartyWallStoriesWest', @party_wall_stories_west)
-      add_element_in_xml_file(building, ns, 'Width', @width)
-      add_element_in_xml_file(building, ns, 'Length', @length)
-      add_element_in_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
-      add_element_in_xml_file(building, ns, 'FractionArea', @fraction_area)
+      add_user_defined_field_to_xml_file(building, ns, 'StandardTemplate', @standard_template)
+      add_user_defined_field_to_xml_file(building, ns, 'BuildingRotation', @building_rotation)
+      add_user_defined_field_to_xml_file(building, ns, 'FloorHeight', @floor_height)
+      add_user_defined_field_to_xml_file(building, ns, 'WindowWallRatio', @wwr)
+      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesNorth', @party_wall_stories_north)
+      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesSouth', @party_wall_stories_south)
+      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesEast', @party_wall_stories_east)
+      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesWest', @party_wall_stories_west)
+      add_user_defined_field_to_xml_file(building, ns, 'Width', @width)
+      add_user_defined_field_to_xml_file(building, ns, 'Length', @length)
+      add_user_defined_field_to_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
+      add_user_defined_field_to_xml_file(building, ns, 'FractionArea', @fraction_area)
 
       write_parameters_to_xml_for_spatial_element(ns, building)
     end
