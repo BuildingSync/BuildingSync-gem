@@ -195,7 +195,7 @@ module BuildingSync
 
     def write_parameters_to_xml(ns, buildingSection)
       buildingSection.elements["#{ns}:fraction_area"].text = @fraction_area
-      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
+      buildingSection.elements["#{ns}:OriginalOccupancyClassification"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
       buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_hvac_type if !@principal_hvac_type.nil?
       buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_lighting_system_type if !@principal_lighting_system_type.nil?
       buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @miscellaneous_electric_load if !@miscellaneous_electric_load.nil?
@@ -210,7 +210,6 @@ module BuildingSync
 
       # Add new element in the XML file
       add_element_in_xml_file(buildingSection, ns, 'BuildingType', @bldg_type)
-      add_element_in_xml_file(buildingSection, ns, 'OriginalOccupancyClassification', @occupancy_classification_original)
       add_element_in_xml_file(buildingSection, ns, 'FractionArea', @fraction_area)
 
       write_parameters_to_xml_for_spatial_element(ns, buildingSection)
