@@ -489,11 +489,11 @@ module BuildingSync
       if result.nil?
         puts "Cannot load results for scenario #{scenario_name}, because the result is nil"
         @failed_scenarios << scenario_name
-        next
+        return
       elsif baseline.nil?
         puts "Cannot load baseline results for scenario #{scenario_name}"
         @failed_scenarios << scenario_name
-        next
+        return
       end
 
       if result['completed_status'] == 'Success' || result[:completed_status] == 'Success'
