@@ -35,6 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'builder'
+require_relative '../../../lib/buildingsync/generator'
 
 RSpec.describe 'FacilitySpec' do
   it 'Should generate meaningful error when passing empty XML data' do
@@ -47,11 +48,13 @@ RSpec.describe 'FacilitySpec' do
   end
 
   it 'Should create an instance of the facility class with minimal XML snippet' do
-    create_minimum_facility('Retail', '1954', 'Gross', '69452')
+    generator = BuildingSync::Generator.new()
+    generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
   end
 
   it 'Should return the boolean value for creating osm file correctly or not.' do
-    facility = create_minimum_facility('Retail', '1954', 'Gross', '69452')
+    generator = BuildingSync::Generator.new()
+    facility = generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
     facility.determine_open_studio_standard(ASHRAE90_1)
     epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
     output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
@@ -203,50 +206,6 @@ RSpec.describe 'FacilitySpec' do
       doc = REXML::Document.new(file)
     end
     return doc
-  end
-
-  def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    xml_path = File.expand_path('../../files/building_151_Blank.xml', File.dirname(__FILE__))
-    ns = 'auc'
-    doc = create_xml_file_object(xml_path)
-    site_element = doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
-
-    occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
-    occupancy_classification_element.text = occupancy_classification
-    site_element.add_element(occupancy_classification_element)
-
-    building_element = site_element.elements["#{ns}:Buildings/#{ns}:Building"]
-
-    year_of_construction_element = REXML::Element.new("#{ns}:YearOfConstruction")
-    year_of_construction_element.text = year_of_const
-    building_element.add_element(year_of_construction_element)
-
-    floor_areas_element = REXML::Element.new("#{ns}:FloorAreas")
-    floor_area_element = REXML::Element.new("#{ns}:FloorArea")
-    floor_area_type_element = REXML::Element.new("#{ns}:FloorAreaType")
-    floor_area_type_element.text = floor_area_type
-    floor_area_value_element = REXML::Element.new("#{ns}:FloorAreaValue")
-    floor_area_value_element.text = floor_area_value
-
-    floor_area_element.add_element(floor_area_type_element)
-    floor_area_element.add_element(floor_area_value_element)
-    floor_areas_element.add_element(floor_area_element)
-    building_element.add_element(floor_areas_element)
-
-    # doc.write(File.open(xml_path, 'w'), 2)
-
-    return doc
-  end
-
-  def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    ns = 'auc'
-    facility_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"]
-    if !facility_element.nil?
-      return BuildingSync::Facility.new(facility_element, 'auc')
-    else
-      expect(facility_element.nil?).to be false
-    end
   end
 
   def create_blank_xml_file1
