@@ -126,12 +126,7 @@ module BuildingSync
       return doc
     end
 
-    def gather_results_and_save_xml(dir, baseline_only = false)
-      gather_results(dir, baseline_only)
-      save_xml(File.join(dir, 'results.xml'))
-    end
-
-    def gather_results(dir, baseline_only = false)
+    def gather_results(dir, year_val, baseline_only = false)
       puts "dir: #{dir}"
       dir_split = dir.split(File::SEPARATOR)
       puts "dir_split: #{dir_split}"
@@ -140,7 +135,7 @@ module BuildingSync
         dir = dir.gsub('/Baseline', '')
       end
       puts "dir: #{dir}"
-      @workflow_maker.gather_results(dir, baseline_only)
+      @workflow_maker.gather_results(dir, year_val, baseline_only)
     end
 
     def save_xml(filename)
@@ -183,7 +178,7 @@ module BuildingSync
       return @model_maker.get_model
     end
 
-    def run_osm(epw_name, runner_options = { run_simulations: true, verbose: false, num_parallel: 1, max_to_run: Float::INFINITY })
+    def run_osm(epw_name, runner_options = {run_simulations: true, verbose: false, num_parallel: 1, max_to_run: Float::INFINITY})
       file_name = 'in.osm'
 
       osm_baseline_dir = File.join(@output_dir, 'Baseline')
@@ -205,13 +200,13 @@ module BuildingSync
       return runner.run_osw(osw_path, osm_baseline_dir)
     end
 
-    def run_osws(runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
+    def run_osws(runner_options = {run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY})
       osw_files = []
       osw_sr_files = []
       Dir.glob("#{@output_dir}/**/in.osw") { |osw| osw_files << osw }
       Dir.glob("#{@output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
 
-      runner = OpenStudio::Extension::Runner.new(dirname=Dir.pwd, bundle_without=[], options=runner_options)
+      runner = OpenStudio::Extension::Runner.new(dirname = Dir.pwd, bundle_without = [], options = runner_options)
       return runner.run_osws(osw_files - osw_sr_files)
     end
 

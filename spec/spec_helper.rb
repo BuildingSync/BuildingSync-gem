@@ -96,7 +96,7 @@ RSpec.configure do |config|
     OpenstudioStandards.run_command(cmd)
 
     expect(File.exist?(osm_baseline_path.gsub('in.osm', 'run/eplusout.sql'))).to be true
-   end
+  end
 
   def run_scenario_simulations(osw_files, num_of_threads = 7)
     cli_path = OpenStudio.getOpenStudioCLI
@@ -235,8 +235,8 @@ RSpec.configure do |config|
   end
 
   def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, simulate = true)
-
-    translator = test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used , epw_file_name)
+    current_year = Date.today.year
+    translator = test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used, epw_file_name)
 
     out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
     osw_files = []
@@ -248,17 +248,18 @@ RSpec.configure do |config|
       dir_path = File.dirname(osw_files[0])
       parent_dir_path = File.expand_path('..', dir_path)
 
-      translator.gather_results(parent_dir_path)
+      translator.gather_results(parent_dir_path, current_year)
       translator.save_xml(File.join(parent_dir_path, 'results.xml'))
     end
   end
 
   def test_baseline_creation_and_simulation(filename, standard_to_be_used, epw_file)
+    current_year = Date.today.year
     translator = test_baseline_creation(filename, standard_to_be_used, epw_file)
     expect(translator.run_osm(epw_file)).to be true
     expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
     out_path = File.dirname(translator.osm_baseline_path)
-    translator.gather_results(out_path, true)
+    translator.gather_results(out_path, current_year, true)
     translator.save_xml(File.join(out_path, 'results.xml'))
     expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
   end
