@@ -758,8 +758,6 @@ module BuildingSync
       results_counter = 0
       super
       begin
-        results = {}
-        monthly_results = {}
         scenarios_found = false
 
         # write an osw for each scenario
@@ -845,7 +843,7 @@ module BuildingSync
           end
         end
 
-        puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
+        puts 'No scenarios found in BuildingSync XML File, please check the object hierarchy for errors.' if !scenarios_found
       rescue StandardError => e
         puts "The following error occurred #{e.message} while processing results in #{dir}"
       end
