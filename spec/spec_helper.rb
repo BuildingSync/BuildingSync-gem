@@ -231,7 +231,9 @@ RSpec.configure do |config|
       dir_path = File.dirname(osw_files[0])
       parent_dir_path = File.expand_path('..', dir_path)
 
-      translator.gather_results(parent_dir_path)
+      successful = translator.gather_results(parent_dir_path)
+      puts "Error during results gathering, please check earlier error messages for issues with measures." if !successful
+      expect(successful).to be true
       translator.save_xml(File.join(parent_dir_path, 'results.xml'))
     end
   end
