@@ -527,7 +527,7 @@ module BuildingSync
       return result, baseline, package_of_measures
     end
 
-    def Add_calc_method_element()
+    def add_calc_method_element()
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
       calc_method = REXML::Element.new("#{@ns}:CalculationMethod")
@@ -548,7 +548,7 @@ module BuildingSync
       return calc_method
     end
 
-    def Calculate_annual_savings_value(package_of_measures, total_site_energy_savings_mmbtu, total_source_energy_savings_mmbtu, total_energy_cost_savings)
+    def calculate_annual_savings_value(package_of_measures, total_site_energy_savings_mmbtu, total_source_energy_savings_mmbtu, total_energy_cost_savings)
 
       annual_savings_site_energy = REXML::Element.new("#{@ns}:AnnualSavingsSiteEnergy")
       annual_savings_source_energy = REXML::Element.new("#{@ns}:AnnualSavingsSourceEnergy")
@@ -782,7 +782,7 @@ module BuildingSync
 
             # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
             # options are: Not Started, Started, Finished, Failed, Unknown
-            package_of_measures.add_element(Add_calc_method_element())
+            package_of_measures.add_element(add_calc_method_element())
 
             # Check out.osw "openstudio_results" for output variables
             total_site_energy_kbtu = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
@@ -830,7 +830,7 @@ module BuildingSync
               total_energy_cost_savings = baseline_annual_utility_cost - annual_utility_cost
             end
 
-            package_of_measures.add_element(Calculate_annual_savings_value(package_of_measures, total_site_energy_savings_mmbtu, total_source_energy_savings_mmbtu, total_energy_cost_savings))
+            package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, total_site_energy_savings_mmbtu, total_source_energy_savings_mmbtu, total_energy_cost_savings))
 
             res_uses = get_resource_uses_element(scenario_name, fuel_electricity_kbtu, annual_peak_electric_demand_kw, fuel_natural_gas_kbtu)
             scenario_type = scenario.elements["#{@ns}:ScenarioType"]
