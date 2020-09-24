@@ -188,6 +188,10 @@ module BuildingSync
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
+      if @num_stories_below_grade
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_stories_above_and_below_grade', "Number of stories below grade is larger than 1: #{@num_stories_below_grade}, currently only one basement story is supported.")
+        raise "Error : Number of stories below grade is larger than 1: #{@num_stories_below_grade}, currently only one basement story is supported."
+      end
     end
 
     def read_aspect_ratio(build_element, ns)
