@@ -98,23 +98,6 @@ RSpec.configure do |config|
     expect(File.exist?(osm_baseline_path.gsub('in.osm', 'run/eplusout.sql'))).to be true
    end
 
-  def run_scenario_simulations(osw_files, num_of_threads = 7)
-    cli_path = OpenStudio.getOpenStudioCLI
-    counter = 1
-    Parallel.each(osw_files, in_threads: num_of_threads) do |osw_file|
-      cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
-      # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
-      puts "#{counter}) #{cmd}"
-      counter += 1
-      # Run the sizing run
-      OpenstudioStandards.run_command(cmd)
-
-      sql_file = osw_file.gsub('in.osw', 'eplusout.sql')
-      puts "Simulation not completed successfully for file: #{osw_file}" if !File.exist?(sql_file)
-      expect(File.exist?(sql_file)).to be true
-    end
-  end
-
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true

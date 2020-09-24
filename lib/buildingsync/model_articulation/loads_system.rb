@@ -96,36 +96,36 @@ module BuildingSync
       # we assume that the standard always generate people per area
       sum_of_people_per_area = 0.0
       count = 0
-	  if !space_types.nil? 
-		  sorted_space_types = model.getSpaceTypes.sort
-		  sorted_space_types.each do |space_type|
-			if space_types.include? space_type
-			  peoples = space_type.people
-			  peoples.each do |people|
-				sum_of_people_per_area += people.peoplePerFloorArea.get
-				count += 1
-			  end
-			end
-		  end
-		  average_people_per_area = sum_of_people_per_area / count
-		  puts "existing occupancy: #{average_people_per_area} new target value: #{new_occupancy_peak.to_f / area.to_f}"
-		  new_sum_of_people_per_area = 0.0
-		  sorted_space_types.each do |space_type|
-			if space_types.include? space_type
-			  peoples = space_type.people
-			  peoples.each do |people|
-				ratio = people.peoplePerFloorArea.get.to_f / average_people_per_area.to_f
-				new_value = ratio * new_occupancy_peak.to_f / area.to_f
-				puts "adjusting occupancy per area value from: #{people.peoplePerFloorArea.get} by ratio #{ratio} to #{new_value}"
-				people.peopleDefinition.setPeopleperSpaceFloorArea(new_value)
-				new_sum_of_people_per_area += new_value
-			  end
-			end
-		  end
-		  puts "resulting total absolute occupancy value: #{new_sum_of_people_per_area * area.to_f} occupancy per area value: #{new_sum_of_people_per_area / count}"
-		else
-		  puts "space types are empty"
-		end
+      if !space_types.nil?
+        sorted_space_types = model.getSpaceTypes.sort
+        sorted_space_types.each do |space_type|
+          if space_types.include? space_type
+            peoples = space_type.people
+            peoples.each do |people|
+              sum_of_people_per_area += people.peoplePerFloorArea.get
+              count += 1
+            end
+          end
+        end
+        average_people_per_area = sum_of_people_per_area / count
+        puts "existing occupancy: #{average_people_per_area} new target value: #{new_occupancy_peak.to_f / area.to_f}"
+        new_sum_of_people_per_area = 0.0
+        sorted_space_types.each do |space_type|
+          if space_types.include? space_type
+            peoples = space_type.people
+            peoples.each do |people|
+              ratio = people.peoplePerFloorArea.get.to_f / average_people_per_area.to_f
+              new_value = ratio * new_occupancy_peak.to_f / area.to_f
+              puts "adjusting occupancy per area value from: #{people.peoplePerFloorArea.get} by ratio #{ratio} to #{new_value}"
+              people.peopleDefinition.setPeopleperSpaceFloorArea(new_value)
+              new_sum_of_people_per_area += new_value
+            end
+          end
+        end
+        puts "resulting total absolute occupancy value: #{new_sum_of_people_per_area * area.to_f} occupancy per area value: #{new_sum_of_people_per_area / count}"
+      else
+        puts 'space types are empty'
+      end
     end
 
     def get_building_section(building_sections, standard_building_type, standard_space_type)
@@ -148,20 +148,20 @@ module BuildingSync
 
     def adjust_people_schedule(space_type, building_section, model)
       if !building_section.typical_occupant_usage_value_hours.nil?
-        puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
-        model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
-        path = model_articulation_instance.measures_dir + '/create_parametric_schedules/resources/os_lib_parametric_schedules.rb'
-        puts "create parametric schedule path: #{path}"
-        require path
+        # puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
+        # model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+        # path = model_articulation_instance.measures_dir + '/create_parametric_schedules/resources/os_lib_parametric_schedules.rb'
+        # puts "create parametric schedule path: #{path}"
+        # require path
 
-        param_Schedules = OsLib_Parametric_Schedules.new(model)
-        param_Schedules.override_hours_per_week(building_section.typical_occupant_usage_value_hours.to_f)
+        # param_Schedules = OsLib_Parametric_Schedules.new(model)
+        # param_Schedules.override_hours_per_week(building_section.typical_occupant_usage_value_hours.to_f)
 
-        param_Schedules.pre_process_space_types
+        # param_Schedules.pre_process_space_types
 
-        param_Schedules.create_default_schedule_set
+        # param_Schedules.create_default_schedule_set
 
-        param_Schedules.create_schedules_and_apply_default_schedule_set
+        # param_Schedules.create_schedules_and_apply_default_schedule_set
       end
     end
 

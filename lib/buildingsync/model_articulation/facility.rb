@@ -40,7 +40,6 @@ require_relative 'envelope_system'
 require_relative 'hvac_system'
 require_relative 'service_hot_water_system'
 require_relative 'measure'
-require 'openstudio/model_articulation/os_lib_model_generation_bricr'
 require 'openstudio/extension/core/os_lib_geometry'
 require_relative '../helpers/Model.hvac'
 require_relative '../helpers/metered_energy'
@@ -48,7 +47,6 @@ require_relative '../helpers/helper'
 
 module BuildingSync
   class Facility
-    include OsLib_ModelGenerationBRICR
     include OsLib_Geometry
 
     # initialize

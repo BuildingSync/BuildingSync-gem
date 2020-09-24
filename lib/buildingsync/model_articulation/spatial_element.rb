@@ -37,10 +37,14 @@
 require 'openstudio'
 require 'fileutils'
 require 'json'
+require 'openstudio/extension/core/os_lib_model_generation'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
+
   class SpatialElement
+
+    include OsLib_ModelGeneration
     def initialize
       @total_floor_area = nil
       @bldg_type = nil
