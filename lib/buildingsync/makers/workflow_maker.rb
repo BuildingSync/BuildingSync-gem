@@ -431,11 +431,10 @@ module BuildingSync
       end
     end
 
-    def get_result_for_baseline_only(dir, baseline_only = false)
+    def get_result_for_baseline_only(dir)
       results = {}
       monthly_results = {}
       get_scenario_elements.each do |scenario|
-        scenarios_found = true
         # get information about the scenario
         if scenario.elements["#{@ns}:ScenarioName"]
           scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
@@ -443,9 +442,8 @@ module BuildingSync
           scenario_name = scenario.attributes['ID']
         end
         next if scenario_name == 'Measured'
-        next if baseline_only && (scenario_name != 'Baseline')
+        next if scenario_name != 'Baseline'
 
-        puts "processing scenario with name #{scenario_name}"
         # dir for the osw
         osw_dir = File.join(dir, scenario_name)
         # cleanup large files
@@ -765,7 +763,7 @@ module BuildingSync
         scenarios_found = false
 
         # write an osw for each scenario
-        results, monthly_results = get_result_for_baseline_only(dir, baseline_only)
+        results, monthly_results = get_result_for_baseline_only(dir)
 
         if !baseline_only
           get_scenario_elements.each do |scenario|
@@ -775,9 +773,7 @@ module BuildingSync
             next if scenario_name == 'Measured'
             next if scenario_name == 'Baseline'
 
-            puts "scenario_name #{scenario_name} should not be Baseline here!!"
             results_counter += 1
-
             result, baseline, package_of_measures = delete_scenario_element(results, scenario)
 
             # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
@@ -837,12 +833,12 @@ module BuildingSync
             scenario.insert_after(scenario_type, res_uses)
 
             # already added ResourceUses above. Needed as ResourceUseID reference
-            timeseriesdata = get_timeseries_data_element(monthly_results,year_val, scenario_name)
-            scenario.insert_after(res_uses, timeseriesdata)
+            timeseries_data = get_timeseries_data_element(monthly_results,year_val, scenario_name)
+            scenario.insert_after(res_uses, timeseries_data)
 
             # all the totals
             all_res_totals = get_all_resource_totals_element(total_site_energy_kbtu, total_site_eui_kbtu_ft2, total_source_energy_kbtu, total_source_eui_kbtu_ft2)
-            scenario.insert_after(timeseriesdata, all_res_totals)
+            scenario.insert_after(timeseries_data, all_res_totals)
 
             # no longer using user defined fields
             scenario.elements.delete("#{@ns}:UserDefinedFields")
