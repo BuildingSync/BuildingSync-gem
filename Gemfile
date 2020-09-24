@@ -30,3 +30,9 @@ if allow_local && File.exist?('../openstudio-model-articulation-gem')
 else
   gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', branch: 'develop'
 end
+
+if allow_local && File.exist?('../openstudio-ee-gem')
+  gem 'openstudio-ee', path: '../openstudio-ee-gem'
+else
+  gem 'openstudio-ee', github: 'NREL/openstudio-ee-gem', branch: 'bldgsync_measures'
+end
