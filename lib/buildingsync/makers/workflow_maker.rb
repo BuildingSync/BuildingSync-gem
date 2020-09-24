@@ -640,7 +640,7 @@ module BuildingSync
       return res_uses
     end
 
-    def get_timeseries_data_element(monthly_results,year_val, scenario_name)
+    def get_timeseries_data_element(monthly_results, scenario_name)
       month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
       scenario_name_ns = scenario_name.gsub(' ', '_').gsub(/[^0-9a-z_]/i, '')
       timeseriesdata = REXML::Element.new("#{@ns}:TimeSeriesData")
@@ -658,18 +658,18 @@ module BuildingSync
         timeseries.add_element(ts_quantity)
         start_time = REXML::Element.new("#{@ns}:StartTimeStamp")
         if month < 10
-          start_time.text = year_val.to_s + '-0' + month.to_s + '-01T00:00:00'
+          start_time.text = '2017-0' + month.to_s + '-01T00:00:00'
         else
-          start_time.text = year_val.to_s + '-' + month.to_s + '-01T00:00:00'
+          start_time.text = '2017-' + month.to_s + '-01T00:00:00'
         end
         timeseries.add_element(start_time)
         end_time = REXML::Element.new("#{@ns}:EndTimeStamp")
         if month < 9
-          end_time.text = year_val.to_s + '-0' + (month + 1).to_s + '-01T00:00:00'
+          end_time.text = '2017-0' + (month + 1).to_s + '-01T00:00:00'
         elsif month < 12
-          end_time.text = year_val.to_s + '-' + (month + 1).to_s + '-01T00:00:00'
+          end_time.text = '2017-' + (month + 1).to_s + '-01T00:00:00'
         else
-          end_time.text = year_val.to_s + '-01-01T00:00:00'
+          end_time.text = '2018-01-01T00:00:00'
         end
         timeseries.add_element(end_time)
         interval_frequency = REXML::Element.new("#{@ns}:IntervalFrequency")
@@ -701,18 +701,18 @@ module BuildingSync
         timeseries.add_element(ts_quantity)
         start_time = REXML::Element.new("#{@ns}:StartTimeStamp")
         if month < 10
-          start_time.text = year_val.to_s + '-0' + month.to_s + '-01T00:00:00'
+          start_time.text = '2017-0' + month.to_s + '-01T00:00:00'
         else
-          start_time.text = year_val.to_s + '-' + month.to_s + '-01T00:00:00'
+          start_time.text = '2017-' + month.to_s + '-01T00:00:00'
         end
         timeseries.add_element(start_time)
         end_time = REXML::Element.new("#{@ns}:EndTimeStamp")
         if month < 9
-          end_time.text = year_val.to_s + '-0' + (month + 1).to_s + '-01T00:00:00'
+          end_time.text = '2017-0' + (month + 1).to_s + '-01T00:00:00'
         elsif month < 12
-          end_time.text = year_val.to_s + '-' + (month + 1).to_s + '-01T00:00:00'
+          end_time.text = '2017-' + (month + 1).to_s + '-01T00:00:00'
         else
-          end_time.text = year_val.to_s + '-01-01T00:00:00'
+          end_time.text = '2018-01-01T00:00:00'
         end
         timeseries.add_element(end_time)
         interval_frequency = REXML::Element.new("#{@ns}:IntervalFrequency")
@@ -755,7 +755,7 @@ module BuildingSync
       return all_res_totals
     end
 
-    def gather_results(dir, year_val, baseline_only = false)
+    def gather_results(dir, baseline_only = false)
       puts 'starting to gather results'
       results_counter = 0
       super
@@ -837,7 +837,7 @@ module BuildingSync
             scenario.insert_after(scenario_type, res_uses)
 
             # already added ResourceUses above. Needed as ResourceUseID reference
-            timeseriesdata = get_timeseries_data_element(monthly_results,year_val, scenario_name)
+            timeseriesdata = get_timeseries_data_element(monthly_results, scenario_name)
             scenario.insert_after(res_uses, timeseriesdata)
 
             # all the totals
