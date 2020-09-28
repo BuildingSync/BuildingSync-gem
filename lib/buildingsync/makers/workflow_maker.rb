@@ -431,7 +431,7 @@ module BuildingSync
       end
     end
 
-    def get_result_for_baseline_only(dir)
+    def get_result_for_scenarios(dir, baseline_only)
       results = {}
       monthly_results = {}
       get_scenario_elements.each do |scenario|
@@ -442,7 +442,7 @@ module BuildingSync
           scenario_name = scenario.attributes['ID']
         end
         next if scenario_name == 'Measured'
-        next if scenario_name != 'Baseline'
+        next if scenario_name != 'Baseline' && baseline_only
 
         # dir for the osw
         osw_dir = File.join(dir, scenario_name)
@@ -469,10 +469,7 @@ module BuildingSync
       return results, monthly_results
     end
 
-    def delete_scenario_element(results, scenario)
-      package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
-
-      # delete previous results
+    def delete_resource_element(scenario, package_of_measures)
       package_of_measures.elements.delete("#{@ns}:AnnualSavingsSiteEnergy")
       package_of_measures.elements.delete("#{@ns}:AnnualSavingsCost")
       package_of_measures.elements.delete("#{@ns}:CalculationMethod")
@@ -480,6 +477,13 @@ module BuildingSync
       scenario.elements.delete("#{@ns}AllResourceTotals")
       scenario.elements.delete("#{@ns}RsourceUses")
       scenario.elements.delete("#{@ns}AnnualSavingsByFuels")
+    end
+
+    def delete_scenario_element(results, scenario)
+      package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
+      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+      # delete previous results
+      delete_resource_element(scenario, package_of_measures)
 
       result = results[scenario_name]
       baseline = results['Baseline']
@@ -638,14 +642,10 @@ module BuildingSync
       return res_uses
     end
 
-    def get_timeseries_data_element(monthly_results,year_val, scenario_name)
+    def get_timeseries_element(monthly_results, year_val, scenario_name, timeseriesdata, key_value)
       month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
       scenario_name_ns = scenario_name.gsub(' ', '_').gsub(/[^0-9a-z_]/i, '')
-      timeseriesdata = REXML::Element.new("#{@ns}:TimeSeriesData")
 
-      # Electricity
-      # looking for: "electricity_ip_jan" through "electricity_ip_dec"
-      # convert from kWh to kBtu
       (1..12).each do |month|
         timeseries = REXML::Element.new("#{@ns}:TimeSeries")
         reading_type = REXML::Element.new("#{@ns}:ReadingType")
@@ -674,60 +674,31 @@ module BuildingSync
         interval_frequency.text = 'Month'
         timeseries.add_element(interval_frequency)
         interval_reading = REXML::Element.new("#{@ns}:IntervalReading")
-        the_key = "electricity_ip_#{month_lookup[month]}"
+        the_key = key_value.downcase + "_ip_#{month_lookup[month]}"
         # puts "saving value 123: #{monthly_results[scenario_name][the_key]}"
         if !monthly_results[scenario_name][the_key.to_sym].nil?
           interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 3.4121416331 # kWh to kBtu
         end
         timeseries.add_element(interval_reading)
         resource_id = REXML::Element.new("#{@ns}:ResourceUseID")
-        resource_id.add_attribute('IDref', scenario_name_ns + '_Electricity')
+        resource_id.add_attribute('IDref', scenario_name_ns + '_' + key_value)
         timeseries.add_element(resource_id)
         timeseriesdata.add_element(timeseries)
       end
+    end
 
+    def get_timeseries_data_element(monthly_results, year_val, scenario_name)
+      timeseriesdata = REXML::Element.new("#{@ns}:TimeSeriesData")
+
+      # Electricity
+      # looking for: "electricity_ip_jan" through "electricity_ip_dec"
+      # convert from kWh to kBtu
+      get_timeseries_element(monthly_results, year_val, scenario_name, timeseriesdata, 'Electricity')
       # Natural Gas
       # looking for: "natural_gas_ip_jan" through "natural_gas_ip_dec"
       # convert from MMBtu to kBtu
-      (1..12).each do |month|
-        timeseries = REXML::Element.new("#{@ns}:TimeSeries")
-        reading_type = REXML::Element.new("#{@ns}:ReadingType")
-        reading_type.text = 'Total'
-        timeseries.add_element(reading_type)
-        ts_quantity = REXML::Element.new("#{@ns}:TimeSeriesReadingQuantity")
-        ts_quantity.text = 'Energy'
-        timeseries.add_element(ts_quantity)
-        start_time = REXML::Element.new("#{@ns}:StartTimeStamp")
-        if month < 10
-          start_time.text = year_val.to_s + '-0' + month.to_s + '-01T00:00:00'
-        else
-          start_time.text = year_val.to_s + '-' + month.to_s + '-01T00:00:00'
-        end
-        timeseries.add_element(start_time)
-        end_time = REXML::Element.new("#{@ns}:EndTimeStamp")
-        if month < 9
-          end_time.text = year_val.to_s + '-0' + (month + 1).to_s + '-01T00:00:00'
-        elsif month < 12
-          end_time.text = year_val.to_s + '-' + (month + 1).to_s + '-01T00:00:00'
-        else
-          end_time.text = year_val.to_s + '-01-01T00:00:00'
-        end
-        timeseries.add_element(end_time)
-        interval_frequency = REXML::Element.new("#{@ns}:IntervalFrequency")
-        interval_frequency.text = 'Month'
-        timeseries.add_element(interval_frequency)
-        interval_reading = REXML::Element.new("#{@ns}:IntervalReading")
-        the_key = "natural_gas_ip_#{month_lookup[month]}"
-        # puts "saving value: #{monthly_results[scenario_name][the_key.to_sym]}"
-        if !monthly_results[scenario_name][the_key.to_sym].nil?
-          interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 1000.0 # MMBtu to kBtu
-        end
-        timeseries.add_element(interval_reading)
-        resource_id = REXML::Element.new("#{@ns}:ResourceUseID")
-        resource_id.add_attribute('IDref', scenario_name_ns + '_NaturalGas')
-        timeseries.add_element(resource_id)
-        timeseriesdata.add_element(timeseries)
-      end
+      get_timeseries_element(monthly_results, year_val, scenario_name, timeseriesdata, 'NaturalGas')
+
       return timeseriesdata
     end
 
@@ -753,6 +724,68 @@ module BuildingSync
       return all_res_totals
     end
 
+    def gather_result_calculation(result, baseline)
+      list_of_variable = []
+      # Check out.osw "openstudio_results" for output variables
+      total_site_energy_kbtu = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
+      baseline_total_site_energy_kbtu = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
+
+      total_site_eui_kbtu_ft2 = get_measure_result(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
+      baseline_total_site_eui_kbtu_ft2 = get_measure_result(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
+
+      # temporary hack to get source energy
+      eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
+      source_energy = get_source_energy_array(eplustbl_path)
+      total_source_energy_kbtu = source_energy[0]
+      total_source_eui_kbtu_ft2 = source_energy[1]
+
+      baseline_eplustbl_path = File.join(dir, 'Baseline', 'eplustbl.htm')
+      baseline_source_energy = get_source_energy_array(baseline_eplustbl_path)
+      baseline_total_source_energy_kbtu = baseline_source_energy[0]
+      baseline_total_source_eui_kbtu_ft2 = baseline_source_energy[1]
+      # end hack
+
+      fuel_electricity_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_electricity') # in kBtu
+      baseline_fuel_electricity_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
+
+      fuel_natural_gas_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
+      baseline_fuel_natural_gas_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
+
+      annual_peak_electric_demand_kw = get_measure_result(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
+      baseline_annual_peak_electric_demand_kw = get_measure_result(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
+
+      annual_utility_cost = get_measure_result(result, 'openstudio_results', 'annual_utility_cost') # in $
+      baseline_annual_utility_cost = get_measure_result(baseline, 'openstudio_results', 'annual_utility_cost') # in $
+
+      total_site_energy_savings_mmbtu = 0
+      if baseline_total_site_energy_kbtu && total_site_energy_kbtu
+        total_site_energy_savings_mmbtu = (baseline_total_site_energy_kbtu - total_site_energy_kbtu) / 1000.0 # in MMBtu
+      end
+
+      total_source_energy_savings_mmbtu = 0
+      if baseline_total_source_energy_kbtu && total_source_energy_kbtu
+        total_source_energy_savings_mmbtu = (baseline_total_source_energy_kbtu - total_source_energy_kbtu) / 1000.0 # in MMBtu
+      end
+
+      total_energy_cost_savings = 0
+      if baseline_annual_utility_cost && annual_utility_cost
+        total_energy_cost_savings = baseline_annual_utility_cost - annual_utility_cost
+      end
+
+      list_of_variable << fuel_electricity_kbtu
+      list_of_variable << total_site_energy_savings_mmbtu
+      list_of_variable << total_source_energy_savings_mmbtu
+      list_of_variable << total_energy_cost_savings
+      list_of_variable << annual_peak_electric_demand_kw
+      list_of_variable << fuel_natural_gas_kbtu
+      list_of_variable << total_site_energy_kbtu
+      list_of_variable << total_site_eui_kbtu_ft2
+      list_of_variable << total_source_energy_kbtu
+      list_of_variable << total_source_eui_kbtu_ft2
+
+      return  list_of_variable
+    end
+
     def gather_results(dir, year_val, baseline_only = false)
       puts 'starting to gather results'
       results_counter = 0
@@ -761,7 +794,7 @@ module BuildingSync
         scenarios_found = false
 
         # write an osw for each scenario
-        results, monthly_results = get_result_for_baseline_only(dir)
+        results, monthly_results = get_result_for_scenarios(dir, baseline_only)
 
         if !baseline_only
           get_scenario_elements.each do |scenario|
@@ -772,57 +805,25 @@ module BuildingSync
             next if scenario_name == 'Baseline'
 
             results_counter += 1
+            results_counter += 1
             result, baseline, package_of_measures = delete_scenario_element(results, scenario)
 
             # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
             # options are: Not Started, Started, Finished, Failed, Unknown
             package_of_measures.add_element(add_calc_method_element())
 
-            # Check out.osw "openstudio_results" for output variables
-            total_site_energy_kbtu = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
-            baseline_total_site_energy_kbtu = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
+            list_of_variable  = gather_result_calculation(result,baseline )
 
-            total_site_eui_kbtu_ft2 = get_measure_result(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-            baseline_total_site_eui_kbtu_ft2 = get_measure_result(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-
-            # temporary hack to get source energy
-            eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
-            source_energy = get_source_energy_array(eplustbl_path)
-            total_source_energy_kbtu = source_energy[0]
-            total_source_eui_kbtu_ft2 = source_energy[1]
-
-            baseline_eplustbl_path = File.join(dir, 'Baseline', 'eplustbl.htm')
-            baseline_source_energy = get_source_energy_array(baseline_eplustbl_path)
-            baseline_total_source_energy_kbtu = baseline_source_energy[0]
-            baseline_total_source_eui_kbtu_ft2 = baseline_source_energy[1]
-            # end hack
-
-            fuel_electricity_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_electricity') # in kBtu
-            baseline_fuel_electricity_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
-
-            fuel_natural_gas_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
-            baseline_fuel_natural_gas_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
-
-            annual_peak_electric_demand_kw = get_measure_result(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
-            baseline_annual_peak_electric_demand_kw = get_measure_result(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
-
-            annual_utility_cost = get_measure_result(result, 'openstudio_results', 'annual_utility_cost') # in $
-            baseline_annual_utility_cost = get_measure_result(baseline, 'openstudio_results', 'annual_utility_cost') # in $
-
-            total_site_energy_savings_mmbtu = 0
-            if baseline_total_site_energy_kbtu && total_site_energy_kbtu
-              total_site_energy_savings_mmbtu = (baseline_total_site_energy_kbtu - total_site_energy_kbtu) / 1000.0 # in MMBtu
-            end
-
-            total_source_energy_savings_mmbtu = 0
-            if baseline_total_source_energy_kbtu && total_source_energy_kbtu
-              total_source_energy_savings_mmbtu = (baseline_total_source_energy_kbtu - total_source_energy_kbtu) / 1000.0 # in MMBtu
-            end
-
-            total_energy_cost_savings = 0
-            if baseline_annual_utility_cost && annual_utility_cost
-              total_energy_cost_savings = baseline_annual_utility_cost - annual_utility_cost
-            end
+            fuel_electricity_kbtu = list_of_variable[0]
+            total_site_energy_savings_mmbtu = list_of_variable[1]
+            total_source_energy_savings_mmbtu = list_of_variable[2]
+            total_energy_cost_savings= list_of_variable[3]
+            annual_peak_electric_demand_kw= list_of_variable[4]
+            fuel_natural_gas_kbtu= list_of_variable[5]
+            total_site_energy_kbtu= list_of_variable[6]
+            total_site_eui_kbtu_ft2= list_of_variable[7]
+            total_source_energy_kbtu= list_of_variable[8]
+            total_source_eui_kbtu_ft2= list_of_variable[9]
 
             package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, total_site_energy_savings_mmbtu, total_source_energy_savings_mmbtu, total_energy_cost_savings))
 
@@ -831,7 +832,7 @@ module BuildingSync
             scenario.insert_after(scenario_type, res_uses)
 
             # already added ResourceUses above. Needed as ResourceUseID reference
-            timeseries_data = get_timeseries_data_element(monthly_results,year_val, scenario_name)
+            timeseries_data = get_timeseries_data_element(monthly_results, year_val, scenario_name)
             scenario.insert_after(res_uses, timeseries_data)
 
             # all the totals
