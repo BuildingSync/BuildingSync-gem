@@ -38,7 +38,7 @@ module BuildingSync
   class HVACSystem < BuildingSystem
     def initialize(system_element = nil, ns = '')
       # code to initialize
-      @primary_hvac_system_type = Hash.new
+      @principal_hvac_system_type = Hash.new
       @systems = system_element
       read_xml(system_element, ns) if system_element
     end
@@ -54,11 +54,11 @@ module BuildingSync
         if hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"]
           linked_building = hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref']
           puts "found primary system type: #{system_type} for linked building: #{linked_building}"
-          @primary_hvac_system_type[linked_building] = system_type
+          @principal_hvac_system_type[linked_building] = system_type
         elsif hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"]
           linked_section = hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"].attributes['IDref']
           puts "found primary system type: #{system_type} for linked section: #{linked_section}"
-          @primary_hvac_system_type[linked_section] = system_type
+          @principal_hvac_system_type[linked_section] = system_type
         elsif system_type
           puts "primary_hvac_system_type: #{system_type} is not linked to a building or section "
         end
@@ -66,8 +66,8 @@ module BuildingSync
     end
 
     def get_primary_hvac_system_type
-      if @primary_hvac_system_type
-        return @primary_hvac_system_type.values[0]
+      if @principal_hvac_system_type
+        return @principal_hvac_system_type.values[0]
       end
       return nil
     end
@@ -186,9 +186,9 @@ module BuildingSync
         standard.model_remove_prm_hvac(model)
       end
 
-      puts "system_type derived from standards: #{system_type} and primary hvac system type override is: #{@primary_hvac_system_type}"
-      if !@primary_hvac_system_type.empty?
-        system_type = map_primary_hvac_system_type_to_cbecs_system_type(@primary_hvac_system_type.first.first, system_type)
+      puts "system_type derived from standards: #{system_type} and primary hvac system type override is: #{@principal_hvac_system_type}"
+      if !@principal_hvac_system_type.empty?
+        system_type = map_primary_hvac_system_type_to_cbecs_system_type(@principal_hvac_system_type.first.first, system_type)
       end
 
       case system_type
@@ -267,7 +267,7 @@ module BuildingSync
           zone_name_list = BuildingSync::Helper.get_zone_name_list(zone_list)
           zones.each do |zone|
             if zone_name_list.include? zone.name.get
-              return map_primary_hvac_system_type_to_cbecs_system_type(@primary_hvac_system_type[id], system_type)
+              return map_primary_hvac_system_type_to_cbecs_system_type(@principal_hvac_system_type[id], system_type)
             end
           end
         end
@@ -302,7 +302,7 @@ module BuildingSync
       return true
     end
 
-    attr_reader :primary_hvac_system_type
+    attr_reader :principal_hvac_system_type
 
 
   end
