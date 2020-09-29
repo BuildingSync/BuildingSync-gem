@@ -222,7 +222,7 @@ module BuildingSync
         hvac_system = facility.elements["#{ns}:HVACSystem"]
       end
 
-      hvac_system.add_primary_system_type(@ID, @principal_hvac_type)
+      hvac_system.add_principal_hvac_system_type(@ID, @principal_hvac_type)
     end
 
     def write_parameters_to_xml(ns, building_section)

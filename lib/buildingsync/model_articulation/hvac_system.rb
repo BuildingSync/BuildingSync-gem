@@ -48,6 +48,8 @@ module BuildingSync
         system_type = nil
         if hvac_system.elements["#{ns}:PrimaryHVACSystemType"]
           system_type = hvac_system.elements["#{ns}:PrimaryHVACSystemType"].text
+        elsif hvac_system.elements["#{ns}:PrincipalHVACSystemType"]
+          system_type = hvac_system.elements["#{ns}:PrincipalHVACSystemType"].text
         end
         if hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"]
           linked_building = hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref']
@@ -71,7 +73,7 @@ module BuildingSync
     end
 
     # adding the principal hvac system type to the hvac systems, overwrite existing values or create new elements if none are present
-    def add_primary_system_type(id, principal_hvac_type)
+    def add_principal_hvac_system_type(id, principal_hvac_type)
       if @systems.nil?
         @systems = REXML::Element.new("#{ns}:HVACSystems")
       end
@@ -97,10 +99,10 @@ module BuildingSync
         end
       end
 
-      if hvac_system.elements["#{ns}:PrimaryHVACSystemType"].nil?
-        primary_hvac_system_type = REXML::Element.new("#{ns}:PrimaryHVACSystemType")
+      if hvac_system.elements["#{ns}:PrincipalHVACSystemType"].nil?
+        primary_hvac_system_type = REXML::Element.new("#{ns}:PrincipalHVACSystemType")
       else
-        primary_hvac_system_type = hvac_system.elements["#{ns}:PrimaryHVACSystemType"]
+        primary_hvac_system_type = hvac_system.elements["#{ns}:PrincipalHVACSystemType"]
       end
       primary_hvac_system_type.text = principal_hvac_type
     end
