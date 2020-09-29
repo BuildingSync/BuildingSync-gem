@@ -73,7 +73,7 @@
 
               <!-- 6.1.1.1.h -->
               <auc:FloorsAboveGrade>2</auc:FloorsAboveGrade>
-              <auc:FloorsBelowGrade>2</auc:FloorsBelowGrade>
+              <auc:FloorsBelowGrade>1</auc:FloorsBelowGrade>
               <auc:ConditionedFloorsAboveGrade>1</auc:ConditionedFloorsAboveGrade>
               <auc:ConditionedFloorsBelowGrade>1</auc:ConditionedFloorsBelowGrade>
 
@@ -296,7 +296,7 @@
                     --------------
                     Notes on any irregularities in meter readings
                   </auc:ResourceUseNotes>
-                  <auc:ResourceUnits>MMbtu</auc:ResourceUnits>
+                  <auc:ResourceUnits>MMBtu</auc:ResourceUnits>
                   <auc:EndUse>All end uses</auc:EndUse>
                   <auc:AnnualFuelUseNativeUnits>0.22</auc:AnnualFuelUseNativeUnits>
                   <auc:AnnualFuelUseConsistentUnits>0.22</auc:AnnualFuelUseConsistentUnits>
