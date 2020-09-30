@@ -775,6 +775,28 @@ module BuildingSync
       return result, baseline
     end
 
+    def add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, monthly_results, year_val)
+      # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
+      # options are: Not Started, Started, Finished, Failed, Unknown
+      package_of_measures.add_element(add_calc_method_element())
+      package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, variables))
+
+      res_uses = get_resource_uses_element(scenario_name, variables)
+      scenario_type = scenario.elements["#{@ns}:ScenarioType"]
+      scenario.insert_after(scenario_type, res_uses)
+
+      # already added ResourceUses above. Needed as ResourceUseID reference
+      timeseries_data = get_timeseries_data_element(monthly_results, year_val, scenario_name)
+      scenario.insert_after(res_uses, timeseries_data)
+
+      # all the totals
+      all_res_totals = get_all_resource_totals_element(variables)
+      scenario.insert_after(timeseries_data, all_res_totals)
+
+      # no longer using user defined fields
+      scenario.elements.delete("#{@ns}:UserDefinedFields")
+    end
+
     def gather_results(dir, year_val, baseline_only = false)
       puts 'starting to gather results'
       results_counter = 0
@@ -798,25 +820,7 @@ module BuildingSync
             result, baseline = get_result_for_scenario(results, scenario)
             variables = gather_result_calculation(result, scenario_name, baseline)
 
-            # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
-            # options are: Not Started, Started, Finished, Failed, Unknown
-            package_of_measures.add_element(add_calc_method_element())
-            package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, variables))
-
-            res_uses = get_resource_uses_element(scenario_name, variables)
-            scenario_type = scenario.elements["#{@ns}:ScenarioType"]
-            scenario.insert_after(scenario_type, res_uses)
-
-            # already added ResourceUses above. Needed as ResourceUseID reference
-            timeseries_data = get_timeseries_data_element(monthly_results, year_val, scenario_name)
-            scenario.insert_after(res_uses, timeseries_data)
-
-            # all the totals
-            all_res_totals = get_all_resource_totals_element(variables)
-            scenario.insert_after(timeseries_data, all_res_totals)
-
-            # no longer using user defined fields
-            scenario.elements.delete("#{@ns}:UserDefinedFields")
+            add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, monthly_results, year_val)
           end
         end
 
