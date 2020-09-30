@@ -94,90 +94,99 @@ RSpec.describe 'FacilitySpec' do
   end
 
   it 'Should return benchmark_eui' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = '9.7'
     puts "expected benchmark_eui: #{expected_value} but got: #{facility.building_eui_benchmark} " if facility.building_eui_benchmark != expected_value
     expect(facility.building_eui_benchmark == expected_value).to be true
   end
 
   it 'Should return eui_building' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = '10.5'
     puts "expected eui_building: #{expected_value} but got: #{facility.building_eui} " if facility.building_eui != expected_value
     expect(facility.building_eui == expected_value).to be true
   end
 
   it 'Should return auditor_contact_id' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = '123'
     puts "expected auditor_contact_id: #{expected_value} but got: #{facility.auditor_contact_id} " if facility.auditor_contact_id != expected_value
     expect(facility.auditor_contact_id == expected_value).to be true
   end
 
   it 'Should return benchmark_source' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'Benchmark Type 1'
     puts "expected benchmark_source: #{expected_value} but got: #{facility.benchmark_source} " if facility.benchmark_source != expected_value
     expect(facility.benchmark_source == expected_value).to be true
   end
 
   it 'Should return annual_fuel_use_native_units' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'kBtu/ft2'
     puts "expected annual_fuel_use_native_units: #{expected_value} but got: #{facility.annual_fuel_use_native_units} " if facility.annual_fuel_use_native_units != expected_value
     expect(facility.annual_fuel_use_native_units == expected_value).to be true
   end
 
   it 'Should return energy_cost' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = '1000'
     puts "expected energy_cost: #{expected_value} but got: #{facility.energy_cost} " if facility.energy_cost != expected_value
     expect(facility.energy_cost == expected_value).to be true
   end
 
   it 'Should return audit_date' do
-    facility = get_facility_from_file('report_478.xml', ASHRAE90_1)
+    facility = get_facility_from_file('report_479.xml')
     expected_value = Date.parse('26/10/2019')
     puts "expected audit_date: #{expected_value} but got: #{facility.audit_date} " if facility.audit_date != expected_value
     expect(facility.audit_date == expected_value).to be true
   end
 
+  it 'Should return error about number of stories below grade' do
+    begin
+      get_facility_from_file('report_478.xml')
+    rescue StandardError => e
+      puts "rescued StandardError: #{e.message}"
+      expect(e.message.include?("Number of stories below grade is larger than")).to be true
+    end
+  end
+
   it 'Should return contact_name' do
-    facility = get_facility_from_file('report_478.xml', ASHRAE90_1)
+    facility = get_facility_from_file('report_479.xml')
     expected_value = 'John Doe'
     puts "expected contact_name: #{expected_value} but got: #{facility.contact_auditor_name} " if facility.contact_auditor_name != expected_value
     expect(facility.contact_auditor_name == expected_value).to be true
   end
 
   it 'Should return utility_name' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'an utility'
     puts "expected utility_name: #{expected_value} but got: #{facility.utility_name} " if facility.utility_name != expected_value
     expect(facility.utility_name == expected_value).to be true
   end
 
   it 'Should return metering_configuration ' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'metering config'
     puts "expected metering_configuration: #{expected_value} but got: #{facility.metering_configuration} " if facility.metering_configuration != expected_value
     expect(facility.metering_configuration == expected_value).to be true
   end
 
   it 'Should return rate_schedules ' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'rate schedule'
     puts "expected rate_schedules: #{expected_value} but got: #{facility.rate_schedules} " if facility.rate_schedules != expected_value
     expect(facility.rate_schedules == expected_value).to be true
   end
 
   it 'Should return rate_schedules ' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'meter 1'
     puts "expected utility_meter_number: #{expected_value} but got: #{facility.utility_meter_number} " if facility.utility_meter_number != expected_value
     expect(facility.utility_meter_number == expected_value).to be true
   end
 
-  def get_facility_from_file(xml_file_name, standard_to_be_used)
+  def get_facility_from_file(xml_file_name)
     xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
     File.open(xml_file_path, 'r') do |file|
       doc = REXML::Document.new(file)

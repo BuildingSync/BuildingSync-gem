@@ -62,7 +62,7 @@ module BuildingSync
         # Don't add infiltration here; will be added later in the script
         test = standard.space_type_apply_internal_loads(space_type, true, true, true, true, true, false)
         if test == false
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "Could not add loads for #{space_type.name}. Not expected for #{template}")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "Could not add loads for #{space_type.name}. Not expected for #{template}")
           next
         end
 
@@ -76,7 +76,7 @@ module BuildingSync
         end
         # extend space type name to include the template. Consider this as well for load defs
         space_type.setName("#{space_type.name} - #{template}")
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding loads to space type named #{space_type.name}")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LoadsSystem.add_internal_loads', "Adding loads to space type named #{space_type.name}")
       end
 
       # warn if spaces in model without space type
@@ -87,7 +87,7 @@ module BuildingSync
         spaces_without_space_types << space
       end
       if !spaces_without_space_types.empty?
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "#{spaces_without_space_types.size} spaces do not have space types assigned, and wont' receive internal loads from standards space type lookups.")
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "#{spaces_without_space_types.size} spaces do not have space types assigned, and wont' receive internal loads from standards space type lookups.")
       end
       return true
     end
@@ -216,7 +216,7 @@ module BuildingSync
 
       exterior_lights = standard.model_add_typical_exterior_lights(model, exterior_lighting_zone.chars[0].to_i, onsite_parking_fraction)
       exterior_lights.each do |k, v|
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding Exterior Lights named #{v.exteriorLightsDefinition.name} with design level of #{v.exteriorLightsDefinition.designLevel} * #{OpenStudio.toNeatString(v.multiplier, 0, true)}.")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LoadsSystem.add_exterior_lights', "Adding Exterior Lights named #{v.exteriorLightsDefinition.name} with design level of #{v.exteriorLightsDefinition.designLevel} * #{OpenStudio.toNeatString(v.multiplier, 0, true)}.")
       end
       return true
     end
@@ -236,11 +236,11 @@ module BuildingSync
 
       elevators = standard.model_add_elevators(model)
       if elevators.nil?
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', 'No elevators added to the building.')
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LoadsSystem.add_elevator', 'No elevators added to the building.')
       else
         elevator_def = elevators.electricEquipmentDefinition
         design_level = elevator_def.designLevel.get
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding #{elevators.multiplier.round(1)} elevators each with power of #{OpenStudio.toNeatString(design_level, 0, true)} (W), plus lights and fans.")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LoadsSystem.add_elevator', "Adding #{elevators.multiplier.round(1)} elevators each with power of #{OpenStudio.toNeatString(design_level, 0, true)} (W), plus lights and fans.")
       end
       return true
     end
