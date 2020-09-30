@@ -35,6 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_system'
+require_relative '../helpers/os_lib_parametric_schedules'
 
 module BuildingSync
   class LoadsSystem < BuildingSystem
@@ -148,60 +149,109 @@ module BuildingSync
 
     def adjust_people_schedule(space_type, building_section, model)
       if !building_section.typical_occupant_usage_value_hours.nil?
-        # puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
-        # model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
-        # path = model_articulation_instance.measures_dir + '/create_parametric_schedules/resources/os_lib_parametric_schedules.rb'
-        # puts "create parametric schedule path: #{path}"
-        # require path
-
-        # param_Schedules = OsLib_Parametric_Schedules.new(model)
-        # param_Schedules.override_hours_per_week(building_section.typical_occupant_usage_value_hours.to_f)
-
-        # param_Schedules.pre_process_space_types
-
-        # param_Schedules.create_default_schedule_set
-
-        # param_Schedules.create_schedules_and_apply_default_schedule_set
-      end
-    end
-
-    def adjust_people_schedule_old(space_type, building_section, model)
-      if !building_section.typical_occupant_usage_value_hours.nil?
-        args = {}
         puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
-        args['hoo_per_week'] = building_section.typical_occupant_usage_value_hours
 
-        model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
-        path = model_articulation_instance.measures_dir + '/create_parametric_schedules/measure.rb'
-        puts "create parametric schedule path: #{path}"
-        require path
+        #param_Schedules = OsLib_Parametric_Schedules.new(model)
+        #param_Schedules.override_hours_per_week(building_section.typical_occupant_usage_value_hours.to_f)
 
-        # create an instance of the measure
-        measure = CreateParametricSchedules.new
+        #param_Schedules.pre_process_space_types
 
-        # create an instance of a runner
-        runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
+        #param_Schedules.create_default_schedule_set
 
-        # get arguments
-        arguments = measure.arguments(model)
-        argument_map = OpenStudio::Ruleset.convertOSArgumentVectorToMap(arguments)
+        #param_Schedules.create_schedules_and_apply_default_schedule_set
 
-        # populate argument with specified hash value if specified
-        arguments.each do |arg|
-          puts "arg #{arg}"
-          temp_arg_var = arg.clone
-          if args.key?(arg.name)
-            temp_arg_var.setValue(args[arg.name])
+
+        hoo_per_week = building_section.typical_occupant_usage_value_hours.to_f
+        # setting default values
+        hoo_start_wkdy = 9.0
+        hoo_end_wkdy = 17
+        hoo_start_sat = 9.0
+        hoo_end_sat = 12.0
+        hoo_start_sun = 7.0
+        hoo_end_sun = 18.0
+
+        # this is the new way of integrating the parametric schedule feature
+        # add in logic for hours per week override
+        profile_override = [] # add to this for day types that should use weekday instead of user entered profile
+        if hoo_per_week > 0.0
+          #runner.registerInfo('Hours per week input was a non zero value, it will override the user intered hours of operation for weekday, saturday, and sunday')
+
+          if hoo_per_week > 84
+            max_hoo = [hoo_per_week / 7.0, 24.0].min
+          else
+            max_hoo = 12.0
           end
-          argument_map[arg.name] = temp_arg_var
+
+          # for 60 horus per week or less only alter weekday. If longer then use weekday profiles for saturday for 12 hours and then sunday
+          typical_weekday_input_hours = hoo_end_wkdy - hoo_start_wkdy
+          target_weekday_hours = [hoo_per_week / 5.0, max_hoo].min
+          delta_hours_per_day = target_weekday_hours - typical_weekday_input_hours
+
+          # shift hours as needed
+          hoo_start_wkdy -= delta_hours_per_day / 2.0
+          hoo_end_wkdy += delta_hours_per_day / 2.0
+          #runner.registerInfo("Adjusted hours of operation for weekday are from #{hoo_start_wkdy} to #{hoo_end_wkdy}.")
+
+          # add logic if more than 60 hours
+          if hoo_per_week > 60.0
+            # for 60-72 horus per week or less only alter saturday.
+            typical_weekday_input_hours = hoo_end_sat - hoo_start_sat
+            target_weekday_hours = [(hoo_per_week - 60.0), max_hoo].min
+            delta_hours_per_day = target_weekday_hours - typical_weekday_input_hours
+
+            # code in process_hash method will alter saturday to use default profile formula
+
+            # shift hours as needed
+            hoo_start_sat -= delta_hours_per_day / 2.0
+            hoo_end_sat += delta_hours_per_day / 2.0
+            #runner.registerInfo("Adjusted hours of operation for saturday are from #{hoo_start_sat} to #{hoo_end_sat}. Saturday will use typical weekday profile formula.")
+
+            # set flag to override typical profile
+            profile_override << 'saturday'
+          end
+
+          # add logic if more than 72 hours
+          if hoo_per_week > 72.0
+            # for 60-72 horus per week or less only alter sunday.
+            typical_weekday_input_hours = hoo_end_sun - args['hoo_start_sun']
+            target_weekday_hours = [(hoo_per_week - 72.0), max_hoo].min
+            delta_hours_per_day = target_weekday_hours - typical_weekday_input_hours
+
+            # code in process_hash method will alter sunday to use default profile formula
+
+            # shift hours as needed
+            hoo_start_sun -= delta_hours_per_day / 2.0
+            hoo_end_sun += delta_hours_per_day / 2.0
+            #runner.registerInfo("Adjusted hours of operation for sunday are from #{hoo_start_sun} to #{hoo_end_sun}. Saturday will use typical weekday profile formula.")
+
+            # set flag to override typical profile
+            profile_override << 'sunday'
+          end
         end
 
-        # run the measure
-        measure.run(model, runner, argument_map)
-        result = runner.result
+        # generate and apply occupancy schedule using hours of operation schedule and parametric inputs
+        ruleset_name = 'Parametric Occupancy Schedule'
+        hash = process_hash(occupancy_profiles, args, profile_override, ruleset_name)
+        if !hash then
+          #runner.registerError("Failed to generate #{ruleset_name}");
+          return false
+        end
+        winter_design_day = [[24, 0]] # if DCV would we want this at 1, prototype uses 0
+        summer_design_day = [[24, 1]]
+        default_day = hash[:default]
+        rules = []
+        rules << hash[:saturday]
+        rules << hash[:sunday]
+        options = {'name' => ruleset_name,
+                   'winter_design_day' => winter_design_day,
+                   'summer_design_day' => summer_design_day,
+                   'default_day' => default_day,
+                   'rules' => rules}
+        occupancy_sch = OsLib_Schedules.createComplexSchedule(model, options)
+        occupancy_sch.setComment(occupancy_profiles)
+        @default_schedule_set.setNumberofPeopleSchedule(occupancy_sch)
 
-        # if 'Fail' passed in make sure at least one error message (while not typical there may be more than one message)
-        if result.value.valueName == 'Fail' then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.adjust_people_schedule', "Applying the create parametric schedule measure failed with #{result.errors.size} errors") end
+        create_schedules_and_apply_default_schedule_set
       end
     end
 
@@ -254,6 +304,347 @@ module BuildingSync
       end
       standard.model_add_daylighting_controls(model)
       return true
+    end
+
+    def create_schedules_and_apply_default_schedule_set(lighting_profiles = nil, electric_equipment_profiles = nil, gas_equipment_profiles = nil, occupancy_profiles = nil,
+                                                        infiltration_profiles = nil, hvac_availability_profiles = nil, swh_profiles = nil, thermostat_setback_profiles = nil,
+                                                        htg_setpoint = 67.0, clg_setpoint = 75.0, setback_delta = 4)
+      # set the default profiles
+      if lighting_profiles.nil?
+        string = []
+        string << ':default => [[start-2,0.1],[start-1,0.3],[start,0.75],[end,0.75],[end+2,0.3],[end+vac*0.5,0.1]]'
+        string << ':saturday => [[start-1,0.1],[start,0.3],[end,0.3],[end+1,0.1]]'
+        string << ':sunday => [[start,0.1],[end,0.1]]'
+        lighting_profiles = string.join(', ')
+      end
+      if electric_equipment_profiles.nil?
+        string = []
+        string << ':default => [[start-1,0.3],[start,0.85],[start+0.5*occ-0.5,0.85],[start+0.5*occ-0.5,0.75],[start+0.5*occ+0.5,0.75],[start+0.5*occ+0.5,0.85],[end,0.85],[end+1,0.45],[end+2,0.3]]'
+        string << ':saturday => [[start-2,0.2],[start,0.35],[end,0.35],[end+6,0.2]]'
+        string << ':sunday => [[start,0.2],[end,0.2]]'
+        electric_equipment_profiles = string.join(', ')
+      end
+      if gas_equipment_profiles.nil?
+        string = []
+        string << ':default => [[start-1,0.3],[start,0.85],[start+0.5*occ-0.5,0.85],[start+0.5*occ-0.5,0.75],[start+0.5*occ+0.5,0.75],[start+0.5*occ+0.5,0.85],[end,0.85],[end+1,0.45],[end+2,0.3]]'
+        string << ':saturday => [[start-2,0.2],[start,0.35],[end,0.35],[end+6,0.2]]'
+        string << ':sunday => [[start,0.2],[end,0.2]]'
+        gas_equipment_profiles = string.join(', ')
+      end
+      if occupancy_profiles.nil?
+        string = []
+        string << ':default => [[start-3,0],[start-1,0.2],[start,0.95],[start+0.5*occ-0.5,0.95],[start+0.5*occ-0.5,0.5],[start+0.5*occ+0.5,0.5],[start+0.5*occ+0.5,0.95],[end,0.95],[end+1,0.3],[end+vac*0.4,0]]'
+        string << ':saturday => [[start-3,0],[start,0.3],[end,0.3],[end+1,0.1],[end+vac*0.3,0]]'
+        string << ':sunday => [[start,0],[start,0.05],[end,0.05],[end,0]]'
+        occupancy_profiles = string.join(', ')
+      end
+      if infiltration_profiles.nil?
+        string = []
+        string << ':default => [[start,1],[start,0.25],[end+vac*0.35,0.25],[end+vac*0.35,1]]'
+        string << ':saturday => [[start,1],[start,0.25],[end+vac*0.25,0.25],[end+vac*0.25,1]]'
+        string << ':sunday => [[start,1],[start,0.25],[end+vac*0.25,0.25],[end+vac*0.25,1]]'
+        infiltration_profiles = string.join(', ')
+      end
+      if hvac_availability_profiles.nil?
+        string = []
+        string << ':default => [[start,0],[start,1],[end+vac*0.35,1],[end+vac*0.35,0]]'
+        string << ':saturday => [[start,0],[start,1],[end+vac*0.25,1],[end+vac*0.25,0]]'
+        string << ':sunday => [[start,0],[start,1],[end+vac*0.25,1],[end+vac*0.25,0]]'
+        hvac_availability_profiles = string.join(', ')
+      end
+      if swh_profiles.nil?
+        string = []
+        string << ':default => [[start-2,0],[start-2,0.07],[start+0.5*occ,0.57],[vac-2,0.33],[vac,0.44],[end+vac*0.35,0.05],[end+vac*0.35,0]]'
+        string << ':saturday => [[start-2,0],[start-2,0.07],[start+0.5*occ,0.23],[end+vac*0.25,0.05],[end+vac*0.25,0]]'
+        string << ':sunday => [[start-2,0],[start-2,0.04],[start+0.5*occ,0.09],[end+vac*0.25,0.04],[end+vac*0.25,0]]'
+        swh_profiles = string.join(', ')
+      end
+      if thermostat_setback_profiles.nil?
+        string = []
+        string << ':default => [[start-2,floor],[start-2,ceiling],[end+vac*0.35,ceiling],[end+vac*0.35,floor]]'
+        string << ':saturday => [[start-2,floor],[start-2,ceiling],[end+vac*0.25,ceiling],[end+vac*0.25,floor]]'
+        string << ':sunday => [[start-2,floor],[start-2,ceiling],[end+vac*0.25,ceiling],[end+vac*0.25,floor]]'
+        thermostat_setback_profiles = string.join(', ')
+      end
+      # create schedules and apply to default schedule set
+      # populate hours of operation schedule for schedule set (this schedule isn't used but in future could be used to dynamically generate schedules)
+      ruleset_name = 'Parametric Hours of Operation Schedule'
+      winter_design_day = nil
+      summer_design_day = nil
+      rules = []
+      if @hoo_end_wkdy == @hoo_start_wkdy
+        default_day = ['Weekday', [@hoo_start_wkdy, 0], [@hoo_end_wkdy, 0], [24, 0]]
+      elsif @hoo_end_wkdy > @hoo_start_wkdy
+        default_day = ['Weekday', [@hoo_start_wkdy, 0], [@hoo_end_wkdy, 1], [24, 0]]
+      else
+        default_day = ['Weekday', [@hoo_end_wkdy, 1], [@hoo_start_wkdy, 0], [24, 1]]
+      end
+      if @hoo_end_sat == @hoo_start_sat
+        rules << ['Saturday', '1/1-12/31', 'Sat', [@hoo_start_sat, 0], [@hoo_end_sat, 0], [24, 0]]
+      elsif @hoo_end_sat > @hoo_start_sat
+        rules << ['Saturday', '1/1-12/31', 'Sat', [@hoo_start_sat, 0], [@hoo_end_sat, 1], [24, 0]]
+      else
+        rules << ['Saturday', '1/1-12/31', 'Sat', [@hoo_end_sat, 1], [@hoo_start_sat, 0], [24, 1]]
+      end
+      if @hoo_end_sun == @hoo_start_sun
+        rules << ['Sunday', '1/1-12/31', 'Sun', [@hoo_start_sun, 0], [@hoo_end_sun, 0], [24, 0]]
+      elsif @hoo_end_sun > @hoo_start_sun
+        rules << ['Sunday', '1/1-12/31', 'Sun', [@hoo_start_sun, 0], [@hoo_end_sun, 1], [24, 0]]
+      else
+        rules << ['Sunday', '1/1-12/31', 'Sun', [@hoo_end_sun, 1], [@hoo_start_sun, 0], [24, 1]]
+      end
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+      hoo_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+      @default_schedule_set.setHoursofOperationSchedule(hoo_sch)
+
+      # create activity schedule
+      # todo - save this from model or add user argument
+      ruleset_name = 'Parametric Activity Schedule'
+      winter_design_day = [[24, 120]]
+      summer_design_day = [[24, 120]]
+      default_day = ['Weekday', [24, 120]]
+      rules = []
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+      activity_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+      @default_schedule_set.setPeopleActivityLevelSchedule(activity_sch)
+
+      # generate and apply lighting schedule using hours of operation schedule and parametric inputs
+      ruleset_name = 'Parametric Lighting Schedule'
+      hash = process_hash(lighting_profiles, ruleset_name)
+      if !hash
+        @runner.registerError("Failed to generate #{ruleset_name}") if !@runner.nil?
+        return false
+      end
+      winter_design_day = [[24, 0]]
+      summer_design_day = [[24, 1]]
+      default_day = hash[:default]
+      rules = []
+      rules << hash[:saturday]
+      rules << hash[:sunday]
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+
+      lighting_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+      lighting_sch.setComment(lighting_profiles)
+      @default_schedule_set.setLightingSchedule(lighting_sch)
+
+      # generate and apply electric_equipment schedule using hours of operation schedule and parametric inputs
+      ruleset_name = 'Parametric Electric Equipment Schedule'
+      hash = process_hash(electric_equipment_profiles, ruleset_name)
+      if !hash
+        @runner.registerError("Failed to generate #{ruleset_name}") if !@runner.nil?
+        return false
+      end
+      winter_design_day = [[24, 0]]
+      summer_design_day = [[24, 1]]
+      default_day = hash[:default]
+      rules = []
+      rules << hash[:saturday]
+      rules << hash[:sunday]
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+      electric_equipment_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+      electric_equipment_sch.setComment(electric_equipment_profiles)
+      @default_schedule_set.setElectricEquipmentSchedule(electric_equipment_sch)
+
+      # generate and apply gas_equipment schedule using hours of operation schedule and parametric inputs
+      ruleset_name = 'Parametric Gas Equipment Schedule'
+      hash = process_hash(gas_equipment_profiles, ruleset_name)
+      if !hash
+        @runner.registerError("Failed to generate #{ruleset_name}") if !@runner.nil?
+        return false
+      end
+      winter_design_day = [[24, 0]]
+      summer_design_day = [[24, 1]]
+      default_day = hash[:default]
+      rules = []
+      rules << hash[:saturday]
+      rules << hash[:sunday]
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+      gas_equipment_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+      gas_equipment_sch.setComment(gas_equipment_profiles)
+      @default_schedule_set.setGasEquipmentSchedule(gas_equipment_sch)
+
+      # generate and apply occupancy schedule using hours of operation schedule and parametric inputs
+      ruleset_name = 'Parametric Occupancy Schedule'
+      hash = process_hash(occupancy_profiles, ruleset_name)
+      if !hash
+        @runner.registerError("Failed to generate #{ruleset_name}") if !@runner.nil?
+        return false
+      end
+      winter_design_day = [[24, 0]] # if DCV would we want this at 1, prototype uses 0
+      summer_design_day = [[24, 1]]
+      default_day = hash[:default]
+      rules = []
+      rules << hash[:saturday]
+      rules << hash[:sunday]
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+      occupancy_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+      occupancy_sch.setComment(occupancy_profiles)
+      @default_schedule_set.setNumberofPeopleSchedule(occupancy_sch)
+
+      # generate and apply infiltration schedule using hours of operation schedule and parametric inputs
+      ruleset_name = 'Parametric Infiltration Schedule'
+      hash = process_hash(infiltration_profiles, ruleset_name)
+      if !hash
+        @runner.registerError("Failed to generate #{ruleset_name}") if !@runner.nil?
+        return false
+      end
+      winter_design_day = [[24, 1]] # TODO: - should it be 1 for both summer and winter
+      summer_design_day = [[24, 1]]
+      default_day = hash[:default]
+      rules = []
+      rules << hash[:saturday]
+      rules << hash[:sunday]
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+      infiltration_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+      infiltration_sch.setComment(infiltration_profiles)
+      @default_schedule_set.setInfiltrationSchedule(infiltration_sch)
+
+      # generate and apply hvac_availability schedule using hours of operation schedule and parametric inputs
+      ruleset_name = 'Parametric HVAC Availability Schedule'
+      hash = process_hash(hvac_availability_profiles, ruleset_name)
+      if !hash
+        @runner.registerError("Failed to generate #{ruleset_name}") if !@runner.nil?
+        return false
+      end
+      winter_design_day = [[24, 1]] # TODO: - confirm proper value
+      summer_design_day = [[24, 1]] # todo - confirm proper value
+      default_day = hash[:default]
+      rules = []
+      rules << hash[:saturday]
+      rules << hash[:sunday]
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+      hvac_availability_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+      hvac_availability_sch.setComment(hvac_availability_profiles)
+
+      # apply HVAC schedules
+      # todo - measure currently only replaces AirLoopHVAC.setAvailabilitySchedule)
+      @air_loops_to_alter.each do |air_loop|
+        air_loop.setAvailabilitySchedule(hvac_availability_sch)
+      end
+
+      # generate and apply heating_setpoint schedule using hours of operation schedule and parametric inputs
+      ruleset_name = 'Parametric Heating Setpoint Schedule'
+
+      # htg setpoints
+      htg_occ = OpenStudio.convert(htg_setpoint, 'F', 'C').get
+      htg_vac = OpenStudio.convert(htg_setpoint - setback_delta, 'F', 'C').get
+
+      # replace floor and celing with user specified values
+      htg_setpoint_profiles = thermostat_setback_profiles.gsub('ceiling', htg_occ.to_s)
+      htg_setpoint_profiles = htg_setpoint_profiles.gsub('floor', htg_vac.to_s)
+
+      # process hash
+      hash = process_hash(htg_setpoint_profiles, ruleset_name)
+      if !hash
+        @runner.registerError("Failed to generate #{ruleset_name}") if !@runner.nil?
+        return false
+      end
+
+      winter_design_day = hash[:default].drop(1) # [[24,htg_occ]]
+      summer_design_day = hash[:default].drop(1) # [[24,htg_occ]]
+      default_day = hash[:default]
+      rules = []
+      rules << hash[:saturday]
+      rules << hash[:sunday]
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+      heating_setpoint_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+
+      # generate and apply cooling_setpoint schedule using hours of operation schedule and parametric inputs
+      ruleset_name = 'Parametric Cooling Setpoint Schedule'
+
+      # clg setpoints
+      clg_occ = OpenStudio.convert(clg_setpoint, 'F', 'C').get
+      clg_vac = OpenStudio.convert(clg_setpoint + setback_delta, 'F', 'C').get
+
+      # replace floor and celing with user specified values
+      clg_setpoint_profiles = thermostat_setback_profiles.gsub('ceiling', clg_occ.to_s)
+      clg_setpoint_profiles = clg_setpoint_profiles.gsub('floor', clg_vac.to_s)
+
+      # process hash
+      hash = process_hash(clg_setpoint_profiles, ruleset_name)
+      if !hash
+        @runner.registerError("Failed to generate #{ruleset_name}") if !@runner.nil?
+        return false
+      end
+
+      winter_design_day = hash[:default].drop(1) # [[24,clg_occ]]
+      summer_design_day = hash[:default].drop(1) # [[24,clg_occ]]
+      default_day = hash[:default]
+      rules = []
+      rules << hash[:saturday]
+      rules << hash[:sunday]
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+      cooling_setpoint_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+
+      # apply heating and cooling setpoint schedules
+      @thermostats_to_alter.each do |thermostat|
+        thermostat.setHeatingSchedule(heating_setpoint_sch)
+        thermostat.setCoolingSchedule(cooling_setpoint_sch)
+      end
+
+      # generate and apply water use equipment schedule using hours of operation schedule and parametric inputs
+      ruleset_name = 'Parametric SWH Schedule'
+      hash = process_hash(swh_profiles, ruleset_name)
+      if !hash
+        @runner.registerError("Failed to generate #{ruleset_name}") if !@runner.nil?
+        return false
+      end
+      winter_design_day = hash[:default].drop(1)
+      summer_design_day = hash[:default].drop(1)
+      default_day = hash[:default]
+      rules = []
+      rules << hash[:saturday]
+      rules << hash[:sunday]
+      options = {'name' => ruleset_name,
+                 'winter_design_day' => winter_design_day,
+                 'summer_design_day' => summer_design_day,
+                 'default_day' => default_day,
+                 'rules' => rules}
+      swh_sch = OsLib_Schedules.createComplexSchedule(@model, options)
+      swh_sch.setComment(swh_profiles)
+      @water_use_equipment_to_alter.each do |water_use_equipment|
+        water_use_equipment.setFlowRateFractionSchedule(swh_sch)
+      end
     end
   end
 end
