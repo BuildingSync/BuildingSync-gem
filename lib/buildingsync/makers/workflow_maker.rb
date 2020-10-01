@@ -37,6 +37,7 @@
 require_relative '../workflow_maker_base'
 require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
+require 'openstudio/ee_measures'
 require_relative '../../../lib/buildingsync/extension'
 
 module BuildingSync
@@ -69,6 +70,7 @@ module BuildingSync
     def get_measure_directories_array
       common_measures_instance = OpenStudio::CommonMeasures::Extension.new
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+      ee_measures_instance = OpenStudio::EeMeasures::Extension.new
       bldg_sync_instance = BuildingSync::Extension.new
       return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, 'R:\NREL\edv-experiment-1\.bundle\install\ruby\2.2.0\gems\openstudio-standards-0.2.9\lib']
     end
@@ -241,6 +243,7 @@ module BuildingSync
     end
 
     def configure_for_scenario(osw, scenario)
+      successful = true
       measure_ids = []
       scenario.elements.each("#{@ns}:ScenarioType/#{@ns}:PackageOfMeasures/#{@ns}:MeasureIDs/#{@ns}:MeasureID") do |measure_id|
         measure_ids << measure_id.attributes['IDref']
@@ -261,9 +264,8 @@ module BuildingSync
           json[:"#{measure_category}"].each do |meas_name|
             if !meas_name[:"#{measure_name}"].nil?
               measure_dir_name = meas_name[:"#{measure_name}"][:measure_dir_name]
-
+              num_measures += 1
               meas_name[:"#{measure_name}"][:arguments].each do |argument|
-                num_measures += 1
                 if !argument[:condition].nil? && !argument[:condition].empty?
                   set_argument_detail(osw, argument, measure_dir_name, measure_name)
                 else
@@ -277,12 +279,14 @@ module BuildingSync
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:*/#{@ns}:MeasureName"].text
             measure_long_description = measure.elements["#{@ns}:LongDescription"].text
             OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_for_scenario', "Measure with name: #{measure_name} and Description: #{measure_long_description} could not be processed!")
+            successful = false
           end
         end
       end
 
       # ensure that we didn't miss any measures by accident
       OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_for_scenario', "#{measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{measure_ids}") if num_measures != measure_ids.size
+      return successful
     end
 
     def get_scenario_elements
@@ -310,6 +314,7 @@ module BuildingSync
     def write_osws(facility, dir)
       super
 
+      successful = true
       @facility = facility
       scenarios = get_scenario_elements
       # ensure there is a 'Baseline' scenario
@@ -372,7 +377,7 @@ module BuildingSync
 
         # configure the workflow based on measures in this scenario
         begin
-          configure_for_scenario(osw, scenario)
+          successful = false if !configure_for_scenario(osw, scenario)
 
           # dir for the osw
           osw_dir = File.join(dir, scenario_name)
@@ -384,10 +389,12 @@ module BuildingSync
             file << JSON.generate(osw)
           end
         rescue StandardError => e
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', "Could not configure for scenario #{scenario_name}")
           puts "Could not configure for scenario #{scenario_name}"
           puts e.backtrace.join("\n\t")
         end
       end
+      return successful
     end
 
     def get_measure_result(result, measure_dir_name, result_name)
@@ -507,7 +514,7 @@ module BuildingSync
       end
     end
 
-    def add_calc_method_element()
+    def add_calc_method_element(result)
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
       calc_method = REXML::Element.new("#{@ns}:CalculationMethod")
@@ -775,10 +782,10 @@ module BuildingSync
       return result, baseline
     end
 
-    def add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, monthly_results, year_val)
+    def add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, result, monthly_results, year_val)
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
-      package_of_measures.add_element(add_calc_method_element())
+      package_of_measures.add_element(add_calc_method_element(result))
       package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, variables))
 
       res_uses = get_resource_uses_element(scenario_name, variables)
@@ -820,7 +827,7 @@ module BuildingSync
             result, baseline = get_result_for_scenario(results, scenario)
             variables = gather_result_calculation(result, scenario_name, baseline)
 
-            add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, monthly_results, year_val)
+            add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, result, monthly_results, year_val)
           end
         end
 
@@ -832,6 +839,7 @@ module BuildingSync
       if results_counter > 0
         puts "#{results_counter} scenarios successfully simulated and results processed"
       end
+      return successful
     end
 
     # DLM: total hack because these are not reported in the out.osw
