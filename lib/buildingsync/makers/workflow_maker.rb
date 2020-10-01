@@ -44,6 +44,7 @@ module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class WorkflowMaker < WorkflowMakerBase
 
+    # initialize - load workflow json file and add necessary measure paths
     def initialize(doc, ns)
       super
 
@@ -67,6 +68,7 @@ module BuildingSync
       end
     end
 
+    # collect all measure directories that contain measures needed for BldgSync
     def get_measure_directories_array
       common_measures_instance = OpenStudio::CommonMeasures::Extension.new
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
@@ -75,18 +77,22 @@ module BuildingSync
       return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir, 'R:\NREL\edv-experiment-1\.bundle\install\ruby\2.2.0\gems\openstudio-standards-0.2.9\lib']
     end
 
+    # insert an EnergyPlus measure to the list of existing measures - by default (item = 0) it gets added as first EnergyPlus measure
     def insert_energyplus_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('EnergyPlusMeasure', measure_dir, item, args_hash)
     end
 
+    # insert a Reporting measure to the list of existing measures - by default (item = 0) it gets added as first Reporting measure
     def insert_reporting_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('ReportingMeasure', measure_dir, item, args_hash)
     end
 
+    # insert a Model measure to the list of existing measures - by default (item = 0) it gets added as first Model measure
     def insert_model_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('ModelMeasure', measure_dir, item, args_hash)
     end
 
+    # inserts any measure
     def insert_measure(measure_goal_type, measure_dir, item = 0, args_hash = {})
       successfully_added = false
       count = 0
@@ -135,6 +141,7 @@ module BuildingSync
       return successfully_added
     end
 
+    # gets the measure type of a measure given its directory - looking up the measure type in the measure.xml file
     def get_measure_type(measure_dir)
       measure_type = nil
       get_measure_directories_array.each do |potential_measure_path|
@@ -155,10 +162,12 @@ module BuildingSync
       return measure_type
     end
 
+    # get the current workflow
     def get_workflow
       return @workflow
     end
 
+    # get the name of a mmeasure within the xml structure
     def get_measure_name(measure_category, measure)
       measure_name = ''
       if measure_category == 'Lighting'
