@@ -57,5 +57,13 @@ module BuildingSync
       end
       return names
     end
+
+    def self.read_xml_file_document(xml_file_path)
+      doc = nil
+      File.open(xml_file_path, 'r') do |file_content|
+        doc = REXML::Document.new(file_content,  { :ignore_whitespace_nodes => :all })
+      end
+      return doc
+    end
   end
 end

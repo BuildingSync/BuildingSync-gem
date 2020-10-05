@@ -43,7 +43,7 @@ RSpec.describe 'WorkFlow Maker' do
     expect(File.exist?(xml_path)).to be true
 
     ns = 'auc'
-    doc = BuildingSync::Translator::read_xml_file_document(xml_path)
+    doc = BuildingSync::Helper.read_xml_file_document(xml_path)
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
     result = {}
     result[:completed_status] = 'Success'

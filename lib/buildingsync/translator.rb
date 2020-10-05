@@ -87,7 +87,7 @@ module BuildingSync
         puts "File '#{xml_file_path}' was not validated against the BuildingSync schema"
       end
 
-      @doc = read_xml_file_document(xml_file_path)
+      @doc = BuildingSync::Helper.read_xml_file_document(xml_file_path)
 
       # test for the namespace
       @ns = 'auc'
@@ -115,14 +115,6 @@ module BuildingSync
 
     def write_osm(ddy_file = nil)
       @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
-    end
-
-    def self.read_xml_file_document(xml_file_path)
-      doc = nil
-      File.open(xml_file_path, 'r') do |file_content|
-        doc = REXML::Document.new(file_content,  { :ignore_whitespace_nodes => :all })
-      end
-      return doc
     end
 
     def gather_results(dir, year_val, baseline_only = false)
