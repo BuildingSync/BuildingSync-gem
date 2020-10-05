@@ -35,7 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative '../workflow_maker_base'
-#require 'openstudio/common_measures'
+require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
 require 'openstudio/ee_measures'
 require_relative '../../../lib/buildingsync/extension'
@@ -68,12 +68,11 @@ module BuildingSync
     end
 
     def get_measure_directories_array
-      #common_measures_instance = OpenStudio::CommonMeasures::Extension.new
+      common_measures_instance = OpenStudio::CommonMeasures::Extension.new
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
       ee_measures_instance = OpenStudio::EeMeasures::Extension.new
       bldg_sync_instance = BuildingSync::Extension.new
-      #return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir, 'R:\NREL\edv-experiment-1\.bundle\install\ruby\2.2.0\gems\openstudio-standards-0.2.9\lib']
-      return [model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir, 'R:\NREL\edv-experiment-1\.bundle\install\ruby\2.2.0\gems\openstudio-standards-0.2.9\lib']
+      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir]
     end
 
     def insert_energyplus_measure(measure_dir, item = 0, args_hash = {})
