@@ -34,62 +34,53 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative '../model_articulation/facility'
-require_relative 'workflow_maker'
 module BuildingSync
-  class ModelMaker < ModelMakerBase
-    def initialize(doc, ns)
-      super
+  class Generator
 
-      @facilities = []
-      @facility = nil
-      read_xml
+    def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, ns = 'auc')
+      xml_path = File.expand_path('./../../spec/files/building_151_Blank.xml', File.dirname(__FILE__))
+
+      doc = create_xml_file_object(xml_path)
+      site_element = doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
+
+      occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
+      occupancy_classification_element.text = occupancy_classification
+      site_element.add_element(occupancy_classification_element)
+
+      building_element = site_element.elements["#{ns}:Buildings/#{ns}:Building"]
+
+      year_of_construction_element = REXML::Element.new("#{ns}:YearOfConstruction")
+      year_of_construction_element.text = year_of_const
+      building_element.add_element(year_of_construction_element)
+
+      floor_areas_element = REXML::Element.new("#{ns}:FloorAreas")
+      floor_area_element = REXML::Element.new("#{ns}:FloorArea")
+      floor_area_type_element = REXML::Element.new("#{ns}:FloorAreaType")
+      floor_area_type_element.text = floor_area_type
+      floor_area_value_element = REXML::Element.new("#{ns}:FloorAreaValue")
+      floor_area_value_element.text = floor_area_value
+
+      floor_area_element.add_element(floor_area_type_element)
+      floor_area_element.add_element(floor_area_value_element)
+      floor_areas_element.add_element(floor_area_element)
+      building_element.add_element(floor_areas_element)
+
+      occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
+      occupancy_classification_element.text = occupancy_classification
+      building_element.add_element(occupancy_classification_element)
+
+      return doc
     end
 
-    def read_xml
-      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
-        @facilities.push(Facility.new(facility_element, @ns))
+    def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+      xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+      ns = 'auc'
+      facility_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"]
+      if !facility_element.nil?
+        return BuildingSync::Facility.new(facility_element, 'auc')
+      else
+        expect(facility_element.nil?).to be false
       end
-
-      if @facilities.count == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMaker.read_xml', 'There are no facilities in your BuildingSync file.')
-        raise 'Error: There are no facilities in your BuildingSync file.'
-      elsif @facilities.count > 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMaker.read_xml', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
-        raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
-      end
-    end
-
-    def get_facility
-      return @facility
-    end
-
-    def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
-      @facilities.each(&:set_all)
-      open_studio_standard = @facilities[0].determine_open_studio_standard(standard_to_be_used)
-
-      @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used, ddy_file)
-      return write_osm(dir)
-    end
-
-    def get_space_types
-      return @facilities[0].get_space_types
-    end
-
-    def get_model
-      return @facilities[0].get_model
-    end
-
-    def write_parameters_to_xml
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
-        @facilities[0].write_parameters_to_xml(@ns, facility)
-      end
-    end
-
-    private
-
-    def write_osm(dir)
-      @facility = @facilities[0].write_osm(dir)
     end
   end
 end

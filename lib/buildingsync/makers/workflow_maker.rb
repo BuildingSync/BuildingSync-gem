@@ -37,6 +37,7 @@
 require_relative '../workflow_maker_base'
 require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
+require 'openstudio/ee_measures'
 require_relative '../../../lib/buildingsync/extension'
 
 module BuildingSync
@@ -69,8 +70,9 @@ module BuildingSync
     def get_measure_directories_array
       common_measures_instance = OpenStudio::CommonMeasures::Extension.new
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+      ee_measures_instance = OpenStudio::EeMeasures::Extension.new
       bldg_sync_instance = BuildingSync::Extension.new
-      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, 'R:\NREL\edv-experiment-1\.bundle\install\ruby\2.2.0\gems\openstudio-standards-0.2.9\lib']
+      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir]
     end
 
     def insert_energyplus_measure(measure_dir, item = 0, args_hash = {})
@@ -187,6 +189,9 @@ module BuildingSync
               measure_name = user_defined_field.elements["#{@ns}:FieldValue"].text
             end
           end
+  #        if measure.elements["#{@ns}:CustomMeasureName"]
+  #          measure_name = measure.elements["#{@ns}:CustomMeasureName"].text
+  #        end
         end
       elsif measure_category == 'Fan'
         measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherElectricMotorsAndDrives/#{@ns}:MeasureName"].text
@@ -241,6 +246,7 @@ module BuildingSync
     end
 
     def configure_for_scenario(osw, scenario)
+      successful = true
       measure_ids = []
       scenario.elements.each("#{@ns}:ScenarioType/#{@ns}:PackageOfMeasures/#{@ns}:MeasureIDs/#{@ns}:MeasureID") do |measure_id|
         measure_ids << measure_id.attributes['IDref']
@@ -261,9 +267,8 @@ module BuildingSync
           json[:"#{measure_category}"].each do |meas_name|
             if !meas_name[:"#{measure_name}"].nil?
               measure_dir_name = meas_name[:"#{measure_name}"][:measure_dir_name]
-
+              num_measures += 1
               meas_name[:"#{measure_name}"][:arguments].each do |argument|
-                num_measures += 1
                 if !argument[:condition].nil? && !argument[:condition].empty?
                   set_argument_detail(osw, argument, measure_dir_name, measure_name)
                 else
@@ -277,12 +282,14 @@ module BuildingSync
             measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:*/#{@ns}:MeasureName"].text
             measure_long_description = measure.elements["#{@ns}:LongDescription"].text
             OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_for_scenario', "Measure with name: #{measure_name} and Description: #{measure_long_description} could not be processed!")
+            successful = false
           end
         end
       end
 
       # ensure that we didn't miss any measures by accident
       OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_for_scenario', "#{measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{measure_ids}") if num_measures != measure_ids.size
+      return successful
     end
 
     def get_scenario_elements
@@ -310,6 +317,7 @@ module BuildingSync
     def write_osws(facility, dir)
       super
 
+      successful = true
       @facility = facility
       scenarios = get_scenario_elements
       # ensure there is a 'Baseline' scenario
@@ -372,7 +380,7 @@ module BuildingSync
 
         # configure the workflow based on measures in this scenario
         begin
-          configure_for_scenario(osw, scenario)
+          successful = false if !configure_for_scenario(osw, scenario)
 
           # dir for the osw
           osw_dir = File.join(dir, scenario_name)
@@ -384,10 +392,12 @@ module BuildingSync
             file << JSON.generate(osw)
           end
         rescue StandardError => e
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', "Could not configure for scenario #{scenario_name}")
           puts "Could not configure for scenario #{scenario_name}"
           puts e.backtrace.join("\n\t")
         end
       end
+      return successful
     end
 
     def get_measure_result(result, measure_dir_name, result_name)
@@ -410,16 +420,33 @@ module BuildingSync
       return @failed_scenarios
     end
 
-    def saveXML(filename)
+    def save_xml(filename)
       File.open(filename, 'w') do |file|
         @doc.write(file)
       end
     end
 
+    def cleanup_larger_files(osw_dir)
+      path = File.join(osw_dir, 'eplusout.sql')
+      FileUtils.rm_f(path) if File.exist?(path)
+      path = File.join(osw_dir, 'data_point.zip')
+      FileUtils.rm_f(path) if File.exist?(path)
+      path = File.join(osw_dir, 'eplusout.eso')
+      FileUtils.rm_f(path) if File.exist?(path)
+      Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
+        FileUtils.rm_rf(path) if File.exist?(path)
+      end
+      Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
+        FileUtils.rm_rf(path) if File.exist?(path)
+      end
+    end
+
     def gather_results(dir, baseline_only = false)
+      successful = true
       puts 'starting to gather results'
       results_counter = 0
       super
+      osw_dir = nil
       begin
         results = {}
         monthly_results = {}
@@ -443,18 +470,8 @@ module BuildingSync
           # dir for the osw
           osw_dir = File.join(dir, scenario_name)
           # cleanup large files
-          path = File.join(osw_dir, 'eplusout.sql')
-          FileUtils.rm_f(path) if File.exist?(path)
-          path = File.join(osw_dir, 'data_point.zip')
-          FileUtils.rm_f(path) if File.exist?(path)
-          path = File.join(osw_dir, 'eplusout.eso')
-          FileUtils.rm_f(path) if File.exist?(path)
-          Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-            FileUtils.rm_rf(path) if File.exist?(path)
-          end
-          Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-            FileUtils.rm_rf(path) if File.exist?(path)
-          end
+          cleanup_larger_files(osw_dir)
+
           # find the osw
           path = File.join(osw_dir, 'out.osw')
           if !File.exist?(path)
@@ -548,41 +565,41 @@ module BuildingSync
             weather_data_type.text = 'TMY3'
             modeled.add_element(weather_data_type)
             sim_completion_status = REXML::Element.new("#{@ns}:SimulationCompletionStatus")
-            sim_completion_status.text = result[:completed_status] == 'Success' ? 'Finished' : 'Failed' # TODO: double check what these keys can be
+            sim_completion_status.text = result[:completed_status] == 'Success' ? 'Finished' : 'Failed'
             modeled.add_element(sim_completion_status)
             calc_method.add_element(modeled)
             package_of_measures.add_element(calc_method)
   
             # Check out.osw "openstudio_results" for output variables
-            total_site_energy_kbtu = getMeasureResult(result, 'openstudio_results', 'total_site_energy') # in kBtu
-            baseline_total_site_energy_kbtu = getMeasureResult(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
+            total_site_energy_kbtu = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
+            baseline_total_site_energy_kbtu = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
   
-            total_site_eui_kbtu_ft2 = getMeasureResult(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-            baseline_total_site_eui_kbtu_ft2 = getMeasureResult(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
+            total_site_eui_kbtu_ft2 = get_measure_result(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
+            baseline_total_site_eui_kbtu_ft2 = get_measure_result(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
   
             # temporary hack to get source energy
             eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
-            source_energy = getSourceEnergyArray(eplustbl_path)
+            source_energy = get_source_energy_array(eplustbl_path)
             total_source_energy_kbtu = source_energy[0]
             total_source_eui_kbtu_ft2 = source_energy[1]
   
             baseline_eplustbl_path = File.join(dir, 'Baseline', 'eplustbl.htm')
-            baseline_source_energy = getSourceEnergyArray(baseline_eplustbl_path)
+            baseline_source_energy = get_source_energy_array(baseline_eplustbl_path)
             baseline_total_source_energy_kbtu = baseline_source_energy[0]
             baseline_total_source_eui_kbtu_ft2 = baseline_source_energy[1]
             # end hack
   
-            fuel_electricity_kbtu = getMeasureResult(result, 'openstudio_results', 'fuel_electricity') # in kBtu
-            baseline_fuel_electricity_kbtu = getMeasureResult(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
+            fuel_electricity_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_electricity') # in kBtu
+            baseline_fuel_electricity_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
   
-            fuel_natural_gas_kbtu = getMeasureResult(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
-            baseline_fuel_natural_gas_kbtu = getMeasureResult(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
+            fuel_natural_gas_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
+            baseline_fuel_natural_gas_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
   
-            annual_peak_electric_demand_kw = getMeasureResult(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
-            baseline_annual_peak_electric_demand_kw = getMeasureResult(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
+            annual_peak_electric_demand_kw = get_measure_result(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
+            baseline_annual_peak_electric_demand_kw = get_measure_result(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
   
-            annual_utility_cost = getMeasureResult(result, 'openstudio_results', 'annual_utility_cost') # in $
-            baseline_annual_utility_cost = getMeasureResult(baseline, 'openstudio_results', 'annual_utility_cost') # in $
+            annual_utility_cost = get_measure_result(result, 'openstudio_results', 'annual_utility_cost') # in $
+            baseline_annual_utility_cost = get_measure_result(baseline, 'openstudio_results', 'annual_utility_cost') # in $
   
             total_site_energy_savings_mmbtu = 0
             if baseline_total_site_energy_kbtu && total_site_energy_kbtu
@@ -806,17 +823,38 @@ module BuildingSync
 
         puts 'No scenarios found in BuildignSync XML File, please check the object hierarchy for errors.' if !scenarios_found
       rescue StandardError => e
-        puts "The following error occurred #{e.message} while processing results in #{dir}"
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "The following error occurred #{e.message} while processing results in #{dir}")
+        end_file = File.join(osw_dir, 'eplusout.end')
+        if File.file?(end_file)
+          # we open the .end file to determine if EnergyPlus was successful or not
+          energy_plus_string = File.open(end_file, &:readline)
+          if energy_plus_string.include? 'Fatal Error Detected'
+            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "EnergyPlus simulation did not succeed! #{energy_plus_string}")
+            # if we found out that there was a fatal error we search the err file for the first error.
+            File.open(File.join(osw_dir, 'eplusout.err')).each do |line|
+              if line.include? '** Severe  **'
+                OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Severe error occured! #{line}")
+              elsif line.include? '**  Fatal  **'
+                OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Fatal error occured! #{line}")
+              end
+            end
+          end
+        else
+          run_log = File.open(File.join(osw_dir, 'run.log'), &:readline)
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Workflow did not succeed! #{run_log}")
+        end
+        successful = false
       end
 
       if results_counter > 0
         puts "#{results_counter} scenarios successfully simulated and results processed"
       end
+      return successful
     end
 
     # DLM: total hack because these are not reported in the out.osw
     # output is array of [source_energy, source_eui] in kBtu and kBtu/ft2
-    def getSourceEnergyArray(eplustbl_path)
+    def get_source_energy_array(eplustbl_path)
       result = []
       File.open(eplustbl_path, 'r') do |f|
         while line = f.gets
@@ -834,7 +872,7 @@ module BuildingSync
       return result
     end
 
-    def getMeasureResult(result, measure_dir_name, result_name)
+    def get_measure_result(result, measure_dir_name, result_name)
       result[:steps].each do |step|
         if step[:measure_dir_name] == measure_dir_name
           if step[:result] && step[:result][:step_values]

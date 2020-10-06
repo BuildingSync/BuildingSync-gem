@@ -44,7 +44,7 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write L100.xml (phase zero) with auc namespace for ASHRAE 90.1' do
-    test_baseline_creation('L100_Instance1.xml', ASHRAE90_1, 'CZ01RV2.epw')
+    test_baseline_creation('L100_Audit.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
   it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace for Title24' do

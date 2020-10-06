@@ -188,6 +188,10 @@ module BuildingSync
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
+      if @num_stories_below_grade > 1.0
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_stories_above_and_below_grade', "Number of stories below grade is larger than 1: #{@num_stories_below_grade}, currently only one basement story is supported.")
+        raise "Error : Number of stories below grade is larger than 1: #{@num_stories_below_grade}, currently only one basement story is supported."
+      end
     end
 
     def read_aspect_ratio(build_element, ns)
@@ -244,7 +248,7 @@ module BuildingSync
       end
     end
 
-    def check_building_faction
+    def check_building_fraction
       # check that sum of fractions for b,c, and d is less than 1.0 (so something is left for primary building type)
       building_fraction = 1.0
       if @building_sections.count > 0
@@ -765,7 +769,7 @@ module BuildingSync
       set_building_form_defaults
 
       # checking that the factions add up
-      check_building_faction
+      check_building_fraction
 
       # set building rotation
       initial_rotation = @model.getBuilding.northAxis
