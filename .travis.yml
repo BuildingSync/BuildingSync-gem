@@ -11,7 +11,7 @@ matrix:
     - env: FAVOR_LOCAL_GEMS=1 OPENSTUDIO_VERSION=3.0.1 OPENSTUDIO_SHA=09b7c8a554 RUBYLIB=/usr/local/openstudio-3.0.1/Ruby:/usr/Ruby
 before_install:
   - gem install bundler
-  - bundle -v
+ # - bundle -v
 install:
   - bundle install
 before_script:
