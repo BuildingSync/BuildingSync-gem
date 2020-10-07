@@ -74,7 +74,7 @@ module BuildingSync
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
       ee_measures_instance = OpenStudio::EeMeasures::Extension.new
       bldg_sync_instance = BuildingSync::Extension.new
-      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir, 'R:\NREL\edv-experiment-1\.bundle\install\ruby\2.2.0\gems\openstudio-standards-0.2.9\lib']
+      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir]
     end
 
     # insert an EnergyPlus measure to the list of existing measures - by default (item = 0) it gets added as first EnergyPlus measure
@@ -429,9 +429,24 @@ module BuildingSync
       return @failed_scenarios
     end
 
-    def saveXML(filename)
+    def save_xml(filename)
       File.open(filename, 'w') do |file|
         @doc.write(file)
+      end
+    end
+
+    def cleanup_larger_files(osw_dir)
+      path = File.join(osw_dir, 'eplusout.sql')
+      FileUtils.rm_f(path) if File.exist?(path)
+      path = File.join(osw_dir, 'data_point.zip')
+      FileUtils.rm_f(path) if File.exist?(path)
+      path = File.join(osw_dir, 'eplusout.eso')
+      FileUtils.rm_f(path) if File.exist?(path)
+      Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
+        FileUtils.rm_rf(path) if File.exist?(path)
+      end
+      Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
+        FileUtils.rm_rf(path) if File.exist?(path)
       end
     end
 
@@ -464,18 +479,8 @@ module BuildingSync
           # dir for the osw
           osw_dir = File.join(dir, scenario_name)
           # cleanup large files
-          path = File.join(osw_dir, 'eplusout.sql')
-          FileUtils.rm_f(path) if File.exist?(path)
-          path = File.join(osw_dir, 'data_point.zip')
-          FileUtils.rm_f(path) if File.exist?(path)
-          path = File.join(osw_dir, 'eplusout.eso')
-          FileUtils.rm_f(path) if File.exist?(path)
-          Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-            FileUtils.rm_rf(path) if File.exist?(path)
-          end
-          Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-            FileUtils.rm_rf(path) if File.exist?(path)
-          end
+          cleanup_larger_files(osw_dir)
+
           # find the osw
           path = File.join(osw_dir, 'out.osw')
           if !File.exist?(path)
@@ -569,41 +574,41 @@ module BuildingSync
             weather_data_type.text = 'TMY3'
             modeled.add_element(weather_data_type)
             sim_completion_status = REXML::Element.new("#{@ns}:SimulationCompletionStatus")
-            sim_completion_status.text = result[:completed_status] == 'Success' ? 'Finished' : 'Failed' # TODO: double check what these keys can be
+            sim_completion_status.text = result[:completed_status] == 'Success' ? 'Finished' : 'Failed'
             modeled.add_element(sim_completion_status)
             calc_method.add_element(modeled)
             package_of_measures.add_element(calc_method)
   
             # Check out.osw "openstudio_results" for output variables
-            total_site_energy_kbtu = getMeasureResult(result, 'openstudio_results', 'total_site_energy') # in kBtu
-            baseline_total_site_energy_kbtu = getMeasureResult(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
+            total_site_energy_kbtu = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
+            baseline_total_site_energy_kbtu = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
   
-            total_site_eui_kbtu_ft2 = getMeasureResult(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-            baseline_total_site_eui_kbtu_ft2 = getMeasureResult(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
+            total_site_eui_kbtu_ft2 = get_measure_result(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
+            baseline_total_site_eui_kbtu_ft2 = get_measure_result(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
   
             # temporary hack to get source energy
             eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
-            source_energy = getSourceEnergyArray(eplustbl_path)
+            source_energy = get_source_energy_array(eplustbl_path)
             total_source_energy_kbtu = source_energy[0]
             total_source_eui_kbtu_ft2 = source_energy[1]
   
             baseline_eplustbl_path = File.join(dir, 'Baseline', 'eplustbl.htm')
-            baseline_source_energy = getSourceEnergyArray(baseline_eplustbl_path)
+            baseline_source_energy = get_source_energy_array(baseline_eplustbl_path)
             baseline_total_source_energy_kbtu = baseline_source_energy[0]
             baseline_total_source_eui_kbtu_ft2 = baseline_source_energy[1]
             # end hack
   
-            fuel_electricity_kbtu = getMeasureResult(result, 'openstudio_results', 'fuel_electricity') # in kBtu
-            baseline_fuel_electricity_kbtu = getMeasureResult(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
+            fuel_electricity_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_electricity') # in kBtu
+            baseline_fuel_electricity_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
   
-            fuel_natural_gas_kbtu = getMeasureResult(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
-            baseline_fuel_natural_gas_kbtu = getMeasureResult(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
+            fuel_natural_gas_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
+            baseline_fuel_natural_gas_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
   
-            annual_peak_electric_demand_kw = getMeasureResult(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
-            baseline_annual_peak_electric_demand_kw = getMeasureResult(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
+            annual_peak_electric_demand_kw = get_measure_result(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
+            baseline_annual_peak_electric_demand_kw = get_measure_result(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
   
-            annual_utility_cost = getMeasureResult(result, 'openstudio_results', 'annual_utility_cost') # in $
-            baseline_annual_utility_cost = getMeasureResult(baseline, 'openstudio_results', 'annual_utility_cost') # in $
+            annual_utility_cost = get_measure_result(result, 'openstudio_results', 'annual_utility_cost') # in $
+            baseline_annual_utility_cost = get_measure_result(baseline, 'openstudio_results', 'annual_utility_cost') # in $
   
             total_site_energy_savings_mmbtu = 0
             if baseline_total_site_energy_kbtu && total_site_energy_kbtu
@@ -858,7 +863,7 @@ module BuildingSync
 
     # DLM: total hack because these are not reported in the out.osw
     # output is array of [source_energy, source_eui] in kBtu and kBtu/ft2
-    def getSourceEnergyArray(eplustbl_path)
+    def get_source_energy_array(eplustbl_path)
       result = []
       File.open(eplustbl_path, 'r') do |f|
         while line = f.gets
@@ -876,7 +881,7 @@ module BuildingSync
       return result
     end
 
-    def getMeasureResult(result, measure_dir_name, result_name)
+    def get_measure_result(result, measure_dir_name, result_name)
       result[:steps].each do |step|
         if step[:measure_dir_name] == measure_dir_name
           if step[:result] && step[:result][:step_values]
