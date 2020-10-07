@@ -40,6 +40,25 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
+  it 'should print out all available measure paths' do
+    workflow_maker = BuildingSync::WorkflowMaker.new(nil, nil)
+    list_of_measures = workflow_maker.get_list_of_available_measures
+    count = 0
+    list_of_measures.each do |path, list|
+      puts "measure path: #{path} with #{list.length} measures"
+      count += list.length
+      list.each do |measure_path_name|
+        puts "     measure name : #{measure_path_name}"
+      end
+    end
+    puts "found #{count} measures"
+  end
+
+  it 'should check if all measures are available' do
+    workflow_maker = BuildingSync::WorkflowMaker.new(nil, nil)
+    expect(workflow_maker.check_if_measures_exist).to be true
+  end
+
   it 'should add a new EnergyPlus measure' do
     xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true

@@ -66,6 +66,40 @@ module BuildingSync
         @workflow = JSON.parse(file.read)
         set_measure_paths(@workflow, get_measure_directories_array)
       end
+      check_if_measures_exist
+    end
+
+    # iterate over the current measure list in the workflow and check if they are available at the referenced measure directories
+    def check_if_measures_exist
+      all_measures_found = true
+      @workflow['steps'].each do |step|
+        measure_is_valid = false
+        measure_dir_name = step['measure_dir_name']
+        get_measure_directories_array.each do |potential_measure_path|
+          measure_dir_full_path = "#{potential_measure_path}/#{measure_dir_name}"
+          if Dir.exist?(measure_dir_full_path)
+            measure_is_valid = true
+            puts "measure found in: #{measure_dir_full_path}/"
+            break
+          end
+        end
+        if !measure_is_valid
+          all_measures_found = false
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.check_if_measures_exist', "CANNOT find measure with name (#{measure_dir_name}) in any of the measure paths  ")
+        end
+      end
+      return all_measures_found
+    end
+
+    # prints out all available measures across all measure directories
+    def get_list_of_available_measures
+      list_of_measures = Hash.new
+      get_measure_directories_array.each do |potential_measure_path|
+        Dir.chdir(potential_measure_path) do
+          list_of_measures[potential_measure_path] = Dir.glob('*').select{ |f| File.directory? f }
+        end
+      end
+      return list_of_measures
     end
 
     # collect all measure directories that contain measures needed for BldgSync
