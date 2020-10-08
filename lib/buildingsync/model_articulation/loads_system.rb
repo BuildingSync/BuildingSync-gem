@@ -604,13 +604,13 @@ module BuildingSync
         create_schedule_hours_of_operations(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
         create_schedule_activity(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
         create_schedule_lighting(model, default_schedule_set, lighting_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-        create_schedule_electric_equipment(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-        create_schedule_gas_equipment(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-        create_schedule_occupancy(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-        create_schedule_infiltration(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-        create_schedule_hvac_availability(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-        create_schedule_heating_cooling(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-        create_schedule_SHW(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+        create_schedule_electric_equipment(model, default_schedule_set, electric_equipment_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+        create_schedule_gas_equipment(model, default_schedule_set, gas_equipment_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+        create_schedule_occupancy(model, default_schedule_set, occupancy_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+        create_schedule_infiltration(model, default_schedule_set, infiltration_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+        create_schedule_hvac_availability(model, default_schedule_set, hvac_availability_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+        create_schedule_heating_cooling(model, default_schedule_set, thermostat_setback_profiles, profile_override,hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+        create_schedule_SHW(model, default_schedule_set, swh_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
       end
     end
 
