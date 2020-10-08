@@ -203,7 +203,7 @@ RSpec.configure do |config|
     p 'IDF file successfully saved' if workspace.save(new_file_path)
 
     original_file_path = "#{@osm_file_path}/originalfiles"
-    oldModel = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
+    old_model = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
     workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
     # first delete the file if exist
     File.delete("#{original_file_path}/in.idf") if File.exist?("#{original_file_path}/in.idf")

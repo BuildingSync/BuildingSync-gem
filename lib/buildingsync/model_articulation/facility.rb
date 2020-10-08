@@ -304,11 +304,11 @@ module BuildingSync
       lookup_building_type = open_studio_system_standard.model_get_lookup_name(primary_bldg_type) # Used for some lookups in the standards gem
       model.getBuilding.setStandardsBuildingType(primary_bldg_type)
 
-      envelopeSystem = nil
+      envelope_system = nil
       # make construction set and apply to building
       if add_constructions
-        envelopeSystem = EnvelopeSystem.new
-        envelopeSystem.create(model, open_studio_system_standard, primary_bldg_type, lookup_building_type, remove_objects)
+        envelope_system = EnvelopeSystem.new
+        envelope_system.create(model, open_studio_system_standard, primary_bldg_type, lookup_building_type, remove_objects)
       end
 
       # add elevators (returns ElectricEquipment object)
@@ -328,8 +328,8 @@ module BuildingSync
 
       # add service water heating demand and supply
       if add_swh
-        serviceHotWaterSystem = ServiceHotWaterSystem.new
-        serviceHotWaterSystem.add(model, open_studio_system_standard, remove_objects)
+        service_hot_water_system = ServiceHotWaterSystem.new
+        service_hot_water_system.add(model, open_studio_system_standard, remove_objects)
       end
 
       @load_system.add_day_lighting_controls(model, open_studio_system_standard, template)

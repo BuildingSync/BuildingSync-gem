@@ -57,7 +57,6 @@ module BuildingSync
       @conditioned_floor_area_heated_only = nil
       @conditioned_floor_area_cooled_only = nil
       @conditioned_floor_area_heated_cooled = nil
-      @conditioned_below_grade_floor_area = nil
       @custom_conditioned_above_grade_floor_area = nil
       @custom_conditioned_below_grade_floor_area = nil
     end
@@ -290,7 +289,6 @@ module BuildingSync
       add_user_defined_field_to_xml_file(user_defined_fields, ns, 'BarDivisionMethod', @bar_division_method)
       add_user_defined_field_to_xml_file(user_defined_fields, ns, 'FractionArea', @fraction_area)
       add_user_defined_field_to_xml_file(user_defined_fields, ns, 'SpaceTypesFloorArea', @space_types_floor_area)
-      add_user_defined_field_to_xml_file(user_defined_fields, ns, 'ConditionedBelowGradeFloorArea', @conditioned_below_grade_floor_area)
 
       add_floor_area_field_to_xml_file(xml_element, ns)
     end
