@@ -35,7 +35,6 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_system'
-require_relative '../helpers/os_lib_parametric_schedules'
 
 module BuildingSync
   class LoadsSystem < BuildingSystem
@@ -357,8 +356,8 @@ module BuildingSync
       summer_design_day = [[24, 1]]
       default_day = hash[:default]
       rules = []
-      rules << hash[:saturday]
-      rules << hash[:sunday]
+      rules << ['Saturday', '1/1-12/31', 'Sat'] + hash[:saturday].to_a
+      rules << ['Sunday', '1/1-12/31', 'Sun'] + hash[:sunday].to_a
       options = { 'name' => ruleset_name,
                   'winter_design_day' => winter_design_day,
                   'summer_design_day' => summer_design_day,
@@ -379,15 +378,15 @@ module BuildingSync
       summer_design_day = [[24, 1]]
       default_day = hash[:default]
       rules = []
-      rules << hash[:saturday]
-      rules << hash[:sunday]
+      rules << ['Saturday', '1/1-12/31', 'Sat'] + hash[:saturday].to_a
+      rules << ['Sunday', '1/1-12/31', 'Sun'] + hash[:sunday].to_a
       options = { 'name' => ruleset_name,
                   'winter_design_day' => winter_design_day,
                   'summer_design_day' => summer_design_day,
                   'default_day' => default_day,
                   'rules' => rules }
       electric_equipment_sch = OsLib_Schedules.createComplexSchedule(model, options)
-      electric_equipment_sch.setComment(args['electric_equipment_profiles'])
+      electric_equipment_sch.setComment(electric_equipment_profiles)
       default_schedule_set.setElectricEquipmentSchedule(electric_equipment_sch)
     end
 
@@ -400,15 +399,15 @@ module BuildingSync
       summer_design_day = [[24, 1]]
       default_day = hash[:default]
       rules = []
-      rules << hash[:saturday]
-      rules << hash[:sunday]
+      rules << ['Saturday', '1/1-12/31', 'Sat'] + hash[:saturday].to_a
+      rules << ['Sunday', '1/1-12/31', 'Sun'] + hash[:sunday].to_a
       options = { 'name' => ruleset_name,
                   'winter_design_day' => winter_design_day,
                   'summer_design_day' => summer_design_day,
                   'default_day' => default_day,
                   'rules' => rules }
       gas_equipment_sch = OsLib_Schedules.createComplexSchedule(model, options)
-      gas_equipment_sch.setComment(args['gas_equipment_profiles'])
+      gas_equipment_sch.setComment(gas_equipment_profiles)
       default_schedule_set.setGasEquipmentSchedule(gas_equipment_sch)
     end
 
@@ -421,8 +420,8 @@ module BuildingSync
       summer_design_day = [[24, 1]]
       default_day = hash[:default]
       rules = []
-      rules << hash[:saturday]
-      rules << hash[:sunday]
+      rules << ['Saturday', '1/1-12/31', 'Sat'] + hash[:saturday].to_a
+      rules << ['Sunday', '1/1-12/31', 'Sun'] + hash[:sunday].to_a
       options = { 'name' => ruleset_name,
                   'winter_design_day' => winter_design_day,
                   'summer_design_day' => summer_design_day,
@@ -442,8 +441,8 @@ module BuildingSync
       summer_design_day = [[24, 1]]
       default_day = hash[:default]
       rules = []
-      rules << hash[:saturday]
-      rules << hash[:sunday]
+      rules << ['Saturday', '1/1-12/31', 'Sat'] + hash[:saturday].to_a
+      rules << ['Sunday', '1/1-12/31', 'Sun'] + hash[:sunday].to_a
       options = { 'name' => ruleset_name,
                   'winter_design_day' => winter_design_day,
                   'summer_design_day' => summer_design_day,
@@ -463,8 +462,8 @@ module BuildingSync
       summer_design_day = [[24, 1]] # todo - confirm proper value
       default_day = hash[:default]
       rules = []
-      rules << hash[:saturday]
-      rules << hash[:sunday]
+      rules << ['Saturday', '1/1-12/31', 'Sat'] + hash[:saturday].to_a
+      rules << ['Sunday', '1/1-12/31', 'Sun'] + hash[:sunday].to_a
       options = { 'name' => ruleset_name,
                   'winter_design_day' => winter_design_day,
                   'summer_design_day' => summer_design_day,
@@ -475,20 +474,20 @@ module BuildingSync
 
       # apply HVAC schedules
       # todo - measure currently only replaces AirLoopHVAC.setAvailabilitySchedule)
-      air_loops_to_alter.each do |air_loop|
+      model.getAirLoopHVACs.each do |air_loop|
         air_loop.setAvailabilitySchedule(hvac_availability_sch)
       end
     end
 
-    def create_schedule_heating_cooling(model, default_schedule_set, thermostat_setback_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def create_schedule_heating_cooling(model, default_schedule_set, thermostat_setback_profiles, htg_setpoint, clg_setpoint, setback_delta, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
       # generate and apply heating_setpoint schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Heating Setpoint Schedule'
 
       # htg setpoints
-      htg_occ = OpenStudio.convert(args['htg_setpoint'], 'F', 'C').get
-      htg_vac = OpenStudio.convert(args['htg_setpoint'] - args['setback_delta'], 'F', 'C').get
+      htg_occ = OpenStudio.convert(htg_setpoint, 'F', 'C').get
+      htg_vac = OpenStudio.convert(htg_setpoint - setback_delta, 'F', 'C').get
 
-      # replace floor and celing with user specified values
+      # replace floor and ceiling with user specified values
       htg_setpoint_profiles = thermostat_setback_profiles.gsub('ceiling', htg_occ.to_s)
       htg_setpoint_profiles = htg_setpoint_profiles.gsub('floor', htg_vac.to_s)
 
@@ -500,8 +499,8 @@ module BuildingSync
       summer_design_day = hash[:default].drop(1) # [[24,htg_occ]]
       default_day = hash[:default]
       rules = []
-      rules << hash[:saturday]
-      rules << hash[:sunday]
+      rules << ['Saturday', '1/1-12/31', 'Sat'] + hash[:saturday].to_a
+      rules << ['Sunday', '1/1-12/31', 'Sun'] + hash[:sunday].to_a
       options = { 'name' => ruleset_name,
                   'winter_design_day' => winter_design_day,
                   'summer_design_day' => summer_design_day,
@@ -528,8 +527,8 @@ module BuildingSync
       summer_design_day = hash[:default].drop(1) # [[24,clg_occ]]
       default_day = hash[:default]
       rules = []
-      rules << hash[:saturday]
-      rules << hash[:sunday]
+      rules << ['Saturday', '1/1-12/31', 'Sat'] + hash[:saturday].to_a
+      rules << ['Sunday', '1/1-12/31', 'Sun'] + hash[:sunday].to_a
       options = { 'name' => ruleset_name,
                   'winter_design_day' => winter_design_day,
                   'summer_design_day' => summer_design_day,
@@ -538,7 +537,7 @@ module BuildingSync
       cooling_setpoint_sch = OsLib_Schedules.createComplexSchedule(model, options)
 
       # apply heating and cooling setpoint schedules
-      thermostats_to_alter.each do |thermostat|
+      model.getThermostatSetpointDualSetpoints.each do |thermostat|
         thermostat.setHeatingSchedule(heating_setpoint_sch)
         thermostat.setCoolingSchedule(cooling_setpoint_sch)
       end
@@ -553,16 +552,16 @@ module BuildingSync
       summer_design_day = hash[:default].drop(1)
       default_day = hash[:default]
       rules = []
-      rules << hash[:saturday]
-      rules << hash[:sunday]
+      rules << ['Saturday', '1/1-12/31', 'Sat'] + hash[:saturday].to_a
+      rules << ['Sunday', '1/1-12/31', 'Sun'] + hash[:sunday].to_a
       options = { 'name' => ruleset_name,
                   'winter_design_day' => winter_design_day,
                   'summer_design_day' => summer_design_day,
                   'default_day' => default_day,
                   'rules' => rules }
       swh_sch = OsLib_Schedules.createComplexSchedule(model, options)
-      swh_sch.setComment(args['swh_profiles'])
-      water_use_equipment_to_alter.each do |water_use_equipment|
+      swh_sch.setComment(swh_profiles)
+      model.getWaterUseEquipments.each do |water_use_equipment|
         water_use_equipment.setFlowRateFractionSchedule(swh_sch)
       end
     end
@@ -609,7 +608,7 @@ module BuildingSync
         create_schedule_occupancy(model, default_schedule_set, occupancy_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
         create_schedule_infiltration(model, default_schedule_set, infiltration_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
         create_schedule_hvac_availability(model, default_schedule_set, hvac_availability_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-        create_schedule_heating_cooling(model, default_schedule_set, thermostat_setback_profiles, profile_override,hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+        create_schedule_heating_cooling(model, default_schedule_set, thermostat_setback_profiles, 67.0, 75.0, 4, profile_override,hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
         create_schedule_SHW(model, default_schedule_set, swh_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
       end
     end
