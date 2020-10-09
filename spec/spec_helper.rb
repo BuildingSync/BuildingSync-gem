@@ -204,7 +204,7 @@ RSpec.configure do |config|
 
     original_file_path = "#{@osm_file_path}/originalfiles"
     old_model = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
-    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
+    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(old_model)
     # first delete the file if exist
     File.delete("#{original_file_path}/in.idf") if File.exist?("#{original_file_path}/in.idf")
 
