@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '~> 2.5.0'
 
-  spec.add_development_dependency 'bundler', '~> 2.1.4'
+  spec.add_development_dependency 'bundler', '~> 2.1.0'
   spec.add_dependency 'openstudio-model-articulation', '~> 0.2.0'
   spec.add_dependency 'openstudio-common-measures', '~> 0.2.0'
   spec.add_dependency 'openstudio-standards', '~> 0.2.0'
