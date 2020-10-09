@@ -35,6 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'builder'
+require_relative '../../../lib/buildingsync/generator'
 
 RSpec.describe 'FacilitySpec' do
   it 'Should generate meaningful error when passing empty XML data' do
@@ -47,11 +48,13 @@ RSpec.describe 'FacilitySpec' do
   end
 
   it 'Should create an instance of the facility class with minimal XML snippet' do
-    create_minimum_facility('Retail', '1954', 'Gross', '69452')
+    generator = BuildingSync::Generator.new()
+    generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
   end
 
   it 'Should return the boolean value for creating osm file correctly or not.' do
-    facility = create_minimum_facility('Retail', '1954', 'Gross', '69452')
+    generator = BuildingSync::Generator.new()
+    facility = generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
     facility.determine_open_studio_standard(ASHRAE90_1)
     epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
     output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
@@ -91,90 +94,99 @@ RSpec.describe 'FacilitySpec' do
   end
 
   it 'Should return benchmark_eui' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = '9.7'
     puts "expected benchmark_eui: #{expected_value} but got: #{facility.building_eui_benchmark} " if facility.building_eui_benchmark != expected_value
     expect(facility.building_eui_benchmark == expected_value).to be true
   end
 
   it 'Should return eui_building' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = '10.5'
     puts "expected eui_building: #{expected_value} but got: #{facility.building_eui} " if facility.building_eui != expected_value
     expect(facility.building_eui == expected_value).to be true
   end
 
   it 'Should return auditor_contact_id' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = '123'
     puts "expected auditor_contact_id: #{expected_value} but got: #{facility.auditor_contact_id} " if facility.auditor_contact_id != expected_value
     expect(facility.auditor_contact_id == expected_value).to be true
   end
 
   it 'Should return benchmark_source' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'Benchmark Type 1'
     puts "expected benchmark_source: #{expected_value} but got: #{facility.benchmark_source} " if facility.benchmark_source != expected_value
     expect(facility.benchmark_source == expected_value).to be true
   end
 
   it 'Should return annual_fuel_use_native_units' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'kBtu/ft2'
     puts "expected annual_fuel_use_native_units: #{expected_value} but got: #{facility.annual_fuel_use_native_units} " if facility.annual_fuel_use_native_units != expected_value
     expect(facility.annual_fuel_use_native_units == expected_value).to be true
   end
 
   it 'Should return energy_cost' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = '1000'
     puts "expected energy_cost: #{expected_value} but got: #{facility.energy_cost} " if facility.energy_cost != expected_value
     expect(facility.energy_cost == expected_value).to be true
   end
 
   it 'Should return audit_date' do
-    facility = get_facility_from_file('report_478.xml', ASHRAE90_1)
+    facility = get_facility_from_file('report_479.xml')
     expected_value = Date.parse('26/10/2019')
     puts "expected audit_date: #{expected_value} but got: #{facility.audit_date} " if facility.audit_date != expected_value
     expect(facility.audit_date == expected_value).to be true
   end
 
+  it 'Should return error about number of stories below grade' do
+    begin
+      get_facility_from_file('report_478.xml')
+    rescue StandardError => e
+      puts "rescued StandardError: #{e.message}"
+      expect(e.message.include?("Number of stories below grade is larger than")).to be true
+    end
+  end
+
   it 'Should return contact_name' do
-    facility = get_facility_from_file('report_478.xml', ASHRAE90_1)
+    facility = get_facility_from_file('report_479.xml')
     expected_value = 'John Doe'
     puts "expected contact_name: #{expected_value} but got: #{facility.contact_auditor_name} " if facility.contact_auditor_name != expected_value
     expect(facility.contact_auditor_name == expected_value).to be true
   end
 
   it 'Should return utility_name' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'an utility'
     puts "expected utility_name: #{expected_value} but got: #{facility.utility_name} " if facility.utility_name != expected_value
     expect(facility.utility_name == expected_value).to be true
   end
 
   it 'Should return metering_configuration ' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'metering config'
     puts "expected metering_configuration: #{expected_value} but got: #{facility.metering_configuration} " if facility.metering_configuration != expected_value
     expect(facility.metering_configuration == expected_value).to be true
   end
 
   it 'Should return rate_schedules ' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'rate schedule'
     puts "expected rate_schedules: #{expected_value} but got: #{facility.rate_schedules} " if facility.rate_schedules != expected_value
     expect(facility.rate_schedules == expected_value).to be true
   end
 
   it 'Should return rate_schedules ' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
+    facility = get_facility_from_file('building_151_level1.xml')
     expected_value = 'meter 1'
     puts "expected utility_meter_number: #{expected_value} but got: #{facility.utility_meter_number} " if facility.utility_meter_number != expected_value
     expect(facility.utility_meter_number == expected_value).to be true
   end
 
-  def get_facility_from_file(xml_file_name, standard_to_be_used)
+  def get_facility_from_file(xml_file_name)
     xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
     File.open(xml_file_path, 'r') do |file|
       doc = REXML::Document.new(file)
@@ -203,50 +215,6 @@ RSpec.describe 'FacilitySpec' do
       doc = REXML::Document.new(file)
     end
     return doc
-  end
-
-  def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    xml_path = File.expand_path('../../files/building_151_Blank.xml', File.dirname(__FILE__))
-    ns = 'auc'
-    doc = create_xml_file_object(xml_path)
-    site_element = doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
-
-    occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
-    occupancy_classification_element.text = occupancy_classification
-    site_element.add_element(occupancy_classification_element)
-
-    building_element = site_element.elements["#{ns}:Buildings/#{ns}:Building"]
-
-    year_of_construction_element = REXML::Element.new("#{ns}:YearOfConstruction")
-    year_of_construction_element.text = year_of_const
-    building_element.add_element(year_of_construction_element)
-
-    floor_areas_element = REXML::Element.new("#{ns}:FloorAreas")
-    floor_area_element = REXML::Element.new("#{ns}:FloorArea")
-    floor_area_type_element = REXML::Element.new("#{ns}:FloorAreaType")
-    floor_area_type_element.text = floor_area_type
-    floor_area_value_element = REXML::Element.new("#{ns}:FloorAreaValue")
-    floor_area_value_element.text = floor_area_value
-
-    floor_area_element.add_element(floor_area_type_element)
-    floor_area_element.add_element(floor_area_value_element)
-    floor_areas_element.add_element(floor_area_element)
-    building_element.add_element(floor_areas_element)
-
-    # doc.write(File.open(xml_path, 'w'), 2)
-
-    return doc
-  end
-
-  def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    ns = 'auc'
-    facility_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"]
-    if !facility_element.nil?
-      return BuildingSync::Facility.new(facility_element, 'auc')
-    else
-      expect(facility_element.nil?).to be false
-    end
   end
 
   def create_blank_xml_file1

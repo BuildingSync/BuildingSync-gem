@@ -124,7 +124,7 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should parse and write L100.xml (phase zero) with auc namespace for ASHRAE 90.1' do
-    translator = test_baseline_creation('L100_Instance1.xml', ASHRAE90_1, 'CZ01RV2.epw')
+    translator = test_baseline_creation('L100_Audit.xml', ASHRAE90_1, 'CZ01RV2.epw')
     expect(translator.run_osm('CZ01RV2.epw')).to be true
     expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
 
@@ -134,16 +134,16 @@ RSpec.describe 'BuildingSync' do
     expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
   end
 
-  it 'should parse and write L000_Instance1.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('L000_Instance1.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+  it 'should parse and write L000_OpenStudio_Simulation_01.xml (phase zero) and perform a baseline simulation and gather results' do
+    test_baseline_creation_and_simulation('L000_OpenStudio_Simulation_01.xml',  ASHRAE90_1, 'CZ01RV2.epw')
   end
 
-  it 'should parse and write L000_Instance2.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('L000_Instance2.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+  it 'should parse and write L000_OpenStudio_Simulation_02.xml (phase zero) and perform a baseline simulation and gather results' do
+    test_baseline_creation_and_simulation('L000_OpenStudio_Simulation_02.xml',  ASHRAE90_1, 'CZ01RV2.epw')
   end
 
-  it 'should parse and write L100_Instance1.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('L100_Instance1.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+  it 'should parse and write L100_Audit.xml (phase zero) and perform a baseline simulation and gather results' do
+    test_baseline_creation_and_simulation('L100_Audit.xml',  ASHRAE90_1, 'CZ01RV2.epw')
   end
 
   it 'should parse and write Office_Carolina.xml (phase zero) and perform a baseline simulation and gather results' do

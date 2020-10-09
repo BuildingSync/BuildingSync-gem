@@ -69,7 +69,7 @@ RSpec.describe 'HVACSystemSpec' do
     expect(hvac_system.apply_sizing_and_assumptions(model, output_path, standard, 'Retail', 'PSZ-AC with gas coil heat', '')).to be false
   end
 
-  it 'Should return typical_occupant_usage_value_weeks ' do
+  it 'Should return expected system type ' do
     hvac_system = get_hvac_system_from_file('building_151_level1.xml', ASHRAE90_1)
     expected_value = 'VAVwReheat'
     puts "hvac_system #{hvac_system}"
