@@ -189,9 +189,6 @@ module BuildingSync
               measure_name = user_defined_field.elements["#{@ns}:FieldValue"].text
             end
           end
-          #        if measure.elements["#{@ns}:CustomMeasureName"]
-          #          measure_name = measure.elements["#{@ns}:CustomMeasureName"].text
-          #        end
         end
       elsif measure_category == 'Fan'
         measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherElectricMotorsAndDrives/#{@ns}:MeasureName"].text
@@ -309,7 +306,7 @@ module BuildingSync
     def get_scenarios
       scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"]
       if scenarios.nil?
-        scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios"]
+        scenarios =  @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios"]
       end
       return scenarios
     end
@@ -523,20 +520,17 @@ module BuildingSync
               @failed_scenarios << scenario_name
               next
             end
-
             if result['completed_status'] == 'Success' || result[:completed_status] == 'Success'
               # success
             else
               @failed_scenarios << scenario_name
             end
-
             # preserve existing user defined fields if they exist
             # KAF: there should no longer be any UDFs
             user_defined_fields = scenario.elements["#{@ns}:UserDefinedFields"]
             if user_defined_fields.nil?
               user_defined_fields = REXML::Element.new("#{@ns}:UserDefinedFields")
             end
-
             # delete previous results (if using an old schema)
             to_remove = []
             user_defined_fields.elements.each("#{@ns}:UserDefinedField") do |user_defined_field|
@@ -550,7 +544,6 @@ module BuildingSync
             to_remove.each do |element|
               user_defined_fields.elements.delete(element)
             end
-
             # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
             # options are: Not Started, Started, Finished, Failed, Unknown
             calc_method = REXML::Element.new("#{@ns}:CalculationMethod")
@@ -569,7 +562,6 @@ module BuildingSync
             modeled.add_element(sim_completion_status)
             calc_method.add_element(modeled)
             package_of_measures.add_element(calc_method)
-
             # Check out.osw "openstudio_results" for output variables
             total_site_energy_kbtu = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
             baseline_total_site_energy_kbtu = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
@@ -591,7 +583,6 @@ module BuildingSync
 
             fuel_electricity_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_electricity') # in kBtu
             baseline_fuel_electricity_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
-
             fuel_natural_gas_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
             baseline_fuel_natural_gas_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
 
@@ -619,15 +610,12 @@ module BuildingSync
             annual_savings_site_energy = REXML::Element.new("#{@ns}:AnnualSavingsSiteEnergy")
             annual_savings_source_energy = REXML::Element.new("#{@ns}:AnnualSavingsSourceEnergy")
             annual_savings_energy_cost = REXML::Element.new("#{@ns}:AnnualSavingsCost")
-
             annual_savings_site_energy.text = total_site_energy_savings_mmbtu
             annual_savings_source_energy.text = total_source_energy_savings_mmbtu
             annual_savings_energy_cost.text = total_energy_cost_savings.to_i # BuildingSync wants an integer, might be a BuildingSync bug
-
             package_of_measures.add_element(annual_savings_site_energy)
             package_of_measures.add_element(annual_savings_source_energy)
             package_of_measures.add_element(annual_savings_energy_cost)
-
             # KAF: adding annual savings by fuel
             electricity_savings = baseline_fuel_electricity_kbtu - fuel_electricity_kbtu
             natural_gas_savings = baseline_fuel_natural_gas_kbtu - fuel_natural_gas_kbtu
@@ -643,7 +631,6 @@ module BuildingSync
             savings_native.text = electricity_savings.to_s
             annual_saving.add_element(savings_native)
             annual_savings.add_element(annual_saving)
-
             annual_saving = REXML::Element.new("#{@ns}:AnnualSavingsByFuel")
             energy_res = REXML::Element.new("#{@ns}:EnergyResource")
             energy_res.text = 'Natural gas'
@@ -655,7 +642,6 @@ module BuildingSync
             savings_native.text = natural_gas_savings.to_s
             annual_saving.add_element(savings_native)
             annual_savings.add_element(annual_saving)
-
             package_of_measures.add_element(annual_savings)
 
             res_uses = REXML::Element.new("#{@ns}:ResourceUses")
@@ -685,7 +671,6 @@ module BuildingSync
             res_use.add_element(peak_native_units)
             res_use.add_element(peak_consistent_units)
             res_uses.add_element(res_use)
-
             # NATURAL GAS
             res_use = REXML::Element.new("#{@ns}:ResourceUse")
             res_use.add_attribute('ID', scenario_name_ns + '_NaturalGas')
@@ -707,7 +692,6 @@ module BuildingSync
 
             # already added ResourceUses above. Needed as ResourceUseID reference
             timeseriesdata = REXML::Element.new("#{@ns}:TimeSeriesData")
-
             # Electricity
             # looking for: "electricity_ip_jan" through "electricity_ip_dec"
             # convert from kWh to kBtu
@@ -750,7 +734,6 @@ module BuildingSync
               timeseries.add_element(resource_id)
               timeseriesdata.add_element(timeseries)
             end
-
             # Natural Gas
             # looking for: "natural_gas_ip_jan" through "natural_gas_ip_dec"
             # convert from MMBtu to kBtu
@@ -794,7 +777,6 @@ module BuildingSync
               timeseriesdata.add_element(timeseries)
             end
             scenario.insert_after(res_uses, timeseriesdata)
-
             # all the totals
             all_res_totals = REXML::Element.new("#{@ns}:AllResourceTotals")
             all_res_total = REXML::Element.new("#{@ns}:AllResourceTotal")
@@ -815,7 +797,6 @@ module BuildingSync
             all_res_total.add_element(source_energy_use_intensity)
             all_res_totals.add_element(all_res_total)
             scenario.insert_after(timeseriesdata, all_res_totals)
-
             # no longer using user defined fields
             scenario.elements.delete("#{@ns}:UserDefinedFields")
           end
