@@ -520,17 +520,20 @@ module BuildingSync
               @failed_scenarios << scenario_name
               next
             end
+
             if result['completed_status'] == 'Success' || result[:completed_status] == 'Success'
               # success
             else
               @failed_scenarios << scenario_name
             end
+
             # preserve existing user defined fields if they exist
             # KAF: there should no longer be any UDFs
             user_defined_fields = scenario.elements["#{@ns}:UserDefinedFields"]
             if user_defined_fields.nil?
               user_defined_fields = REXML::Element.new("#{@ns}:UserDefinedFields")
             end
+
             # delete previous results (if using an old schema)
             to_remove = []
             user_defined_fields.elements.each("#{@ns}:UserDefinedField") do |user_defined_field|
@@ -544,6 +547,7 @@ module BuildingSync
             to_remove.each do |element|
               user_defined_fields.elements.delete(element)
             end
+
             # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
             # options are: Not Started, Started, Finished, Failed, Unknown
             calc_method = REXML::Element.new("#{@ns}:CalculationMethod")
@@ -562,60 +566,55 @@ module BuildingSync
             modeled.add_element(sim_completion_status)
             calc_method.add_element(modeled)
             package_of_measures.add_element(calc_method)
+
             # Check out.osw "openstudio_results" for output variables
             total_site_energy_kbtu = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
             baseline_total_site_energy_kbtu = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
-
             total_site_eui_kbtu_ft2 = get_measure_result(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
             baseline_total_site_eui_kbtu_ft2 = get_measure_result(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-
             # temporary hack to get source energy
             eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
             source_energy = get_source_energy_array(eplustbl_path)
             total_source_energy_kbtu = source_energy[0]
             total_source_eui_kbtu_ft2 = source_energy[1]
-
             baseline_eplustbl_path = File.join(dir, 'Baseline', 'eplustbl.htm')
             baseline_source_energy = get_source_energy_array(baseline_eplustbl_path)
             baseline_total_source_energy_kbtu = baseline_source_energy[0]
             baseline_total_source_eui_kbtu_ft2 = baseline_source_energy[1]
             # end hack
-
             fuel_electricity_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_electricity') # in kBtu
             baseline_fuel_electricity_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
             fuel_natural_gas_kbtu = get_measure_result(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
             baseline_fuel_natural_gas_kbtu = get_measure_result(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
-
             annual_peak_electric_demand_kw = get_measure_result(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
             baseline_annual_peak_electric_demand_kw = get_measure_result(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
 
             annual_utility_cost = get_measure_result(result, 'openstudio_results', 'annual_utility_cost') # in $
             baseline_annual_utility_cost = get_measure_result(baseline, 'openstudio_results', 'annual_utility_cost') # in $
-
             total_site_energy_savings_mmbtu = 0
             if baseline_total_site_energy_kbtu && total_site_energy_kbtu
               total_site_energy_savings_mmbtu = (baseline_total_site_energy_kbtu - total_site_energy_kbtu) / 1000.0 # in MMBtu
             end
-
             total_source_energy_savings_mmbtu = 0
             if baseline_total_source_energy_kbtu && total_source_energy_kbtu
               total_source_energy_savings_mmbtu = (baseline_total_source_energy_kbtu - total_source_energy_kbtu) / 1000.0 # in MMBtu
             end
-
             total_energy_cost_savings = 0
             if baseline_annual_utility_cost && annual_utility_cost
               total_energy_cost_savings = baseline_annual_utility_cost - annual_utility_cost
             end
-
             annual_savings_site_energy = REXML::Element.new("#{@ns}:AnnualSavingsSiteEnergy")
             annual_savings_source_energy = REXML::Element.new("#{@ns}:AnnualSavingsSourceEnergy")
             annual_savings_energy_cost = REXML::Element.new("#{@ns}:AnnualSavingsCost")
+
             annual_savings_site_energy.text = total_site_energy_savings_mmbtu
             annual_savings_source_energy.text = total_source_energy_savings_mmbtu
             annual_savings_energy_cost.text = total_energy_cost_savings.to_i # BuildingSync wants an integer, might be a BuildingSync bug
+
             package_of_measures.add_element(annual_savings_site_energy)
             package_of_measures.add_element(annual_savings_source_energy)
             package_of_measures.add_element(annual_savings_energy_cost)
+
             # KAF: adding annual savings by fuel
             electricity_savings = baseline_fuel_electricity_kbtu - fuel_electricity_kbtu
             natural_gas_savings = baseline_fuel_natural_gas_kbtu - fuel_natural_gas_kbtu
@@ -631,6 +630,7 @@ module BuildingSync
             savings_native.text = electricity_savings.to_s
             annual_saving.add_element(savings_native)
             annual_savings.add_element(annual_saving)
+
             annual_saving = REXML::Element.new("#{@ns}:AnnualSavingsByFuel")
             energy_res = REXML::Element.new("#{@ns}:EnergyResource")
             energy_res.text = 'Natural gas'
@@ -642,8 +642,8 @@ module BuildingSync
             savings_native.text = natural_gas_savings.to_s
             annual_saving.add_element(savings_native)
             annual_savings.add_element(annual_saving)
-            package_of_measures.add_element(annual_savings)
 
+            package_of_measures.add_element(annual_savings)
             res_uses = REXML::Element.new("#{@ns}:ResourceUses")
             scenario_name_ns = scenario_name.gsub(' ', '_').gsub(/[^0-9a-z_]/i, '')
             # ELECTRICITY
@@ -671,6 +671,7 @@ module BuildingSync
             res_use.add_element(peak_native_units)
             res_use.add_element(peak_consistent_units)
             res_uses.add_element(res_use)
+
             # NATURAL GAS
             res_use = REXML::Element.new("#{@ns}:ResourceUse")
             res_use.add_attribute('ID', scenario_name_ns + '_NaturalGas')
@@ -689,9 +690,9 @@ module BuildingSync
             res_uses.add_element(res_use)
             scenario_type = scenario.elements["#{@ns}:ScenarioType"]
             scenario.insert_after(scenario_type, res_uses)
-
             # already added ResourceUses above. Needed as ResourceUseID reference
             timeseriesdata = REXML::Element.new("#{@ns}:TimeSeriesData")
+
             # Electricity
             # looking for: "electricity_ip_jan" through "electricity_ip_dec"
             # convert from kWh to kBtu
@@ -734,6 +735,7 @@ module BuildingSync
               timeseries.add_element(resource_id)
               timeseriesdata.add_element(timeseries)
             end
+
             # Natural Gas
             # looking for: "natural_gas_ip_jan" through "natural_gas_ip_dec"
             # convert from MMBtu to kBtu
@@ -777,6 +779,7 @@ module BuildingSync
               timeseriesdata.add_element(timeseries)
             end
             scenario.insert_after(res_uses, timeseriesdata)
+
             # all the totals
             all_res_totals = REXML::Element.new("#{@ns}:AllResourceTotals")
             all_res_total = REXML::Element.new("#{@ns}:AllResourceTotal")
@@ -797,6 +800,7 @@ module BuildingSync
             all_res_total.add_element(source_energy_use_intensity)
             all_res_totals.add_element(all_res_total)
             scenario.insert_after(timeseriesdata, all_res_totals)
+
             # no longer using user defined fields
             scenario.elements.delete("#{@ns}:UserDefinedFields")
           end
