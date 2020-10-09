@@ -494,24 +494,23 @@ module BuildingSync
       # preserve existing user defined fields if they exist
       # KAF: there should no longer be any UDFs
       user_defined_fields = scenario.elements["#{@ns}:UserDefinedFields"]
-      if user_defined_fields.nil?
-        user_defined_fields = REXML::Element.new("#{@ns}:UserDefinedFields")
-      end
+      if !user_defined_fields.nil?
+        # delete previous results (if using an old schema)
+        to_remove = []
+        user_defined_fields.elements.each("#{@ns}:UserDefinedField") do |user_defined_field|
+          name_element = user_defined_field.elements["#{@ns}:FieldName"]
+          if name_element.nil?
+            to_remove << user_defined_field
+          elsif /OpenStudio/.match(name_element.text)
+            to_remove << user_defined_field
+          end
+        end
 
-      # delete previous results (if using an old schema)
-      to_remove = []
-      user_defined_fields.elements.each("#{@ns}:UserDefinedField") do |user_defined_field|
-        name_element = user_defined_field.elements["#{@ns}:FieldName"]
-        if name_element.nil?
-          to_remove << user_defined_field
-        elsif /OpenStudio/.match(name_element.text)
-          to_remove << user_defined_field
+        to_remove.each do |element|
+          user_defined_fields.elements.delete(element)
         end
       end
-
-      to_remove.each do |element|
-        user_defined_fields.elements.delete(element)
-      end
+      return package_of_measures
     end
 
     def add_calc_method_element(result)
@@ -782,7 +781,13 @@ module BuildingSync
       return result, baseline
     end
 
+    # adding results to a specific scenario
     def add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, result, monthly_results, year_val)
+      # first we need to check if we have any result variables
+      if !variables || variables.length == 0
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.add_results_to_scenario', "result variables are null, cannot add results from scenario: #{scenario_name}to BldgSync file.")
+        return
+      end
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
       package_of_measures.add_element(add_calc_method_element(result))

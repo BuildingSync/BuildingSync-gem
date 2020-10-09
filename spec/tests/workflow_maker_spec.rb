@@ -48,14 +48,18 @@ RSpec.describe 'WorkFlow Maker' do
     result = {}
     result[:completed_status] = 'Success'
 
-    workflow_maker.get_scenario_elements.each do |scenario|
+    variables = {}
+    variables['total_site_energy_savings_mmbtu'] = '100'
+    scenarios = workflow_maker.get_scenario_elements
+    scenarios.each do |scenario|
       puts "scenario: #{scenario}"
-      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+      scenario_name = scenario.elements["#{ns}:ScenarioName"].text
       puts "scenario_name: #{scenario_name}"
       package_of_measures = workflow_maker.delete_previous_results(scenario)
       puts "package_of_measures: #{package_of_measures}"
       if package_of_measures.length > 0
-        workflow_maker.add_results_to_scenario(package_of_measures, scenario, nil, nil, result, nil, nil)
+        workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, {}, result, nil, nil)
+        workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, result, nil, nil)
       end
     end
   end
