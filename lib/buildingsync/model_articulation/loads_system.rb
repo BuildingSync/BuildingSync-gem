@@ -36,6 +36,7 @@
 # *******************************************************************************
 require_relative 'building_system'
 require_relative 'parametric_schedule_helper'
+require 'openstudio/extension/core/os_lib_schedules.rb'
 
 module BuildingSync
   class LoadsSystem < BuildingSystem
