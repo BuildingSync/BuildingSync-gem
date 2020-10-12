@@ -534,47 +534,67 @@ module BuildingSync
       return calc_method
     end
 
+    # add results to xml file and calculate annual savings
     def calculate_annual_savings_value(package_of_measures, variables)
 
-      annual_savings_site_energy = REXML::Element.new("#{@ns}:AnnualSavingsSiteEnergy")
-      annual_savings_source_energy = REXML::Element.new("#{@ns}:AnnualSavingsSourceEnergy")
-      annual_savings_energy_cost = REXML::Element.new("#{@ns}:AnnualSavingsCost")
+      if(variables.key?('total_site_energy_savings_mmbtu'))
+        annual_savings_site_energy = REXML::Element.new("#{@ns}:AnnualSavingsSiteEnergy")
+        annual_savings_site_energy.text = variables['total_site_energy_savings_mmbtu']
+        package_of_measures.add_element(annual_savings_site_energy)
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'total site energy savings' variable to the BldgSync file since it is missing.")
+      end
 
-      annual_savings_site_energy.text = variables['total_site_energy_savings_mmbtu']
-      annual_savings_source_energy.text = variables['total_source_energy_savings_mmbtu']
-      annual_savings_energy_cost.text = variables['total_energy_cost_savings'].to_i # BuildingSync wants an integer, might be a BuildingSync bug
+      if(variables.key?('total_source_energy_savings_mmbtu'))
+        annual_savings_source_energy = REXML::Element.new("#{@ns}:AnnualSavingsSourceEnergy")
+        annual_savings_source_energy.text = variables['total_source_energy_savings_mmbtu']
+        package_of_measures.add_element(annual_savings_source_energy)
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'total source energy savings' variable to the BldgSync file since it is missing.")
+      end
 
-      package_of_measures.add_element(annual_savings_site_energy)
-      package_of_measures.add_element(annual_savings_source_energy)
-      package_of_measures.add_element(annual_savings_energy_cost)
+      if(variables.key?('total_energy_cost_savings'))
+        annual_savings_energy_cost = REXML::Element.new("#{@ns}:AnnualSavingsCost")
+        annual_savings_energy_cost.text = variables['total_energy_cost_savings'].to_i # BuildingSync wants an integer, might be a BuildingSync bug
+        package_of_measures.add_element(annual_savings_energy_cost)
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'total energy cost savings' variable to the BldgSync file since it is missing.")
+      end
 
       # KAF: adding annual savings by fuel
-      electricity_savings = variables['baseline_fuel_electricity_kbtu'] - variables['fuel_electricity_kbtu']
-      natural_gas_savings = variables['baseline_fuel_natural_gas_kbtu'] - variables['fuel_natural_gas_kbtu']
       annual_savings = REXML::Element.new("#{@ns}:AnnualSavingsByFuels")
-      annual_saving = REXML::Element.new("#{@ns}:AnnualSavingsByFuel")
-      energy_res = REXML::Element.new("#{@ns}:EnergyResource")
-      energy_res.text = 'Electricity'
-      annual_saving.add_element(energy_res)
-      resource_units = REXML::Element.new("#{@ns}:ResourceUnits")
-      resource_units.text = 'kBtu'
-      annual_saving.add_element(resource_units)
-      savings_native = REXML::Element.new("#{@ns}:AnnualSavingsNativeUnits") # this is in kBtu
-      savings_native.text = electricity_savings.to_s
-      annual_saving.add_element(savings_native)
-      annual_savings.add_element(annual_saving)
-
-      annual_saving = REXML::Element.new("#{@ns}:AnnualSavingsByFuel")
-      energy_res = REXML::Element.new("#{@ns}:EnergyResource")
-      energy_res.text = 'Natural gas'
-      annual_saving.add_element(energy_res)
-      resource_units = REXML::Element.new("#{@ns}:ResourceUnits")
-      resource_units.text = 'kBtu'
-      annual_saving.add_element(resource_units)
-      savings_native = REXML::Element.new("#{@ns}:AnnualSavingsNativeUnits") # this is in kBtu
-      savings_native.text = natural_gas_savings.to_s
-      annual_saving.add_element(savings_native)
-      annual_savings.add_element(annual_saving)
+      if(variables.key?('baseline_fuel_electricity_kbtu') && variables.key?('fuel_electricity_kbtu'))
+        electricity_savings = variables['baseline_fuel_electricity_kbtu'] - variables['fuel_electricity_kbtu']
+        annual_saving = REXML::Element.new("#{@ns}:AnnualSavingsByFuel")
+        energy_res = REXML::Element.new("#{@ns}:EnergyResource")
+        energy_res.text = 'Electricity'
+        annual_saving.add_element(energy_res)
+        resource_units = REXML::Element.new("#{@ns}:ResourceUnits")
+        resource_units.text = 'kBtu'
+        annual_saving.add_element(resource_units)
+        savings_native = REXML::Element.new("#{@ns}:AnnualSavingsNativeUnits") # this is in kBtu
+        savings_native.text = electricity_savings.to_s
+        annual_saving.add_element(savings_native)
+        annual_savings.add_element(annual_saving)
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'baseline fuel electricity' and 'fuel electricity kbtu' variable to the BldgSync file since it is missing.")
+      end
+      if(variables.key?('baseline_fuel_natural_gas_kbtu') && variables.key?('fuel_natural_gas_kbtu'))
+        natural_gas_savings = variables['baseline_fuel_natural_gas_kbtu'] - variables['fuel_natural_gas_kbtu']
+        annual_saving = REXML::Element.new("#{@ns}:AnnualSavingsByFuel")
+        energy_res = REXML::Element.new("#{@ns}:EnergyResource")
+        energy_res.text = 'Natural gas'
+        annual_saving.add_element(energy_res)
+        resource_units = REXML::Element.new("#{@ns}:ResourceUnits")
+        resource_units.text = 'kBtu'
+        annual_saving.add_element(resource_units)
+        savings_native = REXML::Element.new("#{@ns}:AnnualSavingsNativeUnits") # this is in kBtu
+        savings_native.text = natural_gas_savings.to_s
+        annual_saving.add_element(savings_native)
+        annual_savings.add_element(annual_saving)
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'baseline fuel natural gas' and 'fuel natural gas' variable to the BldgSync file since it is missing.")
+      end
       return annual_savings
     end
 
@@ -584,90 +604,99 @@ module BuildingSync
       # ELECTRICITY
       res_use = REXML::Element.new("#{@ns}:ResourceUse")
       res_use.add_attribute('ID', scenario_name_ns + '_Electricity')
-      energy_res = REXML::Element.new("#{@ns}:EnergyResource")
-      energy_res.text = 'Electricity'
-      res_units = REXML::Element.new("#{@ns}:ResourceUnits")
-      res_units.text = 'kBtu'
-      native_units = REXML::Element.new("#{@ns}:AnnualFuelUseNativeUnits")
-      native_units.text = variables['fuel_electricity_kbtu'].to_s
-      consistent_units = REXML::Element.new("#{@ns}:AnnualFuelUseConsistentUnits")
-      consistent_units.text = (variables['fuel_electricity_kbtu'] / 1000.0).to_s # convert to MMBtu
-      res_use.add_element(energy_res)
-      res_use.add_element(res_units)
-      res_use.add_element(native_units)
-      res_use.add_element(consistent_units)
-      peak_units = REXML::Element.new("#{@ns}:PeakResourceUnits")
-      peak_units.text = 'kW'
-      peak_native_units = REXML::Element.new("#{@ns}:AnnualPeakNativeUnits")
-      peak_native_units.text = variables['annual_peak_electric_demand_kw'].to_s
-      peak_consistent_units = REXML::Element.new("#{@ns}:AnnualPeakConsistentUnits")
-      peak_consistent_units.text = variables['annual_peak_electric_demand_kw'].to_s
-      res_use.add_element(peak_units)
-      res_use.add_element(peak_native_units)
-      res_use.add_element(peak_consistent_units)
-      res_uses.add_element(res_use)
-
+      if variables.key?('fuel_electricity_kbtu')
+        energy_res = REXML::Element.new("#{@ns}:EnergyResource")
+        energy_res.text = 'Electricity'
+        res_units = REXML::Element.new("#{@ns}:ResourceUnits")
+        res_units.text = 'kBtu'
+        native_units = REXML::Element.new("#{@ns}:AnnualFuelUseNativeUnits")
+        native_units.text = variables['fuel_electricity_kbtu'].to_s
+        consistent_units = REXML::Element.new("#{@ns}:AnnualFuelUseConsistentUnits")
+        consistent_units.text = (variables['fuel_electricity_kbtu'] / 1000.0).to_s # convert to MMBtu
+        res_use.add_element(energy_res)
+        res_use.add_element(res_units)
+        res_use.add_element(native_units)
+        res_use.add_element(consistent_units)
+        if variables.key?('annual_peak_electric_demand_kw')
+          peak_units = REXML::Element.new("#{@ns}:PeakResourceUnits")
+          peak_units.text = 'kW'
+          peak_native_units = REXML::Element.new("#{@ns}:AnnualPeakNativeUnits")
+          peak_native_units.text = variables['annual_peak_electric_demand_kw'].to_s
+          peak_consistent_units = REXML::Element.new("#{@ns}:AnnualPeakConsistentUnits")
+          peak_consistent_units.text = variables['annual_peak_electric_demand_kw'].to_s
+          res_use.add_element(peak_units)
+          res_use.add_element(peak_native_units)
+          res_use.add_element(peak_consistent_units)
+        end
+        res_uses.add_element(res_use)
+      end
       # NATURAL GAS
-      res_use = REXML::Element.new("#{@ns}:ResourceUse")
-      res_use.add_attribute('ID', scenario_name_ns + '_NaturalGas')
-      energy_res = REXML::Element.new("#{@ns}:EnergyResource")
-      energy_res.text = 'Natural gas'
-      res_units = REXML::Element.new("#{@ns}:ResourceUnits")
-      res_units.text = 'kBtu'
-      native_units = REXML::Element.new("#{@ns}:AnnualFuelUseNativeUnits")
-      native_units.text = variables['fuel_natural_gas_kbtu'].to_s
-      consistent_units = REXML::Element.new("#{@ns}:AnnualFuelUseConsistentUnits")
-      consistent_units.text = (variables['fuel_natural_gas_kbtu'] / 1000.0).to_s # in MMBtu
-      res_use.add_element(energy_res)
-      res_use.add_element(res_units)
-      res_use.add_element(native_units)
-      res_use.add_element(consistent_units)
-      res_uses.add_element(res_use)
+      if variables.key?('fuel_natural_gas_kbtu')
+        res_use = REXML::Element.new("#{@ns}:ResourceUse")
+        res_use.add_attribute('ID', scenario_name_ns + '_NaturalGas')
+        energy_res = REXML::Element.new("#{@ns}:EnergyResource")
+        energy_res.text = 'Natural gas'
+        res_units = REXML::Element.new("#{@ns}:ResourceUnits")
+        res_units.text = 'kBtu'
+        native_units = REXML::Element.new("#{@ns}:AnnualFuelUseNativeUnits")
+        native_units.text = variables['fuel_natural_gas_kbtu'].to_s
+        consistent_units = REXML::Element.new("#{@ns}:AnnualFuelUseConsistentUnits")
+        consistent_units.text = (variables['fuel_natural_gas_kbtu'] / 1000.0).to_s # in MMBtu
+        res_use.add_element(energy_res)
+        res_use.add_element(res_units)
+        res_use.add_element(native_units)
+        res_use.add_element(consistent_units)
+        res_uses.add_element(res_use)
+      end
       return res_uses
     end
 
     def get_timeseries_element(monthly_results, year_val, scenario_name, timeseriesdata, key_value)
-      month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
-      scenario_name_ns = scenario_name.gsub(' ', '_').gsub(/[^0-9a-z_]/i, '')
+      if !monthly_results.nil?
+        month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
+        scenario_name_ns = scenario_name.gsub(' ', '_').gsub(/[^0-9a-z_]/i, '')
 
-      (1..12).each do |month|
-        timeseries = REXML::Element.new("#{@ns}:TimeSeries")
-        reading_type = REXML::Element.new("#{@ns}:ReadingType")
-        reading_type.text = 'Total'
-        timeseries.add_element(reading_type)
-        ts_quantity = REXML::Element.new("#{@ns}:TimeSeriesReadingQuantity")
-        ts_quantity.text = 'Energy'
-        timeseries.add_element(ts_quantity)
-        start_time = REXML::Element.new("#{@ns}:StartTimeStamp")
-        if month < 10
-          start_time.text = year_val.to_s + '-0' + month.to_s + '-01T00:00:00'
-        else
-          start_time.text = year_val.to_s + '-' + month.to_s + '-01T00:00:00'
+        (1..12).each do |month|
+          timeseries = REXML::Element.new("#{@ns}:TimeSeries")
+          reading_type = REXML::Element.new("#{@ns}:ReadingType")
+          reading_type.text = 'Total'
+          timeseries.add_element(reading_type)
+          ts_quantity = REXML::Element.new("#{@ns}:TimeSeriesReadingQuantity")
+          ts_quantity.text = 'Energy'
+          timeseries.add_element(ts_quantity)
+          start_time = REXML::Element.new("#{@ns}:StartTimeStamp")
+          if month < 10
+            start_time.text = year_val.to_s + '-0' + month.to_s + '-01T00:00:00'
+          else
+            start_time.text = year_val.to_s + '-' + month.to_s + '-01T00:00:00'
+          end
+          timeseries.add_element(start_time)
+          end_time = REXML::Element.new("#{@ns}:EndTimeStamp")
+          if month < 9
+            end_time.text = year_val.to_s + '-0' + (month + 1).to_s + '-01T00:00:00'
+          elsif month < 12
+            end_time.text = year_val.to_s + '-' + (month + 1).to_s + '-01T00:00:00'
+          else
+            end_time.text = year_val.to_s + '-01-01T00:00:00'
+          end
+          timeseries.add_element(end_time)
+          interval_frequency = REXML::Element.new("#{@ns}:IntervalFrequency")
+          interval_frequency.text = 'Month'
+          timeseries.add_element(interval_frequency)
+          interval_reading = REXML::Element.new("#{@ns}:IntervalReading")
+          the_key = key_value.downcase + "_ip_#{month_lookup[month]}"
+          # puts "saving value 123: #{monthly_results[scenario_name][the_key]}"
+          if !monthly_results[scenario_name][the_key.to_sym].nil?
+            interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 3.4121416331 # kWh to kBtu
+          end
+          timeseries.add_element(interval_reading)
+          resource_id = REXML::Element.new("#{@ns}:ResourceUseID")
+          resource_id.add_attribute('IDref', scenario_name_ns + '_' + key_value)
+          timeseries.add_element(resource_id)
+          timeseriesdata.add_element(timeseries)
         end
-        timeseries.add_element(start_time)
-        end_time = REXML::Element.new("#{@ns}:EndTimeStamp")
-        if month < 9
-          end_time.text = year_val.to_s + '-0' + (month + 1).to_s + '-01T00:00:00'
-        elsif month < 12
-          end_time.text = year_val.to_s + '-' + (month + 1).to_s + '-01T00:00:00'
-        else
-          end_time.text = year_val.to_s + '-01-01T00:00:00'
-        end
-        timeseries.add_element(end_time)
-        interval_frequency = REXML::Element.new("#{@ns}:IntervalFrequency")
-        interval_frequency.text = 'Month'
-        timeseries.add_element(interval_frequency)
-        interval_reading = REXML::Element.new("#{@ns}:IntervalReading")
-        the_key = key_value.downcase + "_ip_#{month_lookup[month]}"
-        # puts "saving value 123: #{monthly_results[scenario_name][the_key]}"
-        if !monthly_results[scenario_name][the_key.to_sym].nil?
-          interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 3.4121416331 # kWh to kBtu
-        end
-        timeseries.add_element(interval_reading)
-        resource_id = REXML::Element.new("#{@ns}:ResourceUseID")
-        resource_id.add_attribute('IDref', scenario_name_ns + '_' + key_value)
-        timeseries.add_element(resource_id)
-        timeseriesdata.add_element(timeseries)
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.get_timeseries_element', "Cannot add monthly report values to the BldgSync file since it is missing.")
       end
     end
 
@@ -786,7 +815,7 @@ module BuildingSync
       # first we need to check if we have any result variables
       if !variables || variables.length == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.add_results_to_scenario', "result variables are null, cannot add results from scenario: #{scenario_name}to BldgSync file.")
-        return
+        return false
       end
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
@@ -807,6 +836,7 @@ module BuildingSync
 
       # no longer using user defined fields
       scenario.elements.delete("#{@ns}:UserDefinedFields")
+      return true
     end
 
     def gather_results(dir, year_val, baseline_only = false)
@@ -880,6 +910,52 @@ module BuildingSync
         end
       end
       return nil
+    end
+
+    def extract_results(scenario, package_of_measures)
+      variables = {}
+
+      if(package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"])
+        variables['total_site_energy_savings_mmbtu'] = package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"].text
+      end
+      if(package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"])
+        variables['total_source_energy_savings_mmbtu'] = package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"].text
+      end
+      if(package_of_measures.elements["#{@ns}:AnnualSavingsCost"])
+        variables['total_energy_cost_savings'] = package_of_measures.elements["#{@ns}:AnnualSavingsCost"].text
+      end
+
+      scenario.elements["#{@ns}:ResourceUses"].each do |resource_use|
+        if resource_use.elements["#{@ns}:EnergyResource"].text == 'Electricity'
+          variables['fuel_electricity_kbtu'] = resource_use.elements["#{@ns}:AnnualFuelUseNativeUnits"].text
+          if resource_use.elements["#{@ns}:PeakResourceUnits"].text == 'kW'
+            variables['annual_peak_electric_demand_kw'] = resource_use.elements["#{@ns}:AnnualPeakNativeUnits"].text
+          end
+        elsif resource_use.elements["#{@ns}:EnergyResource"].text == 'Natural gas'
+          variables['fuel_natural_gas_kbtu'] = resource_use.elements["#{@ns}:AnnualFuelUseNativeUnits"].text
+        end
+      end
+
+      package_of_measures.elements["#{@ns}:AnnualSavingsByFuels"].each do |annual_savings|
+        if annual_savings.elements["#{@ns}:EnergyResource"].text == 'Electricity'
+          variables['baseline_fuel_electricity_kbtu'] = annual_savings.elements["#{@ns}:AnnualSavingsNativeUnits"].text.to_i + variables['fuel_electricity_kbtu'].to_i
+        elsif annual_savings.elements["#{@ns}:EnergyResource"].text == 'Natural gas'
+          variables['baseline_fuel_natural_gas_kbtu'] = annual_savings.elements["#{@ns}:AnnualSavingsNativeUnits"].text.to_i + variables['fuel_natural_gas_kbtu'].to_i
+        end
+      end
+
+      scenario.elements["#{@ns}:AllResourceTotals"].each do |all_resource_total|
+        if all_resource_total.elements["#{@ns}:SiteEnergyUse"]
+          variables['total_site_energy_kbtu'] = all_resource_total.elements["#{@ns}:SiteEnergyUse"].text
+        elsif all_resource_total.elements["#{@ns}:SiteEnergyUseIntensity"]
+          variables['total_site_eui_kbtu_ft2'] = all_resource_total.elements["#{@ns}:SiteEnergyUseIntensity"].text
+        elsif all_resource_total.elements["#{@ns}:SourceEnergyUse"]
+          variables['total_source_energy_kbtu'] = all_resource_total.elements["#{@ns}:SourceEnergyUse"].text
+        elsif all_resource_total.elements["#{@ns}:SourceEnergyUseIntensity"]
+          variables['total_source_eui_kbtu_ft2'] = all_resource_total.elements["#{@ns}:SourceEnergyUseIntensity"].text
+        end
+      end
+      return variables
     end
   end
 end

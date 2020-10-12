@@ -49,7 +49,15 @@ RSpec.describe 'WorkFlow Maker' do
     result[:completed_status] = 'Success'
 
     variables = {}
-    variables['total_site_energy_savings_mmbtu'] = '100'
+    variables['total_site_energy_savings_mmbtu'] = 100
+    variables['total_source_energy_savings_mmbtu'] = 200
+    variables['total_energy_cost_savings'] = 300
+    variables['baseline_fuel_electricity_kbtu'] = 400
+    variables['fuel_electricity_kbtu'] = 500
+    variables['baseline_fuel_natural_gas_kbtu'] = 600
+    variables['fuel_natural_gas_kbtu'] = 700
+    variables['annual_peak_electric_demand_kw'] = 800
+
     scenarios = workflow_maker.get_scenario_elements
     scenarios.each do |scenario|
       puts "scenario: #{scenario}"
@@ -58,9 +66,27 @@ RSpec.describe 'WorkFlow Maker' do
       package_of_measures = workflow_maker.delete_previous_results(scenario)
       puts "package_of_measures: #{package_of_measures}"
       if package_of_measures.length > 0
-        workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, {}, result, nil, nil)
-        workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, result, nil, nil)
+        expect(workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, {}, result, nil, nil)).to be false
+        expect(workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, result, nil, nil)).to be true
       end
+      new_variables = workflow_maker.extract_results(scenario, package_of_measures)
+      expect(hash_diff(variables, new_variables)).to be true
     end
+  end
+
+  # function to compare two hashes iterating over the key and comparing the values
+  def hash_diff(left_hash, right_hash)
+    different = false
+    (left_hash.keys + right_hash.keys).uniq.inject({}) do |memo, key|
+      left = left_hash[key]
+      right = right_hash[key]
+
+      next memo if left.to_i == right.to_i
+
+      # we get here when we find a difference
+      puts "The two hashes are different for key: #{key}: left: #{left} right: #{right}"
+      different = true
+    end
+    return !different
   end
 end
