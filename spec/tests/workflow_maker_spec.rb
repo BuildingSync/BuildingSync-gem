@@ -37,7 +37,7 @@
 require_relative './../spec_helper'
 
 RSpec.describe 'WorkFlow Maker' do
-  it 'should save results to xml file' do
+  it 'should save annual results to xml file and verify them' do
     file_name = 'building_151.xml'
     xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
@@ -48,30 +48,65 @@ RSpec.describe 'WorkFlow Maker' do
     result = {}
     result[:completed_status] = 'Success'
 
-    variables = {}
-    variables['total_site_energy_savings_mmbtu'] = 100
-    variables['total_source_energy_savings_mmbtu'] = 200
-    variables['total_energy_cost_savings'] = 300
-    variables['baseline_fuel_electricity_kbtu'] = 400
-    variables['fuel_electricity_kbtu'] = 500
-    variables['baseline_fuel_natural_gas_kbtu'] = 600
-    variables['fuel_natural_gas_kbtu'] = 700
-    variables['annual_peak_electric_demand_kw'] = 800
+    annual_results = {}
+    annual_results['total_site_energy_savings_mmbtu'] = 100
+    annual_results['total_source_energy_savings_mmbtu'] = 200
+    annual_results['total_energy_cost_savings'] = 300
+    annual_results['baseline_fuel_electricity_kbtu'] = 400
+    annual_results['fuel_electricity_kbtu'] = 500
+    annual_results['baseline_fuel_natural_gas_kbtu'] = 600
+    annual_results['fuel_natural_gas_kbtu'] = 700
+    annual_results['annual_peak_electric_demand_kw'] = 800
 
     scenarios = workflow_maker.get_scenario_elements
     scenarios.each do |scenario|
-      puts "scenario: #{scenario}"
       scenario_name = scenario.elements["#{ns}:ScenarioName"].text
       puts "scenario_name: #{scenario_name}"
       package_of_measures = workflow_maker.delete_previous_results(scenario)
       puts "package_of_measures: #{package_of_measures}"
       if package_of_measures.length > 0
         expect(workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, {}, result, nil, nil)).to be false
-        expect(workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, result, nil, nil)).to be true
+        expect(workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, nil, nil)).to be true
       end
-      new_variables = workflow_maker.extract_results(scenario, package_of_measures)
-      expect(hash_diff(variables, new_variables)).to be true
+      new_variables = workflow_maker.extract_annual_results(scenario, package_of_measures)
+      expect(hash_diff(annual_results, new_variables)).to be true
     end
+    xml_path_output = xml_path.sub! '/files/', '/output/'
+    workflow_maker.save_xml(xml_path_output)
+
+    doc_output = BuildingSync::Helper.read_xml_file_document(xml_path_output)
+    workflow_maker_output = BuildingSync::WorkflowMaker.new(doc_output, ns)
+
+    scenarios = workflow_maker_output.get_scenario_elements
+    scenarios.each do |scenario|
+      scenario_name = scenario.elements["#{ns}:ScenarioName"].text
+      puts "scenario_name: #{scenario_name}"
+      package_of_measures = workflow_maker_output.get_package_of_measures(scenario)
+      puts "package_of_measures: #{package_of_measures}"
+      new_annual_results = workflow_maker_output.extract_annual_results(scenario, package_of_measures)
+      expect(hash_diff(annual_results, new_annual_results)).to be true
+    end
+  end
+
+  it 'should process results correctly' do
+    file_name = 'building_151.xml'
+    xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    ns = 'auc'
+    doc = BuildingSync::Helper.read_xml_file_document(xml_path)
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+
+    result = {}
+    result[:completed_status] = 'Success'
+    calc_method = workflow_maker.add_calc_method_element(result)
+    expect(calc_method.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to be == 'Finished'
+    result[:completed_status] = 'Failed'
+    calc_method = workflow_maker.add_calc_method_element(result)
+    expect(calc_method.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to eq 'Failed'
+    result[:completed_status] = 'XXX'
+    calc_method = workflow_maker.add_calc_method_element(result)
+    expect(calc_method.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to eq 'Failed'
   end
 
   # function to compare two hashes iterating over the key and comparing the values

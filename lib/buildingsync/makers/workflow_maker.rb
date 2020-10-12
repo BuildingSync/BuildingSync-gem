@@ -486,8 +486,12 @@ module BuildingSync
       scenario.elements.delete("#{@ns}AnnualSavingsByFuels")
     end
 
+    def get_package_of_measures(scenario)
+      return scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
+    end
+
     def delete_previous_results(scenario)
-      package_of_measures = scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
+      package_of_measures = get_package_of_measures(scenario)
       # delete previous results
       delete_resource_element(scenario, package_of_measures)
 
@@ -737,7 +741,7 @@ module BuildingSync
       return all_res_totals
     end
 
-    def gather_result_calculation(result, scenario_name, baseline)
+    def gather_annual_results(result, scenario_name, baseline)
       variables = {}
       # Check out.osw "openstudio_results" for output variables
       variables['total_site_energy_kbtu'] = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
@@ -811,18 +815,18 @@ module BuildingSync
     end
 
     # adding results to a specific scenario
-    def add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, result, monthly_results, year_val)
+    def add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, monthly_results, year_val)
       # first we need to check if we have any result variables
-      if !variables || variables.length == 0
+      if !annual_results || annual_results.length == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.add_results_to_scenario', "result variables are null, cannot add results from scenario: #{scenario_name}to BldgSync file.")
         return false
       end
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
       package_of_measures.add_element(add_calc_method_element(result))
-      package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, variables))
+      package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, annual_results))
 
-      res_uses = get_resource_uses_element(scenario_name, variables)
+      res_uses = get_resource_uses_element(scenario_name, annual_results)
       scenario_type = scenario.elements["#{@ns}:ScenarioType"]
       scenario.insert_after(scenario_type, res_uses)
 
@@ -831,7 +835,7 @@ module BuildingSync
       scenario.insert_after(res_uses, timeseries_data)
 
       # all the totals
-      all_res_totals = get_all_resource_totals_element(variables)
+      all_res_totals = get_all_resource_totals_element(annual_results)
       scenario.insert_after(timeseries_data, all_res_totals)
 
       # no longer using user defined fields
@@ -860,9 +864,9 @@ module BuildingSync
             results_counter += 1
             package_of_measures = delete_previous_results(scenario)
             result, baseline = get_result_for_scenario(results, scenario)
-            variables = gather_result_calculation(result, scenario_name, baseline)
+            annual_results = gather_annual_results(result, scenario_name, baseline)
 
-            add_results_to_scenario(package_of_measures, scenario, scenario_name, variables, result, monthly_results, year_val)
+            add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, monthly_results, year_val)
           end
         end
 
@@ -897,22 +901,7 @@ module BuildingSync
       return result[0], result[1]
     end
 
-    def get_measure_result(result, measure_dir_name, result_name)
-      result[:steps].each do |step|
-        if step[:measure_dir_name] == measure_dir_name
-          if step[:result] && step[:result][:step_values]
-            step[:result][:step_values].each do |step_value|
-              if step_value[:name] == result_name
-                return step_value[:value]
-              end
-            end
-          end
-        end
-      end
-      return nil
-    end
-
-    def extract_results(scenario, package_of_measures)
+    def extract_annual_results(scenario, package_of_measures)
       variables = {}
 
       if(package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"])
