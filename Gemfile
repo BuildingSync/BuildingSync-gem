@@ -34,5 +34,5 @@ end
 if allow_local && File.exist?('../openstudio-ee-gem')
   gem 'openstudio-ee', path: '../openstudio-ee-gem'
 else
-  gem 'openstudio-ee', github: 'NREL/openstudio-ee-gem', branch: 'bldgsync_measures'
+  gem 'openstudio-ee', github: 'NREL/openstudio-ee-gem', branch: 'bldgsync_measures_2'
 end
