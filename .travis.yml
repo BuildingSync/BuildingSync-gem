@@ -36,5 +36,15 @@ script:
 #  - bundle exec rspec spec/tests/model_articulation_test/site_spec.rb
 #  - bundle exec rspec spec/tests/translator_baseline_generation_spec.rb
 #  - bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
-
-
+after_failure:
+  - echo "Job failed... maybe these logs will help?"
+  - free -tm
+  - ls -alt /home/travis/build/BuildingSync/BuildingSync-gem
+  - echo "============================================ Gemfile.lock ========================================="
+  - cat /home/travis/build/BuildingSync/BuildingSync-gem/Gemfile.lock
+  - echo "============================================ osw logs ========================================="
+  - |
+    find /home/travis/build/BuildingSync/BuildingSync-gem/spec/output -type f -name 'in.osw.log' -print | while read filename; do
+      echo "$filename"
+      cat "$filename"
+    done
