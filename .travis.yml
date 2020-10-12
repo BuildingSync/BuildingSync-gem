@@ -1,5 +1,5 @@
 ---
-sudo: false
+sudo: true
 dist: bionic
 language: ruby
 rvm:
@@ -18,6 +18,7 @@ before_script:
   - curl -LO https://github.com/NREL/OpenStudio/releases/download/v3.0.1/OpenStudio-3.0.1+09b7c8a554-Linux.deb
   - sudo apt install ./OpenStudio-3.0.1+09b7c8a554-Linux.deb
 script:
+  - bundle -v
   - bundle exec rspec ./spec/tests/translator_spec.rb:62
 #  - bundle exec rspec spec/tests/selection_tool_spec.rb  // selection tool is not working with ASHRAE level 1.5 yet
 #  - bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb  // fails sometimes due to connection issues, so we exclude it here

@@ -88,16 +88,15 @@ RSpec.configure do |config|
     osw_path = osm_baseline_path.gsub('.osm', '.osw')
     workflow.saveAs(File.absolute_path(osw_path.to_s))
 
-    cli_path = OpenStudio.getOpenStudioCLI
-    cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
-    # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_path}\""
-    puts cmd
 
-    # Run the sizing run
-    OpenstudioStandards.run_command(cmd)
-
-    expect(File.exist?(osm_baseline_path.gsub('in.osm', 'run/eplusout.sql'))).to be true
-   end
+    extension = OpenStudio::Extension::Extension.new
+    runner_options = { run_simulations: true }
+    runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
+    result = runner.run_osws(osw_files, 4)
+    puts result
+      # todo: test all the osw_files for results
+      # expect(File.exist?(osw_file.gsub('in.osw', 'eplusout.sql'))).to be true
+  end
 
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
