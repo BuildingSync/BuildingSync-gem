@@ -691,7 +691,7 @@ module BuildingSync
           the_key = key_value.downcase + "_ip_#{month_lookup[month]}"
           # puts "saving value 123: #{monthly_results[scenario_name][the_key]}"
           if !monthly_results[scenario_name][the_key.to_sym].nil?
-            interval_reading.text = monthly_results[scenario_name][the_key.to_sym] * 3.4121416331 # kWh to kBtu
+            interval_reading.text = monthly_results[scenario_name][the_key.to_sym].to_i * 3.4121416331 # kWh to kBtu
           end
           timeseries.add_element(interval_reading)
           resource_id = REXML::Element.new("#{@ns}:ResourceUseID")

@@ -109,6 +109,51 @@ RSpec.describe 'WorkFlow Maker' do
     expect(calc_method.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to eq 'Failed'
   end
 
+  it 'should process monthly data correctly' do
+    file_name = 'building_151.xml'
+    xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    ns = 'auc'
+    doc = BuildingSync::Helper.read_xml_file_document(xml_path)
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+
+    month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
+
+    scenario_name = 'baseline'
+    monthly_results = {}
+    electricity = 'Electricity'
+    natural_gas = 'NaturalGas'
+
+    values_e = []
+    values_ng = []
+    monthly = {}
+    (1..12).each do |month|
+      values_e << 10 * month
+      values_ng << 10 * month
+      electricity_key = electricity.downcase + "_ip_#{month_lookup[month]}"
+      monthly[electricity_key.to_sym] = (10*month).to_s
+      natural_gas_key = natural_gas.downcase + "_ip_#{month_lookup[month]}"
+      monthly[natural_gas_key.to_sym] = (10*month).to_s
+    end
+    monthly_results[scenario_name] = monthly
+
+    time_series_data = workflow_maker.get_timeseries_data_element(monthly_results, 2020, scenario_name)
+
+    time_series_data.each do |time_series|
+      reading = time_series.elements["#{ns}:IntervalReading"].text.to_f
+      if time_series.elements["#{ns}:ResourceUseID"].attributes['IDref'].include? electricity
+        shift = values_e.shift * 3.4121416331
+        expect(reading).to eq (shift)
+      elsif time_series.elements["#{ns}:ResourceUseID"].attributes['IDref'].include? natural_gas
+        shift = values_ng.shift * 3.4121416331
+        expect(reading).to eq (shift)
+      end
+    end
+    expect(values_e.count).to eq 0
+    expect(values_ng.count).to eq 0
+  end
+
   # function to compare two hashes iterating over the key and comparing the values
   def hash_diff(left_hash, right_hash)
     different = false
