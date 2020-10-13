@@ -741,7 +741,7 @@ module BuildingSync
       return all_res_totals
     end
 
-    def gather_annual_results(result, scenario_name, baseline)
+    def gather_annual_results(dir, result, scenario_name, baseline)
       variables = {}
       # Check out.osw "openstudio_results" for output variables
       variables['total_site_energy_kbtu'] = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
@@ -864,7 +864,7 @@ module BuildingSync
             results_counter += 1
             package_of_measures = delete_previous_results(scenario)
             result, baseline = get_result_for_scenario(results, scenario)
-            annual_results = gather_annual_results(result, scenario_name, baseline)
+            annual_results = gather_annual_results(dir, result, scenario_name, baseline)
 
             add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, monthly_results, year_val)
           end
