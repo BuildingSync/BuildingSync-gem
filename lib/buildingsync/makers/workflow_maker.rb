@@ -844,8 +844,8 @@ module BuildingSync
     end
 
     def gather_results(dir, year_val, baseline_only = false)
-      puts 'starting to gather results'
       results_counter = 0
+      successful = true
       super
       begin
         scenarios_found = false
@@ -873,6 +873,7 @@ module BuildingSync
         puts 'No scenarios found in BuildingSync XML File, please check the object hierarchy for errors.' if !scenarios_found
       rescue StandardError => e
         puts "The following error occurred #{e.message} while processing results in #{dir}"
+        successful = false
       end
 
       if results_counter > 0
