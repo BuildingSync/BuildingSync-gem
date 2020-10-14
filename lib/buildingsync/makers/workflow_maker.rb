@@ -314,18 +314,12 @@ module BuildingSync
     def scenario_is_baseline_scenario(scenario)
       # first we check if we find the new scenario type definition
       return true if scenario.elements["#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Modeled"]
-      # alternatively we check based on the Scenario Name as we used to
-      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-      return true if scenario_name == BASELINE
       return false
     end
 
     def scenario_is_measured_scenario(scenario)
       # first we check if we find the new scenario type definition
       return true if scenario.elements["#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Measured"]
-      # alternatively we check based on the Scenario Name as we used to
-      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-      return true if scenario_name == MEASURED
       return false
     end
 
