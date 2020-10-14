@@ -35,7 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_system'
-require_relative 'parametric_schedule_helper'
+require_relative '../helpers/parametric_schedule_helper'
 require 'openstudio/extension/core/os_lib_schedules.rb'
 
 module BuildingSync
