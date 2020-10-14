@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -41,12 +41,18 @@ require 'parallel'
 
 RSpec.describe 'BuildingSync' do
   it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and all simulations' do
-    osw_paths = test_baseline_and_scenario_creation('building_151.xml', 30)
-    run_scenario_simulations(osw_paths)
+    test_baseline_and_scenario_creation_with_simulation('building_151.xml', 30)
   end
 
-  it 'should parse and write DC GSA Headquarters.xml (phase zero) with auc namespace for ASHRAE90_1 and all simulations' do
-    osw_paths = test_baseline_and_scenario_creation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw')
-    run_scenario_simulations(osw_paths)
+  it 'should parse and write DC GSA Headquarters.xml (phase zero) with auc namespace for ASHRAE90_1 and just run all simulations' do
+    test_baseline_and_scenario_creation_with_simulation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24, process all simulations and gather their results also' do
+    test_baseline_and_scenario_creation_with_simulation('building_151.xml', 30)
+  end
+
+  it 'should parse and write DC GSA Headquarters.xml (phase zero) with auc namespace for ASHRAE90_1, process all simulations and gather their results also' do
+    test_baseline_and_scenario_creation_with_simulation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw')
   end
 end

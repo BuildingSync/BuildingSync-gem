@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,37 +34,19 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require 'openstudio/model_articulation/os_lib_model_generation_bricr'
-require 'openstudio-standards'
+require 'fileutils'
+require 'json'
+
 module BuildingSync
-  class BuildingSubsection < SpatialElement
-    include OsLib_ModelGenerationBRICR
-    include OpenstudioStandards
-
-    # initialize
-    def initialize(subsection_element, occ_type, bldg_total_floor_area, ns)
-      @subsection_element = nil
-      @fraction_area = nil
-      @bldg_type = {}
-      # code to initialize
-      read_xml(subsection_element, occ_type, bldg_total_floor_area, ns)
+  # base class for objects that will configure model maker based on building sync files
+  class ModelMakerBase
+    def initialize(doc, ns)
+      @doc = doc
+      @ns = ns
     end
 
-    def read_xml(subsection_element, occ_type, bldg_total_floor_area, ns)
-      # floor areas
-      @total_floor_area = read_floor_areas(subsection_element, bldg_total_floor_area, ns)
-      # based on the occupancy type set building type, system type and bar division method
-      read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
+    def generate_baseline; end
 
-      @subsection_element = subsection_element
-    end
-
-    def read_bldg_system_type_based_on_occupancy_type(subsection_element, occ_type, ns)
-      @occupancy_type = read_occupancy_type(subsection_element, occ_type, ns)
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area, true)
-    end
-
-    attr_reader :bldg_type, :space_types_floor_area
-    attr_accessor :fraction_area
+    def write_osm; end
   end
 end

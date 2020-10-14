@@ -1,6 +1,8 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
@@ -36,12 +38,13 @@ require 'json'
 
 module BuildingSync
   class GetBCLWeatherFile
-    def download_weather_file_from_city_name(state, city)
+    $weather_file_path_prefix = '../data/weather/'.freeze
 
+    def download_weather_file_from_city_name(state, city)
       weather_file_name = get_weather_file_from_city_and_state(city)
 
       if !weather_file_name.empty?
-        return File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
+        return File.expand_path("#{$weather_file_path_prefix}#{weather_file_name}", File.dirname(__FILE__))
       else
         wmo_no = 0
         remote = OpenStudio::RemoteBCL.new
@@ -74,42 +77,41 @@ module BuildingSync
     end
 
     def download_weather_file_from_weather_id(weather_id)
-
       weather_file_name = get_weather_file_from_weatherid(weather_id)
 
       if !weather_file_name.empty?
-        return File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
+        return File.expand_path("#{$weather_file_path_prefix}#{weather_file_name}", File.dirname(__FILE__))
       else
-      wmo_no = 0
-      remote = OpenStudio::RemoteBCL.new
+        wmo_no = 0
+        remote = OpenStudio::RemoteBCL.new
 
-      # Search for weather files
-      responses = remote.searchComponentLibrary(weather_id, 'Weather File')
+        # Search for weather files
+        responses = remote.searchComponentLibrary(weather_id, 'Weather File')
 
-      choices = OpenStudio::StringVector.new
+        choices = OpenStudio::StringVector.new
 
-      responses.each do |response|
-        if response.name.include? 'TMY3'
-          choices << response.uid
+        responses.each do |response|
+          if response.name.include? 'TMY3'
+            choices << response.uid
 
-          response.attributes.each do |attribute|
-            if attribute.name == 'WMO'
-              wmo_no = attribute.valueAsDouble
+            response.attributes.each do |attribute|
+              if attribute.name == 'WMO'
+                wmo_no = attribute.valueAsDouble
+              end
             end
           end
         end
-      end
 
-      if choices.count == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file_from_weather_id',
-                           "Error, could not find uid for #{name.valueAsString}.  Please try a different weather file.")
-        return false
-      end
-
-      epw_path = download_weather_file(remote, choices)
-      download_design_day_file(wmo_no, epw_path)
-      return epw_path
+        if choices.count == 0
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.download_weather_file_from_weather_id',
+                             "Error, could not find uid for #{weather_id}.  Please try a different weather file.")
+          return false
         end
+
+        epw_path = download_weather_file(remote, choices)
+        download_design_day_file(wmo_no, epw_path)
+        return epw_path
+      end
     end
 
     def download_weather_file(remote, choices)
@@ -139,12 +141,12 @@ module BuildingSync
         dir_path = File.dirname(epw_weather_file_path)
         weather_file_name = File.basename(epw_weather_file_path)
 
-        epw_path = File.expand_path('../../spec/weather', File.dirname(__FILE__))
+        epw_path = File.expand_path("#{$weather_file_path_prefix}", File.dirname(__FILE__))
 
         Dir.glob("#{dir_path}/**/*.*").each do |filename|
           FileUtils.mv(filename, epw_path)
         end
-        epw_path = File.expand_path("../../spec/weather/#{weather_file_name}", File.dirname(__FILE__))
+        epw_path = File.expand_path("#{$weather_file_path_prefix}/#{weather_file_name}", File.dirname(__FILE__))
       end
 
       puts "Successfully set weather file to #{epw_path}"
@@ -187,8 +189,16 @@ module BuildingSync
           raise "Error, cannot find local component for: #{uid}.  Please try a different weather file."
         end
       end
+
+      puts "Successfully downloaded ddy file to #{epw_path}"
       create_ddy_file(idf_path_collection, epw_path)
-      update_json_file(epw_path)
+      puts "Successfully combined design day files to ddy file in #{epw_path}"
+      if update_json_file(epw_path)
+        puts 'JSON file updated'
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.update_json_file',
+                           "Error, cannot write JSON file for downloaded weather file #{epw_path}.  The format of the weather file seems incorrect.")
+      end
     end
 
     def create_ddy_file(idf_path_collection, epw_path)
@@ -210,16 +220,18 @@ module BuildingSync
     end
 
     def update_json_file(epw_path)
-      location = []
       weather_file = File.open(epw_path)
       location = weather_file.readlines.first.split(',')
 
       weather_file_name = File.basename(epw_path)
+      if location.length < 5
+        return false
+      end
       city_name = location[1]
       state_code = location[2]
       weather_id = location[5]
 
-      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      weather_file_path = File.expand_path("#{$weather_file_path_prefix}/weather_file.json", File.dirname(__FILE__))
 
       if !File.exist?(weather_file_path)
         create_json_file(weather_file_path)
@@ -233,11 +245,11 @@ module BuildingSync
       weather_json[:weather_id] << weather_id
 
       File.open(weather_file_path, 'w') { |f| f.write(weather_json.to_json) }
-
+      return true
     end
 
     def read_json_file
-      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      weather_file_path = File.expand_path("#{$weather_file_path_prefix}/weather_file.json", File.dirname(__FILE__))
       File.open(weather_file_path) do |f|
         str = f.gets
         p str
@@ -292,14 +304,15 @@ module BuildingSync
     end
 
     def get_weather_json_data
-      weather_file_path = File.expand_path('../../spec/weather/weather_file.json', File.dirname(__FILE__))
+      weather_file_path = File.expand_path("#{$weather_file_path_prefix}/weather_file.json", File.dirname(__FILE__))
       create_json_file(weather_file_path) if !File.exist?(weather_file_path)
 
       return eval(File.read(weather_file_path))
     end
 
     def create_json_file(weather_file_path)
-      weather_file_folder = File.expand_path('../../spec/weather', File.dirname(__FILE__))
+      weather_file_folder = File.expand_path("#{$weather_file_path_prefix}", File.dirname(__FILE__))
+      FileUtils.mkdir_p weather_file_folder
       weather_file = File.new("#{weather_file_folder}/weather_file.json", 'w')
 
       arr = []

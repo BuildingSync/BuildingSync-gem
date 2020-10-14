@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,10 @@ RSpec.describe 'BuildingSync' do
     test_baseline_creation('building_151.xml', ASHRAE90_1)
   end
 
+  it 'should parse and write L100.xml (phase zero) with auc namespace for ASHRAE 90.1' do
+    test_baseline_creation('L100_Instance1.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  end
+
   it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace for Title24' do
     test_baseline_creation('building_151_n1.xml', CA_TITLE24)
   end
@@ -51,12 +55,17 @@ RSpec.describe 'BuildingSync' do
     begin
       test_baseline_creation('DC GSA Headquarters.xml', CA_TITLE24, 'CZ01RV2.epw')
     rescue StandardError => e
+      puts "rescued StandardError: #{e.message}"
       expect(e.message.include?("Did not find a class called 'CBES Pre-1978_LargeOffice' to create in")).to be true
     end
   end
 
   it 'should parse and write DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1' do
     test_baseline_creation('DC GSA Headquarters.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  end
+
+  it 'should parse and write DC GSA Headquarterswith.xml (phase zero) with ASHRAE 90.1' do
+    test_baseline_creation('DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
   it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with Title 24' do
@@ -67,15 +76,20 @@ RSpec.describe 'BuildingSync' do
     test_baseline_creation('BuildingSync Website Valid Schema.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
-  it 'should parse and write Golden Test File.xml (phase zero) with Title 24' do
-    test_baseline_creation('Golden Test File.xml', CA_TITLE24, 'CZ01RV2.epw')
-  end
-
   it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1' do
-    test_baseline_creation('Golden Test File.xml', ASHRAE90_1, 'CZ01RV2.epw')
+    begin
+      test_baseline_creation('Golden Test File.xml', ASHRAE90_1, 'CZ01RV2.epw')
+    rescue StandardError => e
+      puts "StandardError occured #{e.message}"
+      expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
+    end
   end
 
-  it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1 and without weather file' do
-    test_baseline_creation('Golden Test File.xml', ASHRAE90_1)
+  it 'should parse and write AT_example_property_report_25.xml (phase zero) with ASHRAE 90.1' do
+    begin
+      test_baseline_creation('AT_example_property_report_25.xml', ASHRAE90_1, 'CZ01RV2.epw')
+    rescue StandardError => e
+      expect(e.message.include?('Error: There is more than one (3) building attached to this site in your BuildingSync file.')).to be true
+    end
   end
 end

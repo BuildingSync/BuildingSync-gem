@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative '../../../lib/buildingsync/model_articulation/building'
 
 RSpec.describe 'BuildingSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
@@ -87,7 +88,108 @@ RSpec.describe 'BuildingSpec' do
     expect(building.set_climate_zone('Climate Zone 6', CA_TITLE24, '')).to be true
   end
 
+  it 'Should return the year of last energy audit' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = 2010
+    puts "expected year_of_last_energy_audit: #{expected_value} but got: #{building.year_of_last_energy_audit} " if building.year_of_last_energy_audit != expected_value
+    expect(building.year_of_last_energy_audit == expected_value).to be true
+  end
+
+  it 'Should return ownership' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = 'The owner'
+    puts "expected ownership: #{expected_value} but got: #{building.ownership} " if building.ownership != expected_value
+    expect(building.ownership == expected_value).to be true
+  end
+
+  it 'Should return occupancy_classification' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = 'Hospital'
+    puts "expected occupancy_classification: #{expected_value} but got: #{building.occupancy_classification} " if building.occupancy_classification != expected_value
+    expect(building.occupancy_classification == expected_value).to be true
+  end
+
+  it 'Should return PrimaryContactID' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = '12345'
+    puts "expected primary_contact_id: #{expected_value} but got: #{building.primary_contact_id} " if building.primary_contact_id != expected_value
+    expect(building.primary_contact_id == expected_value).to be true
+  end
+
+  it 'Should return RetrocommissioningDate' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = Date.parse '1/1/2019'
+    puts "expected retro_commissioning_date: #{expected_value} but got: #{building.year_last_commissioning} " if building.year_last_commissioning != expected_value
+    expect(building.year_last_commissioning == expected_value).to be true
+  end
+
+  it 'Should return BuildingAutomationSystem' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = true
+    puts "expected building_automation_system: #{expected_value} but got: #{building.building_automation_system} " if building.building_automation_system != expected_value
+    expect(building.building_automation_system == expected_value).to be true
+  end
+
+  it 'Should return HistoricalLandmark' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = true
+    puts "expected historical_landmark: #{expected_value} but got: #{building.historical_landmark} " if building.historical_landmark != expected_value
+    expect(building.historical_landmark == expected_value).to be true
+  end
+
+  it 'Should return PercentOccupiedByOwner' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = '60'
+    puts "expected percent_occupied_by_owner: #{expected_value} but got: #{building.percent_occupied_by_owner} " if building.percent_occupied_by_owner != expected_value
+    expect(building.percent_occupied_by_owner == expected_value).to be true
+  end
+
+  it 'Should return OccupantQuantity' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = '15000'
+    puts "expected occupant_quantity: #{expected_value} but got: #{building.occupant_quantity} " if building.occupant_quantity != expected_value
+    expect(building.occupant_quantity == expected_value).to be true
+  end
+
+  it 'Should return NumberOfUnits' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = '18'
+    puts "expected number_of_units: #{expected_value} but got: #{building.number_of_units} " if building.number_of_units != expected_value
+    expect(building.number_of_units == expected_value).to be true
+  end
+
+  it 'Should return built_year' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = Integer('2003')
+    puts "expected built_year: #{expected_value} but got: #{building.built_year} " if building.built_year != expected_value
+    expect(building.built_year == expected_value).to be true
+  end
+
+  it 'Should return major_remodel_year' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = Integer('2003')
+    puts "expected major_remodel_year: #{expected_value} but got: #{building.year_major_remodel} " if building.year_major_remodel != expected_value
+    expect(building.year_major_remodel == expected_value).to be true
+  end
+
+  it 'Should return year_of_last_energy_audit' do
+    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    expected_value = Integer('2010')
+    puts "expected year_of_last_energy_audit: #{expected_value} but got: #{building.year_of_last_energy_audit} " if building.year_of_last_energy_audit != expected_value
+    expect(building.year_of_last_energy_audit == expected_value).to be true
+  end
+
   # we skip the method "set_weater_and_climate_zone" function because this method doesn't return any value
+  def get_building_from_file(xml_file_name, standard_to_be_used)
+    xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
+    File.open(xml_file_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+      ns = 'auc'
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building|
+        return BuildingSync::Building.new(building, 'Office', '20000', ns)
+      end
+    end
+  end
 
   def generate_baseline(file_name, occupancy_type, total_floor_area, ns)
     buildings = []

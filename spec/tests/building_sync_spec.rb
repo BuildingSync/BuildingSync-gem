@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -38,51 +38,17 @@ require_relative './../spec_helper'
 
 require 'fileutils'
 require 'parallel'
+require 'openstudio-extension'
 
 RSpec.describe 'BuildingSync' do
   it 'should have a version' do
     expect(BuildingSync::VERSION).not_to be_nil
   end
 
-  it 'should parse and write building_151.xml (phase zero) with n1 namespace and run all simulations' do
-    # create_osw_file('building_151.xml')
-    xml_path = File.expand_path('../files/building_151.xml', File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
-
-    out_path = File.expand_path('../output/phase0_building_151/', File.dirname(__FILE__))
-    if File.exist?(out_path)
-      FileUtils.rm_rf(out_path)
-    end
-
-    FileUtils.mkdir_p(out_path)
-    expect(File.exist?(out_path)).to be true
-
-    translator = BuildingSync::Translator.new(xml_path, out_path)
-    translator.write_osm
-    translator.write_osws
-
-    osw_files = []
-    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
-
-    expect(osw_files.size).to eq 32
-
-    if BuildingSync::DO_SIMULATIONS
-      num_sims = 0
-      Parallel.each(osw_files, in_threads: [BuildingSync::NUM_PARALLEL, BuildingSync::MAX_DATAPOINTS].min) do |osw|
-        break if num_sims > BuildingSync::MAX_DATAPOINTS
-
-        cmd = "\"#{BuildingSync::OPENSTUDIO_EXE}\" run -w \"#{osw}\""
-        puts "Running cmd: #{cmd}"
-        result = system(cmd)
-        expect(result).to be true
-
-        num_sims += 1
-      end
-
-      translator.gather_results(out_path)
-      translator.save_xml(File.join(out_path, 'results.xml'))
-
-      expect(translator.failed_scenarios.empty?).to be(true), "Scenarios #{translator.failed_scenarios.join(', ')} failed to run"
-    end
+ it 'has a measures directory' do
+    instance = BuildingSync::Extension.new
+    measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
+    expect(instance.measures_dir).to eq measure_path
+    expect(Dir.exist?(instance.measures_dir)).to eq true
   end
 end

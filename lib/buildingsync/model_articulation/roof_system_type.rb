@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,39 +34,28 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative '../model_articulation/facility'
-require_relative 'workflow_maker_phase_zero'
+
 module BuildingSync
-  class ModelMakerLevelZero < PhaseZeroWorkflowMaker
-    def initialize(doc, ns)
-      super
+  class RoofSystemType
 
-      @facilities = []
+    def initialize(doc, ns, ref)
+      doc.elements.each("#{ns}:Systems/#{ns}:RoofSystems/#{ns}:RoofSystem") do |roof_system|
+        if roof_system.attributes["ID"] == ref
+          read(roof_system, ns)
+        end
+      end
     end
 
-    def generate_baseline(dir, epw_file_path, standard_to_be_used)
-      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
-        @facilities.push(Facility.new(facility_element, @ns))
-      end
-
-      if @facilities.count == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', 'There are no facilities in your BuildingSync file.')
-        raise 'Error: There are no facilities in your BuildingSync file.'
-      elsif @facilities.count > 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
-        raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
-      end
-
-      open_studio_standard = @facilities[0].determine_open_studio_standard(standard_to_be_used)
-
-      @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used)
-      return write_osm(dir)
-    end
-
-    private
-
-    def write_osm(dir)
-      @@facility = @facilities[0].write_osm(dir)
+    def read(section_element, ns)
+      #if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
+      #  @fenestration_type = "Door"
+      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
+      #  @fenestration_type = "Skylight"
+      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
+      #  @fenestration_type = "Window"
+      #end
     end
   end
 end
+
+
