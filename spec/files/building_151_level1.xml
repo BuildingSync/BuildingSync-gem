@@ -121,7 +121,7 @@
       <auc:Systems>
         <auc:HVACSystems>
           <auc:HVACSystem>
-            <auc:PrimaryHVACSystemType>VAVwReheat</auc:PrimaryHVACSystemType>
+            <auc:PrincipalHVACSystemType>VAVwReheat</auc:PrincipalHVACSystemType>
             <auc:LinkedPremises>
               <auc:Building>
                 <auc:LinkedBuildingID IDref="Building151"></auc:LinkedBuildingID>

@@ -52,14 +52,14 @@ module BuildingSync
       @building_sections_whole_building = []
       @model = nil
       @primary_contact_id = nil
-      @ID = nil
+      @id = nil
       @all_set = false
 
       # parameter to read and write.
       @standard_template = nil
       @building_rotation = 0.0
       @floor_height = 0.0
-      @width  = 0.0
+      @width = 0.0
       @length = 0.0
       @wwr = 0.0
       @name = nil
@@ -93,7 +93,7 @@ module BuildingSync
     def read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
       # building ID
       if build_element.attributes['ID']
-        @ID = build_element.attributes['ID']
+        @id = build_element.attributes['ID']
       end
       # city and state
       read_city_and_state_name(build_element, ns)
@@ -218,15 +218,15 @@ module BuildingSync
     def get_building_type
       set_all
       # try to get the bldg type at the building level, if it is nil then look at the first section
-      if @bldg_type.nil?
+      if !@bldg_type.nil?
+        return @bldg_type
+      else
         if @building_sections.count == 0
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_building_type', 'There is no occupancy type attached to this building in your BuildingSync file.')
           raise 'Error: There is no occupancy type attached to this building in your BuildingSync file.'
         else
           return @building_sections[0].bldg_type
         end
-      else
-        return @bldg_type
       end
     end
 
@@ -272,7 +272,7 @@ module BuildingSync
           @building_sections[0].fraction_area = building_fraction
         end
         @building_sections.each do |section|
-          puts "section with ID: #{section.ID} and type: '#{section.section_type}' has fraction: #{section.fraction_area}"
+          puts "section with ID: #{section.id} and type: '#{section.section_type}' has fraction: #{section.fraction_area}"
           next if section.fraction_area.nil?
           building_fraction -= section.fraction_area
         end
@@ -358,14 +358,14 @@ module BuildingSync
         @space_types.each do |space_name, space_type|
           zone_list.concat(get_zones_per_space_type(space_type[:space_type]))
         end
-        zone_hash[@ID] = zone_list
+        zone_hash[@id] = zone_list
       end
       @building_sections.each do |bldg_subsec|
         zone_list = []
         bldg_subsec.space_types_floor_area.each do |space_type, hash|
           zone_list.concat(get_zones_per_space_type(space_type))
         end
-        zone_hash[bldg_subsec.ID] = zone_list
+        zone_hash[bldg_subsec.id] = zone_list
       end
       return zone_hash
     end
@@ -377,14 +377,14 @@ module BuildingSync
         @space_types.each do |space_name, space_type|
           space_type_list << space_type[:space_type]
         end
-        space_type_hash[@ID] = space_type_list
+        space_type_hash[@id] = space_type_list
       end
       @building_sections.each do |bldg_subsec|
         space_type_list = []
         bldg_subsec.space_types_floor_area.each do |space_type, hash|
           space_type_list << space_type
         end
-        space_type_hash[bldg_subsec.ID] = space_type_list
+        space_type_hash[bldg_subsec.id] = space_type_list
       end
       return space_type_hash
     end
@@ -553,8 +553,8 @@ module BuildingSync
 
       # setting the current year, so we do not get these annoying log messages:
       # [openstudio.model.YearDescription] <1> 'UseWeatherFile' is not yet a supported option for YearDescription
-      yearDescription = @model.getYearDescription
-      yearDescription.setCalendarYear(::Date.today.year)
+      year_description = @model.getYearDescription
+      year_description.setCalendarYear(::Date.today.year)
 
       # add final condition
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
@@ -615,12 +615,12 @@ module BuildingSync
         end
       end
 
-      climateZones = @model.getClimateZones
+      climate_zones = @model.getClimateZones
       # set climate zone
-      climateZones.clear
+      climate_zones.clear
       if standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
-        climateZones.setClimateZone('ASHRAE', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climateZones.getClimateZones('ASHRAE').first.value}")
+        climate_zones.setClimateZone('ASHRAE', climate_zone)
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climate_zones.getClimateZones('ASHRAE').first.value}")
         puts "setting ASHRAE climate zone to: #{climate_zone}"
         return true
       elsif standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
@@ -629,7 +629,7 @@ module BuildingSync
         climate_zone = climate_zone.delete('A').strip
         climate_zone = climate_zone.delete('B').strip
         climate_zone = climate_zone.delete('C').strip
-        climateZones.setClimateZone('CEC', climate_zone)
+        climate_zones.setClimateZone('CEC', climate_zone)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climate_zone}")
         puts "setting CA_TITLE24 climate zone to: #{climate_zone}"
         return true
@@ -787,7 +787,7 @@ module BuildingSync
       # populate bar_hash and create envelope with data from envelope_data_hash and user arguments
       bar_hash = {}
       bar_hash[:length] = @length
-      bar_hash[:width] =  @width
+      bar_hash[:width] = @width
       bar_hash[:num_stories_below_grade] = num_stories_below_grade.to_i
       bar_hash[:num_stories_above_grade] = num_stories_above_grade.to_i
       bar_hash[:floor_height] = floor_height
@@ -826,7 +826,7 @@ module BuildingSync
         end
 
         # bottom_story_ground_exposed_floor and top_story_exterior_exposed_roof already setup as bool
-        bar_hash[:stories]["key #{i}"] = { story_party_walls: party_walls, story_min_multiplier: 1, story_included_in_building_area: true, below_partial_story: below_partial_story, bottom_story_ground_exposed_floor: true, top_story_exterior_exposed_roof: true }
+        bar_hash[:stories]["key #{i}"] = {story_party_walls: party_walls, story_min_multiplier: 1, story_included_in_building_area: true, below_partial_story: below_partial_story, bottom_story_ground_exposed_floor: true, top_story_exterior_exposed_roof: true}
       end
 
       # store expected floor areas to check after bar made
@@ -964,7 +964,8 @@ module BuildingSync
         if ![90.0, 270.0].include? best_fit
           width_card_dir = ['east', 'west']
           length_card_dir = ['north', 'south']
-        else # if rotation is closest to 90 or 270 then reverse which orientation is used for length and width
+        else
+          # if rotation is closest to 90 or 270 then reverse which orientation is used for length and width
           width_card_dir = ['north', 'south']
           length_card_dir = ['east', 'west']
         end
@@ -988,7 +989,8 @@ module BuildingSync
             end
           end
 
-        else # use long sides instead
+        else
+          # use long sides instead
           num_stories.ceil.times do |i|
             if i + 1 <= @num_stories_below_grade
               party_walls_array << []
@@ -1029,18 +1031,18 @@ module BuildingSync
       building.elements["#{ns}:PercentOccupiedByOwner"].text = @percent_occupied_by_owner if !@percent_occupied_by_owner.nil?
 
       # Add new element in the XML file
-      add_element_in_xml_file(building, ns, 'StandardTemplate', @standard_template)
-      add_element_in_xml_file(building, ns, 'BuildingRotation', @building_rotation)
-      add_element_in_xml_file(building, ns, 'FloorHeight', @floor_height)
-      add_element_in_xml_file(building, ns, 'WindowWallRatio', @wwr)
-      add_element_in_xml_file(building, ns, 'PartyWallStoriesNorth', @party_wall_stories_north)
-      add_element_in_xml_file(building, ns, 'PartyWallStoriesSouth', @party_wall_stories_south)
-      add_element_in_xml_file(building, ns, 'PartyWallStoriesEast', @party_wall_stories_east)
-      add_element_in_xml_file(building, ns, 'PartyWallStoriesWest', @party_wall_stories_west)
-      add_element_in_xml_file(building, ns, 'Width', @width)
-      add_element_in_xml_file(building, ns, 'Length', @length)
-      add_element_in_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
-      add_element_in_xml_file(building, ns, 'FractionArea', @fraction_area)
+      add_user_defined_field_to_xml_file(building, ns, 'StandardTemplate', @standard_template)
+      add_user_defined_field_to_xml_file(building, ns, 'BuildingRotation', @building_rotation)
+      add_user_defined_field_to_xml_file(building, ns, 'FloorHeight', @floor_height)
+      add_user_defined_field_to_xml_file(building, ns, 'WindowWallRatio', @wwr)
+      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesNorth', @party_wall_stories_north)
+      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesSouth', @party_wall_stories_south)
+      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesEast', @party_wall_stories_east)
+      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesWest', @party_wall_stories_west)
+      add_user_defined_field_to_xml_file(building, ns, 'Width', @width)
+      add_user_defined_field_to_xml_file(building, ns, 'Length', @length)
+      add_user_defined_field_to_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
+      add_user_defined_field_to_xml_file(building, ns, 'FractionArea', @fraction_area)
 
       write_parameters_to_xml_for_spatial_element(ns, building)
     end
@@ -1052,11 +1054,11 @@ module BuildingSync
     def get_peak_occupancy
       peak_occupancy = Hash.new
       if @occupant_quantity
-        peak_occupancy[@ID] = @occupant_quantity.to_f
+        peak_occupancy[@id] = @occupant_quantity.to_f
         return peak_occupancy
       end
       @building_sections.each do |section|
-          peak_occupancy[section.ID] = section.get_peak_occupancy.to_f if section.get_peak_occupancy
+        peak_occupancy[section.id] = section.get_peak_occupancy.to_f if section.get_peak_occupancy
       end
       return peak_occupancy
     end
@@ -1064,11 +1066,11 @@ module BuildingSync
     def get_floor_area
       floor_area = Hash.new
       if @total_floor_area
-        floor_area[@ID] = @total_floor_area.to_f
+        floor_area[@id] = @total_floor_area.to_f
       end
       @building_sections.each do |section|
         if section.get_floor_area
-          floor_area[section.ID] = section.get_floor_area
+          floor_area[section.id] = section.get_floor_area
         end
       end
       return floor_area
