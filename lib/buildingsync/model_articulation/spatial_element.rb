@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,10 +37,14 @@
 require 'openstudio'
 require 'fileutils'
 require 'json'
+require 'openstudio/extension/core/os_lib_model_generation'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
+
   class SpatialElement
+
+    include OsLib_ModelGeneration
     def initialize
       @total_floor_area = nil
       @bldg_type = nil
@@ -49,10 +53,17 @@ module BuildingSync
       @space_types = {}
       @fraction_area = nil
       @space_types_floor_area = nil
+      @conditioned_floor_area_heated_only = nil
+      @conditioned_floor_area_cooled_only = nil
+      @conditioned_floor_area_heated_cooled = nil
+      @conditioned_below_grade_floor_area = nil
+      @custom_conditioned_above_grade_floor_area = nil
+      @custom_conditioned_below_grade_floor_area = nil
     end
 
     def read_floor_areas(build_element, parent_total_floor_area, ns)
       build_element.elements.each("#{ns}:FloorAreas/#{ns}:FloorArea") do |floor_area_element|
+        next if !floor_area_element.elements["#{ns}:FloorAreaValue"]
         floor_area = floor_area_element.elements["#{ns}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
 
@@ -60,26 +71,56 @@ module BuildingSync
         if floor_area_type == 'Gross'
           @total_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('gross_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Heated and Cooled'
-          @heated_and_cooled_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@heated_and_cooled_floor_area', floor_area), 'ft^2', 'm^2').get
+          @conditioned_floor_area_heated_cooled = OpenStudio.convert(validate_positive_number_excluding_zero('@heated_and_cooled_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Footprint'
           @footprint_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@footprint_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Conditioned'
-          @conditioned_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@@conditioned_floor_area', floor_area), 'ft^2', 'm^2').get
+          @conditioned_floor_area_heated_cooled = OpenStudio.convert(validate_positive_number_excluding_zero('@conditioned_floor_area_heated_cooled', floor_area), 'ft^2', 'm^2').get
+        elsif floor_area_type == 'Heated Only'
+          @conditioned_floor_area_heated_only = OpenStudio.convert(validate_positive_number_excluding_zero('@heated_only_floor_area', floor_area), 'ft^2', 'm^2').get
+        elsif floor_area_type == 'Cooled Only'
+          @conditioned_floor_area_cooled_only = OpenStudio.convert(validate_positive_number_excluding_zero('@cooled_only_floor_area', floor_area), 'ft^2', 'm^2').get
+        elsif floor_area_type == 'Custom'
+          if floor_area_element.elements["#{ns}:FloorAreaCustomName"].text == 'Conditioned above grade'
+            @custom_conditioned_above_grade_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@custom_conditioned_above_grade_floor_area', floor_area), 'ft^2', 'm^2').get
+          elsif floor_area_element.elements["#{ns}:FloorAreaCustomName"].text == 'Conditioned below grade'
+            @custom_conditioned_below_grade_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@custom_conditioned_below_grade_floor_area', floor_area), 'ft^2', 'm^2').get
+          end
         else
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.SpatialElement.generate_baseline_osm', "Unsupported floor area type found: #{floor_area_type}")
         end
+      end
 
-        if @total_floor_area.nil? && !@conditioned_floor_area.nil?
-          @total_floor_area = @conditioned_floor_area
+      if @total_floor_area.nil? || @total_floor_area == 0
+        # if the total floor area is null, we try to calculate the total area, from various conditioned areas
+        running_floor_area = 0
+        if !@conditioned_floor_area_cooled_only.nil? && @conditioned_floor_area_cooled_only > 0
+          running_floor_area += @conditioned_floor_area_cooled_only
+        end
+        if !@conditioned_floor_area_heated_only.nil? && @conditioned_floor_area_heated_only > 0
+          running_floor_area += @conditioned_floor_area_heated_only
+        end
+        if !@conditioned_floor_area_heated_cooled.nil? && @conditioned_floor_area_heated_cooled > 0
+          running_floor_area += @conditioned_floor_area_heated_cooled
+        end
+        if running_floor_area > 0
+          @total_floor_area = running_floor_area
         else
-          if @total_floor_area.nil? && !@heated_and_cooled_floor_area.nil?
-            @total_floor_area = @heated_and_cooled_floor_area
+          # if the conditions floor areas are null, we look at the conditioned above and below grade areas
+          if !@custom_conditioned_above_grade_floor_area.nil? && @custom_conditioned_above_grade_floor_area > 0
+            running_floor_area += @custom_conditioned_above_grade_floor_area
+          end
+          if !@custom_conditioned_below_grade_floor_area.nil? && @custom_conditioned_below_grade_floor_area > 0
+            running_floor_area += @custom_conditioned_below_grade_floor_area
+          end
+          if running_floor_area > 0
+            @total_floor_area = running_floor_area
           end
         end
-
-        raise 'Spatial element does not define gross floor area' if @total_floor_area.nil? && parent_total_floor_area.nil?
       end
-      if @total_floor_area.nil?
+
+      # if we did not find any area we get the parent one
+      if @total_floor_area.nil? || @total_floor_area == 0
         return parent_total_floor_area
       else
         return @total_floor_area
@@ -96,87 +137,17 @@ module BuildingSync
     end
 
     def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
-      ' DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb'
-      ' SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient'
-      ' Hospital, SmallHotel, LargeHotel, QuickServiceRestaurant, FullServiceRestaurant, MidriseApartment, HighriseApartment, Warehouse'
+      # DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb
+      # SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient
+      # Hospital, SmallHotel, LargeHotel, QuickServiceRestaurant, FullServiceRestaurant, MidriseApartment, HighriseApartment, Warehouse
+
       if !occupancy_type.nil? && !total_floor_area.nil?
-        if occupancy_type == 'Retail'
-          @bldg_type = 'RetailStandalone'
-          @bar_division_method = 'Multiple Space Types - Individual Stories Sliced'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'Office'
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          if (total_floor_area > 0) && (total_floor_area < 20000)
-            @bldg_type = 'SmallOffice'
-            @system_type = 'PSZ-AC with gas coil heat'
-          elsif total_floor_area >= 20000 && total_floor_area < 75000
-            @bldg_type = 'MediumOffice'
-            @system_type = 'PVAV with reheat'
-          else
-            @bldg_type = 'LargeOffice'
-            @system_type = 'VAV with reheat'
-          end
-        elsif occupancy_type == 'StripMall'
-          @bldg_type = 'RetailStripmall'
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat' # Two speed DX AC
-        elsif occupancy_type == 'PrimarySchool'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PVAV with reheat'
-        elsif occupancy_type == 'SecondarySchool'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'VAV with reheat'
-        elsif occupancy_type == 'Outpatient'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PVAV with reheat'
-        elsif occupancy_type == 'Hospital'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'VAV with reheat'
-        elsif occupancy_type == 'SmallHotel'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PTAC with electric baseboard heat'
-        elsif occupancy_type == 'LargeHotel'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'VAV with reheat'
-        elsif occupancy_type == 'QuickServiceRestaurant'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'FullServiceRestaurant'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'MidriseApartment'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'HighriseApartment'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-HP'
-        elsif occupancy_type == 'Warehouse'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'SuperMarket'
-          @bldg_type = occupancy_type
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'Lodging'
-          @bldg_type = 'MidriseApartment'
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'PSZ-AC with gas coil heat'
-        elsif occupancy_type == 'Laboratory-Testing'
-          @bldg_type = 'Laboratory'
-          @bar_division_method = 'Single Space Type - Core and Perimeter'
-          @system_type = 'tbd'
-        else
+        json_file_path = File.expand_path('bldg_and_system_types.json', File.dirname(__FILE__))
+        json = eval(File.read(json_file_path))
+
+        process_bldg_and_system_type(json, occupancy_type, total_floor_area)
+
+        if @bldg_type == ''
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
         end
       elsif raise_exception
@@ -186,31 +157,74 @@ module BuildingSync
           raise "Building total floor area '#{total_floor_area}' is nil"
         end
       end
+      puts "to get @bldg_type #{@bldg_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}"
+    end
+
+    def process_bldg_and_system_type(json, occupancy_type, total_floor_area)
+      puts "using occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}"
+      min_floor_area_correct = false
+      max_floor_area_correct = false
+      if !json[:"#{occupancy_type}"].nil?
+        json[:"#{occupancy_type}"].each do |occ_type|
+          if !occ_type[:bldg_type].nil?
+            if occ_type[:min_floor_area] || occ_type[:max_floor_area]
+              if occ_type[:min_floor_area] && occ_type[:min_floor_area].to_f < total_floor_area
+                min_floor_area_correct = true
+              end
+              if occ_type[:max_floor_area] && occ_type[:max_floor_area].to_f > total_floor_area
+                max_floor_area_correct = true
+              end
+              if (min_floor_area_correct && max_floor_area_correct) || (!occ_type[:min_floor_area] && max_floor_area_correct) || (min_floor_area_correct && !occ_type[:max_floor_area])
+                puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
+                @bldg_type = occ_type[:bldg_type]
+                @bar_division_method = occ_type[:bar_division_method]
+                @system_type = occ_type[:system_type]
+                return
+              end
+            else
+              # otherwise we assume the first one is correct and we select this
+              puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
+              @bldg_type = occ_type[:bldg_type]
+              @bar_division_method = occ_type[:bar_division_method]
+              @system_type = occ_type[:system_type]
+              return
+            end
+          else
+            # otherwise we assume the first one is correct and we select this
+            @bldg_type = occ_type[:bldg_type]
+            @bar_division_method = occ_type[:bar_division_method]
+            @system_type = occ_type[:system_type]
+            return
+          end
+        end
+      end
+      raise "Occupancy type #{occupancy_type} is not available in the bldg_and_system_types.json dictionary"
     end
 
     def validate_positive_number_excluding_zero(name, value)
-      if value <= 0
-        puts "Error: parameter #{name} must be positive and not zero."
-      end
+      puts "Error: parameter #{name} must be positive and not zero." if value <= 0
       return value
     end
 
     def validate_positive_number_including_zero(name, value)
-      if value < 0
-        puts "Error: parameter #{name} must be positive or zero."
-      end
+      puts "Error: parameter #{name} must be positive or zero." if value < 0
       return value
     end
 
     # create space types
     def create_space_types(model, total_bldg_floor_area, standard_template, open_studio_standard)
-      # create space types from subsection type
+      # create space types from section type
       # mapping lookup_name name is needed for a few methods
-      if @bldg_type.nil?
-        set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false)
-      end
+      set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false) if @bldg_type.nil?
       if open_studio_standard.nil?
-        open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
+        begin
+          open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
+        rescue StandardError => e
+          # if the combination of standard type and bldg type fails we try the standard type alone.
+          puts "could not find open studio standard for template #{standard_template} and bldg type: #{bldg_type}, trying the standard type alone"
+          open_studio_standard = Standard.build(standard_template)
+          raise(e)
+        end
       end
       lookup_name = open_studio_standard.model_get_lookup_name(@occupancy_type)
       puts " Building type: #{lookup_name} selected for occupancy type: #{@occupancy_type}"
@@ -229,9 +243,7 @@ module BuildingSync
 
         # set color
         test = open_studio_standard.space_type_apply_rendering_color(space_type) # this uses openstudio-standards
-        if !test
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', "Warning: Could not find color for #{space_type.name}")
-        end
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', "Warning: Could not find color for #{space_type.name}") if !test
         # extend hash to hold new space type object
         hash[:space_type] = space_type
 
@@ -251,7 +263,39 @@ module BuildingSync
       return @space_types_floor_area
     end
 
+    def add_element_in_xml_file(building_element, ns, field_name, field_value)
+      user_defined_fields = REXML::Element.new("#{ns}:UserDefinedFields")
+      user_defined_field = REXML::Element.new("#{ns}:UserDefinedField")
+      field_name_element = REXML::Element.new("#{ns}:FieldName")
+      field_value_element = REXML::Element.new("#{ns}:FieldValue")
+
+      if !field_value.nil?
+        user_defined_fields.add_element(user_defined_field)
+        building_element.add_element(user_defined_fields)
+        user_defined_field.add_element(field_name_element)
+        user_defined_field.add_element(field_value_element)
+
+        field_name_element.text = field_name
+        field_value_element.text = field_value
+      end
+    end
+
+    def write_parameters_to_xml_for_spatial_element(ns, xml_element)
+      add_element_in_xml_file(xml_element, ns, 'TotalFloorArea', @total_floor_area)
+      add_element_in_xml_file(xml_element, ns, 'BuildingType', @bldg_type)
+      add_element_in_xml_file(xml_element, ns, 'SystemType', @system_type)
+      add_element_in_xml_file(xml_element, ns, 'BarDivisionMethod', @bar_division_method)
+      add_element_in_xml_file(xml_element, ns, 'FractionArea', @fraction_area)
+      add_element_in_xml_file(xml_element, ns, 'SpaceTypesFloorArea', @space_types_floor_area)
+      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaHeatedOnly', @conditioned_floor_area_heated_only)
+      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaCooledOnly', @conditioned_floor_area_cooled_only)
+      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaHeatedCooled', @conditioned_floor_area_heated_cooled)
+      add_element_in_xml_file(xml_element, ns, 'ConditionedBelowGradeFloorArea', @conditioned_below_grade_floor_area)
+      add_element_in_xml_file(xml_element, ns, 'CustomConditionedAboveGradeFloorArea', @custom_conditioned_above_grade_floor_area)
+      add_element_in_xml_file(xml_element, ns, 'CustomConditionedBelowGradeFloorArea', @custom_conditioned_below_grade_floor_area)
+    end
+
     def validate_fraction; end
-    attr_reader :total_floor_area, :bldg_type, :system_type
+    attr_reader :total_floor_area, :bldg_type, :system_type, :space_types
   end
 end

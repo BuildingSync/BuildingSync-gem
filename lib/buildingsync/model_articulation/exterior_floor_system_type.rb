@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,19 +34,28 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+
 module BuildingSync
-  class ModelMakerLevelOne < ModelMaker
-    # load the building sync file and chooses the correct workflow
-    def initialize(path)
-      # init
+  class ExteriorFloorSystemType
+
+    def initialize(doc, ns, ref)
+      doc.elements.each("#{ns}:Systems/#{ns}:ExteriorFloorSystems/#{ns}:ExteriorFloorSystem") do |floor_system|
+        if floor_system.attributes["ID"] == ref
+          read(floor_system, ns)
+        end
+      end
     end
 
-    def generate_baseline(dir)
-      # generate the baseline open studio model
-    end
-
-    def write_osws(dir)
-      # create the OSWs for the scenarios
+    def read(section_element, ns)
+      #if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
+      #  @fenestration_type = "Door"
+      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
+      #  @fenestration_type = "Skylight"
+      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
+      #  @fenestration_type = "Window"
+      #end
     end
   end
 end
+
+

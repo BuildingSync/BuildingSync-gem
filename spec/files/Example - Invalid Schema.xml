@@ -49,8 +49,8 @@
       <auc:YearOfLastMajorRemodel>2011</auc:YearOfLastMajorRemodel>
       <auc:PercentOccupiedByOwner>100.0</auc:PercentOccupiedByOwner>
       <auc:NumberOfFacilitiesOnSite>2</auc:NumberOfFacilitiesOnSite>
-      <auc:Subsections>
-        <auc:Subsection ID="Subsection-1">
+      <auc:Sections>
+        <auc:Section ID="Subsection-1">
           <auc:OccupancyClassification>Office</auc:OccupancyClassification>
           <auc:TypicalOccupantUsages>
             <auc:TypicalOccupantUsage>
@@ -76,8 +76,8 @@
               <auc:FloorAreaValue>247810.5</auc:FloorAreaValue>
             </auc:FloorArea>
           </auc:FloorAreas>
-        </auc:Subsection>
-        <auc:Subsection ID="Subsection-2">
+        </auc:Section>
+        <auc:Section ID="Subsection-2">
           <auc:OccupancyClassification>Parking</auc:OccupancyClassification>
           <auc:FloorAreas>
             <auc:FloorArea>
@@ -93,8 +93,8 @@
               <auc:FloorAreaValue>0.0</auc:FloorAreaValue>
             </auc:FloorArea>
           </auc:FloorAreas>
-        </auc:Subsection>
-      </auc:Subsections>
+        </auc:Section>
+      </auc:Sections>
       <auc:UserDefinedFields>
         <auc:UserDefinedField>
           <auc:FieldName>Above Grade Demising Wall Area</auc:FieldName>
@@ -190,9 +190,9 @@
           </auc:OtherHVACSystem>
         </auc:OtherHVACSystems>
         <auc:LinkedPremises>
-          <auc:Subsection>
+          <auc:Section>
             <auc:LinkedSubsectionID IDref="Subsection-1"></auc:LinkedSubsectionID>
-          </auc:Subsection>
+          </auc:Section>
         </auc:LinkedPremises>
         <auc:UserDefinedFields>
           <auc:UserDefinedField>
@@ -263,9 +263,9 @@
           </auc:OtherHVACSystem>
         </auc:OtherHVACSystems>
         <auc:LinkedPremises>
-          <auc:Subsection>
+          <auc:Section>
             <auc:LinkedSubsectionID IDref="Subsection-2"></auc:LinkedSubsectionID>
-          </auc:Subsection>
+          </auc:Section>
         </auc:LinkedPremises>
         <auc:UserDefinedFields>
           <auc:UserDefinedField>
@@ -303,9 +303,9 @@
         <auc:LampPower>15</auc:LampPower>
         <auc:NumberOfLampsPerLuminaire>1</auc:NumberOfLampsPerLuminaire>
         <auc:LinkedPremises>
-          <auc:Subsection>
+          <auc:Section>
             <auc:LinkedSubsectionID IDref="Subsection-1"></auc:LinkedSubsectionID>
-          </auc:Subsection>
+          </auc:Section>
         </auc:LinkedPremises>
         <auc:UserDefinedFields>
           <auc:UserDefinedField>
@@ -330,10 +330,10 @@
         <auc:LampPower>32</auc:LampPower>
         <auc:NumberOfLampsPerLuminaire>4</auc:NumberOfLampsPerLuminaire>
         <auc:LinkedPremises>
-          <auc:Subsection>
+          <auc:Section>
             <auc:LinkedSubsectionID IDref="Subsection-2"></auc:LinkedSubsectionID>
             <auc:LinkedSubsectionID IDref="Subsection-1"></auc:LinkedSubsectionID>
-          </auc:Subsection>
+          </auc:Section>
         </auc:LinkedPremises>
         <auc:UserDefinedFields>
           <auc:UserDefinedField>
@@ -384,9 +384,9 @@
         <auc:PrimaryFuel>Natural gas</auc:PrimaryFuel>
         <auc:Location>Mechanical Room</auc:Location>
         <auc:LinkedPremises>
-          <auc:Subsection>
+          <auc:Section>
             <auc:LinkedSubsectionID IDref="Subsection-2"></auc:LinkedSubsectionID>
-          </auc:Subsection>
+          </auc:Section>
         </auc:LinkedPremises>
         <auc:UserDefinedFields>
           <auc:UserDefinedField>
@@ -412,9 +412,9 @@
           </auc:StorageTank>
         </auc:DomesticHotWaterType>
         <auc:LinkedPremises>
-          <auc:Subsection>
+          <auc:Section>
             <auc:LinkedSubsectionID IDref="Subsection-2"></auc:LinkedSubsectionID>
-          </auc:Subsection>
+          </auc:Section>
         </auc:LinkedPremises>
         <auc:UserDefinedFields>
           <auc:UserDefinedField>
@@ -485,9 +485,9 @@
     <auc:PlugLoads>
       <auc:PlugLoad ID="PlugLoad-1">
         <auc:LinkedPremises>
-          <auc:Subsection>
+          <auc:Section>
             <auc:LinkedSubsectionID IDref="Subsection-2"></auc:LinkedSubsectionID>
-          </auc:Subsection>
+          </auc:Section>
         </auc:LinkedPremises>
       </auc:PlugLoad>
     </auc:PlugLoads>

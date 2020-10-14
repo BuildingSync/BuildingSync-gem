@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,77 +34,27 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-
-require 'fileutils'
-require 'json'
-require_relative 'model_maker'
-
 module BuildingSync
-  # base class for objects that will configure workflows based on building sync files
-  class WorkflowMaker < ModelMaker
-    def write_osws(dir)
-      FileUtils.mkdir_p(dir)
-    end
+  class FenestrationSystemType
 
-    def gather_results(dir); end
+    def initialize(doc, ns, ref)
+      @fenestration_type = nil
 
-    def failed_scenarios
-      return []
-    end
-
-    def save_xml(filename)
-      File.open(filename, 'w') do |file|
-        @doc.write(file)
-      end
-    end
-
-    def set_measure_path(osw, measures_dir)
-      osw['measure_paths'] = [measures_dir]
-    end
-
-    def set_measure_paths(osw, measures_dir_array)
-      osw['measure_paths'] = measures_dir_array
-    end
-
-    def add_measure_path(osw, measures_dir)
-      osw['measure_paths'].each do |dir|
-        if dir == measures_dir
-          return false
+      doc.elements.each("#{ns}:Systems/#{ns}:FenestrationSystems/#{ns}:FenestrationSystem") do |fenestration_system|
+        if fenestration_system.attributes["ID"] == ref
+          read_fenestration_type(fenestration_system, ns)
         end
       end
-      osw['measure_paths'] << measures_dir
-      return true
     end
 
-    def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
-      result = false
-      osw['steps'].each do |step|
-        if step['measure_dir_name'] == measure_dir_name
-          step['arguments'][argument_name] = argument_value
-          result = true
-        end
+    def read_fenestration_type(section_element, ns)
+      if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
+        @fenestration_type = "Door"
+      elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
+        @fenestration_type = "Skylight"
+      elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
+        @fenestration_type = "Window"
       end
-
-      if !result
-        raise "Could not set '#{argument_name}' to '#{argument_value}' for measure '#{measure_dir_name}'"
-      end
-
-      return result
-    end
-
-    def add_new_measure(osw, measure_dir_name)
-      # first we check if the measure already exists
-      osw['steps'].each do |step|
-        if step['measure_dir_name'] == measure_dir_name
-          return false
-        end
-      end
-      # if it does not exist we add it
-      new_step = {}
-      new_step['measure_dir_name'] = measure_dir_name
-      # TODO: what about arguments to measures, need to add an option to also set arguments and their values
-      osw['steps'].unshift(new_step)
-      return true
     end
   end
 end

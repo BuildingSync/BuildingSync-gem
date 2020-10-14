@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,15 +35,16 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_system'
+
 module BuildingSync
   class LoadsSystem < BuildingSystem
     # initialize
-    def initialize
+    def initialize(system_element = '', ns = '')
       # code to initialize
     end
 
     # add internal loads from standard definitions
-    def add_internal_loads(model, standard, template, remove_objects)
+    def add_internal_loads(model, standard, template, building_sections, remove_objects)
       # remove internal loads
       if remove_objects
         model.getSpaceLoads.each do |instance|
@@ -69,6 +70,10 @@ module BuildingSync
         # the last bool test it to make thermostat schedules. They are now added in HVAC section instead of here
         standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
 
+        # here we adjust the people schedules according to user input of hours per week and weeks per year
+        if !building_sections.empty?
+          adjust_people_schedule(space_type, get_building_section(building_sections, space_type.standardsBuildingType, space_type.standardsSpaceType), model)
+        end
         # extend space type name to include the template. Consider this as well for load defs
         space_type.setName("#{space_type.name} - #{template}")
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Adding loads to space type named #{space_type.name}")
@@ -85,6 +90,119 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "#{spaces_without_space_types.size} spaces do not have space types assigned, and wont' receive internal loads from standards space type lookups.")
       end
       return true
+    end
+
+    def adjust_occupancy_peak(model, new_occupancy_peak, area, space_types)
+      # we assume that the standard always generate people per area
+      sum_of_people_per_area = 0.0
+      count = 0
+      if !space_types.nil?
+        sorted_space_types = model.getSpaceTypes.sort
+        sorted_space_types.each do |space_type|
+          if space_types.include? space_type
+            peoples = space_type.people
+            peoples.each do |people|
+              sum_of_people_per_area += people.peoplePerFloorArea.get
+              count += 1
+            end
+          end
+        end
+        average_people_per_area = sum_of_people_per_area / count
+        puts "existing occupancy: #{average_people_per_area} new target value: #{new_occupancy_peak.to_f / area.to_f}"
+        new_sum_of_people_per_area = 0.0
+        sorted_space_types.each do |space_type|
+          if space_types.include? space_type
+            peoples = space_type.people
+            peoples.each do |people|
+              ratio = people.peoplePerFloorArea.get.to_f / average_people_per_area.to_f
+              new_value = ratio * new_occupancy_peak.to_f / area.to_f
+              puts "adjusting occupancy per area value from: #{people.peoplePerFloorArea.get} by ratio #{ratio} to #{new_value}"
+              people.peopleDefinition.setPeopleperSpaceFloorArea(new_value)
+              new_sum_of_people_per_area += new_value
+            end
+          end
+        end
+        puts "resulting total absolute occupancy value: #{new_sum_of_people_per_area * area.to_f} occupancy per area value: #{new_sum_of_people_per_area / count}"
+      else
+        puts 'space types are empty'
+      end
+    end
+
+    def get_building_section(building_sections, standard_building_type, standard_space_type)
+      if building_sections.count == 1
+        return building_sections[0]
+      end
+      building_sections.each do |section|
+        if section.occupancy_type.to_s == standard_building_type.to_s
+          return section if section.space_types
+          section.space_types.each do |space_type_name, hash|
+            if space_type_name == standard_space_type
+              puts "space_type_name #{space_type_name}"
+              return section
+            end
+          end
+        end
+      end
+      return nil
+    end
+
+    def adjust_people_schedule(space_type, building_section, model)
+      if !building_section.typical_occupant_usage_value_hours.nil?
+        # puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
+        # model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+        # path = model_articulation_instance.measures_dir + '/create_parametric_schedules/resources/os_lib_parametric_schedules.rb'
+        # puts "create parametric schedule path: #{path}"
+        # require path
+
+        # param_Schedules = OsLib_Parametric_Schedules.new(model)
+        # param_Schedules.override_hours_per_week(building_section.typical_occupant_usage_value_hours.to_f)
+
+        # param_Schedules.pre_process_space_types
+
+        # param_Schedules.create_default_schedule_set
+
+        # param_Schedules.create_schedules_and_apply_default_schedule_set
+      end
+    end
+
+    def adjust_people_schedule_old(space_type, building_section, model)
+      if !building_section.typical_occupant_usage_value_hours.nil?
+        args = {}
+        puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
+        args['hoo_per_week'] = building_section.typical_occupant_usage_value_hours
+
+        model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
+        path = model_articulation_instance.measures_dir + '/create_parametric_schedules/measure.rb'
+        puts "create parametric schedule path: #{path}"
+        require path
+
+        # create an instance of the measure
+        measure = CreateParametricSchedules.new
+
+        # create an instance of a runner
+        runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
+
+        # get arguments
+        arguments = measure.arguments(model)
+        argument_map = OpenStudio::Ruleset.convertOSArgumentVectorToMap(arguments)
+
+        # populate argument with specified hash value if specified
+        arguments.each do |arg|
+          puts "arg #{arg}"
+          temp_arg_var = arg.clone
+          if args.key?(arg.name)
+            temp_arg_var.setValue(args[arg.name])
+          end
+          argument_map[arg.name] = temp_arg_var
+        end
+
+        # run the measure
+        measure.run(model, runner, argument_map)
+        result = runner.result
+
+        # if 'Fail' passed in make sure at least one error message (while not typical there may be more than one message)
+        if result.value.valueName == 'Fail' then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.adjust_people_schedule', "Applying the create parametric schedule measure failed with #{result.errors.size} errors") end
+      end
     end
 
     def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)

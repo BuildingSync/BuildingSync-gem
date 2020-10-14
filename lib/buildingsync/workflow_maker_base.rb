@@ -1,6 +1,6 @@
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2019, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2019, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,43 +35,80 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-RSpec.describe 'BuildingSpec' do
-  it 'Should generate meaningful error when passing empty XML data' do
-    begin
-      generate_baseline('building_151_Blank', nil, nil, 'auc')
-    rescue StandardError => e
-      puts "expected error message:Building type '' is nil but got: #{e.message} " if !e.message.include?("Building type '' is nil")
-      expect(e.message.include?("Building type '' is nil")).to be true
+require 'fileutils'
+require 'json'
+require_relative 'model_maker_base'
+
+module BuildingSync
+  # base class for objects that will configure workflows based on building sync files
+  class WorkflowMakerBase < ModelMakerBase
+    def write_osws(facility, dir)
+      FileUtils.mkdir_p(dir)
     end
-  end
 
-  def generate_baseline(file_name, occupancy_type, total_floor_area, ns)
-    sub_sections = []
-    xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
+    def gather_results(dir, baseline_only = false); end
 
-    doc = create_xml_file_object(xml_path)
-    building_xml = create_building_object(doc, ns)
-
-    building_xml.elements.each("#{ns}:Subsections/#{ns}:Subsection") do |building_element|
-      sub_sections.push(BuildingSync::BuildingSubsection.new(building_element, occupancy_type, total_floor_area, ns))
+    def failed_scenarios
+      return []
     end
-    return sub_sections
-  end
 
-  def create_building_object(doc, ns)
-    buildings = []
-    doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building_xml|
-      buildings.push(building_xml)
+    def save_xml(filename)
+      File.open(filename, 'w') do |file|
+        @doc.write(file)
+      end
     end
-    return buildings[0]
-  end
 
-  def create_xml_file_object(xml_file_path)
-    doc = nil
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
+    def set_measure_path(osw, measures_dir)
+      osw['measure_paths'] = [measures_dir]
     end
-    return doc
+
+    def set_measure_paths(osw, measures_dir_array)
+      osw['measure_paths'] = measures_dir_array
+    end
+
+    def clear_all_measures
+      @workflow.delete('steps')
+      @workflow['steps'] = []
+    end
+
+    def add_measure_path(measures_dir)
+      @workflow['measure_paths'].each do |dir|
+        if dir == measures_dir
+          return false
+        end
+      end
+      @workflow['measure_paths'] << measures_dir
+      return true
+    end
+
+    def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
+      result = false
+      osw['steps'].each do |step|
+        if step['measure_dir_name'] == measure_dir_name
+          step['arguments'][argument_name] = argument_value
+          result = true
+        end
+      end
+
+      if !result
+        raise "Could not set '#{argument_name}' to '#{argument_value}' for measure '#{measure_dir_name}'"
+      end
+
+      return result
+    end
+
+    def add_new_measure(osw, measure_dir_name)
+      # first we check if the measure already exists
+      osw['steps'].each do |step|
+        if step['measure_dir_name'] == measure_dir_name
+          return false
+        end
+      end
+      # if it does not exist we add it
+      new_step = {}
+      new_step['measure_dir_name'] = measure_dir_name
+      osw['steps'].unshift(new_step)
+      return true
+    end
   end
 end
