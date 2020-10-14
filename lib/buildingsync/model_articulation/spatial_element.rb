@@ -283,7 +283,6 @@ module BuildingSync
       user_defined_fields = REXML::Element.new("#{ns}:UserDefinedFields")
       xml_element.add_element(user_defined_fields)
 
-      add_user_defined_field_to_xml_file(user_defined_fields, ns, 'TotalFloorArea', @total_floor_area)
       add_user_defined_field_to_xml_file(user_defined_fields, ns, 'BuildingType', @bldg_type)
       add_user_defined_field_to_xml_file(user_defined_fields, ns, 'SystemType', @system_type)
       add_user_defined_field_to_xml_file(user_defined_fields, ns, 'BarDivisionMethod', @bar_division_method)
