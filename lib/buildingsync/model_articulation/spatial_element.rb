@@ -300,7 +300,9 @@ module BuildingSync
         next if floor_area.nil?
 
         floor_area_type = floor_area_element.elements["#{ns}:FloorAreaType"].text
-        if floor_area_type == 'Heated and Cooled'
+        if floor_area_type == 'Gross'
+          floor_area_element.elements["#{ns}:FloorAreaValue"].text = @total_floor_area
+        elsif floor_area_type == 'Heated and Cooled'
           floor_area_element.elements["#{ns}:FloorAreaValue"].text = @conditioned_floor_area_heated_cooled
         elsif floor_area_type == 'Conditioned'
           floor_area_element.elements["#{ns}:FloorAreaValue"].text = @conditioned_floor_area_heated_cooled
