@@ -120,7 +120,6 @@ RSpec.describe 'WorkFlow Maker' do
 
     month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
 
-    scenario_name = 'baseline'
     monthly_results = {}
     electricity = 'Electricity'
     natural_gas = 'NaturalGas'
@@ -136,9 +135,9 @@ RSpec.describe 'WorkFlow Maker' do
       natural_gas_key = natural_gas.downcase + "_ip_#{month_lookup[month]}"
       monthly[natural_gas_key.to_sym] = (10*month).to_s
     end
-    monthly_results[scenario_name] = monthly
+    monthly_results[BASELINE] = monthly
 
-    time_series_data = workflow_maker.get_timeseries_data_element(monthly_results, 2020, scenario_name)
+    time_series_data = workflow_maker.get_timeseries_data_element(monthly_results, 2020, BASELINE)
 
     time_series_data.each do |time_series|
       reading = time_series.elements["#{ns}:IntervalReading"].text.to_f

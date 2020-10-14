@@ -74,7 +74,7 @@ RSpec.configure do |config|
     basic_dir = File.dirname(osm_name)
     file_name = File.basename(osm_name)
 
-    osm_baseline_dir = File.join(basic_dir, 'Baseline')
+    osm_baseline_dir = File.join(basic_dir, BASELINE)
     if !File.exist?(osm_baseline_dir)
       FileUtils.mkdir_p(osm_baseline_dir)
     end

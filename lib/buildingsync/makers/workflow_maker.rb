@@ -311,6 +311,24 @@ module BuildingSync
       return scenarios
     end
 
+    def scenario_is_baseline_scenario(scenario)
+      # first we check if we find the new scenario type definition
+      return true if scenario.elements["#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Modeled"]
+      # alternatively we check based on the Scenario Name as we used to
+      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+      return true if scenario_name == BASELINE
+      return false
+    end
+
+    def scenario_is_measured_scenario(scenario)
+      # first we check if we find the new scenario type definition
+      return true if scenario.elements["#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Measured"]
+      # alternatively we check based on the Scenario Name as we used to
+      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+      return true if scenario_name == MEASURED
+      return false
+    end
+
     def write_osws(facility, dir)
       super
 
@@ -323,9 +341,8 @@ module BuildingSync
       scenarios.each do |scenario|
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
         puts "scenario with name #{scenario_name} found"
-        if scenario_name == 'Baseline'
+        if scenario_is_baseline_scenario(scenario)
           found_baseline = true
-          puts '.....found the baseline scenario'
           break
         end
       end
@@ -333,16 +350,16 @@ module BuildingSync
       if !found_baseline
         if !scenarios.nil?
           scenario_element = REXML::Element.new("#{@ns}:Scenario")
-          scenario_element.attributes['ID'] = 'Baseline'
+          scenario_element.attributes['ID'] = BASELINE
 
           scenario_name_element = REXML::Element.new("#{@ns}:ScenarioName")
-          scenario_name_element.text = 'Baseline'
+          scenario_name_element.text = BASELINE
           scenario_element.add_element(scenario_name_element)
 
           scenario_type_element = REXML::Element.new("#{@ns}:ScenarioType")
           package_of_measures_element = REXML::Element.new("#{@ns}:PackageOfMeasures")
           reference_case_element = REXML::Element.new("#{@ns}:ReferenceCase")
-          reference_case_element.attributes['IDref'] = 'Baseline'
+          reference_case_element.attributes['IDref'] = BASELINE
           package_of_measures_element.add_element(reference_case_element)
           scenario_type_element.add_element(package_of_measures_element)
           scenario_element.add_element(scenario_type_element)
@@ -354,8 +371,7 @@ module BuildingSync
 
       found_baseline = false
       scenarios.each do |scenario|
-        scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        if scenario_name == 'Baseline'
+        if scenario_is_baseline_scenario(scenario)
           found_baseline = true
           break
         end
@@ -370,7 +386,7 @@ module BuildingSync
       scenarios.each do |scenario|
         # get information about the scenario
         scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if scenario_name == 'Measured'
+        next if scenario_is_measured_scenario(scenario)
 
         # deep clone
         osw = JSON.load(JSON.generate(@workflow))
@@ -448,8 +464,8 @@ module BuildingSync
         else
           scenario_name = scenario.attributes['ID']
         end
-        next if scenario_name == 'Measured'
-        next if scenario_name != 'Baseline' && baseline_only
+        next if scenario_is_measured_scenario(scenario)
+        next if !scenario_is_baseline_scenario(scenario) && baseline_only
 
         # dir for the osw
         osw_dir = File.join(dir, scenario_name)
@@ -754,7 +770,7 @@ module BuildingSync
       eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
       variables['total_source_energy_kbtu'], variables['total_source_eui_kbtu_ft2'] = get_source_energy_array(eplustbl_path)
 
-      baseline_eplustbl_path = File.join(dir, 'Baseline', 'eplustbl.htm')
+      baseline_eplustbl_path = File.join(dir, BASELINE, 'eplustbl.htm')
       variables['baseline_total_source_energy_kbtu'], variables['baseline_total_source_eui_kbtu_ft2'] = get_source_energy_array(baseline_eplustbl_path)
       # end hack
 
@@ -793,7 +809,7 @@ module BuildingSync
       scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
 
       result = results[scenario_name]
-      baseline = results['Baseline']
+      baseline = results[BASELINE]
 
       if result.nil?
         puts "Cannot load results for scenario #{scenario_name}, because the result is nil"
@@ -858,8 +874,8 @@ module BuildingSync
             scenarios_found = true
             # get information about the scenario
             scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-            next if scenario_name == 'Measured'
-            next if scenario_name == 'Baseline'
+            next if scenario_is_measured_scenario(scenario)
+            next if scenario_is_baseline_scenario(scenario)
 
             results_counter += 1
             package_of_measures = delete_previous_results(scenario)
