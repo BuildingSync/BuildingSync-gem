@@ -364,6 +364,13 @@ module BuildingSync
           scenario_type_element.add_element(package_of_measures_element)
           scenario_element.add_element(scenario_type_element)
 
+          # adding XML elements for the new way to define a baseline scenario
+          current_building = REXML::Element.new("#{@ns}:CurrentBuilding")
+          calculation_method = REXML::Element.new("#{@ns}:CalculationMethod")
+          modeled = REXML::Element.new("#{@ns}:Modeled")
+          calculation_method.add_element(modeled)
+          current_building.add_element(calculation_method)
+          scenario_element.add_element(current_building)
           get_scenarios.add_element(scenario_element)
           puts '.....adding a new baseline scenario'
         end
