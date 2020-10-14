@@ -73,8 +73,8 @@ RSpec.describe 'HVACSystemSpec' do
     hvac_system = get_hvac_system_from_file('building_151_level1.xml', ASHRAE90_1)
     expected_value = 'VAVwReheat'
     puts "hvac_system #{hvac_system}"
-    puts "expected primary_hvac_system_type : #{expected_value} but got: #{hvac_system.get_primary_hvac_system_type} " if hvac_system.get_primary_hvac_system_type != expected_value
-    expect(hvac_system.get_primary_hvac_system_type == expected_value).to be true
+    puts "expected primary_hvac_system_type : #{expected_value} but got: #{hvac_system.get_principal_hvac_system_type} " if hvac_system.get_principal_hvac_system_type != expected_value
+    expect(hvac_system.get_principal_hvac_system_type == expected_value).to be true
   end
 
   def get_hvac_system_from_file(xml_file_name, standard_to_be_used)
