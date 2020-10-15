@@ -356,14 +356,6 @@ module BuildingSync
           scenario_name_element.text = BASELINE
           scenario_element.add_element(scenario_name_element)
 
-          scenario_type_element = REXML::Element.new("#{@ns}:ScenarioType")
-          package_of_measures_element = REXML::Element.new("#{@ns}:PackageOfMeasures")
-          reference_case_element = REXML::Element.new("#{@ns}:ReferenceCase")
-          reference_case_element.attributes['IDref'] = BASELINE
-          package_of_measures_element.add_element(reference_case_element)
-          scenario_type_element.add_element(package_of_measures_element)
-          scenario_element.add_element(scenario_type_element)
-
           # adding XML elements for the new way to define a baseline scenario
           current_building = REXML::Element.new("#{@ns}:CurrentBuilding")
           calculation_method = REXML::Element.new("#{@ns}:CalculationMethod")
