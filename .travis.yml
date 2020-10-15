@@ -39,6 +39,11 @@ script:
 #  - bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
 after_failure:
   - echo "Job failed... maybe these logs will help?"
+  - gem env
+  - bundle env
+  - which bundle
+  - cat $(which bundle)
+  - which gem
   - free -tm
   - ls -alt /home/travis/build/BuildingSync/BuildingSync-gem
   - echo "============================================ Gemfile.lock ========================================="
