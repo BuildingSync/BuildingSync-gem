@@ -13,8 +13,8 @@ before_install:
   - gem install bundler
   - bundle -v
 install:
-  # - bundle config set path '.'
-  - bundle install --path .
+  - bundle config set path './build/BuildingSync/BuildingSync-gem/'
+  # - bundle install --path .
 before_script:
   - curl -LO https://github.com/NREL/OpenStudio/releases/download/v3.0.1/OpenStudio-3.0.1+09b7c8a554-Linux.deb
   - sudo apt install ./OpenStudio-3.0.1+09b7c8a554-Linux.deb
