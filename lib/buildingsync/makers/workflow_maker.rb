@@ -821,8 +821,12 @@ module BuildingSync
       end
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
-      package_of_measures.add_element(add_calc_method_element(result))
-      package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, annual_results))
+      if package_of_measures
+        package_of_measures.add_element(add_calc_method_element(result))
+        package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, annual_results))
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.add_results_to_scenario', "Scenario: #{scenario_name} does not have a package of measures xml element defined.")
+      end
 
       res_uses = get_resource_uses_element(scenario_name, annual_results)
       scenario_type = scenario.elements["#{@ns}:ScenarioType"]
