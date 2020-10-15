@@ -76,7 +76,7 @@ RSpec.describe 'BuildingSync' do
     epw_file_path = nil
 
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, CA_TITLE24)
-    # translator.insert_energyplus_measure('scale_geometry', 1)
+    translator.insert_energyplus_measure('scale_geometry', 1)
     translator.write_osm
     translator.write_osws
     translator.run_osws
