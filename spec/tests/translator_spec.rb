@@ -60,10 +60,10 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should add a new EnergyPlus measure' do
-    xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
+    xml_path = File.expand_path('./../files/building_151_one_scenario.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
-    out_path = File.expand_path('./../output/building_151/', File.dirname(__FILE__))
+    out_path = File.expand_path('./../output/building_151_one_scenario/', File.dirname(__FILE__))
 
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
