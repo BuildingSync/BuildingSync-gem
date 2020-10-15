@@ -211,10 +211,12 @@ module BuildingSync
       Dir.glob("#{@output_dir}/**/in.osw") { |osw| osw_files << osw }
       Dir.glob("#{@output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
 
-      puts ENV['PATH']
-      puts ENV['GEM_PATH']
-      puts ENV['GEM_HOME']
-      puts ENV['RUBYLIB']
+      puts "PATH #{ENV['PATH']}"
+      puts "GEM_PATH #{ENV['GEM_PATH']}"
+      puts "GEM HOME #{ENV['GEM_HOME']}"
+      puts "RUBYLIB #{ENV['RUBYLIB']}"
+      puts 'gem list'
+      puts `gem list`
       runner = OpenStudio::Extension::Runner.new(dirname=Dir.pwd, bundle_without=[], options=runner_options)
       return runner.run_osws(osw_files - osw_sr_files)
     end
