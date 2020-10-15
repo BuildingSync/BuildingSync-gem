@@ -25,19 +25,17 @@
           </auc:Buildings>
         </auc:Site>
       </auc:Sites>
-      <auc:Systems/>
-      <auc:Measures>
-        <auc:Measure/>
-      </auc:Measures>
       <auc:Reports>
         <auc:Report>
           <auc:Scenarios>
             <auc:Scenario ID="Baseline">
               <auc:ScenarioName>Baseline</auc:ScenarioName>
               <auc:ScenarioType>
-                <auc:PackageOfMeasures>
-                  <auc:ReferenceCase IDref="Baseline"/>
-                </auc:PackageOfMeasures>
+                <auc:CurrentBuilding>
+                  <auc:CalculationMethod>
+                    <auc:Modeled/>
+                  </auc:CalculationMethod>
+                </auc:CurrentBuilding>
               </auc:ScenarioType>
             </auc:Scenario>
           </auc:Scenarios>

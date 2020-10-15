@@ -833,9 +833,11 @@
             <n1:Scenario ID="Baseline">
               <n1:ScenarioName>Baseline</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
-                  <n1:ReferenceCase IDref="Baseline"/>
-                </n1:PackageOfMeasures>
+                <n1:CurrentBuilding>
+                  <n1:CalculationMethod>
+                    <n1:Modeled/>
+                  </n1:CalculationMethod>
+                </n1:CurrentBuilding>
               </n1:ScenarioType>
             </n1:Scenario>
             <n1:Scenario>

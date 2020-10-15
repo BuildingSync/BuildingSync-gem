@@ -34,7 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative '../workflow_maker_base'
+require_relative 'workflow_maker_base'
 require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
 require 'openstudio/ee_measures'
@@ -305,27 +305,18 @@ module BuildingSync
 
     def get_scenarios
       scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"]
-      if scenarios.nil?
-        scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios"]
-      end
       return scenarios
     end
 
     def scenario_is_baseline_scenario(scenario)
       # first we check if we find the new scenario type definition
       return true if scenario.elements["#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Modeled"]
-      # alternatively we check based on the Scenario Name as we used to
-      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-      return true if scenario_name == BASELINE
       return false
     end
 
     def scenario_is_measured_scenario(scenario)
       # first we check if we find the new scenario type definition
       return true if scenario.elements["#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Measured"]
-      # alternatively we check based on the Scenario Name as we used to
-      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-      return true if scenario_name == MEASURED
       return false
     end
 

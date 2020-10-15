@@ -35,19 +35,19 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 RSpec.describe 'BuildingSync' do
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for Title24' do
+  it 'should parse building_151.xml (phase zero) with auc namespace for Title24, perform a sizing run, and create an in.osm' do
     test_baseline_creation('building_151.xml', CA_TITLE24)
   end
 
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1' do
+  it 'should parse building_151.xml (phase zero) with auc namespace for ASHRAE 90.1, perform a sizing run, and create an in.osm' do
     test_baseline_creation('building_151.xml', ASHRAE90_1)
   end
 
-  it 'should parse and write L100.xml (phase zero) with auc namespace for ASHRAE 90.1' do
+  it 'should parse L100_Instance1.xml (phase zero) with auc namespace for ASHRAE 90.1, perform a sizing run, and create an in.osm' do
     test_baseline_creation('L100_Instance1.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
-  it 'should parse and write building_151_n1.xml (phase zero) with n1 namespace for Title24' do
+  it 'should parse building_151_n1.xml (phase zero) with n1 namespace for Title24, perform a sizing run, and create an in.osm' do
     test_baseline_creation('building_151_n1.xml', CA_TITLE24)
   end
 
@@ -60,23 +60,23 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
-  it 'should parse and write DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1' do
+  it 'should parse DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1, perform a sizing run, and create an in.osm' do
     test_baseline_creation('DC GSA Headquarters.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
-  it 'should parse and write DC GSA Headquarterswith.xml (phase zero) with ASHRAE 90.1' do
+  it 'should parse DC GSA HeadquartersWithClimateZone.xml (phase zero) with ASHRAE 90.1, perform a sizing run, and create an in.osm' do
     test_baseline_creation('DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
-  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with Title 24' do
+  it 'should parse BuildingSync Website Valid Schema.xml (phase zero) with Title 24, perform a sizing run, and create an in.osm' do
     test_baseline_creation('BuildingSync Website Valid Schema.xml', CA_TITLE24, 'CZ01RV2.epw')
   end
 
-  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with ASHRAE 90.1' do
+  it 'should parse BuildingSync Website Valid Schema.xml (phase zero) with ASHRAE 90.1, perform a sizing run, and create an in.osm' do
     test_baseline_creation('BuildingSync Website Valid Schema.xml', ASHRAE90_1, 'CZ01RV2.epw')
   end
 
-  it 'should parse and write Golden Test File.xml (phase zero) with ASHRAE 90.1' do
+  it 'should not parse Golden Test File.xml (phase zero) since there are 2 buildings defined' do
     begin
       test_baseline_creation('Golden Test File.xml', ASHRAE90_1, 'CZ01RV2.epw')
     rescue StandardError => e
@@ -85,7 +85,7 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
-  it 'should parse and write AT_example_property_report_25.xml (phase zero) with ASHRAE 90.1' do
+  it 'should not parse AT_example_property_report_25.xml since there are 3 buildings defined' do
     begin
       test_baseline_creation('AT_example_property_report_25.xml', ASHRAE90_1, 'CZ01RV2.epw')
     rescue StandardError => e
