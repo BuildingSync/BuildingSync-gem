@@ -13,8 +13,8 @@ before_install:
   - gem install bundler
   - bundle -v
 install:
-  - bundle config set path '.'
-  - bundle install
+  # - bundle config set path '.'
+  - bundle install --path .
 before_script:
   - curl -LO https://github.com/NREL/OpenStudio/releases/download/v3.0.1/OpenStudio-3.0.1+09b7c8a554-Linux.deb
   - sudo apt install ./OpenStudio-3.0.1+09b7c8a554-Linux.deb
@@ -39,7 +39,7 @@ script:
 #  - bundle exec rspec spec/tests/model_articulation_test/site_spec.rb
 #  - bundle exec rspec spec/tests/translator_baseline_generation_spec.rb
 #  - bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
-after_failure:
+after_script:
   - echo "Job failed... maybe these logs will help?"
   - gem env
   - bundle env
