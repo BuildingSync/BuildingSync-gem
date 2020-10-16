@@ -747,34 +747,32 @@ module BuildingSync
       return all_res_totals
     end
 
-    def gather_annual_results(dir, result, scenario_name, baseline)
+    def gather_annual_results(dir, result, scenario_name, baseline, is_baseline)
       variables = {}
       # Check out.osw "openstudio_results" for output variables
       variables['total_site_energy_kbtu'] = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
-      variables['baseline_total_site_energy_kbtu'] = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
-
       variables['total_site_eui_kbtu_ft2'] = get_measure_result(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-      variables['baseline_total_site_eui_kbtu_ft2'] = get_measure_result(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-
       # temporary hack to get source energy
       eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
       variables['total_source_energy_kbtu'], variables['total_source_eui_kbtu_ft2'] = get_source_energy_array(eplustbl_path)
 
-      baseline_eplustbl_path = File.join(dir, BASELINE, 'eplustbl.htm')
-      variables['baseline_total_source_energy_kbtu'], variables['baseline_total_source_eui_kbtu_ft2'] = get_source_energy_array(baseline_eplustbl_path)
-      # end hack
-
       variables['fuel_electricity_kbtu'] = get_measure_result(result, 'openstudio_results', 'fuel_electricity') # in kBtu
-      variables['baseline_fuel_electricity_kbtu'] = get_measure_result(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
-
       variables['fuel_natural_gas_kbtu'] = get_measure_result(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
-      variables['baseline_fuel_natural_gas_kbtu'] = get_measure_result(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
-
       variables['annual_peak_electric_demand_kw'] = get_measure_result(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
-      variables['baseline_annual_peak_electric_demand_kw'] = get_measure_result(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
-
       variables['annual_utility_cost'] = get_measure_result(result, 'openstudio_results', 'annual_utility_cost') # in $
-      variables['baseline_annual_utility_cost'] = get_measure_result(baseline, 'openstudio_results', 'annual_utility_cost') # in $
+
+      if(!is_baseline)
+        variables['baseline_total_site_energy_kbtu'] = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
+        variables['baseline_total_site_eui_kbtu_ft2'] = get_measure_result(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
+        # temporary hack
+        baseline_eplustbl_path = File.join(dir, 'Baseline', 'eplustbl.htm')
+        variables['baseline_total_source_energy_kbtu'], variables['baseline_total_source_eui_kbtu_ft2'] = get_source_energy_array(baseline_eplustbl_path)
+
+        variables['baseline_fuel_electricity_kbtu'] = get_measure_result(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
+        variables['baseline_fuel_natural_gas_kbtu'] = get_measure_result(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
+        variables['baseline_annual_peak_electric_demand_kw'] = get_measure_result(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
+        variables['baseline_annual_utility_cost'] = get_measure_result(baseline, 'openstudio_results', 'annual_utility_cost') # in $
+      end
 
       variables['total_site_energy_savings_mmbtu'] = 0
       if variables['baseline_total_site_energy_kbtu'] && variables['total_site_energy_kbtu']
@@ -829,8 +827,12 @@ module BuildingSync
       end
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
-      package_of_measures.add_element(add_calc_method_element(result))
-      package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, annual_results))
+      if package_of_measures
+        package_of_measures.add_element(add_calc_method_element(result))
+        package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, annual_results))
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.add_results_to_scenario', "Scenario: #{scenario_name} does not have a package of measures xml element defined.")
+      end
 
       res_uses = get_resource_uses_element(scenario_name, annual_results)
       scenario_type = scenario.elements["#{@ns}:ScenarioType"]
@@ -870,7 +872,7 @@ module BuildingSync
             results_counter += 1
             package_of_measures = delete_previous_results(scenario)
             result, baseline = get_result_for_scenario(results, scenario)
-            annual_results = gather_annual_results(dir, result, scenario_name, baseline)
+            annual_results = gather_annual_results(dir, result, scenario_name, baseline, scenario_name == 'Baseline')
 
             add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, monthly_results, year_val)
           end
