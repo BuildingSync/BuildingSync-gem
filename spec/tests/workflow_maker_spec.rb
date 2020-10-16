@@ -68,7 +68,7 @@ RSpec.describe 'WorkFlow Maker' do
         expect(workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, {}, result, nil, nil)).to be false
         expect(workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, nil, nil)).to be true
       end
-      new_variables = workflow_maker.extract_annual_results(scenario, package_of_measures)
+      new_variables = workflow_maker.extract_annual_results(scenario, scenario_name, package_of_measures)
       expect(hash_diff(annual_results, new_variables)).to be true
     end
     xml_path_output = xml_path.sub! '/files/', '/output/'
@@ -83,8 +83,60 @@ RSpec.describe 'WorkFlow Maker' do
       puts "scenario_name: #{scenario_name}"
       package_of_measures = workflow_maker_output.get_package_of_measures(scenario)
       puts "package_of_measures: #{package_of_measures}"
-      new_annual_results = workflow_maker_output.extract_annual_results(scenario, package_of_measures)
+      new_annual_results = workflow_maker_output.extract_annual_results(scenario, scenario_name, package_of_measures)
       expect(hash_diff(annual_results, new_annual_results)).to be true
+    end
+  end
+
+  it 'should save baseline annual results to xml file and verify them' do
+    file_name = 'building_151.xml'
+    xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
+    expect(File.exist?(xml_path)).to be true
+
+    ns = 'auc'
+    doc = BuildingSync::Helper.read_xml_file_document(xml_path)
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+    result = {}
+    result[:completed_status] = 'Success'
+
+    annual_results = {}
+    annual_results['total_site_energy_savings_mmbtu'] = 100
+    annual_results['total_source_energy_savings_mmbtu'] = 200
+    annual_results['total_energy_cost_savings'] = 300
+    annual_results['fuel_electricity_kbtu'] = 500
+    annual_results['fuel_natural_gas_kbtu'] = 700
+    annual_results['annual_peak_electric_demand_kw'] = 800
+
+    scenarios = workflow_maker.get_scenario_elements
+    scenarios.each do |scenario|
+      scenario_name = scenario.elements["#{ns}:ScenarioName"].text
+      if scenario_name == 'Baseline'
+        puts "scenario_name: #{scenario_name}"
+        package_of_measures = workflow_maker.delete_previous_results(scenario)
+        puts "package_of_measures: #{package_of_measures}"
+        if package_of_measures.length > 0
+          expect(workflow_maker.add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, nil, nil)).to be true
+        end
+        new_variables = workflow_maker.extract_annual_results(scenario, scenario_name, package_of_measures)
+        expect(hash_diff(annual_results, new_variables)).to be true
+      end
+    end
+    xml_path_output = xml_path.sub! '/files/', '/output/'
+    workflow_maker.save_xml(xml_path_output)
+
+    doc_output = BuildingSync::Helper.read_xml_file_document(xml_path_output)
+    workflow_maker_output = BuildingSync::WorkflowMaker.new(doc_output, ns)
+
+    scenarios = workflow_maker_output.get_scenario_elements
+    scenarios.each do |scenario|
+      scenario_name = scenario.elements["#{ns}:ScenarioName"].text
+      if scenario_name == 'Baseline'
+        puts "scenario_name: #{scenario_name}"
+        package_of_measures = workflow_maker_output.get_package_of_measures(scenario)
+        puts "package_of_measures: #{package_of_measures}"
+        new_annual_results = workflow_maker_output.extract_annual_results(scenario, scenario_name, package_of_measures)
+        expect(hash_diff(annual_results, new_annual_results)).to be true
+      end
     end
   end
 

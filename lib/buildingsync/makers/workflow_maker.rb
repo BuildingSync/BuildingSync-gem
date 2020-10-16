@@ -903,7 +903,7 @@ module BuildingSync
       return result[0], result[1]
     end
 
-    def extract_annual_results(scenario, package_of_measures)
+    def extract_annual_results(scenario, scenario_name, package_of_measures)
       variables = {}
 
       if(package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"])
@@ -916,35 +916,47 @@ module BuildingSync
         variables['total_energy_cost_savings'] = package_of_measures.elements["#{@ns}:AnnualSavingsCost"].text
       end
 
-      scenario.elements["#{@ns}:ResourceUses"].each do |resource_use|
-        if resource_use.elements["#{@ns}:EnergyResource"].text == 'Electricity'
-          variables['fuel_electricity_kbtu'] = resource_use.elements["#{@ns}:AnnualFuelUseNativeUnits"].text
-          if resource_use.elements["#{@ns}:PeakResourceUnits"].text == 'kW'
-            variables['annual_peak_electric_demand_kw'] = resource_use.elements["#{@ns}:AnnualPeakNativeUnits"].text
+      if scenario.elements["#{@ns}:ResourceUses"]
+        scenario.elements["#{@ns}:ResourceUses"].each do |resource_use|
+          if resource_use.elements["#{@ns}:EnergyResource"].text == 'Electricity'
+            variables['fuel_electricity_kbtu'] = resource_use.elements["#{@ns}:AnnualFuelUseNativeUnits"].text
+            if resource_use.elements["#{@ns}:PeakResourceUnits"].text == 'kW'
+              variables['annual_peak_electric_demand_kw'] = resource_use.elements["#{@ns}:AnnualPeakNativeUnits"].text
+            end
+          elsif resource_use.elements["#{@ns}:EnergyResource"].text == 'Natural gas'
+            variables['fuel_natural_gas_kbtu'] = resource_use.elements["#{@ns}:AnnualFuelUseNativeUnits"].text
           end
-        elsif resource_use.elements["#{@ns}:EnergyResource"].text == 'Natural gas'
-          variables['fuel_natural_gas_kbtu'] = resource_use.elements["#{@ns}:AnnualFuelUseNativeUnits"].text
         end
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.extract_annual_results', "Scenario: #{scenario_name} does not have any ResourceUses xml elements defined.")
       end
 
-      package_of_measures.elements["#{@ns}:AnnualSavingsByFuels"].each do |annual_savings|
-        if annual_savings.elements["#{@ns}:EnergyResource"].text == 'Electricity'
-          variables['baseline_fuel_electricity_kbtu'] = annual_savings.elements["#{@ns}:AnnualSavingsNativeUnits"].text.to_i + variables['fuel_electricity_kbtu'].to_i
-        elsif annual_savings.elements["#{@ns}:EnergyResource"].text == 'Natural gas'
-          variables['baseline_fuel_natural_gas_kbtu'] = annual_savings.elements["#{@ns}:AnnualSavingsNativeUnits"].text.to_i + variables['fuel_natural_gas_kbtu'].to_i
+      if scenario.elements["#{@ns}:AnnualSavingsByFuels"]
+        package_of_measures.elements["#{@ns}:AnnualSavingsByFuels"].each do |annual_savings|
+          if annual_savings.elements["#{@ns}:EnergyResource"].text == 'Electricity'
+            variables['baseline_fuel_electricity_kbtu'] = annual_savings.elements["#{@ns}:AnnualSavingsNativeUnits"].text.to_i + variables['fuel_electricity_kbtu'].to_i
+          elsif annual_savings.elements["#{@ns}:EnergyResource"].text == 'Natural gas'
+            variables['baseline_fuel_natural_gas_kbtu'] = annual_savings.elements["#{@ns}:AnnualSavingsNativeUnits"].text.to_i + variables['fuel_natural_gas_kbtu'].to_i
+          end
         end
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.extract_annual_results', "Scenario: #{scenario_name} does not have any AnnualSavingsByFuels xml elements defined.")
       end
 
-      scenario.elements["#{@ns}:AllResourceTotals"].each do |all_resource_total|
-        if all_resource_total.elements["#{@ns}:SiteEnergyUse"]
-          variables['total_site_energy_kbtu'] = all_resource_total.elements["#{@ns}:SiteEnergyUse"].text
-        elsif all_resource_total.elements["#{@ns}:SiteEnergyUseIntensity"]
-          variables['total_site_eui_kbtu_ft2'] = all_resource_total.elements["#{@ns}:SiteEnergyUseIntensity"].text
-        elsif all_resource_total.elements["#{@ns}:SourceEnergyUse"]
-          variables['total_source_energy_kbtu'] = all_resource_total.elements["#{@ns}:SourceEnergyUse"].text
-        elsif all_resource_total.elements["#{@ns}:SourceEnergyUseIntensity"]
-          variables['total_source_eui_kbtu_ft2'] = all_resource_total.elements["#{@ns}:SourceEnergyUseIntensity"].text
+      if scenario.elements["#{@ns}:AllResourceTotals"]
+        scenario.elements["#{@ns}:AllResourceTotals"].each do |all_resource_total|
+          if all_resource_total.elements["#{@ns}:SiteEnergyUse"]
+            variables['total_site_energy_kbtu'] = all_resource_total.elements["#{@ns}:SiteEnergyUse"].text
+          elsif all_resource_total.elements["#{@ns}:SiteEnergyUseIntensity"]
+            variables['total_site_eui_kbtu_ft2'] = all_resource_total.elements["#{@ns}:SiteEnergyUseIntensity"].text
+          elsif all_resource_total.elements["#{@ns}:SourceEnergyUse"]
+            variables['total_source_energy_kbtu'] = all_resource_total.elements["#{@ns}:SourceEnergyUse"].text
+          elsif all_resource_total.elements["#{@ns}:SourceEnergyUseIntensity"]
+            variables['total_source_eui_kbtu_ft2'] = all_resource_total.elements["#{@ns}:SourceEnergyUseIntensity"].text
+          end
         end
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.extract_annual_results', "Scenario: #{scenario_name} does not have any AllResourceTotals xml elements defined.")
       end
       return variables
     end
