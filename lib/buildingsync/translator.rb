@@ -122,7 +122,7 @@ module BuildingSync
       dir_split = dir.split(File::SEPARATOR)
       puts "dir_split: #{dir_split}"
       puts "dir_split[]: #{dir_split[dir_split.length - 1]}"
-      if (dir_split[dir_split.length - 1] == 'Baseline')
+      if (dir_split[dir_split.length - 1] == BASELINE)
         dir = dir.gsub('/Baseline', '')
       end
       puts "dir: #{dir}"
@@ -172,7 +172,7 @@ module BuildingSync
     def run_osm(epw_name, runner_options = {run_simulations: true, verbose: false, num_parallel: 1, max_to_run: Float::INFINITY})
       file_name = 'in.osm'
 
-      osm_baseline_dir = File.join(@output_dir, 'Baseline')
+      osm_baseline_dir = File.join(@output_dir, BASELINE)
       if !File.exist?(osm_baseline_dir)
         FileUtils.mkdir_p(osm_baseline_dir)
       end
