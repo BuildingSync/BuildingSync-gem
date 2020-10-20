@@ -39,9 +39,9 @@ jobs:
     - script:
       - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb 
       name: "Translator Baseline Simulation Spec"
-      - script:
-        - bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb
-        name: "Translator Scenario Simulation Spec"
+    - script:
+      - bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb
+      name: "Translator Scenario Simulation Spec"
     - script:
       - bundle exec rspec spec/tests/building_sync_spec.rb
       - bundle exec rspec spec/tests/epw_test_spec.rb
