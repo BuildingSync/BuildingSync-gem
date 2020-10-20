@@ -48,15 +48,14 @@ module BuildingSync
 
     # initialize
     def initialize(section_element, occ_type, bldg_total_floor_area, ns)
-      @ID = nil
-      @doorIDs = []
-      @wallIDs = []
-      @windowIDs = []
-      @roofIDs = []
-      @skylightIDs = []
-      @exterior_floorIDs = []
-      @foundationIDs = []
-
+      @id = nil
+      @doorids = []
+      @wall_ids = []
+      @window_ids = []
+      @roof_ids = []
+      @skylight_ids = []
+      @exterior_floor_ids = []
+      @foundation_ids = []
 
       # parameter to read and write.
       @fraction_area = nil
@@ -80,7 +79,7 @@ module BuildingSync
 
     def read_xml(section_element, occ_type, bldg_total_floor_area, ns)
       if section_element.attributes['ID']
-        @ID = section_element.attributes['ID']
+        @id = section_element.attributes['ID']
       end
       # floor areas
       @total_floor_area = read_floor_areas(section_element, bldg_total_floor_area, ns)
@@ -158,62 +157,95 @@ module BuildingSync
             @dwellings_occupied_percent = user_defined_field.elements["#{ns}:FieldValue"].text
           end
         end
-       end
+      end
     end
 
     def read_construction_types(section_element, ns)
       if section_element.elements["#{ns}:Sides"]
         section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:DoorID") do |door|
-          @doorIDs.push(door.attributes['IDref'])
+          @doorids.push(door.attributes['IDref'])
         end
         section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:WallID") do |wall|
-          @wallIDs.push(wall.attributes['IDref'])
+          @wall_ids.push(wall.attributes['IDref'])
         end
         section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:WindowID") do |window|
-          @windowIDs.push(window.attributes['IDref'])
+          @window_ids.push(window.attributes['IDref'])
         end
       end
       if section_element.elements["#{ns}:Roofs"]
         section_element.elements.each("#{ns}:Roofs/#{ns}:Roof/#{ns}:RoofID") do |roof|
-          @roofIDs.push(roof.attributes['IDref'])
+          @roof_ids.push(roof.attributes['IDref'])
         end
         section_element.elements.each("#{ns}:Roofs/#{ns}:Roof/#{ns}:RoofID/#{ns}:SkylightIDs/#{ns}:SkylightID") do |skylight|
-          @skylightIDs.push(skylight.attributes['IDref'])
+          @skylight_ids.push(skylight.attributes['IDref'])
         end
       end
       if section_element.elements["#{ns}:ExteriorFloors"]
         section_element.elements.each("#{ns}:ExteriorFloors/#{ns}:ExteriorFloor/#{ns}:ExteriorFloorID ") do |floor|
-          @exterior_floorIDs.push(floor.attributes['IDref'])
+          @exterior_floor_ids.push(floor.attributes['IDref'])
         end
       end
       if section_element.elements["#{ns}:Foundations"]
         section_element.elements.each("#{ns}:Foundations/#{ns}:Foundation/#{ns}:FoundationID  ") do |foundation|
-          @foundationIDs.push(foundation.attributes['IDref'])
+          @foundation_ids.push(foundation.attributes['IDref'])
         end
       end
     end
 
-    def write_parameters_to_xml(ns, buildingSection)
-      buildingSection.elements["#{ns}:fraction_area"].text = @fraction_area
-      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
-      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_hvac_type if !@principal_hvac_type.nil?
-      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_lighting_system_type if !@principal_lighting_system_type.nil?
-      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @miscellaneous_electric_load if !@miscellaneous_electric_load.nil?
-      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @spaces_conditioned_percent if !@spaces_conditioned_percent.nil?
-      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwelling_quantity if !@dwelling_quantity.nil?
-      buildingSection.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwellings_occupied_percent if !@dwellings_occupied_percent.nil?
-      buildingSection.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_hours if !@typical_occupant_usage_value_hours.nil?
-      buildingSection.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_weeks if !@typical_occupant_usage_value_weeks.nil?
-      buildingSection.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
-      buildingSection.elements["#{ns}:FootprintShape"].text = @footprint_shape if !@footprint_shape.nil?
-      buildingSection.elements["#{ns}:SectionType"].text = @section_type if !@section_type.nil?
+    def add_principal_hvac_type(building_section)
+      # code here
+      building_sections = building_section.parent
+      building = building_sections.parent
+      buildings = building.parent
+      site = buildings.parent
+      sites = site.parent
+      facility = sites.parent
+
+      if facility.elements["#{ns}:Systems"].nil?
+        systems = REXML::Element.new("#{ns}:Systems")
+        facility.add_element(systems)
+      else
+        systems = facility.elements["#{ns}:Systems"]
+      end
+
+      if systems.elements["#{ns}:HVACSystems"].nil?
+        hvac_systems = REXML::Element.new("#{ns}:HVACSystems")
+        systems.add_element(hvac_systems)
+      else
+        hvac_systems = facility.elements["#{ns}:HVACSystems"]
+      end
+
+      if hvac_systems.elements["#{ns}:HVACSystem"].nil?
+        hvac_system = BuildingSync::HVACSystem.new
+      else
+        hvac_system = facility.elements["#{ns}:HVACSystem"]
+      end
+
+      hvac_system.add_principal_hvac_system_type(@id, @principal_hvac_type)
+    end
+
+    def write_parameters_to_xml(ns, building_section)
+      building_section.elements["#{ns}:fraction_area"].text = @fraction_area
+      building_section.elements["#{ns}:OriginalOccupancyClassification"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
+
+      add_principal_hvac_type(building_section) if !@principal_hvac_type.nil?
+
+      building_section.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_lighting_system_type if !@principal_lighting_system_type.nil?
+      building_section.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @miscellaneous_electric_load if !@miscellaneous_electric_load.nil?
+      building_section.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @spaces_conditioned_percent if !@spaces_conditioned_percent.nil?
+      building_section.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwelling_quantity if !@dwelling_quantity.nil?
+      building_section.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwellings_occupied_percent if !@dwellings_occupied_percent.nil?
+      building_section.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_hours if !@typical_occupant_usage_value_hours.nil?
+      building_section.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_weeks if !@typical_occupant_usage_value_weeks.nil?
+      building_section.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
+      building_section.elements["#{ns}:FootprintShape"].text = @footprint_shape if !@footprint_shape.nil?
+      building_section.elements["#{ns}:SectionType"].text = @section_type if !@section_type.nil?
 
       # Add new element in the XML file
-      add_element_in_xml_file(buildingSection, ns, 'BuildingType', @bldg_type)
-      add_element_in_xml_file(buildingSection, ns, 'OriginalOccupancyClassification', @occupancy_classification_original)
-      add_element_in_xml_file(buildingSection, ns, 'FractionArea', @fraction_area)
+      add_user_defined_field_to_xml_file(building_section, ns, 'BuildingType', @bldg_type)
+      add_user_defined_field_to_xml_file(building_section, ns, 'FractionArea', @fraction_area)
 
-      write_parameters_to_xml_for_spatial_element(ns, buildingSection)
+      write_parameters_to_xml_for_spatial_element(ns, building_section)
     end
 
     def set_bldg_and_system_type
@@ -236,7 +268,7 @@ module BuildingSync
       return @total_floor_area
     end
 
-    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type, :ID
+    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type, :id
     attr_accessor :fraction_area
   end
 end
