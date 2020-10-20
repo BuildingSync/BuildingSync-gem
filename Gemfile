@@ -28,7 +28,7 @@ end
 if allow_local && File.exist?('../openstudio-model-articulation-gem')
   gem 'openstudio-model-articulation', path: '../openstudio-model-articulation-gem'
 else
-  gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', branch: 'develop'
+  gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', ref: '5b1d842'
 end
 
 if allow_local && File.exist?('../openstudio-ee-gem')
