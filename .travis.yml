@@ -8,7 +8,7 @@ matrix:
   include:
     # For now use local checkout of model articulation to use the DA branch. This should be removed once
     # model articulation is released with the bricr model generation file.
-    - env: FAVOR_LOCAL_GEMS=1 OPENSTUDIO_VERSION=3.0.1 OPENSTUDIO_SHA=09b7c8a554 RUBYLIB=/usr/local/openstudio-3.0.1/Ruby:/usr/Ruby
+    - env: OPENSTUDIO_VERSION=3.0.1 OPENSTUDIO_SHA=09b7c8a554 RUBYLIB=/usr/local/openstudio-3.0.1/Ruby:/usr/Ruby
 before_install:
   - gem install bundler
   - bundle -v
@@ -20,7 +20,7 @@ before_script:
 script:
   - bundle -v
   - gem list
-  - bundle exec rspec ./spec/tests/translator_spec.rb:62
+  - bundle exec rspec ./spec/tests/translator_spec.rb
 #  - bundle exec rspec spec/tests/selection_tool_spec.rb  // selection tool is not working with ASHRAE level 1.5 yet
 #  - bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb  // fails sometimes due to connection issues, so we exclude it here
 #  - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb // not sure why this is excluded.
