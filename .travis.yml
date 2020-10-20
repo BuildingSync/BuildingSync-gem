@@ -8,7 +8,7 @@ services:
   - docker
 env:
   global:
-    - SH: "docker exec -t os-3.0.1 bash -c"  # shortcut to run a command in the openstudio docker container
+    - SH="docker exec -t os-3.0.1 bash -c "  # shortcut to run a command in the openstudio docker container
 before_install:
   - docker pull nrel/openstudio:3.0.1
   - docker images --all
