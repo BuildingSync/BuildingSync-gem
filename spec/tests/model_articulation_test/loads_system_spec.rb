@@ -69,4 +69,31 @@ RSpec.describe 'LoadSystemSpec' do
     puts 'expected add day lighting controls : true but got: false} ' if load_system.add_day_lighting_controls(model, standard, 'DOE Ref Pre-1980') != true
     expect(load_system.add_day_lighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
   end
+
+  it 'Should add internal loads and adjust schedules successfully' do
+    model = OpenStudio::Model::Model.new
+    standard = Standard.build('DOE Ref Pre-1980')
+    load_system = BuildingSync::LoadsSystem.new
+    puts 'expected add internal loads : true but got: false} ' if load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', nil, false) != true
+    expect(load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', nil, false)).to be true
+
+    new_building_section = BuildingSync::BuildingSection.new(create_minimum_section_xml('auc'), 'Office', '20000', 'auc')
+    expect(load_system.adjust_people_schedule('all', new_building_section, model)).to be true
+  end
+
+  def create_minimum_section_xml(ns, typical_usage_hours = 40)
+    section = REXML::Element.new("#{ns}:Section")
+    ## adding the XML elements for the typical hourly usage per week
+    typical_usages = REXML::Element.new("#{ns}:TypicalOccupantUsages")
+    section.add_element(typical_usages)
+    typical_usage = REXML::Element.new("#{ns}:TypicalOccupantUsage")
+    typical_usages.add_element(typical_usage)
+    typical_usage_unit = REXML::Element.new("#{ns}:TypicalOccupantUsageUnits")
+    typical_usage_unit.text = 'Hours per week'
+    typical_usage.add_element(typical_usage_unit)
+    typical_usage_value = REXML::Element.new("#{ns}:TypicalOccupantUsageValue")
+    typical_usage_value.text = typical_usage_hours
+    typical_usage.add_element(typical_usage_value)
+    return section
+  end
 end

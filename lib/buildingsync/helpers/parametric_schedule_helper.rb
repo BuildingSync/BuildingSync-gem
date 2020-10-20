@@ -37,7 +37,17 @@
 
 module BuildingSync
   class ParametricScheduleHelper
-    def self.process_schedules(model, hoo_per_week, hoo_start_wkdy = 9.0, hoo_end_wkdy = 17, hoo_start_sat = 9.0, hoo_end_sat = 12.0, hoo_start_sun = 7.0, hoo_end_sun = 18.0, htg_setpoint = 67.0, clg_setpoint = 75.0, setback_delta = 4)
+    def self.process_schedules(model, this_space_type, hoo_per_week, hoo_start_wkdy = 9.0, hoo_end_wkdy = 17, hoo_start_sat = 9.0, hoo_end_sat = 12.0, hoo_start_sun = 7.0, hoo_end_sun = 18.0, htg_setpoint = 67.0, clg_setpoint = 75.0, setback_delta = 4)
+      # pre-process space types to identify which ones to alter
+      space_types_to_alter = []
+      model.getSpaceTypes.each do |space_type|
+        if this_space_type != ''
+          next if !space_type.standardsSpaceType.is_initialized
+          next if space_type.standardsSpaceType.get != this_space_type
+        end
+        next if space_type.spaces.empty?
+        space_types_to_alter << space_type
+      end
       # this is the new way of integrating the parametric schedule feature
       # add in logic for hours per week override
       # add to this for day types that should use weekday instead of user entered profile
@@ -51,7 +61,7 @@ module BuildingSync
       default_schedule_set.setName('Parametric Hours of Operation Schedule Set')
 
       # alter all objects
-      remove_old_schedules(model, default_schedule_set)
+      remove_old_schedules(model, default_schedule_set, space_types_to_alter)
 
       lighting_profiles, electric_equipment_profiles, gas_equipment_profiles, occupancy_profiles, infiltration_profiles, hvac_availability_profiles, swh_profiles, thermostat_setback_profiles = get_profiles
 
@@ -65,6 +75,7 @@ module BuildingSync
       create_schedule_hvac_availability(model, default_schedule_set, hvac_availability_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
       create_schedule_heating_cooling(model, default_schedule_set, thermostat_setback_profiles, htg_setpoint, clg_setpoint, setback_delta, profile_override,hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
       create_schedule_SHW(model, default_schedule_set, swh_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      return true
     end
 
     def self.get_profiles(lighting_profiles = nil, electric_equipment_profiles = nil, gas_equipment_profiles = nil, occupancy_profiles = nil,
@@ -191,27 +202,46 @@ module BuildingSync
       return profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun
     end
 
-    def self.remove_old_schedules(model, default_schedule_set)
-      # remove schedule sets for load instances
-      model.getLightss.each(&:resetSchedule)
-      model.getElectricEquipments.each(&:resetSchedule)
-      model.getGasEquipments.each(&:resetSchedule)
-      model.getSpaceInfiltrationDesignFlowRates.each(&:resetSchedule)
-      model.getPeoples.each(&:resetNumberofPeopleSchedule)
-      # don't have to remove HVAC and setpoint schedules, they will be replaced individually
+    def self.remove_old_schedules(model, default_schedule_set, space_types_to_alter)
+      thermostats_to_alter = []
+      air_loops_to_alter = []
+      water_use_equipment_to_alter = []
+      space_types_to_alter.each do |space_type|
+        # remove schedule sets for load instances
+        space_type.electricEquipment.each(&:resetSchedule)
+        space_type.gasEquipment.each(&:resetSchedule)
+        space_type.spaceInfiltrationDesignFlowRates.each(&:resetSchedule)
+        space_type.people.each(&:resetNumberofPeopleSchedule)
+        # don't have to remove HVAC and setpoint schedules, they will be replaced individually
 
-      # remove schedule sets.
-      model.getDefaultScheduleSets.each do |sch_set|
-        next if sch_set == default_schedule_set
-        sch_set.remove
+        # set default schedule set for space type
+        space_type.setDefaultScheduleSet(default_schedule_set)
+
+        # loop through spaces to populate thermostats and airloops
+        space_type.spaces.each do |space|
+          thermal_zone = space.thermalZone
+          if thermal_zone.is_initialized
+            thermal_zone = thermal_zone.get
+
+            # get thermostat
+            thermostat = thermal_zone.thermostatSetpointDualSetpoint
+            if thermostat.is_initialized
+              thermostats_to_alter << thermostat.get
+            end
+
+            # get air loop
+            air_loop = thermal_zone.airLoopHVAC
+            if air_loop.is_initialized
+              air_loops_to_alter << air_loop.get
+            end
+          end
+
+          # get water use equipment
+          space.waterUseEquipment.each do |water_use_equipment|
+            water_use_equipment_to_alter << water_use_equipment
+          end
+        end
       end
-
-      # assign default schedule set to building level
-      model.getBuilding.setDefaultScheduleSet(default_schedule_set)
-
-      thermostats_to_alter = model.getThermostatSetpointDualSetpoints
-      air_loops_to_alter = model.getAirLoopHVACs
-      water_use_equipment_to_alter = model.getWaterUseEquipments
       return thermostats_to_alter, air_loops_to_alter, water_use_equipment_to_alter
     end
 

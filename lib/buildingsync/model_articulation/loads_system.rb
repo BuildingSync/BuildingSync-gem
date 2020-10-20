@@ -155,8 +155,9 @@ module BuildingSync
         hoo_per_week = building_section.typical_occupant_usage_value_hours.to_f
         # setting default values
 
-        BuildingSync::ParametricScheduleHelper::process_schedules(model, hoo_per_week)
+        return BuildingSync::ParametricScheduleHelper::process_schedules(model, space_type, hoo_per_week)
       end
+      return false
     end
 
     def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
