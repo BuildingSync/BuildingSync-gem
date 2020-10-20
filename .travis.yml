@@ -37,13 +37,15 @@ jobs:
       - bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
       name: "Translator Generation Specs"
     - script:
-      - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb // not sure why this is excluded.
-      # - bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb // this takes too long, had do exclude it from here
-      name: "Translator Simulation Specs"
+      - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb 
+      name: "Translator Baseline Simulation Spec"
+      - script:
+        - bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb
+        name: "Translator Scenario Simulation Spec"
     - script:
       - bundle exec rspec spec/tests/building_sync_spec.rb
       - bundle exec rspec spec/tests/epw_test_spec.rb
-      # - bundle exec rspec spec/tests/selection_tool_spec.rb  // selection tool is not working with ASHRAE level 1.5 yet
+      # - bundle exec rspec spec/tests/selection_tool_spec.rb  # selection tool is not working with ASHRAE level 1.5 yet
       name: "Other Specs"
 
 after_script:
