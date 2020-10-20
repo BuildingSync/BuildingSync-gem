@@ -175,13 +175,15 @@
         <auc:Report ID="ReportType-69916110806500">
           <auc:Scenarios>
             <auc:Scenario ID="Baseline">
-            <auc:ScenarioName>Baseline</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:PackageOfMeasures>
-                <auc:ReferenceCase IDref="Baseline"/>
-              </auc:PackageOfMeasures>
-            </auc:ScenarioType>
-          </auc:Scenario>
+              <auc:ScenarioName>Baseline</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:CurrentBuilding>
+                  <auc:CalculationMethod>
+                    <auc:Modeled/>
+                  </auc:CalculationMethod>
+                </auc:CurrentBuilding>
+              </auc:ScenarioType>
+            </auc:Scenario>
           </auc:Scenarios>
           <auc:AuditDates>
             <auc:AuditDate>

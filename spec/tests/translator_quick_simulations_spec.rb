@@ -34,36 +34,14 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-module BuildingSync
-  class Helper
-    def self.get_text_value(xml_element)
-      if xml_element
-        return xml_element.text
-      end
-      return nil
-    end
+require_relative './../spec_helper'
 
-    def self.get_date_value(xml_element)
-      if xml_element
-        return Date.parse(xml_element.text)
-      end
-      return nil
-    end
+RSpec.describe 'BuildingSync' do
+  it 'should parse building_151_one_scenario.xml (phase zero) for Title24 and perform a baseline simulation' do
+    test_baseline_creation_and_simulation('building_151_one_scenario.xml', CA_TITLE24, 'CZ01RV2.epw')
+  end
 
-    def self.get_zone_name_list(zones)
-      names = []
-      zones.each do |zone|
-        names << zone.name.get
-      end
-      return names
-    end
-
-    def self.read_xml_file_document(xml_file_path)
-      doc = nil
-      File.open(xml_file_path, 'r') do |file_content|
-        doc = REXML::Document.new(file_content,  { :ignore_whitespace_nodes => :all })
-      end
-      return doc
-    end
+  it 'should parse and write building_151_one_scenario.xml (phase zero) with auc namespace for CAT24 and all simulations' do
+    test_baseline_and_scenario_creation_with_simulation('building_151_one_scenario.xml', 2)
   end
 end
