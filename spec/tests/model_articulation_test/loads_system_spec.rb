@@ -78,7 +78,18 @@ RSpec.describe 'LoadSystemSpec' do
     expect(load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', nil, false)).to be true
 
     new_building_section = BuildingSync::BuildingSection.new(create_minimum_section_xml('auc'), 'Office', '20000', 'auc')
-    expect(load_system.adjust_people_schedule('all', new_building_section, model)).to be true
+    expect(load_system.adjust_people_schedule(nil, new_building_section, model)).to be true
+
+    default_schedule_set = model.getObjectsByType(OpenStudio::IddObjectType.new("OS:DefaultScheduleSet"))
+    occupancy_Schedule = default_schedule_set[0].optional.numberofPeopleSchedule
+    puts "occupancy_Schedule: #{occupancy_Schedule}"
+
+    # read in the schedule
+    model.getSpaceTypes.each do |space_type|
+      default_schedule_set = space_type.getDefaultScheduleSet
+      occupancy_Schedule = default_schedule_set.getNumberofPeopleSchedule
+      puts "occupancy_Schedule: #{occupancy_Schedule}"
+    end
   end
 
   def create_minimum_section_xml(ns, typical_usage_hours = 40)

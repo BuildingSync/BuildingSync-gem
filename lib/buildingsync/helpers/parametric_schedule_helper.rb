@@ -41,7 +41,7 @@ module BuildingSync
       # pre-process space types to identify which ones to alter
       space_types_to_alter = []
       model.getSpaceTypes.each do |space_type|
-        if this_space_type != ''
+        if !this_space_type.nil?
           next if !space_type.standardsSpaceType.is_initialized
           next if space_type.standardsSpaceType.get != this_space_type
         end
