@@ -25,41 +25,30 @@ jobs:
   include:
     - script:
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
+      - $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
+      - $SH "bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb"
+      - $SH "bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb"
+      - $SH "bundle exec rspec spec/tests/model_articulation_test/hvac_system_spec.rb"
+      - $SH "bundle exec rspec spec/tests/model_articulation_test/loads_system_spec.rb"
+      - $SH "bundle exec rspec spec/tests/model_articulation_test/service_hot_water_system_spec.rb"
+      - $SH "bundle exec rspec spec/tests/model_articulation_test/site_spec.rb"
+      # - $SH "bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb"  // fails sometimes due to connection issues, so we exclude it here
       name: "Model Articulation Tests"
-#     - OPENSTUDIO_VERSION: 3.0.1
-#     - OPENSTUDIO_SHA: 09b7c8a554
-#     - RUBYLIB: /usr/local/openstudio-3.0.1/Ruby:/usr/Ruby   
-# before_install:
-#   - gem install bundler
-#   - bundle -v
-# install:
-#   - bundle install --path .
-# jobs:
-#   include:
-#       - bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb
-#       - bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb
-#       - bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb
-#       - bundle exec rspec spec/tests/model_articulation_test/hvac_system_spec.rb
-#       - bundle exec rspec spec/tests/model_articulation_test/loads_system_spec.rb
-#       - bundle exec rspec spec/tests/model_articulation_test/service_hot_water_system_spec.rb
-#       - bundle exec rspec spec/tests/model_articulation_test/site_spec.rb
-#       # - bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb  // fails sometimes due to connection issues, so we exclude it here
-#       name: "Model Articulation Tests"
-#     - script: bundle exec rspec spec/tests/translator_spec.rb
-#       name: "Translator Spec"
-#     - script:
-#       - bundle exec rspec spec/tests/translator_baseline_generation_spec.rb
-#       - bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
-#       name: "Translator Generation Specs"
-#     - script:
-#       - bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb 
-#       name: "Translator Baseline Simulation Spec"
-#     - script:
-#       - bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb
-#       name: "Translator Scenario Simulation Spec"
-#     - script:
-#       - bundle exec rspec spec/tests/building_sync_spec.rb
-#       - bundle exec rspec spec/tests/epw_test_spec.rb
-#       # - bundle exec rspec spec/tests/selection_tool_spec.rb  # selection tool is not working with ASHRAE level 1.5 yet
-#       name: "Other Specs"
+    - script: $SH "bundle exec rspec spec/tests/translator_spec.rb"
+      name: "Translator Spec"
+    - script:
+      - $SH "bundle exec rspec spec/tests/translator_baseline_generation_spec.rb"
+      - $SH "bundle exec rspec spec/tests/translator_scenario_generation_spec.rb"
+      name: "Translator Generation Specs"
+    - script:
+      - $SH "bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb"
+      name: "Translator Baseline Simulation Spec"
+    - script:
+      - $SH "bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb"
+      name: "Translator Scenario Simulation Spec"
+    - script:
+      - $SH "bundle exec rspec spec/tests/building_sync_spec.rb"
+      - $SH "bundle exec rspec spec/tests/epw_test_spec.rb"
+      # - $SH "bundle exec rspec spec/tests/selection_tool_spec.rb"  # selection tool is not working with ASHRAE level 1.5 yet
+      name: "Other Specs"
 
