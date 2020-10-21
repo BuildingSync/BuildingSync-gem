@@ -24,7 +24,7 @@ install:
 jobs:
   include:
     - script:
-      - $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
+      - $SH bundle exec rspec spec/tests/model_articulation_test/building_spec.rb
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb"
