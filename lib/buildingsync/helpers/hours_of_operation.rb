@@ -45,6 +45,8 @@ module BuildingSync
       @end_sat = 12.0
       @start_sun = 7.0
       @end_sun = 18.0
+      # these default values are coming from the create_parametric_schedules measure in the openstudio-model-articulation-gem
+      # see: https://github.com/NREL/openstudio-model-articulation-gem/blob/e1da9c43d6cee75012520975cc4b7022414336b6/lib/measures/create_parametric_schedules/measure.rb#L68
     end
 
     attr_reader :hours_per_week, :start_sat, :end_sat, :start_sun, :end_sun

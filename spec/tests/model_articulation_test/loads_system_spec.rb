@@ -80,16 +80,84 @@ RSpec.describe 'LoadSystemSpec' do
     new_building_section = BuildingSync::BuildingSection.new(create_minimum_section_xml('auc'), 'Office', '20000', 'auc')
     expect(load_system.adjust_people_schedule(nil, new_building_section, model)).to be true
 
-    #   default_schedule_set = model.getObjectsByType(OpenStudio::IddObjectType.new("OS:DefaultScheduleSet"))
-    # occupancy_Schedule = default_schedule_set[0].optional.numberofPeopleSchedule
-    # puts "occupancy_Schedule: #{occupancy_Schedule}"
+    # building.defaultScheduleSet.get
+  end
+
+  it 'should parse and write building_151.xml and adjust schedules successfully' do
+    translator = test_baseline_creation('building_151.xml', CA_TITLE24)
+    model = translator.get_model
 
     # read in the schedule
-    model.getSpaceTypes.each do |space_type|
-      default_schedule_set = space_type.getDefaultScheduleSet
-      occupancy_Schedule = default_schedule_set.getNumberofPeopleSchedule
+    space_types = model.getSpaceTypes
+    expect(space_types.length).to be 4
+    space_types.each do |space_type|
+      calculated_hours_per_week = 0
+      default_schedule_set = space_type.defaultScheduleSet.get
+      puts "default_schedule_set: #{default_schedule_set.name} for space type: #{space_type.name}"
+      occupancy_Schedule = default_schedule_set.numberofPeopleSchedule.get
       puts "occupancy_Schedule: #{occupancy_Schedule}"
+      occupancy_Schedule_rule_set = occupancy_Schedule.to_ScheduleRuleset.get
+      puts "occupancy_Schedule_rule_set: #{occupancy_Schedule_rule_set}"
+      defaultProfile = occupancy_Schedule_rule_set.defaultDaySchedule
+
+      default_profile_duration = get_duration(defaultProfile, 0.5)
+      puts "default_profile_duration: #{default_profile_duration}"
+
+      default_number_of_days = 7
+      occupancy_Schedule_rule_set.scheduleRules.each do |rule|
+        profile_duration = get_duration(rule.daySchedule, 0.5)
+        puts "profile_duration: #{profile_duration}"
+
+        number_of_days = count_number_of_days(rule)
+        default_number_of_days -= number_of_days
+        calculated_hours_per_week += profile_duration * number_of_days
+      end
+      calculated_hours_per_week += default_profile_duration * default_number_of_days
+      expect(calculated_hours_per_week).to be 48
     end
+  end
+
+  def count_number_of_days(rule)
+    count = 0
+    count += 1 if rule.applyFriday
+    count += 1 if rule.applyMonday
+    count += 1 if rule.applySaturday
+    count += 1 if rule.applySunday
+    count += 1 if rule.applyThursday
+    count += 1 if rule.applyTuesday
+    count += 1 if rule.applyWednesday
+    return count
+  end
+
+  def get_duration(profile, cut_off_value)
+    min_time = nil
+    max_time = nil
+    min_time_value = nil
+    max_time_value = nil
+    last_time = nil
+
+    profile.times.each do |time|
+
+      puts "time: #{time} value: #{profile.getValue(time)}"
+      if min_time.nil?
+        if profile.getValue(time) >= cut_off_value
+          min_time = time
+          min_time_value = profile.getValue(time)
+        end
+      elsif max_time.nil?
+        if profile.getValue(time) < cut_off_value then max_time = last_time end
+      end
+      last_time = time
+    end
+
+    return 0 if min_time.nil?
+    puts "min_time: #{min_time}"
+    puts "max_time: #{max_time}"
+    puts "min_time_value: #{min_time_value}"
+    puts "max_time_value: #{profile.getValue(max_time)}"
+    duration = max_time.hours - min_time.hours
+    puts "duration: #{duration}"
+    return duration
   end
 
   def create_minimum_section_xml(ns, typical_usage_hours = 40)

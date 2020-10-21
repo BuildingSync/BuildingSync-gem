@@ -151,7 +151,7 @@ module BuildingSync
 
     def adjust_people_schedule(space_type, building_section, model)
       if !building_section.typical_occupant_usage_value_hours.nil?
-        puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
+        puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours} for space type: #{space_type.name} in building section: #{building_section.ID}"
 
         hours_per_week = building_section.typical_occupant_usage_value_hours.to_f
         # setting default values
