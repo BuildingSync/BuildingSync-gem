@@ -235,21 +235,28 @@ RSpec.configure do |config|
   end
 
   def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, simulate = true)
+    puts "LWKEFJLWKEJFWOEIFJQW"
     current_year = Date.today.year
     translator = test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used, epw_file_name)
-
+    puts "PAST TRANSLATOR"
     out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
     osw_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
 
+    puts "Simulate: #{simulate}"
     if simulate
+      puts "ENTERED SIMULATE"
       translator.run_osws
 
       dir_path = File.dirname(osw_files[0])
       parent_dir_path = File.expand_path('..', dir_path)
 
       translator.gather_results(parent_dir_path, current_year)
+      puts "About to save file to: #{File.join(parent_dir_path, 'results.xml')}"
       translator.save_xml(File.join(parent_dir_path, 'results.xml'))
+      expect(File.exist?(File.join(parent_dir_path, 'results.xml'))).to be true
+    else
+      puts "Not simulate"
     end
   end
 
@@ -278,6 +285,7 @@ RSpec.configure do |config|
 
     # we compare the counts, by also considering the two potential osw files in the SR directory
     expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
+    puts "test_baseline_and_scenario_creation: returning translator: #{translator}"
     return translator
   end
 
@@ -303,7 +311,7 @@ RSpec.configure do |config|
     translator.write_osm
 
     expect(File.exist?("#{out_path}/in.osm")).to be true
-
+    puts "test_baseline_creation: returning translator: #{translator}"
     return translator
   end
 
