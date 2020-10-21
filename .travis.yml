@@ -18,6 +18,9 @@ before_install:
   - ls
   - docker exec -t os-3.0.1 bash -c echo $RUBYLIB
   - docker exec -t os-3.0.1 bash -c "echo $RUBYLIB"
+  - docker exec -t os-3.0.1 bash -c "echo ${RUBYLIB}"
+  - docker exec -t os-3.0.1 bash -c "echo ${LANG}"
+  - docker exec -t os-3.0.1 bash -c "echo $LANG"
   - $SH "\"echo $RUBYLIB\""
   - $SH "\"gem install bundler\""
   - $SH "\"bundle -v\""
