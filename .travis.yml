@@ -20,6 +20,7 @@ before_script:
 script:
 #  - bundle exec rspec spec/tests/selection_tool_spec.rb  // selection tool is not working with ASHRAE level 1.5 yet
   - bundle exec rspec spec/tests/building_sync_spec.rb
+  - bundle exec rspec spec/tests/workflow_maker_spec.rb
 #  - bundle exec rspec spec/tests/translator_spec.rb // 2 failures, both: expect(File.exist?(sql_file)).to be true got false
   - bundle exec rspec spec/tests/epw_test_spec.rb
   - bundle exec rspec spec/tests/model_articulation_test/building_spec.rb
