@@ -21,8 +21,8 @@ allow_local = ENV['FAVOR_LOCAL_GEMS']
 
  if allow_local && File.exist?('../openstudio-common-measures-gem')
    gem 'openstudio-common-measures', path: '../openstudio-common-measures-gem'
- elsif allow_local
-   gem 'openstudio-common-measures', github: 'NREL/openstudio-common-measures-gem', branch: 'remove_ee_measures'
+ else
+   gem 'openstudio-common-measures', github: 'NREL/openstudio-common-measures-gem', ref: '32e76c3'
  end
 
 if allow_local && File.exist?('../openstudio-model-articulation-gem')
