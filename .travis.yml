@@ -12,7 +12,7 @@ env:
 before_install:
   - docker pull nrel/openstudio:3.0.1
   - docker images --all
-  - docker run -d --name os-3.0.1 -v $(pwd):/travis -w /travis nrel/openstudio:3.0.1
+  - docker run -d --name os-3.0.1 -v $(pwd):/travis -w /travis nrel/openstudio:3.0.1 tail -f /dev/null
   - docker ps -a
   - pwd
   - ls
@@ -20,7 +20,7 @@ before_install:
   - $SH "gem install bundler"
   - $SH "bundle -v"
 install:
-  - $SH "bundle install --path ."
+  - $SH "export LANG=C.UTF-8 && bundle install --path ."
 jobs:
   include:
     - script:
