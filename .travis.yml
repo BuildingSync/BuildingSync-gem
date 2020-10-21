@@ -16,11 +16,11 @@ before_install:
   - docker ps -a
   - pwd
   - ls
-  - $SH "echo $RUBYLIB"
-  - $SH "gem install bundler"
-  - $SH "bundle -v"
+  - $SH echo $RUBYLIB
+  - $SH gem install bundler
+  - $SH bundle -v
 install:
-  - $SH "bundle install --path ."
+  - $SH bundle install --path .
 jobs:
   include:
     - script:
