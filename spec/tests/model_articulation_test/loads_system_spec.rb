@@ -80,9 +80,9 @@ RSpec.describe 'LoadSystemSpec' do
     new_building_section = BuildingSync::BuildingSection.new(create_minimum_section_xml('auc'), 'Office', '20000', 'auc')
     expect(load_system.adjust_people_schedule(nil, new_building_section, model)).to be true
 
-    default_schedule_set = model.getObjectsByType(OpenStudio::IddObjectType.new("OS:DefaultScheduleSet"))
-    occupancy_Schedule = default_schedule_set[0].optional.numberofPeopleSchedule
-    puts "occupancy_Schedule: #{occupancy_Schedule}"
+    #   default_schedule_set = model.getObjectsByType(OpenStudio::IddObjectType.new("OS:DefaultScheduleSet"))
+    # occupancy_Schedule = default_schedule_set[0].optional.numberofPeopleSchedule
+    # puts "occupancy_Schedule: #{occupancy_Schedule}"
 
     # read in the schedule
     model.getSpaceTypes.each do |space_type|

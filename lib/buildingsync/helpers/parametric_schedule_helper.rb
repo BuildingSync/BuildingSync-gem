@@ -37,7 +37,7 @@
 
 module BuildingSync
   class ParametricScheduleHelper
-    def self.process_schedules(model, this_space_type, hoo_per_week, hoo_start_wkdy = 9.0, hoo_end_wkdy = 17, hoo_start_sat = 9.0, hoo_end_sat = 12.0, hoo_start_sun = 7.0, hoo_end_sun = 18.0, htg_setpoint = 67.0, clg_setpoint = 75.0, setback_delta = 4)
+    def self.process_schedules(model, this_space_type, hours_of_operation, htg_setpoint = 67.0, clg_setpoint = 75.0, setback_delta = 4)
       # pre-process space types to identify which ones to alter
       space_types_to_alter = []
       model.getSpaceTypes.each do |space_type|
@@ -51,8 +51,7 @@ module BuildingSync
       # this is the new way of integrating the parametric schedule feature
       # add in logic for hours per week override
       # add to this for day types that should use weekday instead of user entered profile
-      profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat,
-          hoo_start_sun, hoo_end_sun = get_profile_override(hoo_per_week, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      profile_override, hours_of_operation = get_profile_override(hours_of_operation)
 
       # pre-process space types to identify which ones to alter - in this case we want to alter all of them so we do not do any selections
       # create shared default schedule set
@@ -63,143 +62,137 @@ module BuildingSync
       # alter all objects
       remove_old_schedules(model, default_schedule_set, space_types_to_alter)
 
-      lighting_profiles, electric_equipment_profiles, gas_equipment_profiles, occupancy_profiles, infiltration_profiles, hvac_availability_profiles, swh_profiles, thermostat_setback_profiles = get_profiles
+      profiles = get_profiles
 
-      create_schedule_hours_of_operations(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-      create_schedule_activity(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-      create_schedule_lighting(model, default_schedule_set, lighting_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-      create_schedule_electric_equipment(model, default_schedule_set, electric_equipment_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-      create_schedule_gas_equipment(model, default_schedule_set, gas_equipment_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-      create_schedule_occupancy(model, default_schedule_set, occupancy_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-      create_schedule_infiltration(model, default_schedule_set, infiltration_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-      create_schedule_hvac_availability(model, default_schedule_set, hvac_availability_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-      create_schedule_heating_cooling(model, default_schedule_set, thermostat_setback_profiles, htg_setpoint, clg_setpoint, setback_delta, profile_override,hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
-      create_schedule_SHW(model, default_schedule_set, swh_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      create_schedule_hours_of_operations(model, default_schedule_set, hours_of_operation)
+      create_schedule_activity(model, default_schedule_set)
+      create_schedule_lighting(model, default_schedule_set, profiles['lighting'], profile_override, hours_of_operation)
+      create_schedule_electric_equipment(model, default_schedule_set, profiles['electric_equipment'], profile_override, hours_of_operation)
+      create_schedule_gas_equipment(model, default_schedule_set, profiles['gas_equipment'], profile_override, hours_of_operation)
+      create_schedule_occupancy(model, default_schedule_set, profiles['occupancy'], profile_override, hours_of_operation)
+      create_schedule_infiltration(model, default_schedule_set, profiles['infiltration'], profile_override, hours_of_operation)
+      create_schedule_hvac_availability(model, default_schedule_set, profiles['hvac_availability'], profile_override, hours_of_operation)
+      create_schedule_heating_cooling(model, default_schedule_set, profiles['thermostat_setback'], htg_setpoint, clg_setpoint, setback_delta, profile_override, hours_of_operation)
+      create_schedule_SHW(model, default_schedule_set, profiles['swh'], profile_override, hours_of_operation)
       return true
     end
 
-    def self.get_profiles(lighting_profiles = nil, electric_equipment_profiles = nil, gas_equipment_profiles = nil, occupancy_profiles = nil,
-                     infiltration_profiles = nil, hvac_availability_profiles = nil, swh_profiles = nil, thermostat_setback_profiles = nil)
+    def self.get_profiles(profiles = nil)
+      if profiles.nil?
+        profiles = {}
+      end
       # set the default profiles
-      if lighting_profiles.nil?
+      if profiles['lighting'].nil?
         string = []
         string << ':default => [[start-2,0.1],[start-1,0.3],[start,0.75],[end,0.75],[end+2,0.3],[end+vac*0.5,0.1]]'
         string << ':saturday => [[start-1,0.1],[start,0.3],[end,0.3],[end+1,0.1]]'
         string << ':sunday => [[start,0.1],[end,0.1]]'
-        lighting_profiles = string.join(', ')
+        profiles['lighting'] = string.join(', ')
       end
-      if electric_equipment_profiles.nil?
+      if profiles['electric_equipment'].nil?
         string = []
         string << ':default => [[start-1,0.3],[start,0.85],[start+0.5*occ-0.5,0.85],[start+0.5*occ-0.5,0.75],[start+0.5*occ+0.5,0.75],[start+0.5*occ+0.5,0.85],[end,0.85],[end+1,0.45],[end+2,0.3]]'
         string << ':saturday => [[start-2,0.2],[start,0.35],[end,0.35],[end+6,0.2]]'
         string << ':sunday => [[start,0.2],[end,0.2]]'
-        electric_equipment_profiles = string.join(', ')
+      profiles['electric_equipment'] = string.join(', ')
       end
-      if gas_equipment_profiles.nil?
+      if profiles['gas_equipment'].nil?
         string = []
         string << ':default => [[start-1,0.3],[start,0.85],[start+0.5*occ-0.5,0.85],[start+0.5*occ-0.5,0.75],[start+0.5*occ+0.5,0.75],[start+0.5*occ+0.5,0.85],[end,0.85],[end+1,0.45],[end+2,0.3]]'
         string << ':saturday => [[start-2,0.2],[start,0.35],[end,0.35],[end+6,0.2]]'
         string << ':sunday => [[start,0.2],[end,0.2]]'
-        gas_equipment_profiles = string.join(', ')
+      profiles['gas_equipment'] = string.join(', ')
       end
-      if occupancy_profiles.nil?
+      if profiles['occupancy'].nil?
         string = []
         string << ':default => [[start-3,0],[start-1,0.2],[start,0.95],[start+0.5*occ-0.5,0.95],[start+0.5*occ-0.5,0.5],[start+0.5*occ+0.5,0.5],[start+0.5*occ+0.5,0.95],[end,0.95],[end+1,0.3],[end+vac*0.4,0]]'
         string << ':saturday => [[start-3,0],[start,0.3],[end,0.3],[end+1,0.1],[end+vac*0.3,0]]'
         string << ':sunday => [[start,0],[start,0.05],[end,0.05],[end,0]]'
-        occupancy_profiles = string.join(', ')
+      profiles['occupancy'] = string.join(', ')
       end
-      if infiltration_profiles.nil?
+      if profiles['infiltration'].nil?
         string = []
         string << ':default => [[start,1],[start,0.25],[end+vac*0.35,0.25],[end+vac*0.35,1]]'
         string << ':saturday => [[start,1],[start,0.25],[end+vac*0.25,0.25],[end+vac*0.25,1]]'
         string << ':sunday => [[start,1],[start,0.25],[end+vac*0.25,0.25],[end+vac*0.25,1]]'
-        infiltration_profiles = string.join(', ')
+      profiles['infiltration'] = string.join(', ')
       end
-      if hvac_availability_profiles.nil?
+      if profiles['hvac_availability'].nil?
         string = []
         string << ':default => [[start,0],[start,1],[end+vac*0.35,1],[end+vac*0.35,0]]'
         string << ':saturday => [[start,0],[start,1],[end+vac*0.25,1],[end+vac*0.25,0]]'
         string << ':sunday => [[start,0],[start,1],[end+vac*0.25,1],[end+vac*0.25,0]]'
-        hvac_availability_profiles = string.join(', ')
+      profiles['hvac_availability'] = string.join(', ')
       end
-      if swh_profiles.nil?
+      if profiles['swh'].nil?
         string = []
         string << ':default => [[start-2,0],[start-2,0.07],[start+0.5*occ,0.57],[vac-2,0.33],[vac,0.44],[end+vac*0.35,0.05],[end+vac*0.35,0]]'
         string << ':saturday => [[start-2,0],[start-2,0.07],[start+0.5*occ,0.23],[end+vac*0.25,0.05],[end+vac*0.25,0]]'
         string << ':sunday => [[start-2,0],[start-2,0.04],[start+0.5*occ,0.09],[end+vac*0.25,0.04],[end+vac*0.25,0]]'
-        swh_profiles = string.join(', ')
+      profiles['swh'] = string.join(', ')
       end
-      if thermostat_setback_profiles.nil?
+      if profiles['thermostat_setback'].nil?
         string = []
         string << ':default => [[start-2,floor],[start-2,ceiling],[end+vac*0.35,ceiling],[end+vac*0.35,floor]]'
         string << ':saturday => [[start-2,floor],[start-2,ceiling],[end+vac*0.25,ceiling],[end+vac*0.25,floor]]'
         string << ':sunday => [[start-2,floor],[start-2,ceiling],[end+vac*0.25,ceiling],[end+vac*0.25,floor]]'
-        thermostat_setback_profiles = string.join(', ')
+      profiles['thermostat_setback'] = string.join(', ')
       end
 
-      return lighting_profiles, electric_equipment_profiles, gas_equipment_profiles, occupancy_profiles, infiltration_profiles,
-          hvac_availability_profiles, swh_profiles, thermostat_setback_profiles
+      return profiles
     end
 
-    def self.get_profile_override(hoo_per_week, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.get_profile_override(hoo)
       profile_override = []
-      if hoo_per_week > 0.0
-        #runner.registerInfo('Hours per week input was a non zero value, it will override the user intered hours of operation for weekday, saturday, and sunday')
-        # TODO: update logging
-        if hoo_per_week > 84
-          max_hoo = [hoo_per_week / 7.0, 24.0].min
+      if hoo.hours_per_week > 0.0
+        if hoo.hours_per_week > 84
+          max_hoo = [hoo.hours_per_week / 7.0, 24.0].min
         else
           max_hoo = 12.0
         end
 
         # for 60 horus per week or less only alter weekday. If longer then use weekday profiles for saturday for 12 hours and then sunday
-        typical_weekday_input_hours = hoo_end_wkdy - hoo_start_wkdy
-        target_weekday_hours = [hoo_per_week / 5.0, max_hoo].min
+        typical_weekday_input_hours = hoo.end_wkdy - hoo.start_wkdy
+        target_weekday_hours = [hoo.hours_per_week / 5.0, max_hoo].min
         delta_hours_per_day = target_weekday_hours - typical_weekday_input_hours
 
         # shift hours as needed
-        hoo_start_wkdy -= delta_hours_per_day / 2.0
-        hoo_end_wkdy += delta_hours_per_day / 2.0
-        #runner.registerInfo("Adjusted hours of operation for weekday are from #{hoo_start_wkdy} to #{hoo_end_wkdy}.")
+        hoo.start_wkdy -= delta_hours_per_day / 2.0
+        hoo.end_wkdy += delta_hours_per_day / 2.0
 
         # add logic if more than 60 hours
-        if hoo_per_week > 60.0
+        if hoo.hours_per_week > 60.0
           # for 60-72 horus per week or less only alter saturday.
-          typical_weekday_input_hours = hoo_end_sat - hoo_start_sat
-          target_weekday_hours = [(hoo_per_week - 60.0), max_hoo].min
+          typical_weekday_input_hours = hoo.end_sat - hoo.start_sat
+          target_weekday_hours = [(hoo.hours_per_week - 60.0), max_hoo].min
           delta_hours_per_day = target_weekday_hours - typical_weekday_input_hours
 
           # code in process_hash method will alter saturday to use default profile formula
 
           # shift hours as needed
-          hoo_start_sat -= delta_hours_per_day / 2.0
-          hoo_end_sat += delta_hours_per_day / 2.0
-          #runner.registerInfo("Adjusted hours of operation for saturday are from #{hoo_start_sat} to #{hoo_end_sat}. Saturday will use typical weekday profile formula.")
-          # TODO: update logging
+          hoo.start_sat -= delta_hours_per_day / 2.0
+          hoo.end_sat += delta_hours_per_day / 2.0
           # set flag to override typical profile
           profile_override << 'saturday'
         end
 
         # add logic if more than 72 hours
-        if hoo_per_week > 72.0
+        if hoo.hours_per_week > 72.0
           # for 60-72 horus per week or less only alter sunday.
-          typical_weekday_input_hours = hoo_end_sun - hoo_start_sun
-          target_weekday_hours = [(hoo_per_week - 72.0), max_hoo].min
+          typical_weekday_input_hours = hoo.end_sun - hoo.start_sun
+          target_weekday_hours = [(hoo.hours_per_week - 72.0), max_hoo].min
           delta_hours_per_day = target_weekday_hours - typical_weekday_input_hours
 
           # code in process_hash method will alter sunday to use default profile formula
 
           # shift hours as needed
-          hoo_start_sun -= delta_hours_per_day / 2.0
-          hoo_end_sun += delta_hours_per_day / 2.0
-          #runner.registerInfo("Adjusted hours of operation for sunday are from #{hoo_start_sun} to #{hoo_end_sun}. Saturday will use typical weekday profile formula.")
-          # TODO: update logging
+          hoo.start_sun -= delta_hours_per_day / 2.0
+          hoo.end_sun += delta_hours_per_day / 2.0
           # set flag to override typical profile
           profile_override << 'sunday'
         end
       end
-      return profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun
+      return profile_override, hoo
     end
 
     def self.remove_old_schedules(model, default_schedule_set, space_types_to_alter)
@@ -245,32 +238,32 @@ module BuildingSync
       return thermostats_to_alter, air_loops_to_alter, water_use_equipment_to_alter
     end
 
-    def self.create_schedule_hours_of_operations(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.create_schedule_hours_of_operations(model, default_schedule_set, hoo)
       # populate hours of operation schedule for schedule set (this schedule isn't used but in future could be used to dynamically generate schedules)
       ruleset_name = 'Parametric Hours of Operation Schedule'
       winter_design_day = nil
       summer_design_day = nil
       rules = []
-      if hoo_end_wkdy == hoo_start_wkdy
-        default_day = ['Weekday', [hoo_start_wkdy, 0], [hoo_end_wkdy, 0], [24, 0]]
-      elsif hoo_end_wkdy > hoo_start_wkdy
-        default_day = ['Weekday', [hoo_start_wkdy, 0], [hoo_end_wkdy, 1], [24, 0]]
+      if hoo.end_wkdy == hoo.start_wkdy
+        default_day = ['Weekday', [hoo.start_wkdy, 0], [hoo.end_wkdy, 0], [24, 0]]
+      elsif hoo.end_wkdy > hoo.start_wkdy
+        default_day = ['Weekday', [hoo.start_wkdy, 0], [hoo.end_wkdy, 1], [24, 0]]
       else
-        default_day = ['Weekday', [hoo_end_wkdy, 1], [hoo_start_wkdy, 0], [24, 1]]
+        default_day = ['Weekday', [hoo.end_wkdy, 1], [hoo.start_wkdy, 0], [24, 1]]
       end
-      if hoo_end_sat == hoo_start_sat
-        rules << ['Saturday', '1/1-12/31', 'Sat', [hoo_start_sat, 0], [hoo_end_sat, 0], [24, 0]]
-      elsif hoo_end_sat > hoo_start_sat
-        rules << ['Saturday', '1/1-12/31', 'Sat', [hoo_start_sat, 0], [hoo_end_sat, 1], [24, 0]]
+      if hoo.end_sat == hoo.start_sat
+        rules << ['Saturday', '1/1-12/31', 'Sat', [hoo.start_sat, 0], [hoo.end_sat, 0], [24, 0]]
+      elsif hoo.end_sat > hoo.start_sat
+        rules << ['Saturday', '1/1-12/31', 'Sat', [hoo.start_sat, 0], [hoo.end_sat, 1], [24, 0]]
       else
-        rules << ['Saturday', '1/1-12/31', 'Sat', [hoo_end_sat, 1], [hoo_start_sat, 0], [24, 1]]
+        rules << ['Saturday', '1/1-12/31', 'Sat', [hoo.end_sat, 1], [hoo.start_sat, 0], [24, 1]]
       end
-      if hoo_end_sun == hoo_start_sun
-        rules << ['Sunday', '1/1-12/31', 'Sun', [hoo_start_sun, 0], [hoo_end_sun, 0], [24, 0]]
-      elsif hoo_end_sun > hoo_start_sun
-        rules << ['Sunday', '1/1-12/31', 'Sun', [hoo_start_sun, 0], [hoo_end_sun, 1], [24, 0]]
+      if hoo.end_sun == hoo.start_sun
+        rules << ['Sunday', '1/1-12/31', 'Sun', [hoo.start_sun, 0], [hoo.end_sun, 0], [24, 0]]
+      elsif hoo.end_sun > hoo.start_sun
+        rules << ['Sunday', '1/1-12/31', 'Sun', [hoo.start_sun, 0], [hoo.end_sun, 1], [24, 0]]
       else
-        rules << ['Sunday', '1/1-12/31', 'Sun', [hoo_end_sun, 1], [hoo_start_sun, 0], [24, 1]]
+        rules << ['Sunday', '1/1-12/31', 'Sun', [hoo.end_sun, 1], [hoo.start_sun, 0], [24, 1]]
       end
       options = {'name' => ruleset_name,
                  'winter_design_day' => winter_design_day,
@@ -281,7 +274,7 @@ module BuildingSync
       default_schedule_set.setHoursofOperationSchedule(hoo_sch)
     end
 
-    def self.create_schedule_activity(model, default_schedule_set, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.create_schedule_activity(model, default_schedule_set)
       # create activity schedule
       # todo - save this from model or add user argument
       ruleset_name = 'Parametric Activity Schedule'
@@ -298,10 +291,10 @@ module BuildingSync
       default_schedule_set.setPeopleActivityLevelSchedule(activity_sch)
     end
 
-    def self.create_schedule_lighting(model, default_schedule_set, lighting_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.create_schedule_lighting(model, default_schedule_set, lighting_profiles, profile_override, hoo)
       # generate and apply lighting schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Lighting Schedule'
-      hash = process_hash(lighting_profiles, profile_override, ruleset_name, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      hash = process_hash(lighting_profiles, profile_override, ruleset_name, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
       winter_design_day = [[24, 0]]
       summer_design_day = [[24, 1]]
@@ -320,10 +313,10 @@ module BuildingSync
       default_schedule_set.setLightingSchedule(lighting_sch)
     end
 
-    def self.create_schedule_electric_equipment(model, default_schedule_set, electric_equipment_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.create_schedule_electric_equipment(model, default_schedule_set, electric_equipment_profiles, profile_override, hoo)
       # generate and apply electric_equipment schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Electric Equipment Schedule'
-      hash = process_hash(electric_equipment_profiles, profile_override, ruleset_name, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      hash = process_hash(electric_equipment_profiles, profile_override, ruleset_name, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
       winter_design_day = [[24, 0]]
       summer_design_day = [[24, 1]]
@@ -341,10 +334,10 @@ module BuildingSync
       default_schedule_set.setElectricEquipmentSchedule(electric_equipment_sch)
     end
 
-    def self.create_schedule_gas_equipment(model, default_schedule_set, gas_equipment_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.create_schedule_gas_equipment(model, default_schedule_set, gas_equipment_profiles, profile_override, hoo)
       # generate and apply gas_equipment schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Gas Equipment Schedule'
-      hash = process_hash(gas_equipment_profiles, profile_override, ruleset_name, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      hash = process_hash(gas_equipment_profiles, profile_override, ruleset_name, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
       winter_design_day = [[24, 0]]
       summer_design_day = [[24, 1]]
@@ -362,10 +355,10 @@ module BuildingSync
       default_schedule_set.setGasEquipmentSchedule(gas_equipment_sch)
     end
 
-    def self.create_schedule_occupancy(model, default_schedule_set, occupancy_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.create_schedule_occupancy(model, default_schedule_set, occupancy_profiles, profile_override, hoo)
       # generate and apply occupancy schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Occupancy Schedule'
-      hash = process_hash(occupancy_profiles, profile_override, ruleset_name, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      hash = process_hash(occupancy_profiles, profile_override, ruleset_name, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
       winter_design_day = [[24, 0]] # if DCV would we want this at 1, prototype uses 0
       summer_design_day = [[24, 1]]
@@ -383,10 +376,10 @@ module BuildingSync
       default_schedule_set.setNumberofPeopleSchedule(occupancy_sch)
     end
 
-    def self.create_schedule_infiltration(model, default_schedule_set, infiltration_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.create_schedule_infiltration(model, default_schedule_set, infiltration_profiles, profile_override, hoo)
       # generate and apply infiltration schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Infiltration Schedule'
-      hash = process_hash(infiltration_profiles, profile_override, ruleset_name, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      hash = process_hash(infiltration_profiles, profile_override, ruleset_name, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
       winter_design_day = [[24, 1]] # TODO: - should it be 1 for both summer and winter
       summer_design_day = [[24, 1]]
@@ -404,10 +397,10 @@ module BuildingSync
       default_schedule_set.setInfiltrationSchedule(infiltration_sch)
     end
 
-    def self.create_schedule_hvac_availability(model, default_schedule_set, hvac_availability_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.create_schedule_hvac_availability(model, default_schedule_set, hvac_availability_profiles, profile_override, hoo)
       # generate and apply hvac_availability schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric HVAC Availability Schedule'
-      hash = process_hash(hvac_availability_profiles, profile_override, ruleset_name, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      hash = process_hash(hvac_availability_profiles, profile_override, ruleset_name, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
       winter_design_day = [[24, 1]] # TODO: - confirm proper value
       summer_design_day = [[24, 1]] # todo - confirm proper value
@@ -430,7 +423,7 @@ module BuildingSync
       end
     end
 
-    def self.create_schedule_heating_cooling(model, default_schedule_set, thermostat_setback_profiles, htg_setpoint, clg_setpoint, setback_delta, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.create_schedule_heating_cooling(model, default_schedule_set, thermostat_setback_profiles, htg_setpoint, clg_setpoint, setback_delta, profile_override, hoo)
       # generate and apply heating_setpoint schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Heating Setpoint Schedule'
 
@@ -443,7 +436,7 @@ module BuildingSync
       htg_setpoint_profiles = htg_setpoint_profiles.gsub('floor', htg_vac.to_s)
 
       # process hash
-      hash = process_hash(htg_setpoint_profiles, profile_override, ruleset_name, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      hash = process_hash(htg_setpoint_profiles, profile_override, ruleset_name, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedule', "Failed to generate #{ruleset_name}"); return false end
 
       winter_design_day = hash[:default].drop(1) # [[24,htg_occ]]
@@ -471,7 +464,7 @@ module BuildingSync
       clg_setpoint_profiles = clg_setpoint_profiles.gsub('floor', clg_vac.to_s)
 
       # process hash
-      hash = process_hash(clg_setpoint_profiles, profile_override, ruleset_name, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      hash = process_hash(clg_setpoint_profiles, profile_override, ruleset_name, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
 
       winter_design_day = hash[:default].drop(1) # [[24,clg_occ]]
@@ -494,10 +487,10 @@ module BuildingSync
       end
     end
 
-    def self.create_schedule_SHW(model, default_schedule_set, swh_profiles, profile_override, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.create_schedule_SHW(model, default_schedule_set, swh_profiles, profile_override, hoo)
       # generate and apply water use equipment schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric SWH Schedule'
-      hash = process_hash(swh_profiles, profile_override, ruleset_name, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+      hash = process_hash(swh_profiles, profile_override, ruleset_name, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
       winter_design_day = hash[:default].drop(1)
       summer_design_day = hash[:default].drop(1)
@@ -518,7 +511,7 @@ module BuildingSync
     end
 
     # make hash of out string argument in eval. Rescue if can't be made into hash
-    def self.process_hash(string, profile_override, ruleset_name, hoo_start_wkdy, hoo_end_wkdy, hoo_start_sat, hoo_end_sat, hoo_start_sun, hoo_end_sun)
+    def self.process_hash(string, profile_override, ruleset_name, hoo)
       begin
         # temp code to make profile_hash from original commit work with updated process hash method that doesn't expose quotes or escape characters
         string = string.delete('{').delete('}')
@@ -560,14 +553,14 @@ module BuildingSync
         temp_array.each_with_index do |string, i|
           day_type = string.split('=>').first.delete(':')
           if day_type == 'default'
-            hoo_start = hoo_start_wkdy
-            hoo_end = hoo_end_wkdy
+            hoo_start = hoo.start_wkdy
+            hoo_end = hoo.end_wkdy
           elsif day_type == 'saturday'
-            hoo_start = hoo_start_sat
-            hoo_end = hoo_end_sat
+            hoo_start = hoo.start_sat
+            hoo_end = hoo.end_sat
           elsif day_type == 'sunday'
-            hoo_start = hoo_start_sun
-            hoo_end = hoo_end_sun
+            hoo_start = hoo.start_sun
+            hoo_end = hoo.end_sun
           end
 
           if hoo_end >= hoo_start

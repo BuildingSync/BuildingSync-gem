@@ -36,6 +36,7 @@
 # *******************************************************************************
 require_relative 'building_system'
 require_relative '../helpers/parametric_schedule_helper'
+require_relative '../helpers/hours_of_operation'
 require 'openstudio/extension/core/os_lib_schedules.rb'
 
 module BuildingSync
@@ -152,10 +153,10 @@ module BuildingSync
       if !building_section.typical_occupant_usage_value_hours.nil?
         puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
 
-        hoo_per_week = building_section.typical_occupant_usage_value_hours.to_f
+        hours_per_week = building_section.typical_occupant_usage_value_hours.to_f
         # setting default values
-
-        return BuildingSync::ParametricScheduleHelper::process_schedules(model, space_type, hoo_per_week)
+        hours_of_operation = HoursOfOperation.new(hours_per_week)
+        return BuildingSync::ParametricScheduleHelper::process_schedules(model, space_type, hours_of_operation)
       end
       return false
     end
