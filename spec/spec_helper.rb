@@ -91,7 +91,7 @@ RSpec.configure do |config|
 
     extension = OpenStudio::Extension::Extension.new
     runner_options = { run_simulations: true }
-    runner = OpenStudio::Extension::Runner.new(extension.root_dir, [], runner_options)
+    runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
     result = runner.run_osw(osw_path, osm_baseline_dir)
     puts result
     # todo: test all the osw_files for results
