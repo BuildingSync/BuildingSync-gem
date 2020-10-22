@@ -61,8 +61,8 @@ module BuildingSync
       # to further reduce the log messages we can change the log level with this command
       # OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Error)
       # Open a log for the library
-      logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
-      logFile.setLogLevel(OpenStudio::Info)
+      log_file = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
+      log_file.setLogLevel(OpenStudio::Info)
 
       # parse the xml
       if !File.exist?(xml_file_path)

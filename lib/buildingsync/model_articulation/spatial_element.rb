@@ -45,6 +45,7 @@ module BuildingSync
   class SpatialElement
 
     include OsLib_ModelGeneration
+
     def initialize
       @total_floor_area = nil
       @bldg_type = nil
@@ -56,7 +57,6 @@ module BuildingSync
       @conditioned_floor_area_heated_only = nil
       @conditioned_floor_area_cooled_only = nil
       @conditioned_floor_area_heated_cooled = nil
-      @conditioned_below_grade_floor_area = nil
       @custom_conditioned_above_grade_floor_area = nil
       @custom_conditioned_below_grade_floor_area = nil
     end
@@ -258,20 +258,18 @@ module BuildingSync
       @space_types.each do |space_type_name, hash|
         ratio_of_bldg_total = hash[:ratio] * @ratio_adjustment_multiplier * @fraction_area
         final_floor_area = ratio_of_bldg_total * total_bldg_floor_area # I think I can just pass ratio but passing in area is cleaner
-        @space_types_floor_area[hash[:space_type]] = { floor_area: final_floor_area }
+        @space_types_floor_area[hash[:space_type]] = {floor_area: final_floor_area}
       end
       return @space_types_floor_area
     end
 
-    def add_element_in_xml_file(building_element, ns, field_name, field_value)
-      user_defined_fields = REXML::Element.new("#{ns}:UserDefinedFields")
+    def add_user_defined_field_to_xml_file(user_defined_fields, ns, field_name, field_value)
       user_defined_field = REXML::Element.new("#{ns}:UserDefinedField")
       field_name_element = REXML::Element.new("#{ns}:FieldName")
       field_value_element = REXML::Element.new("#{ns}:FieldValue")
 
       if !field_value.nil?
         user_defined_fields.add_element(user_defined_field)
-        building_element.add_element(user_defined_fields)
         user_defined_field.add_element(field_name_element)
         user_defined_field.add_element(field_value_element)
 
@@ -280,22 +278,51 @@ module BuildingSync
       end
     end
 
+
     def write_parameters_to_xml_for_spatial_element(ns, xml_element)
-      add_element_in_xml_file(xml_element, ns, 'TotalFloorArea', @total_floor_area)
-      add_element_in_xml_file(xml_element, ns, 'BuildingType', @bldg_type)
-      add_element_in_xml_file(xml_element, ns, 'SystemType', @system_type)
-      add_element_in_xml_file(xml_element, ns, 'BarDivisionMethod', @bar_division_method)
-      add_element_in_xml_file(xml_element, ns, 'FractionArea', @fraction_area)
-      add_element_in_xml_file(xml_element, ns, 'SpaceTypesFloorArea', @space_types_floor_area)
-      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaHeatedOnly', @conditioned_floor_area_heated_only)
-      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaCooledOnly', @conditioned_floor_area_cooled_only)
-      add_element_in_xml_file(xml_element, ns, 'ConditionedFloorAreaHeatedCooled', @conditioned_floor_area_heated_cooled)
-      add_element_in_xml_file(xml_element, ns, 'ConditionedBelowGradeFloorArea', @conditioned_below_grade_floor_area)
-      add_element_in_xml_file(xml_element, ns, 'CustomConditionedAboveGradeFloorArea', @custom_conditioned_above_grade_floor_area)
-      add_element_in_xml_file(xml_element, ns, 'CustomConditionedBelowGradeFloorArea', @custom_conditioned_below_grade_floor_area)
+      user_defined_fields = REXML::Element.new("#{ns}:UserDefinedFields")
+      xml_element.add_element(user_defined_fields)
+
+      add_user_defined_field_to_xml_file(user_defined_fields, ns, 'BuildingType', @bldg_type)
+      add_user_defined_field_to_xml_file(user_defined_fields, ns, 'SystemType', @system_type)
+      add_user_defined_field_to_xml_file(user_defined_fields, ns, 'BarDivisionMethod', @bar_division_method)
+      add_user_defined_field_to_xml_file(user_defined_fields, ns, 'FractionArea', @fraction_area)
+      add_user_defined_field_to_xml_file(user_defined_fields, ns, 'SpaceTypesFloorArea', @space_types_floor_area)
+
+      add_floor_area_field_to_xml_file(xml_element, ns)
+    end
+
+    def add_floor_area_field_to_xml_file(xml_element, ns)
+      xml_element.elements.each("#{ns}:FloorAreas/#{ns}:FloorArea") do |floor_area_element|
+        next if !floor_area_element.elements["#{ns}:FloorAreaValue"]
+        floor_area = floor_area_element.elements["#{ns}:FloorAreaValue"].text.to_f
+        next if floor_area.nil?
+
+        floor_area_type = floor_area_element.elements["#{ns}:FloorAreaType"].text
+        if floor_area_type == 'Gross'
+          floor_area_element.elements["#{ns}:FloorAreaValue"].text = @total_floor_area
+        elsif floor_area_type == 'Heated and Cooled'
+          floor_area_element.elements["#{ns}:FloorAreaValue"].text = @conditioned_floor_area_heated_cooled
+        elsif floor_area_type == 'Conditioned'
+          floor_area_element.elements["#{ns}:FloorAreaValue"].text = @conditioned_floor_area_heated_cooled
+        elsif floor_area_type == 'Heated Only'
+          floor_area_element.elements["#{ns}:FloorAreaValue"].text = @conditioned_floor_area_heated_only
+        elsif floor_area_type == 'Cooled Only'
+          floor_area_element.elements["#{ns}:FloorAreaValue"].text = @conditioned_floor_area_cooled_only
+        elsif floor_area_type == 'Custom'
+          if floor_area_element.elements["#{ns}:FloorAreaCustomName"].text == 'Conditioned above grade'
+            floor_area_element.elements["#{ns}:FloorAreaValue"].text = @custom_conditioned_above_grade_floor_area
+          elsif floor_area_element.elements["#{ns}:FloorAreaCustomName"].text == 'Conditioned below grade'
+            floor_area_element.elements["#{ns}:FloorAreaValue"].text = @custom_conditioned_below_grade_floor_area
+          end
+        else
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.SpatialElement.generate_baseline_osm', "Unsupported floor area type found: #{floor_area_type}")
+        end
+      end
     end
 
     def validate_fraction; end
+
     attr_reader :total_floor_area, :bldg_type, :system_type, :space_types
   end
 end

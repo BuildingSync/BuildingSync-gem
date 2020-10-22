@@ -52,4 +52,3 @@ jobs:
       - $SH "bundle exec rspec spec/tests/epw_test_spec.rb"
       # - $SH "bundle exec rspec spec/tests/selection_tool_spec.rb"  # selection tool is not working with ASHRAE level 1.5 yet
       name: "Other Specs"
-
