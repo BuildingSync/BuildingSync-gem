@@ -94,8 +94,8 @@ RSpec.configure do |config|
     runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
     result = runner.run_osws(osw_files, 4)
     puts result
-      # todo: test all the osw_files for results
-      # expect(File.exist?(osw_file.gsub('in.osw', 'eplusout.sql'))).to be true
+    # todo: test all the osw_files for results
+    expect(File.exist?(osw_file.gsub('in.osw', 'eplusout.sql'))).to be true
   end
 
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
