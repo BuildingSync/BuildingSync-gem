@@ -87,7 +87,7 @@ RSpec.configure do |config|
     workflow.setWeatherFile(File.join('../../../weather', epw_name))
     osw_path = osm_baseline_path.gsub('.osm', '.osw')
     workflow.saveAs(File.absolute_path(osw_path.to_s))
-
+    osw_files = [osw_path.to_s]
 
     extension = OpenStudio::Extension::Extension.new
     runner_options = { run_simulations: true }
@@ -95,7 +95,7 @@ RSpec.configure do |config|
     result = runner.run_osws(osw_files, 4)
     puts result
     # todo: test all the osw_files for results
-    expect(File.exist?(osw_file.gsub('in.osw', 'eplusout.sql'))).to be true
+    expect(File.exist?(osw_path.to_s.gsub('in.osw', 'eplusout.sql'))).to be true
   end
 
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
