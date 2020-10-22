@@ -25,8 +25,8 @@ install:
 jobs:
   include:
     - script:
-      - $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
+      - $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/hvac_system_spec.rb"
@@ -37,6 +37,9 @@ jobs:
       name: "Model Articulation Tests"
     - script: $SH "bundle exec rspec spec/tests/translator_spec.rb"
       name: "Translator Spec"
+    - script: 
+      - $SH "bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb"
+      name: "Occupancy Types Spec"
     - script:
       - $SH "bundle exec rspec spec/tests/translator_baseline_generation_spec.rb"
       - $SH "bundle exec rspec spec/tests/translator_scenario_generation_spec.rb"
