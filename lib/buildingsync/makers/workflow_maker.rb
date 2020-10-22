@@ -424,6 +424,9 @@ module BuildingSync
     end
 
     def save_xml(filename)
+      # first we make sure all directories exist
+      FileUtils.mkdir_p(File.dirname(filename))
+      # then we can save the file
       File.open(filename, 'w') do |file|
         @doc.write(file)
       end
@@ -483,10 +486,12 @@ module BuildingSync
     end
 
     def delete_resource_element(scenario, package_of_measures)
-      package_of_measures.elements.delete("#{@ns}:AnnualSavingsSiteEnergy")
-      package_of_measures.elements.delete("#{@ns}:AnnualSavingsCost")
-      package_of_measures.elements.delete("#{@ns}:CalculationMethod")
-      package_of_measures.elements.delete("#{@ns}AnnualSavingsByFuels")
+      if package_of_measures
+        package_of_measures.elements.delete("#{@ns}:AnnualSavingsSiteEnergy")
+        package_of_measures.elements.delete("#{@ns}:AnnualSavingsCost")
+        package_of_measures.elements.delete("#{@ns}:CalculationMethod")
+        package_of_measures.elements.delete("#{@ns}AnnualSavingsByFuels")
+      end
       scenario.elements.delete("#{@ns}AllResourceTotals")
       scenario.elements.delete("#{@ns}RsourceUses")
       scenario.elements.delete("#{@ns}AnnualSavingsByFuels")
@@ -496,10 +501,17 @@ module BuildingSync
       return scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
     end
 
-    def delete_previous_results(scenario)
-      package_of_measures = get_package_of_measures(scenario)
+    def get_current_building(scenario)
+      return scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:CurrentBuilding"]
+    end
+
+    def prepare_package_of_measures_or_current_building(scenario)
+      package_of_measures_or_current_building = get_package_of_measures(scenario)
+      if package_of_measures_or_current_building.nil?
+        package_of_measures_or_current_building = get_current_building(scenario)
+      end
       # delete previous results
-      delete_resource_element(scenario, package_of_measures)
+      delete_resource_element(scenario, package_of_measures_or_current_building)
 
       # preserve existing user defined fields if they exist
       # KAF: there should no longer be any UDFs
@@ -520,7 +532,7 @@ module BuildingSync
           user_defined_fields.elements.delete(element)
         end
       end
-      return package_of_measures
+      return package_of_measures_or_current_building
     end
 
     def add_calc_method_element(result)
@@ -870,11 +882,11 @@ module BuildingSync
             next if scenario_is_baseline_scenario(scenario)
 
             results_counter += 1
-            package_of_measures = delete_previous_results(scenario)
+            package_of_measures_or_current_building = prepare_package_of_measures_or_current_building(scenario)
             result, baseline = get_result_for_scenario(results, scenario)
             annual_results = gather_annual_results(dir, result, scenario_name, baseline, scenario_name == 'Baseline')
 
-            add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, monthly_results, year_val)
+            add_results_to_scenario(package_of_measures_or_current_building, scenario, scenario_name, annual_results, result, monthly_results, year_val)
           end
         end
 
@@ -913,14 +925,16 @@ module BuildingSync
     def extract_annual_results(scenario, scenario_name, package_of_measures)
       variables = {}
 
-      if(package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"])
-        variables['total_site_energy_savings_mmbtu'] = package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"].text
-      end
-      if(package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"])
-        variables['total_source_energy_savings_mmbtu'] = package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"].text
-      end
-      if(package_of_measures.elements["#{@ns}:AnnualSavingsCost"])
-        variables['total_energy_cost_savings'] = package_of_measures.elements["#{@ns}:AnnualSavingsCost"].text
+      if package_of_measures
+        if(package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"])
+          variables['total_site_energy_savings_mmbtu'] = package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"].text
+        end
+        if(package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"])
+          variables['total_source_energy_savings_mmbtu'] = package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"].text
+        end
+        if(package_of_measures.elements["#{@ns}:AnnualSavingsCost"])
+          variables['total_energy_cost_savings'] = package_of_measures.elements["#{@ns}:AnnualSavingsCost"].text
+        end
       end
 
       if scenario.elements["#{@ns}:ResourceUses"]
@@ -938,7 +952,7 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.extract_annual_results', "Scenario: #{scenario_name} does not have any ResourceUses xml elements defined.")
       end
 
-      if scenario.elements["#{@ns}:AnnualSavingsByFuels"]
+      if package_of_measures and package_of_measures.elements["#{@ns}:AnnualSavingsByFuels"]
         package_of_measures.elements["#{@ns}:AnnualSavingsByFuels"].each do |annual_savings|
           if annual_savings.elements["#{@ns}:EnergyResource"].text == 'Electricity'
             variables['baseline_fuel_electricity_kbtu'] = annual_savings.elements["#{@ns}:AnnualSavingsNativeUnits"].text.to_i + variables['fuel_electricity_kbtu'].to_i
