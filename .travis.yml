@@ -16,20 +16,16 @@ before_install:
   - docker ps -a
   - pwd
   - ls
-  - docker exec -t os-3.0.1 bash -c echo $RUBYLIB
-  - docker exec -t os-3.0.1 bash -c "echo $RUBYLIB"
-  - docker exec -t os-3.0.1 bash -c "echo ${RUBYLIB}"
-  - docker exec -t os-3.0.1 bash -c "echo ${LANG}"
+  - docker exec -t os-3.0.1 bash -c "env"
   - docker exec -t os-3.0.1 bash -c "echo $LANG"
-  - $SH "\"echo $RUBYLIB\""
-  - $SH "\"gem install bundler\""
-  - $SH "\"bundle -v\""
-install:
-  - $SH "\"bundle install --path .\""
+  - docker exec -t os-3.0.1 bash -c "gem install bundler"
+  - docker exec -t os-3.0.1 bash -c "bundle -v"
+  install:
+  - docker exec -t os-3.0.1 bash -c "bundle install --path ."
 jobs:
   include:
     - script:
-      - $SH "\"bundle exec rspec spec/tests/model_articulation_test/building_spec.rb\""
+      - docker exec -t os-3.0.1 bash -c "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
       # - $SH "\"bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb\""
       # - $SH "\"bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb\""
       # - $SH "\"bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb\""
