@@ -91,21 +91,36 @@ RSpec.describe 'LoadSystemSpec' do
     space_types = model.getSpaceTypes
     expect(space_types.length).to be 4
     space_types.each do |space_type|
-      calculated_hours_per_week = 0
       default_schedule_set = space_type.defaultScheduleSet.get
       puts "default_schedule_set: #{default_schedule_set.name} for space type: #{space_type.name}"
-      occupancy_Schedule = default_schedule_set.numberofPeopleSchedule.get
-      puts "occupancy_Schedule: #{occupancy_Schedule}"
-      occupancy_Schedule_rule_set = occupancy_Schedule.to_ScheduleRuleset.get
-      puts "occupancy_Schedule_rule_set: #{occupancy_Schedule_rule_set}"
-      defaultProfile = occupancy_Schedule_rule_set.defaultDaySchedule
 
-      default_profile_duration = get_duration(defaultProfile, 0.5)
+      expect(calculate_hours(default_schedule_set.numberofPeopleSchedule, 0.5)). to be 45.0
+      expect(calculate_hours(default_schedule_set.hoursofOperationSchedule, 0.5)). to be 54.0
+      expect(calculate_hours(default_schedule_set.peopleActivityLevelSchedule, 0.5)). to be 168.0
+      expect(calculate_hours(default_schedule_set.lightingSchedule, 0.5)). to be 45.0
+      expect(calculate_hours(default_schedule_set.electricEquipmentSchedule, 0.5)). to be 85.0
+      expect(calculate_hours(default_schedule_set.gasEquipmentSchedule, 0.5)). to be 85.0
+      expect(calculate_hours(default_schedule_set.hotWaterEquipmentSchedule , 0.5)). to be 0.0
+      expect(calculate_hours(default_schedule_set.infiltrationSchedule, 0.5)). to be 90.5
+      expect(calculate_hours(default_schedule_set.steamEquipmentSchedule, 0.5)). to be 0.0
+      expect(calculate_hours(default_schedule_set.otherEquipmentSchedule, 0.5)). to be 0.0
+    end
+  end
+
+  def calculate_hours(optional_schedule, cut_off_value = 0.5)
+    calculated_hours_per_week = 0.0
+    if optional_schedule.is_initialized
+      schedule = optional_schedule.get
+      schedule_rule_set = schedule.to_ScheduleRuleset.get
+      puts "schedule_rule_set: #{schedule_rule_set}"
+      defaultProfile = schedule_rule_set.defaultDaySchedule
+
+      default_profile_duration = get_duration(defaultProfile, cut_off_value)
       puts "default_profile_duration: #{default_profile_duration}"
 
       default_number_of_days = 7
-      occupancy_Schedule_rule_set.scheduleRules.each do |rule|
-        profile_duration = get_duration(rule.daySchedule, 0.5)
+      schedule_rule_set.scheduleRules.each do |rule|
+        profile_duration = get_duration(rule.daySchedule, cut_off_value)
         puts "profile_duration: #{profile_duration}"
 
         number_of_days = count_number_of_days(rule)
@@ -113,8 +128,8 @@ RSpec.describe 'LoadSystemSpec' do
         calculated_hours_per_week += profile_duration * number_of_days
       end
       calculated_hours_per_week += default_profile_duration * default_number_of_days
-      expect(calculated_hours_per_week).to be 48
     end
+    return calculated_hours_per_week
   end
 
   def count_number_of_days(rule)
@@ -130,34 +145,24 @@ RSpec.describe 'LoadSystemSpec' do
   end
 
   def get_duration(profile, cut_off_value)
-    min_time = nil
-    max_time = nil
-    min_time_value = nil
-    max_time_value = nil
     last_time = nil
+
+    duration_above_cut_off = 0.0
 
     profile.times.each do |time|
 
       puts "time: #{time} value: #{profile.getValue(time)}"
-      if min_time.nil?
-        if profile.getValue(time) >= cut_off_value
-          min_time = time
-          min_time_value = profile.getValue(time)
+      if profile.getValue(time) >= cut_off_value
+        if last_time.nil?
+          duration_above_cut_off += time.totalHours
+        else
+          duration_above_cut_off += time.totalHours - last_time.totalHours
         end
-      elsif max_time.nil?
-        if profile.getValue(time) < cut_off_value then max_time = last_time end
       end
       last_time = time
     end
 
-    return 0 if min_time.nil?
-    puts "min_time: #{min_time}"
-    puts "max_time: #{max_time}"
-    puts "min_time_value: #{min_time_value}"
-    puts "max_time_value: #{profile.getValue(max_time)}"
-    duration = max_time.hours - min_time.hours
-    puts "duration: #{duration}"
-    return duration
+    return duration_above_cut_off
   end
 
   def create_minimum_section_xml(ns, typical_usage_hours = 40)
