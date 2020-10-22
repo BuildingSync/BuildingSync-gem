@@ -71,7 +71,7 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  def run_baseline_simulation(osm_name, epw_name)
+  def run_baseline_simulation(osm_name, epw_file_path)
     basic_dir = File.dirname(osm_name)
     file_name = File.basename(osm_name)
 
@@ -84,18 +84,18 @@ RSpec.configure do |config|
     puts "osm_baseline_path: #{osm_baseline_path}"
     workflow = OpenStudio::WorkflowJSON.new
     workflow.setSeedFile(osm_baseline_path)
-    workflow.setWeatherFile(File.join('../../../weather', epw_name))
+    workflow.setWeatherFile(epw_file_path)
     osw_path = osm_baseline_path.gsub('.osm', '.osw')
     workflow.saveAs(File.absolute_path(osw_path.to_s))
 
 
     extension = OpenStudio::Extension::Extension.new
     runner_options = { run_simulations: true }
-    runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
-    result = runner.run_osws(osw_files, 4)
+    runner = OpenStudio::Extension::Runner.new(extension.root_dir, [], runner_options)
+    result = runner.run_osw(osw_path, osm_baseline_dir)
     puts result
     # todo: test all the osw_files for results
-    expect(File.exist?(osw_file.gsub('in.osw', 'eplusout.sql'))).to be true
+    expect(File.exist?(osw_path.gsub('in.osw', 'eplusout.sql'))).to be true
   end
 
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
@@ -301,6 +301,26 @@ RSpec.configure do |config|
     else
       expect(site_element.nil?).to be false
     end
+  end
+
+  def create_xml_file_object(xml_file_path)
+    doc = nil
+    File.open(xml_file_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+    end
+    return doc
+  end
+
+  def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used, spec_name)
+    generator = BuildingSync::Generator.new()
+    facility = generator.create_minimum_facility(occupancy_classification,  year_of_const, floor_area_type, floor_area_value)
+    facility.determine_open_studio_standard(standard_to_be_used)
+    epw_file_path = File.expand_path('./weather/CZ01RV2.epw', File.dirname(__FILE__))
+    output_path = File.expand_path("./output/#{spec_name}/#{occupancy_classification}", File.dirname(__FILE__))
+    expect(facility.generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)).to be true
+    facility.write_osm(output_path)
+
+    run_baseline_simulation(output_path + '/in.osm', epw_file_path)
   end
 
   def create_xml_file_object(xml_file_path)
