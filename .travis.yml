@@ -20,7 +20,7 @@ before_install:
   - docker exec -t os-3.0.1 bash -c "echo $LANG"
   - docker exec -t os-3.0.1 bash -c "gem install bundler"
   - docker exec -t os-3.0.1 bash -c "bundle -v"
-  install:
+install:
   - docker exec -t os-3.0.1 bash -c "bundle install --path ."
 jobs:
   include:
