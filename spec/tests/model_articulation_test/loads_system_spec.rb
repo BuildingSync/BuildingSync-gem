@@ -80,7 +80,21 @@ RSpec.describe 'LoadSystemSpec' do
     new_building_section = BuildingSync::BuildingSection.new(create_minimum_section_xml('auc'), 'Office', '20000', 'auc')
     expect(load_system.adjust_people_schedule(nil, new_building_section, model)).to be true
 
-    # building.defaultScheduleSet.get
+
+    default_schedule_set = model.getBuilding.defaultScheduleSet.get
+
+    puts "default_schedule_set: #{default_schedule_set.name}"
+
+    expect(calculate_hours(default_schedule_set.numberofPeopleSchedule, 0.5)). to be 45.0
+    expect(calculate_hours(default_schedule_set.hoursofOperationSchedule, 0.5)). to be 54.0
+    expect(calculate_hours(default_schedule_set.peopleActivityLevelSchedule, 0.5)). to be 168.0
+    expect(calculate_hours(default_schedule_set.lightingSchedule, 0.5)). to be 45.0
+    expect(calculate_hours(default_schedule_set.electricEquipmentSchedule, 0.5)). to be 85.0
+    expect(calculate_hours(default_schedule_set.gasEquipmentSchedule, 0.5)). to be 85.0
+    expect(calculate_hours(default_schedule_set.hotWaterEquipmentSchedule, 0.5)). to be 0.0
+    expect(calculate_hours(default_schedule_set.infiltrationSchedule, 0.5)). to be 90.5
+    expect(calculate_hours(default_schedule_set.steamEquipmentSchedule, 0.5)). to be 0.0
+    expect(calculate_hours(default_schedule_set.otherEquipmentSchedule, 0.5)). to be 0.0
   end
 
   it 'should parse and write building_151.xml and adjust schedules successfully' do

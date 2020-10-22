@@ -40,6 +40,14 @@ module BuildingSync
     def self.process_schedules(model, this_space_type, hours_of_operation, htg_setpoint = 67.0, clg_setpoint = 75.0, setback_delta = 4)
       # pre-process space types to identify which ones to alter
       space_types_to_alter = []
+      # if space type is nil we get all space types in the model that are bnot
+      if this_space_type.nil?
+        model.getSpaceTypes.each do |space_type|
+          next if space_type.spaces.empty?
+          space_types_to_alter << space_type
+        end
+      end
+      # otherwise we check for the space types we want to alter
       model.getSpaceTypes.each do |space_type|
         if !this_space_type.nil?
           next if space_type != this_space_type
@@ -87,6 +95,21 @@ module BuildingSync
         water_use_equipment_to_alter.each do |water_use_equipment|
           water_use_equipment.setFlowRateFractionSchedule(swh_sch)
         end
+      end
+
+      # if there are no space types in the model we create the default schedule set at the building level
+      if space_types_to_alter.length == 0
+        default_schedule_set = OpenStudio::Model::DefaultScheduleSet.new(model)
+        default_schedule_set.setName('Parametric Hours of Operation Schedule Set')
+
+        default_schedule_set.setHoursofOperationSchedule(create_schedule_hours_of_operations(model, hours_of_operation))
+        default_schedule_set.setPeopleActivityLevelSchedule(create_schedule_activity(model))
+        default_schedule_set.setLightingSchedule(create_schedule_lighting(model, profiles['lighting'], profile_override, hours_of_operation))
+        default_schedule_set.setElectricEquipmentSchedule(create_schedule_electric_equipment(model, profiles['electric_equipment'], profile_override, hours_of_operation))
+        default_schedule_set.setGasEquipmentSchedule(create_schedule_gas_equipment(model, profiles['gas_equipment'], profile_override, hours_of_operation))
+        default_schedule_set.setNumberofPeopleSchedule(create_schedule_occupancy(model, profiles['occupancy'], profile_override, hours_of_operation))
+        default_schedule_set.setInfiltrationSchedule(create_schedule_infiltration(model, profiles['infiltration'], profile_override, hours_of_operation))
+        model.getBuilding.setDefaultScheduleSet(default_schedule_set)
       end
       return true
     end
