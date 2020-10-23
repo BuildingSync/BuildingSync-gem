@@ -64,10 +64,6 @@ RSpec.describe 'OccupancyTypeSpec' do
   it 'Should generate osm and simulate baseline for OccupancyType: Outpatient' do
     run_minimum_facility('Outpatient', '2001', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
   end
-  
-  it 'Should generate osm and simulate baseline for OccupancyType: Hospital' do
-    run_minimum_facility('Hospital', '2002', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
-  end
 
   it 'Should generate osm and simulate baseline for OccupancyType: SmallHotel' do
     run_minimum_facility('SmallHotel', '2003', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
