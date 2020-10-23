@@ -182,9 +182,34 @@ module BuildingSync
       workflow = OpenStudio::WorkflowJSON.new
       workflow.setSeedFile(@osm_baseline_path)
       workflow.setWeatherFile(File.join('../../../weather', epw_name))
+      # we need to add the report measure, too
+      measure_step = OpenStudio::MeasureStep.new('openstudio_results')
+      measure_steps = OpenStudio::MeasureStepVector.new
+      measure_steps.push(measure_step)
+      adding_workflow_failed = false
+      if !workflow.setMeasureSteps(OpenStudio::MeasureType.new('ModelMeasure'), measure_steps)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.run_osm', "Could not add reporting measure to osw")
+        adding_workflow_failed = true
+      end
 
       osw_path = osm_baseline_path.gsub('.osm', '.osw')
       workflow.saveAs(File.absolute_path(osw_path.to_s))
+
+      # this is a workaround if the above code fails
+      if adding_workflow_failed
+        # if this does not work we add it directly into the JSON file
+        json_workflow = nil
+        File.open(osw_path, 'r') do |file|
+          json_workflow = JSON.parse(file.read)
+          new_step = {}
+          new_step['measure_dir_name'] = 'openstudio_results'
+          #new_step['arguments'] = args_hash
+          json_workflow['steps'].insert(0, new_step)
+        end
+        File.open(osw_path, 'w') do |file|
+            file << JSON.generate(json_workflow)
+        end
+      end
 
       extension = OpenStudio::Extension::Extension.new
       runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)

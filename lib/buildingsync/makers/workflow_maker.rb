@@ -310,13 +310,13 @@ module BuildingSync
 
     def scenario_is_baseline_scenario(scenario)
       # first we check if we find the new scenario type definition
-      return true if scenario.elements["#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Modeled"]
+      return true if scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Modeled"]
       return false
     end
 
     def scenario_is_measured_scenario(scenario)
       # first we check if we find the new scenario type definition
-      return true if scenario.elements["#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Measured"]
+      return true if scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Measured"]
       return false
     end
 
@@ -415,7 +415,7 @@ module BuildingSync
           end
         end
       end
-
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.get_measure_result', "Did not find any steps for measure #{measure_dir_name} for result #{result_name}")
       return nil
     end
 
@@ -626,7 +626,7 @@ module BuildingSync
       # ELECTRICITY
       res_use = REXML::Element.new("#{@ns}:ResourceUse")
       res_use.add_attribute('ID', scenario_name_ns + '_Electricity')
-      if variables.key?('fuel_electricity_kbtu')
+      if variables.key?('fuel_electricity_kbtu') and variables['fuel_electricity_kbtu']
         energy_res = REXML::Element.new("#{@ns}:EnergyResource")
         energy_res.text = 'Electricity'
         res_units = REXML::Element.new("#{@ns}:ResourceUnits")
@@ -634,12 +634,15 @@ module BuildingSync
         native_units = REXML::Element.new("#{@ns}:AnnualFuelUseNativeUnits")
         native_units.text = variables['fuel_electricity_kbtu'].to_s
         consistent_units = REXML::Element.new("#{@ns}:AnnualFuelUseConsistentUnits")
-        consistent_units.text = (variables['fuel_electricity_kbtu'] / 1000.0).to_s # convert to MMBtu
+        if variables['fuel_electricity_kbtu']
+          consistent_units.text = (variables['fuel_electricity_kbtu'] / 1000.0).to_s # convert to MMBtu
+          res_use.add_element(consistent_units)
+        end
         res_use.add_element(energy_res)
         res_use.add_element(res_units)
         res_use.add_element(native_units)
-        res_use.add_element(consistent_units)
-        if variables.key?('annual_peak_electric_demand_kw')
+
+        if variables.key?('annual_peak_electric_demand_kw') and variables['annual_peak_electric_demand_kw']
           peak_units = REXML::Element.new("#{@ns}:PeakResourceUnits")
           peak_units.text = 'kW'
           peak_native_units = REXML::Element.new("#{@ns}:AnnualPeakNativeUnits")
@@ -653,7 +656,7 @@ module BuildingSync
         res_uses.add_element(res_use)
       end
       # NATURAL GAS
-      if variables.key?('fuel_natural_gas_kbtu')
+      if variables.key?('fuel_natural_gas_kbtu') and variables['fuel_natural_gas_kbtu']
         res_use = REXML::Element.new("#{@ns}:ResourceUse")
         res_use.add_attribute('ID', scenario_name_ns + '_NaturalGas')
         energy_res = REXML::Element.new("#{@ns}:EnergyResource")
@@ -873,21 +876,19 @@ module BuildingSync
         # write an osw for each scenario
         results, monthly_results = get_result_for_scenarios(dir, baseline_only)
 
-        if !baseline_only
-          get_scenario_elements.each do |scenario|
-            scenarios_found = true
-            # get information about the scenario
-            scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-            next if scenario_is_measured_scenario(scenario)
-            next if scenario_is_baseline_scenario(scenario)
+        get_scenario_elements.each do |scenario|
+          scenarios_found = true
+          # get information about the scenario
+          scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+          next if scenario_is_measured_scenario(scenario)
+          next if !scenario_is_baseline_scenario(scenario) and baseline_only
 
-            results_counter += 1
-            package_of_measures_or_current_building = prepare_package_of_measures_or_current_building(scenario)
-            result, baseline = get_result_for_scenario(results, scenario)
-            annual_results = gather_annual_results(dir, result, scenario_name, baseline, scenario_name == 'Baseline')
+          results_counter += 1
+          package_of_measures_or_current_building = prepare_package_of_measures_or_current_building(scenario)
+          result, baseline = get_result_for_scenario(results, scenario)
+          annual_results = gather_annual_results(dir, result, scenario_name, baseline, scenario_name == 'Baseline')
 
-            add_results_to_scenario(package_of_measures_or_current_building, scenario, scenario_name, annual_results, result, monthly_results, year_val)
-          end
+          add_results_to_scenario(package_of_measures_or_current_building, scenario, scenario_name, annual_results, result, monthly_results, year_val)
         end
 
         puts 'No scenarios found in BuildingSync XML File, please check the object hierarchy for errors.' if !scenarios_found
