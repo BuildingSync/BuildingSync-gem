@@ -38,7 +38,10 @@ jobs:
     # - script: $SH "bundle exec rspec spec/tests/translator_spec.rb"
     #   name: "Translator Spec"
     - script: 
-      - travis_wait 30 $SH "bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb"
+      - travis_wait 20 $SH "bundle exec rspec spec/tests/model_articulation_test/hospital_occupancy_type_spec.rb"
+      name: "Hospital Occupancy Type Spec"
+    - script: 
+      - "bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb"
       name: "Occupancy Types Spec"
     # - script:
     #   - $SH "bundle exec rspec spec/tests/translator_baseline_generation_spec.rb"
