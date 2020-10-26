@@ -61,8 +61,8 @@ module BuildingSync
       # to further reduce the log messages we can change the log level with this command
       # OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Error)
       # Open a log for the library
-      logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
-      logFile.setLogLevel(OpenStudio::Info)
+      log_file = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
+      log_file.setLogLevel(OpenStudio::Info)
 
       # parse the xml
       if !File.exist?(xml_file_path)
@@ -78,6 +78,7 @@ module BuildingSync
             raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
           else
             OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
+            puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
           end
         rescue StandardError
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")

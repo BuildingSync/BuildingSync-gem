@@ -40,7 +40,7 @@ RSpec.describe 'EnvelopeSystemSpec' do
     standard = Standard.build('DOE Ref 1980-2004')
 
     model = OpenStudio::Model::Model.new
-    envelopeSystem = BuildingSync::EnvelopeSystem.new
-    envelopeSystem.create(model, standard, 'Retail', 'Retail', false)
+    envelope_system = BuildingSync::EnvelopeSystem.new
+    envelope_system.create(model, standard, 'Retail', 'Retail', false)
   end
 end

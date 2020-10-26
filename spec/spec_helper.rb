@@ -34,6 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative '../lib/buildingsync/generator'
 
 # try to load configuration, use defaults if doesn't exist
 begin
@@ -70,7 +71,7 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  def run_baseline_simulation(osm_name, epw_name)
+  def run_baseline_simulation(osm_name, epw_file_path)
     basic_dir = File.dirname(osm_name)
     file_name = File.basename(osm_name)
 
@@ -83,36 +84,18 @@ RSpec.configure do |config|
     puts "osm_baseline_path: #{osm_baseline_path}"
     workflow = OpenStudio::WorkflowJSON.new
     workflow.setSeedFile(osm_baseline_path)
-    workflow.setWeatherFile(File.join('../../../weather', epw_name))
+    workflow.setWeatherFile(epw_file_path)
     osw_path = osm_baseline_path.gsub('.osm', '.osw')
     workflow.saveAs(File.absolute_path(osw_path.to_s))
 
-    cli_path = OpenStudio.getOpenStudioCLI
-    cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
-    # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_path}\""
-    puts cmd
 
-    # Run the sizing run
-    OpenstudioStandards.run_command(cmd)
-
-    expect(File.exist?(osm_baseline_path.gsub('in.osm', 'run/eplusout.sql'))).to be true
-  end
-
-  def run_scenario_simulations(osw_files, num_of_threads = 7)
-    cli_path = OpenStudio.getOpenStudioCLI
-    counter = 1
-    Parallel.each(osw_files, in_threads: num_of_threads) do |osw_file|
-      cmd = "\"#{cli_path}\" run -w \"#{osw_file}\""
-      # cmd = "\"#{cli_path}\" --verbose run -w \"#{osw_file}\""
-      puts "#{counter}) #{cmd}"
-      counter += 1
-      # Run the sizing run
-      OpenstudioStandards.run_command(cmd)
-
-      sql_file = osw_file.gsub('in.osw', 'eplusout.sql')
-      puts "Simulation not completed successfully for file: #{osw_file}" if !File.exist?(sql_file)
-      expect(File.exist?(sql_file)).to be true
-    end
+    extension = OpenStudio::Extension::Extension.new
+    runner_options = { run_simulations: true }
+    runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
+    result = runner.run_osw(osw_path, osm_baseline_dir)
+    puts result
+    # todo: test all the osw_files for results
+    expect(File.exist?(osw_path.gsub('in.osw', 'eplusout.sql'))).to be true
   end
 
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
@@ -220,8 +203,8 @@ RSpec.configure do |config|
     p 'IDF file successfully saved' if workspace.save(new_file_path)
 
     original_file_path = "#{@osm_file_path}/originalfiles"
-    oldModel = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
-    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(oldModel)
+    old_model = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
+    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(old_model)
     # first delete the file if exist
     File.delete("#{original_file_path}/in.idf") if File.exist?("#{original_file_path}/in.idf")
 
@@ -235,24 +218,22 @@ RSpec.configure do |config|
   end
 
   def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, simulate = true)
-    puts "LWKEFJLWKEJFWOEIFJQW"
     current_year = Date.today.year
     translator = test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used, epw_file_name)
-    puts "PAST TRANSLATOR"
+
     out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
     osw_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
 
-    puts "Simulate: #{simulate}"
     if simulate
-      puts "ENTERED SIMULATE"
       translator.run_osws
 
       dir_path = File.dirname(osw_files[0])
       parent_dir_path = File.expand_path('..', dir_path)
 
-      translator.gather_results(parent_dir_path, current_year)
-      puts "About to save file to: #{File.join(parent_dir_path, 'results.xml')}"
+      successful = translator.gather_results(parent_dir_path)
+      puts "Error during results gathering, please check earlier error messages for issues with measures." if !successful
+      expect(successful).to be true
       translator.save_xml(File.join(parent_dir_path, 'results.xml'))
       expect(File.exist?(File.join(parent_dir_path, 'results.xml'))).to be true
     else
@@ -285,7 +266,6 @@ RSpec.configure do |config|
 
     # we compare the counts, by also considering the two potential osw files in the SR directory
     expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
-    puts "test_baseline_and_scenario_creation: returning translator: #{translator}"
     return translator
   end
 
@@ -311,12 +291,13 @@ RSpec.configure do |config|
     translator.write_osm
 
     expect(File.exist?("#{out_path}/in.osm")).to be true
-    puts "test_baseline_creation: returning translator: #{translator}"
+
     return translator
   end
 
   def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    generator = BuildingSync::Generator.new()
+    xml_snippet =generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
     ns = 'auc'
     site_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
     if !site_element.nil?
@@ -326,37 +307,24 @@ RSpec.configure do |config|
     end
   end
 
-  def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    xml_path = File.expand_path('./files/building_151_Blank.xml', File.dirname(__FILE__))
-    ns = 'auc'
-    doc = create_xml_file_object(xml_path)
-    site_element = doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
-
-    occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
-    occupancy_classification_element.text = occupancy_classification
-    site_element.add_element(occupancy_classification_element)
-
-    building_element = site_element.elements["#{ns}:Buildings/#{ns}:Building"]
-
-    year_of_construction_element = REXML::Element.new("#{ns}:YearOfConstruction")
-    year_of_construction_element.text = year_of_const
-    building_element.add_element(year_of_construction_element)
-
-    floor_areas_element = REXML::Element.new("#{ns}:FloorAreas")
-    floor_area_element = REXML::Element.new("#{ns}:FloorArea")
-    floor_area_type_element = REXML::Element.new("#{ns}:FloorAreaType")
-    floor_area_type_element.text = floor_area_type
-    floor_area_value_element = REXML::Element.new("#{ns}:FloorAreaValue")
-    floor_area_value_element.text = floor_area_value
-
-    floor_area_element.add_element(floor_area_type_element)
-    floor_area_element.add_element(floor_area_value_element)
-    floor_areas_element.add_element(floor_area_element)
-    building_element.add_element(floor_areas_element)
-
-    # doc.write(File.open(xml_path, 'w'), 2)
-
+  def create_xml_file_object(xml_file_path)
+    doc = nil
+    File.open(xml_file_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+    end
     return doc
+  end
+
+  def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used, spec_name)
+    generator = BuildingSync::Generator.new()
+    facility = generator.create_minimum_facility(occupancy_classification,  year_of_const, floor_area_type, floor_area_value)
+    facility.determine_open_studio_standard(standard_to_be_used)
+    epw_file_path = File.expand_path('./weather/CZ01RV2.epw', File.dirname(__FILE__))
+    output_path = File.expand_path("./output/#{spec_name}/#{occupancy_classification}", File.dirname(__FILE__))
+    expect(facility.generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)).to be true
+    facility.write_osm(output_path)
+
+    run_baseline_simulation(output_path + '/in.osm', epw_file_path)
   end
 
   def create_xml_file_object(xml_file_path)

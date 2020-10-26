@@ -223,7 +223,8 @@ RSpec.describe 'BuildingSpec' do
 
   def create_minimum_building(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
     ns = 'auc'
-    xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, ns)
+    generator = BuildingSync::Generator.new()
+    xml_snippet = generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, ns)
 
     building_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building"]
     if !building_element.nil?
@@ -233,33 +234,4 @@ RSpec.describe 'BuildingSpec' do
     end
   end
 
-  def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, ns)
-    xml_path = File.expand_path('../../files/building_151_Blank.xml', File.dirname(__FILE__))
-    doc = create_xml_file_object(xml_path)
-
-    building_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building"]
-
-    year_of_construction_element = REXML::Element.new("#{ns}:YearOfConstruction")
-    year_of_construction_element.text = year_of_const
-    building_element.add_element(year_of_construction_element)
-
-    floor_areas_element = REXML::Element.new("#{ns}:FloorAreas")
-    floor_area_element = REXML::Element.new("#{ns}:FloorArea")
-    floor_area_type_element = REXML::Element.new("#{ns}:FloorAreaType")
-    floor_area_type_element.text = floor_area_type
-    floor_area_value_element = REXML::Element.new("#{ns}:FloorAreaValue")
-    floor_area_value_element.text = floor_area_value
-
-    floor_area_element.add_element(floor_area_type_element)
-    floor_area_element.add_element(floor_area_value_element)
-    floor_areas_element.add_element(floor_area_element)
-    building_element.add_element(floor_areas_element)
-
-    occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
-    occupancy_classification_element.text = occupancy_classification
-    building_element.add_element(occupancy_classification_element)
-    # doc.write(File.open(xml_path, 'w'), 2)
-
-    return doc
-  end
 end

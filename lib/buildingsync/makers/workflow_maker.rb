@@ -34,7 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative 'workflow_maker_base'
+require_relative '../workflow_maker_base'
 require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
 require 'openstudio/ee_measures'
@@ -44,6 +44,7 @@ module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class WorkflowMaker < WorkflowMakerBase
 
+    # initialize - load workflow json file and add necessary measure paths
     def initialize(doc, ns)
       super
 
@@ -65,28 +66,67 @@ module BuildingSync
         @workflow = JSON.parse(file.read)
         set_measure_paths(@workflow, get_measure_directories_array)
       end
+      check_if_measures_exist
     end
 
+    # iterate over the current measure list in the workflow and check if they are available at the referenced measure directories
+    def check_if_measures_exist
+      all_measures_found = true
+      @workflow['steps'].each do |step|
+        measure_is_valid = false
+        measure_dir_name = step['measure_dir_name']
+        get_measure_directories_array.each do |potential_measure_path|
+          measure_dir_full_path = "#{potential_measure_path}/#{measure_dir_name}"
+          if Dir.exist?(measure_dir_full_path)
+            measure_is_valid = true
+            puts "measure found in: #{measure_dir_full_path}/"
+            break
+          end
+        end
+        if !measure_is_valid
+          all_measures_found = false
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.check_if_measures_exist', "CANNOT find measure with name (#{measure_dir_name}) in any of the measure paths  ")
+        end
+      end
+      return all_measures_found
+    end
+
+    # prints out all available measures across all measure directories
+    def get_list_of_available_measures
+      list_of_measures = Hash.new
+      get_measure_directories_array.each do |potential_measure_path|
+        Dir.chdir(potential_measure_path) do
+          list_of_measures[potential_measure_path] = Dir.glob('*').select{ |f| File.directory? f }
+        end
+      end
+      return list_of_measures
+    end
+
+    # collect all measure directories that contain measures needed for BldgSync
     def get_measure_directories_array
       common_measures_instance = OpenStudio::CommonMeasures::Extension.new
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
       ee_measures_instance = OpenStudio::EeMeasures::Extension.new
       bldg_sync_instance = BuildingSync::Extension.new
-      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, 'R:\NREL\edv-experiment-1\.bundle\install\ruby\2.2.0\gems\openstudio-standards-0.2.9\lib']
+      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir]
     end
 
+    # insert an EnergyPlus measure to the list of existing measures - by default (item = 0) it gets added as first EnergyPlus measure
     def insert_energyplus_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('EnergyPlusMeasure', measure_dir, item, args_hash)
     end
 
+    # insert a Reporting measure to the list of existing measures - by default (item = 0) it gets added as first Reporting measure
     def insert_reporting_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('ReportingMeasure', measure_dir, item, args_hash)
     end
 
+    # insert a Model measure to the list of existing measures - by default (item = 0) it gets added as first Model measure
     def insert_model_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('ModelMeasure', measure_dir, item, args_hash)
     end
 
+    # inserts any measure
     def insert_measure(measure_goal_type, measure_dir, item = 0, args_hash = {})
       successfully_added = false
       count = 0
@@ -135,6 +175,7 @@ module BuildingSync
       return successfully_added
     end
 
+    # gets the measure type of a measure given its directory - looking up the measure type in the measure.xml file
     def get_measure_type(measure_dir)
       measure_type = nil
       get_measure_directories_array.each do |potential_measure_path|
@@ -155,10 +196,12 @@ module BuildingSync
       return measure_type
     end
 
+    # get the current workflow
     def get_workflow
       return @workflow
     end
 
+    # get the name of a measure within the xml structure
     def get_measure_name(measure_category, measure)
       measure_name = ''
       if measure_category == 'Lighting'
@@ -305,6 +348,9 @@ module BuildingSync
 
     def get_scenarios
       scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"]
+      if scenarios.nil?
+        scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios"]
+      end
       return scenarios
     end
 
@@ -893,7 +939,26 @@ module BuildingSync
 
         puts 'No scenarios found in BuildingSync XML File, please check the object hierarchy for errors.' if !scenarios_found
       rescue StandardError => e
-        puts "The following error occurred #{e.message} while processing results in #{dir}"
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "The following error occurred #{e.message} while processing results in #{dir}")
+        end_file = File.join(osw_dir, 'eplusout.end')
+        if File.file?(end_file)
+          # we open the .end file to determine if EnergyPlus was successful or not
+          energy_plus_string = File.open(end_file, &:readline)
+          if energy_plus_string.include? 'Fatal Error Detected'
+            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "EnergyPlus simulation did not succeed! #{energy_plus_string}")
+            # if we found out that there was a fatal error we search the err file for the first error.
+            File.open(File.join(osw_dir, 'eplusout.err')).each do |line|
+              if line.include? '** Severe  **'
+                OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Severe error occured! #{line}")
+              elsif line.include? '**  Fatal  **'
+                OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Fatal error occured! #{line}")
+              end
+            end
+          end
+        else
+          run_log = File.open(File.join(osw_dir, 'run.log'), &:readline)
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Workflow did not succeed! #{run_log}")
+        end
         successful = false
       end
 

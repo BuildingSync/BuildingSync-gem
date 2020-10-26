@@ -34,27 +34,12 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'builder'
+require_relative '../../../lib/buildingsync/generator'
+require_relative './../../spec_helper'
 
-module BuildingSync
-  class ExteriorFloorSystemType
-
-    def initialize(doc, ns, ref)
-      doc.elements.each("#{ns}:Systems/#{ns}:ExteriorFloorSystems/#{ns}:ExteriorFloorSystem") do |floor_system|
-        if floor_system.attributes["ID"] == ref
-          read(floor_system, ns)
-        end
-      end
-    end
-
-    def read(section_element, ns)
-      #if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
-      #  @fenestration_type = "Door"
-      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
-      #  @fenestration_type = "Skylight"
-      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
-      #  @fenestration_type = "Window"
-      #end
-    end
+RSpec.describe 'OccupancyTypeSpec' do  
+  it 'Should generate osm and simulate baseline for OccupancyType: Hospital' do
+    run_minimum_facility('Hospital', '2002', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
   end
 end
-

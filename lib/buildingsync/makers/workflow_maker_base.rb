@@ -46,9 +46,7 @@ module BuildingSync
       FileUtils.mkdir_p(dir)
     end
 
-    def gather_results(dir, year_val, baseline_only = false)
-      ;
-    end
+    def gather_results(dir, baseline_only = false); end
 
     def failed_scenarios
       return []

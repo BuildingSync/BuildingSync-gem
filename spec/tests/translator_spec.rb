@@ -40,11 +40,30 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
+  it 'should print out all available measure paths' do
+    workflow_maker = BuildingSync::WorkflowMaker.new(nil, nil)
+    list_of_measures = workflow_maker.get_list_of_available_measures
+    count = 0
+    list_of_measures.each do |path, list|
+      puts "measure path: #{path} with #{list.length} measures"
+      count += list.length
+      list.each do |measure_path_name|
+        puts "     measure name : #{measure_path_name}"
+      end
+    end
+    puts "found #{count} measures"
+  end
+
+  it 'should check if all measures are available' do
+    workflow_maker = BuildingSync::WorkflowMaker.new(nil, nil)
+    expect(workflow_maker.check_if_measures_exist).to be true
+  end
+
   it 'should add a new EnergyPlus measure' do
-    xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
+    xml_path = File.expand_path('./../files/building_151_one_scenario.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
-    out_path = File.expand_path('./../output/building_151/', File.dirname(__FILE__))
+    out_path = File.expand_path('./../output/building_151_one_scenario/', File.dirname(__FILE__))
 
     if File.exist?(out_path)
       FileUtils.rm_rf(out_path)
@@ -60,9 +79,14 @@ RSpec.describe 'BuildingSync' do
     translator.insert_energyplus_measure('scale_geometry', 1)
     translator.write_osm
     translator.write_osws
+    translator.run_osws
     osw_files = []
     Dir.glob("#{out_path}/Baseline/in.osw") { |osw| osw_files << osw }
-    run_scenario_simulations(osw_files)
+    osw_files.each do |osw|
+      sql_file = osw.gsub('in.osw', 'eplusout.sql')
+      puts "Simulation not completed successfully for file: #{osw}" if !File.exist?(sql_file)
+      expect(File.exist?(sql_file)).to be true
+    end
   end
 
   it 'remove all measures and the add a new EnergyPlus measure' do
@@ -86,9 +110,14 @@ RSpec.describe 'BuildingSync' do
     translator.insert_energyplus_measure('scale_geometry', 1)
     translator.write_osm
     translator.write_osws
+    translator.run_osws
     osw_files = []
     Dir.glob("#{out_path}/Baseline/in.osw") { |osw| osw_files << osw }
-    run_scenario_simulations(osw_files)
+    osw_files.each do |osw|
+      sql_file = osw.gsub('in.osw', 'eplusout.sql')
+      puts "Simulation not completed successfully for file: #{osw}" if !File.exist?(sql_file)
+      expect(File.exist?(sql_file)).to be true
+    end
   end
 
   it 'should add a new Reporting measure' do
@@ -111,9 +140,14 @@ RSpec.describe 'BuildingSync' do
     translator.insert_reporting_measure('openstudio_results', 0)
     translator.write_osm
     translator.write_osws
+    translator.run_osws
     osw_files = []
     Dir.glob("#{out_path}/Baseline/in.osw") { |osw| osw_files << osw }
-    run_scenario_simulations(osw_files)
+    osw_files.each do |osw|
+      sql_file = osw.gsub('in.osw', 'eplusout.sql')
+      puts "Simulation not completed successfully for file: #{osw}" if !File.exist?(sql_file)
+      expect(File.exist?(sql_file)).to be true
+    end
   end
 
   it 'should write parameter value into XML' do
