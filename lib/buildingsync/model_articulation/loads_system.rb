@@ -151,11 +151,18 @@ module BuildingSync
 
     def adjust_people_schedule(space_type, building_section, model)
       if !building_section.typical_occupant_usage_value_hours.nil?
+        puts_string = "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
+
         if space_type.nil?
-          puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours} for all space types in building section: #{building_section.ID}"
+          puts_string +=  " for all space types"
         else
-          puts "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours} for space type: #{space_type.name} in building section: #{building_section.ID}"
+          puts_string +=  " for space type: #{space_type.name}"
         end
+        if !building_section.nil?
+          puts_string +=  " in building section: #{building_section.ID}"
+        end
+        puts puts_string
+
         hours_per_week = building_section.typical_occupant_usage_value_hours.to_f
         # setting default values
         hours_of_operation = HoursOfOperation.new(hours_per_week)
