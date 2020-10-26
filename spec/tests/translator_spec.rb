@@ -121,7 +121,7 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should add a new Reporting measure' do
-    xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
+    xml_path = File.expand_path('./../files/building_151_one_scenario.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
     out_path = File.expand_path('./../output/building_151/', File.dirname(__FILE__))
@@ -151,7 +151,7 @@ RSpec.describe 'BuildingSync' do
   end
 
   it 'should write parameter value into XML' do
-    xml_path = File.expand_path('./../files/building_151.xml', File.dirname(__FILE__))
+    xml_path = File.expand_path('./../files/building_151_one_scenario.xml', File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
 
     out_path = File.expand_path('./../output/building_151/', File.dirname(__FILE__))
