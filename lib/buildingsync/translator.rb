@@ -61,8 +61,8 @@ module BuildingSync
       # to further reduce the log messages we can change the log level with this command
       # OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Error)
       # Open a log for the library
-      logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
-      logFile.setLogLevel(OpenStudio::Info)
+      log_file = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
+      log_file.setLogLevel(OpenStudio::Info)
 
       # parse the xml
       if !File.exist?(xml_file_path)
@@ -211,6 +211,12 @@ module BuildingSync
       Dir.glob("#{@output_dir}/**/in.osw") { |osw| osw_files << osw }
       Dir.glob("#{@output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
 
+      puts "PATH #{ENV['PATH']}"
+      puts "GEM_PATH #{ENV['GEM_PATH']}"
+      puts "GEM HOME #{ENV['GEM_HOME']}"
+      puts "RUBYLIB #{ENV['RUBYLIB']}"
+      puts 'gem list'
+      puts `gem list`
       runner = OpenStudio::Extension::Runner.new(dirname=Dir.pwd, bundle_without=[], options=runner_options)
       return runner.run_osws(osw_files - osw_sr_files)
     end
