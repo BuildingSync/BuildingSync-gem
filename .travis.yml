@@ -36,7 +36,7 @@ jobs:
       # - $SH "bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb"  // fails sometimes due to connection issues, so we exclude it here
       name: "Model Articulation Tests"
     - script:
-      - travis_wait 40 $SH "bundle exec rspec spec/tests/translator_spec.rb"
+      - travis_wait 50 $SH "bundle exec rspec spec/tests/translator_spec.rb"
       name: "Translator Spec"
     - script: 
       - travis_wait 40 $SH "bundle exec rspec spec/tests/model_articulation_test/hospital_occupancy_type_spec.rb"
