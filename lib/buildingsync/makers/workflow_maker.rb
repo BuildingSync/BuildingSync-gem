@@ -34,7 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative '../workflow_maker_base'
+require_relative 'workflow_maker_base'
 require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
 require 'openstudio/ee_measures'
