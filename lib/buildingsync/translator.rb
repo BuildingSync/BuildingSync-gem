@@ -118,7 +118,7 @@ module BuildingSync
       @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
     end
 
-    def gather_results(dir, year_val, baseline_only = false)
+    def gather_results(dir, year_val = Date.today.year, baseline_only = false)
       puts "dir: #{dir}"
       dir_split = dir.split(File::SEPARATOR)
       puts "dir_split: #{dir_split}"

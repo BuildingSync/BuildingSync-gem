@@ -432,7 +432,7 @@ module BuildingSync
           successful = false if !configure_for_scenario(osw, scenario)
 
           # dir for the osw
-          osw_dir = File.join(dir, scenario_name)
+          osw_dir = get_osw_dir(dir, scenario)
           FileUtils.mkdir_p(osw_dir)
 
           # write the osw
@@ -507,7 +507,7 @@ module BuildingSync
         next if !scenario_is_baseline_scenario(scenario) && baseline_only
 
         # dir for the osw
-        osw_dir = File.join(dir, scenario_name)
+        osw_dir = get_osw_dir(dir, scenario)
         # cleanup large files
         cleanup_larger_files(osw_dir)
 
@@ -672,7 +672,7 @@ module BuildingSync
       # ELECTRICITY
       res_use = REXML::Element.new("#{@ns}:ResourceUse")
       res_use.add_attribute('ID', scenario_name_ns + '_Electricity')
-      if variables.key?('fuel_electricity_kbtu') and variables['fuel_electricity_kbtu']
+      if variables.key?('fuel_electricity_kbtu') && variables['fuel_electricity_kbtu']
         energy_res = REXML::Element.new("#{@ns}:EnergyResource")
         energy_res.text = 'Electricity'
         res_units = REXML::Element.new("#{@ns}:ResourceUnits")
@@ -688,7 +688,7 @@ module BuildingSync
         res_use.add_element(res_units)
         res_use.add_element(native_units)
 
-        if variables.key?('annual_peak_electric_demand_kw') and variables['annual_peak_electric_demand_kw']
+        if variables.key?('annual_peak_electric_demand_kw') && variables['annual_peak_electric_demand_kw']
           peak_units = REXML::Element.new("#{@ns}:PeakResourceUnits")
           peak_units.text = 'kW'
           peak_native_units = REXML::Element.new("#{@ns}:AnnualPeakNativeUnits")
@@ -702,7 +702,7 @@ module BuildingSync
         res_uses.add_element(res_use)
       end
       # NATURAL GAS
-      if variables.key?('fuel_natural_gas_kbtu') and variables['fuel_natural_gas_kbtu']
+      if variables.key?('fuel_natural_gas_kbtu') && variables['fuel_natural_gas_kbtu']
         res_use = REXML::Element.new("#{@ns}:ResourceUse")
         res_use.add_attribute('ID', scenario_name_ns + '_NaturalGas')
         energy_res = REXML::Element.new("#{@ns}:EnergyResource")
@@ -882,7 +882,7 @@ module BuildingSync
     # adding results to a specific scenario
     def add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, monthly_results, year_val)
       # first we need to check if we have any result variables
-      if !annual_results || annual_results.length == 0
+      if !annual_results || annual_results.empty?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.add_results_to_scenario', "result variables are null, cannot add results from scenario: #{scenario_name}to BldgSync file.")
         return false
       end
@@ -912,7 +912,12 @@ module BuildingSync
       return true
     end
 
-    def gather_results(dir, year_val, baseline_only = false)
+    def get_osw_dir(dir, scenario)
+      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+      return File.join(dir, scenario_name)
+    end
+
+    def gather_results(dir, year_val = Date.today.year, baseline_only = false)
       results_counter = 0
       successful = true
       super
@@ -923,42 +928,44 @@ module BuildingSync
         results, monthly_results = get_result_for_scenarios(dir, baseline_only)
 
         get_scenario_elements.each do |scenario|
-          scenarios_found = true
-          # get information about the scenario
-          scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-          next if scenario_is_measured_scenario(scenario)
-          next if !scenario_is_baseline_scenario(scenario) and baseline_only
-
-          results_counter += 1
-          package_of_measures_or_current_building = prepare_package_of_measures_or_current_building(scenario)
-          result, baseline = get_result_for_scenario(results, scenario)
-          annual_results = gather_annual_results(dir, result, scenario_name, baseline, scenario_name == 'Baseline')
-
-          add_results_to_scenario(package_of_measures_or_current_building, scenario, scenario_name, annual_results, result, monthly_results, year_val)
+          begin
+            scenarios_found = true
+            # get information about the scenario
+            scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
+            next if scenario_is_measured_scenario(scenario)
+            next if !scenario_is_baseline_scenario(scenario) && baseline_only
+            results_counter += 1
+            package_of_measures_or_current_building = prepare_package_of_measures_or_current_building(scenario)
+            result, baseline = get_result_for_scenario(results, scenario)
+            annual_results = gather_annual_results(dir, result, scenario_name, baseline, scenario_name == 'Baseline')
+            add_results_to_scenario(package_of_measures_or_current_building, scenario, scenario_name, annual_results, result, monthly_results, year_val)
+          rescue StandardError => e
+            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "The following error occurred #{e.message} while processing results in #{dir}")
+            end_file = File.join(get_osw_dir(dir, scenario), 'eplusout.end')
+            if File.file?(end_file)
+              # we open the .end file to determine if EnergyPlus was successful or not
+              energy_plus_string = File.open(end_file, &:readline)
+              if energy_plus_string.include? 'Fatal Error Detected'
+                OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "EnergyPlus simulation did not succeed! #{energy_plus_string}")
+                # if we found out that there was a fatal error we search the err file for the first error.
+                File.open(File.join(osw_dir, 'eplusout.err')).each do |line|
+                  if line.include? '** Severe  **'
+                    OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Severe error occured! #{line}")
+                  elsif line.include? '**  Fatal  **'
+                    OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Fatal error occured! #{line}")
+                  end
+                end
+              end
+            else
+              run_log = File.open(File.join(osw_dir, 'run.log'), &:readline)
+              OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Workflow did not succeed! #{run_log}")
+            end
+          end
         end
 
         puts 'No scenarios found in BuildingSync XML File, please check the object hierarchy for errors.' if !scenarios_found
       rescue StandardError => e
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "The following error occurred #{e.message} while processing results in #{dir}")
-        end_file = File.join(osw_dir, 'eplusout.end')
-        if File.file?(end_file)
-          # we open the .end file to determine if EnergyPlus was successful or not
-          energy_plus_string = File.open(end_file, &:readline)
-          if energy_plus_string.include? 'Fatal Error Detected'
-            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "EnergyPlus simulation did not succeed! #{energy_plus_string}")
-            # if we found out that there was a fatal error we search the err file for the first error.
-            File.open(File.join(osw_dir, 'eplusout.err')).each do |line|
-              if line.include? '** Severe  **'
-                OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Severe error occured! #{line}")
-              elsif line.include? '**  Fatal  **'
-                OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Fatal error occured! #{line}")
-              end
-            end
-          end
-        else
-          run_log = File.open(File.join(osw_dir, 'run.log'), &:readline)
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Workflow did not succeed! #{run_log}")
-        end
         successful = false
       end
 
@@ -1018,7 +1025,7 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.extract_annual_results', "Scenario: #{scenario_name} does not have any ResourceUses xml elements defined.")
       end
 
-      if package_of_measures and package_of_measures.elements["#{@ns}:AnnualSavingsByFuels"]
+      if package_of_measures && package_of_measures.elements["#{@ns}:AnnualSavingsByFuels"]
         package_of_measures.elements["#{@ns}:AnnualSavingsByFuels"].each do |annual_savings|
           if annual_savings.elements["#{@ns}:EnergyResource"].text == 'Electricity'
             variables['baseline_fuel_electricity_kbtu'] = annual_savings.elements["#{@ns}:AnnualSavingsNativeUnits"].text.to_i + variables['fuel_electricity_kbtu'].to_i

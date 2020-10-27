@@ -118,18 +118,18 @@ RSpec.describe 'BuildingSync' do
     expect(translator.run_osm('CZ01RV2.epw')).to be true
     expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
     out_path = File.dirname(translator.osm_baseline_path)
-    translator.gather_results(out_path, true)
+    translator.gather_results(out_path, Date.today.year, true)
     translator.save_xml(File.join(out_path, 'results.xml'))
     expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
   end
 
-  it 'should parse and write L100.xml (phase zero) with auc namespace for ASHRAE 90.1' do
+  it 'should parse and write L100_Audit.xml (phase zero) with auc namespace for ASHRAE 90.1' do
     translator = test_baseline_creation('L100_Audit.xml', ASHRAE90_1, 'CZ01RV2.epw')
     expect(translator.run_osm('CZ01RV2.epw')).to be true
     expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
 
     out_path = File.dirname(translator.osm_baseline_path)
-    translator.gather_results(out_path, true)
+    translator.gather_results(out_path, Date.today.year, true)
     translator.save_xml(File.join(out_path, 'results.xml'))
     expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
   end
