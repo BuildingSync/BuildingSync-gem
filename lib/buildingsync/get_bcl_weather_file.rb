@@ -40,6 +40,12 @@ module BuildingSync
   class GetBCLWeatherFile
     $weather_file_path_prefix = '../data/weather/'.freeze
 
+    ##
+    # download weather file from city name
+    ##
+    # @param state [string]
+    # @param city [string]
+    # @return string
     def download_weather_file_from_city_name(state, city)
       weather_file_name = get_weather_file_from_city_and_state(city)
 
@@ -76,6 +82,11 @@ module BuildingSync
       end
     end
 
+    ##
+    # download weather file from weather id
+    ##
+    # @param weather_id [string]
+    # @return string
     def download_weather_file_from_weather_id(weather_id)
       weather_file_name = get_weather_file_from_weatherid(weather_id)
 
@@ -114,6 +125,12 @@ module BuildingSync
       end
     end
 
+    ##
+    # download weather file
+    ##
+    # @param remote [OpenStudio::RemoteBCL]
+    # @param choices [OpenStudio::StringVector]
+    # @return string
     def download_weather_file(remote, choices)
       epw_path = ''
 
@@ -150,10 +167,14 @@ module BuildingSync
       end
 
       puts "Successfully set weather file to #{epw_path}"
-
       return epw_path
     end
 
+    ##
+    # download design day file
+    ##
+    # @param wmo_no [string]
+    # @param epw_path [string]
     def download_design_day_file(wmo_no, epw_path)
       remote = OpenStudio::RemoteBCL.new
       responses = remote.searchComponentLibrary(wmo_no.to_s[0, 6], 'Design Day')
