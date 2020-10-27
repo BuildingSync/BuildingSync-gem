@@ -107,11 +107,16 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
-  # it 'should parse and write report_478.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
-  #  translator = test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
-  #  expect(translator.run_osm('CZ01RV2.epw')).to be true
-  #  expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
-  # end
+  it 'should parse report_478.xml and issue an exception that it contains 2 basement stories' do
+    begin
+      translator = test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
+      expect(translator.run_osm('CZ01RV2.epw')).to be true
+      expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
+    rescue StandardError => e
+      puts "e.message #{e.message}"
+      expect(e.message.include?('Number of stories below grade is larger than 1: 2.0, currently only one basement story is supported.')).to be true
+    end
+  end
 
   it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24, perform a baseline simulation and gather results' do
     translator = test_baseline_creation('building_151.xml', CA_TITLE24, 'CZ01RV2.epw')
