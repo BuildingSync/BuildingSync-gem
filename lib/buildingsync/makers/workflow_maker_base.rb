@@ -34,36 +34,81 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+
+require 'fileutils'
+require 'json'
+require_relative 'model_maker_base'
+
 module BuildingSync
-  class Helper
-    def self.get_text_value(xml_element)
-      if xml_element
-        return xml_element.text
-      end
-      return nil
+  # base class for objects that will configure workflows based on building sync files
+  class WorkflowMakerBase < ModelMakerBase
+    def write_osws(facility, dir)
+      FileUtils.mkdir_p(dir)
     end
 
-    def self.get_date_value(xml_element)
-      if xml_element
-        return Date.parse(xml_element.text)
-      end
-      return nil
+    def gather_results(dir, year_val, baseline_only = false); end
+
+    def failed_scenarios
+      return []
     end
 
-    def self.get_zone_name_list(zones)
-      names = []
-      zones.each do |zone|
-        names << zone.name.get
+    def save_xml(filename)
+      File.open(filename, 'w') do |file|
+        @doc.write(file)
       end
-      return names
     end
 
-    def self.read_xml_file_document(xml_file_path)
-      doc = nil
-      File.open(xml_file_path, 'r') do |file_content|
-        doc = REXML::Document.new(file_content,  { :ignore_whitespace_nodes => :all })
+    def set_measure_path(osw, measures_dir)
+      osw['measure_paths'] = [measures_dir]
+    end
+
+    def set_measure_paths(osw, measures_dir_array)
+      osw['measure_paths'] = measures_dir_array
+    end
+
+    def clear_all_measures
+      @workflow.delete('steps')
+      @workflow['steps'] = []
+    end
+
+    def add_measure_path(measures_dir)
+      @workflow['measure_paths'].each do |dir|
+        if dir == measures_dir
+          return false
+        end
       end
-      return doc
+      @workflow['measure_paths'] << measures_dir
+      return true
+    end
+
+    def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
+      result = false
+      osw['steps'].each do |step|
+        if step['measure_dir_name'] == measure_dir_name
+          step['arguments'][argument_name] = argument_value
+          result = true
+        end
+      end
+
+      if !result
+        raise "Could not set '#{argument_name}' to '#{argument_value}' for measure '#{measure_dir_name}'"
+      end
+
+      return result
+    end
+
+    def add_new_measure(osw, measure_dir_name)
+      # first we check if the measure already exists
+      osw['steps'].each do |step|
+        if step['measure_dir_name'] == measure_dir_name
+          return false
+        end
+      end
+      # if it does not exist we add it
+      new_step = {}
+      new_step['measure_dir_name'] = measure_dir_name
+      osw['steps'].unshift(new_step)
+      return true
     end
   end
 end
