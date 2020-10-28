@@ -13,17 +13,17 @@ allow_local = ENV['FAVOR_LOCAL_GEMS']
 if allow_local && File.exist?('../openstudio-common-measures-gem')
    gem 'openstudio-common-measures', path: '../openstudio-common-measures-gem'
 else
-   gem 'openstudio-common-measures', github: 'NREL/openstudio-common-measures-gem', branch: 'prep/v0.2.1'
+   gem 'openstudio-common-measures', github: 'NREL/openstudio-common-measures-gem', tag: 'v0.2.1'
 end
 
 if allow_local && File.exist?('../openstudio-model-articulation-gem')
   gem 'openstudio-model-articulation', path: '../openstudio-model-articulation-gem'
 else
-  gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', branch: 'prep/v0.2.1'
+  gem 'openstudio-model-articulation', github: 'NREL/openstudio-model-articulation-gem', tag: 'v0.2.1'
 end
 
 if allow_local && File.exist?('../openstudio-ee-gem')
   gem 'openstudio-ee', path: '../openstudio-ee-gem'
 else
-  gem 'openstudio-ee', github: 'NREL/openstudio-ee-gem', branch: 'prep/v0.2.1'
+  gem 'openstudio-ee', github: 'NREL/openstudio-ee-gem', tag: 'v0.2.1'
 end
