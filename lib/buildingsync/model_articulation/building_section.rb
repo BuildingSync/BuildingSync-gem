@@ -252,14 +252,6 @@ module BuildingSync
       super(@occupancy_type, @total_floor_area, false)
     end
 
-    def read_xml_file_document(xml_file_path)
-      doc = nil
-      File.open(xml_file_path, 'r') do |file|
-        doc = REXML::Document.new(file)
-      end
-      return doc
-    end
-
     def get_peak_occupancy
       return @occupant_quantity
     end

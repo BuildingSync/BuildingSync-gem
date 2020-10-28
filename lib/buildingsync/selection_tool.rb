@@ -41,8 +41,12 @@ require 'net/http/post/multipart'
 module BuildingSync
   # Class for communicating with SelectionTool
   class SelectionTool
-    # See documentation here: https://github.com/buildingsync/selection-tool#validator
-    # Use core Net::HTTPS
+    ##
+    # initialize the selection tools class
+    ##
+    # @note See documentation here: https://github.com/buildingsync/selection-tool#validator
+    # @note Use core Net::HTTPS
+    # @param xml_path [string]
     def initialize(xml_path)
       @hash_response = nil
       url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
@@ -57,9 +61,13 @@ module BuildingSync
       response = http.request(request)
 
       @hash_response = JSON.parse(response.read_body)
-      # p @hash_response
     end
 
+    ##
+    # validate use case
+    ##
+    # @param use_case [string]
+    # @return boolean
     def validate_use_case(use_case)
       if !@hash_response['validation_results']['use_cases'][use_case]['valid']
         @hash_response['validation_results']['use_cases'][use_case]['errors'].each do |error|
@@ -70,6 +78,10 @@ module BuildingSync
       return @hash_response['validation_results']['use_cases'][use_case]['valid']
     end
 
+    ##
+    # validate schema
+    ##
+    # @return boolean
     def validate_schema
       if !@hash_response['validation_results']['schema']['valid']
         @hash_response['validation_results']['schema']['errors'].each do |error|
@@ -78,15 +90,6 @@ module BuildingSync
       end
 
       return @hash_response['validation_results']['schema']['valid']
-    end
-
-    def get_json_data_from_schema
-      return @hash_response
-    end
-
-    def get_ASHRAE_211_Level
-      # or 1 or 2 or 3
-      return 0
     end
   end
 end
