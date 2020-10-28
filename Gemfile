@@ -11,9 +11,9 @@ gemspec
 allow_local = ENV['FAVOR_LOCAL_GEMS']
 
 if allow_local && File.exist?('../openstudio-common-measures-gem')
-  gem 'openstudio-common-measures', path: '../openstudio-common-measures-gem'
+   gem 'openstudio-common-measures', path: '../openstudio-common-measures-gem'
 else
-  gem 'openstudio-common-measures', github: 'NREL/openstudio-common-measures-gem', branch: 'develop'
+   gem 'openstudio-common-measures', github: 'NREL/openstudio-common-measures-gem', branch: 'develop'
 end
 
 if allow_local && File.exist?('../openstudio-model-articulation-gem')
@@ -25,5 +25,5 @@ end
 if allow_local && File.exist?('../openstudio-ee-gem')
   gem 'openstudio-ee', path: '../openstudio-ee-gem'
 else
-  gem 'openstudio-ee', github: 'NREL/openstudio-ee-gem', branch: 'develop'
+  gem 'openstudio-ee', github: 'NREL/openstudio-ee-gem', branch: 'bldgsync_measures'
 end
