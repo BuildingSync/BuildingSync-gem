@@ -46,7 +46,8 @@ module BuildingSync
     include EnergyPlus
     include OsLib_ModelGeneration
 
-    # initialize
+    ##
+    # initialize the building class
     def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
       @building_sections = []
       @building_sections_whole_building = []
