@@ -92,4 +92,8 @@ RSpec.describe 'BuildingSync' do
       expect(e.message.include?('Error: There is more than one (3) building attached to this site in your BuildingSync file.')).to be true
     end
   end
+
+  it 'should parse L000_OpenStudio_Pre-Simulation_02.xml with ASHRAE 90.1, perform a sizing run, and create an in.osm' do
+    test_baseline_creation('L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1)
+  end
 end

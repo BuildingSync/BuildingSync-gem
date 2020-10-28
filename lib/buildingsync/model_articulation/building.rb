@@ -35,13 +35,14 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_section'
+require_relative 'location_element'
 require_relative '../../../lib/buildingsync/get_bcl_weather_file'
 require 'date'
 require 'openstudio/extension/core/os_lib_helper_methods'
 require 'openstudio/extension/core/os_lib_model_generation'
 
 module BuildingSync
-  class Building < SpatialElement
+  class Building < LocationElement
     include OsLib_HelperMethods
     include EnergyPlus
     include OsLib_ModelGeneration
@@ -95,6 +96,9 @@ module BuildingSync
       if build_element.attributes['ID']
         @id = build_element.attributes['ID']
       end
+
+      # read location specific values
+      read_location_values(build_element, ns)
       # city and state
       read_city_and_state_name(build_element, ns)
       # floor areas
@@ -227,6 +231,16 @@ module BuildingSync
         else
           return @building_sections[0].bldg_type
         end
+      end
+    end
+
+    def get_climate_zone(standard_to_be_used)
+      if standard_to_be_used == ASHRAE90_1
+        return @climate_zone_ashrae
+      elsif standard_to_be_used == CA_TITLE24
+        return @climate_zone_ca_t24
+      else
+        return @climate_zone
       end
     end
 
@@ -1044,7 +1058,7 @@ module BuildingSync
       add_user_defined_field_to_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
       add_user_defined_field_to_xml_file(building, ns, 'FractionArea', @fraction_area)
 
-      write_parameters_to_xml_for_spatial_element(ns, building)
+      write_parameters_to_xml_for_spatial_element(building, ns)
     end
 
     def get_space_types
@@ -1052,7 +1066,7 @@ module BuildingSync
     end
 
     def get_peak_occupancy
-      peak_occupancy = Hash.new
+      peak_occupancy = {}
       if @occupant_quantity
         peak_occupancy[@id] = @occupant_quantity.to_f
         return peak_occupancy
