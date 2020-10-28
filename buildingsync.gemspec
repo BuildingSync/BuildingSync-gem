@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'openstudio-model-articulation', '~> 0.2.0'
   spec.add_dependency 'openstudio-common-measures', '~> 0.2.0'
   spec.add_dependency 'openstudio-standards', '~> 0.2.11'
+  spec.add_dependency 'openstudio-ee', '~> 0.2.0'
 
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.9'
