@@ -52,6 +52,7 @@ module BuildingSync
     # number of parallel BuildingSync files to run
     NUM_BUILDINGS_PARALLEL = 2
 
+    ##
     # Override the base class
     # The Extension class contains both the instance of the BuildingSync file (in XML) and the
     # helper methods from the OpenStudio::Extension gem to support managing measures that are related
@@ -61,34 +62,6 @@ module BuildingSync
       # root_dir will be the root_dir in the OpenStudio Extension Gem.
       super
       @root_dir = File.absolute_path(File.join(File.dirname(__FILE__), '..', '..'))
-    end
-
-    # Read in an existing buildingsync file
-    #
-    # @param buildingsync_file [string]: path to BuildingSync XML
-    def self.from_file(buildingsync_file)
-      bsync = Extension.new
-      bsync.read_from_xml(buildingsync_file)
-      return bsync
-    end
-
-    # read the XML from file
-    def read_from_xml(buildingsync_file)
-      return nil
-    end
-
-    # write OSW file
-    # This method will write a single OSW from the BuildingSync file. The OSW will not include any of the scenarios
-    # other than the baseline.
-    def to_osw
-      return nil
-    end
-
-    # write multiple OSW files
-    # This method will write out multiple OSW files from the BuildingSync file. The OSWs will be constructed based
-    # on the various scenarios that are in the BuildingSync file
-    def to_osws
-      return nil
     end
   end
 end

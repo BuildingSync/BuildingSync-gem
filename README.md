@@ -20,15 +20,41 @@ Or install it yourself as:
 
 ## Usage
 
-To be filled out later. 
+The BuildingSync-Gem 
+- converts your BuildingSync.xml file into 
+  - an OpenStudio Baseline model
+  - an OpenStudio workflow for each scenario defined in the XML file
+- enables simulation of the baseline model and all workflows and 
+- inserts simulation results back into the xml file. 
+
+All these features are driven by the translator class.
+
+```ruby
+# initializing the translator 
+translator = BuildingSync::Translator.new(building_sync_xml_file_path, out_path)
+# generating the OpenStudio Model and writing the osm file  
+translator.write_osm
+# generating the OpenStudio workflows and writing the osw files
+translator.write_osws
+# running the baseline simulations
+translator.run_osm
+# running all simulations
+translator.run_osws
+# gather the results and save them to an BuildingSync.XML
+translator.gather_results(out_path)
+```
+## Testing
+
+Check out the repository and then execute:
+```ruby
+$ bundle install
+$ bundle update    
+$ bundle exec rake
+```
 
 ## TODO
 
-- [ ] Add initial BuildingSync class (can use [BRICR](https://github.com/NREL/bricr/blob/develop/lib/bricr/building_sync.rb) class as example). Use REXML for reading and writing BSync.
-- [ ] Add ForwardTranslator class (following [other OpenStudio conventions](https://github.com/NREL/OpenStudio/blob/develop/openstudiocore/src/gbxml/ForwardTranslator.hpp)) that translates BuildingSync to OpenStudio (using pure Ruby)
 - [ ] Move BuildingSync specific measures into this gem. See list from [here](https://docs.google.com/spreadsheets/d/1PCB4nZoLQ1cWhnlrlnHwo9kI4G8ChOeblU3L4uZu7bc/edit#gid=1482405742) 
-- [ ] Add example on how to use some code from ```openstudio-standards``` or ```openstudio-model-articulation``` during the translation
-- [ ] Add unit test for BuildingSync -> OSM translation
 - [ ] Add ability to perform validation using https://selectiontool.buildingsync.net. Return which use cases existing BuildingSync XML is valid for.
 
 

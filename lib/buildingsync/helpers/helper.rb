@@ -36,6 +36,10 @@
 # *******************************************************************************
 module BuildingSync
   class Helper
+    ##
+    # get text value from xml element
+    # @param xml_element [REXML::Element]
+    # @return string
     def self.get_text_value(xml_element)
       if xml_element
         return xml_element.text
@@ -43,6 +47,10 @@ module BuildingSync
       return nil
     end
 
+    ##
+    # get date value from xml element
+    # @param xml_element [REXML::Element]
+    # @return string
     def self.get_date_value(xml_element)
       if xml_element
         return Date.parse(xml_element.text)
@@ -50,6 +58,10 @@ module BuildingSync
       return nil
     end
 
+    ##
+    # get zone name list
+    # @param zones [array<OpenStudio::Model::ThermalZone>]
+    # @return array
     def self.get_zone_name_list(zones)
       names = []
       zones.each do |zone|
@@ -58,10 +70,14 @@ module BuildingSync
       return names
     end
 
+    ##
+    # read xml file document
+    # @param xml_file_path [string]
+    # @return REXML::Document
     def self.read_xml_file_document(xml_file_path)
       doc = nil
       File.open(xml_file_path, 'r') do |file_content|
-        doc = REXML::Document.new(file_content,  { :ignore_whitespace_nodes => :all })
+        doc = REXML::Document.new(file_content, :ignore_whitespace_nodes => :all)
       end
       return doc
     end
