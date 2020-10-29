@@ -99,8 +99,6 @@ module BuildingSync
 
       # read location specific values
       read_location_values(build_element, ns)
-      # city and state
-      read_city_and_state_name(build_element, ns)
       # floor areas
       read_floor_areas(build_element, site_total_floor_area, ns)
       # standard template
