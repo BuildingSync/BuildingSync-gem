@@ -234,7 +234,7 @@ module BuildingSync
       end
     end
 
-    def get_climate_zone(standard_to_be_used)
+    def get_climate_zone(standard_to_be_used = nil)
       if standard_to_be_used == ASHRAE90_1
         return @climate_zone_ashrae
       elsif standard_to_be_used == CA_TITLE24
