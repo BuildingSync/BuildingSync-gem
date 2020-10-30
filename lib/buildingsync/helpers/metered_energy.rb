@@ -36,6 +36,13 @@
 # *******************************************************************************
 
 class MeteredEnergy
+  ##
+  # initialize MeteredEnergy class
+  ##
+  # @param energy_resource
+  # @param interval_frequency
+  # @param reading_type
+  # @param interval_reading
   def initialize(energy_resource, interval_frequency, reading_type, interval_reading)
     @energy_resource = energy_resource
     @interval_frequency = interval_frequency
@@ -43,5 +50,19 @@ class MeteredEnergy
     @interval_reading = interval_reading
   end
 
-  attr_reader :energy_resource, :interval_frequency, :reading_type, :interval_reading
+  # energy resource
+  # @return [string]
+  attr_reader :energy_resource
+
+  # interval frequency
+  # @return [string]
+  attr_reader :interval_frequency
+
+  # reading type
+  # @return [string]
+  attr_reader :reading_type
+
+  # interval reading
+  # @return [string]
+  attr_reader :interval_reading
 end

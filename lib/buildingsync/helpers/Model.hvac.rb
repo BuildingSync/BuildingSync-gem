@@ -1,9 +1,14 @@
 class OpenStudio::Model::Model
+  ##
   # Adds the HVAC system as derived from the combinations of
   # CBECS 2012 MAINHT and MAINCL fields.
   # Mapping between combinations and HVAC systems per
   # http://www.nrel.gov/docs/fy08osti/41956.pdf
   # Table C-31
+  ##
+  # @param standard [Standard]
+  # @param system_type [string]
+  # @param zones [Array<OpenStudio::Model::ThermalZone>]
   def add_cbecs_hvac_system(standard, system_type, zones)
     case system_type
     when 'PTAC with hot water heat'

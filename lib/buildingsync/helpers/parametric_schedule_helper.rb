@@ -36,7 +36,19 @@
 # *******************************************************************************
 
 module BuildingSync
+  ##
+  # helper class for parametric schedules
   class ParametricScheduleHelper
+    ##
+    # process schedules
+    ##
+    # @param model [OpenStudio::Model]
+    # @param this_space_type [float]
+    # @param hours_of_operation [HoursOfOperation]
+    # @param htg_setpoint [float]
+    # @param clg_setpoint [float]
+    # @param setback_delta [float]
+    # @return boolean
     def self.process_schedules(model, this_space_type, hours_of_operation, htg_setpoint = 67.0, clg_setpoint = 75.0, setback_delta = 4)
       # pre-process space types to identify which ones to alter
       space_types_to_alter = []
@@ -67,7 +79,7 @@ module BuildingSync
         default_schedule_set = space_type.defaultScheduleSet.get
         default_schedule_set.setName(default_schedule_set.name.get + " parameterised")
         # alter all objects
-        thermostats_to_alter, air_loops_to_alter, water_use_equipment_to_alter = remove_old_schedules(model, space_type)
+        thermostats_to_alter, air_loops_to_alter, water_use_equipment_to_alter = remove_old_schedules(space_type)
         # schedules of the default schedule set
         default_schedule_set.setHoursofOperationSchedule(create_schedule_hours_of_operations(model, hours_of_operation))
         default_schedule_set.setPeopleActivityLevelSchedule(create_schedule_activity(model))
@@ -98,7 +110,7 @@ module BuildingSync
       end
 
       # if there are no space types in the model we create the default schedule set at the building level
-      if space_types_to_alter.length == 0
+      if space_types_to_alter.empty?
         default_schedule_set = OpenStudio::Model::DefaultScheduleSet.new(model)
         default_schedule_set.setName('Parametric Hours of Operation Schedule Set')
 
@@ -114,6 +126,11 @@ module BuildingSync
       return true
     end
 
+    ##
+    # gather the default profiles for the schedules
+    ##
+    # @param profiles [string]
+    # @return Hash
     def self.get_profiles(profiles = nil)
       if profiles.nil?
         profiles = {}
@@ -131,54 +148,58 @@ module BuildingSync
         string << ':default => [[start-1,0.3],[start,0.85],[start+0.5*occ-0.5,0.85],[start+0.5*occ-0.5,0.75],[start+0.5*occ+0.5,0.75],[start+0.5*occ+0.5,0.85],[end,0.85],[end+1,0.45],[end+2,0.3]]'
         string << ':saturday => [[start-2,0.2],[start,0.35],[end,0.35],[end+6,0.2]]'
         string << ':sunday => [[start,0.2],[end,0.2]]'
-      profiles['electric_equipment'] = string.join(', ')
+        profiles['electric_equipment'] = string.join(', ')
       end
       if profiles['gas_equipment'].nil?
         string = []
         string << ':default => [[start-1,0.3],[start,0.85],[start+0.5*occ-0.5,0.85],[start+0.5*occ-0.5,0.75],[start+0.5*occ+0.5,0.75],[start+0.5*occ+0.5,0.85],[end,0.85],[end+1,0.45],[end+2,0.3]]'
         string << ':saturday => [[start-2,0.2],[start,0.35],[end,0.35],[end+6,0.2]]'
         string << ':sunday => [[start,0.2],[end,0.2]]'
-      profiles['gas_equipment'] = string.join(', ')
+        profiles['gas_equipment'] = string.join(', ')
       end
       if profiles['occupancy'].nil?
         string = []
         string << ':default => [[start-3,0],[start-1,0.2],[start,0.95],[start+0.5*occ-0.5,0.95],[start+0.5*occ-0.5,0.5],[start+0.5*occ+0.5,0.5],[start+0.5*occ+0.5,0.95],[end,0.95],[end+1,0.3],[end+vac*0.4,0]]'
         string << ':saturday => [[start-3,0],[start,0.3],[end,0.3],[end+1,0.1],[end+vac*0.3,0]]'
         string << ':sunday => [[start,0],[start,0.05],[end,0.05],[end,0]]'
-      profiles['occupancy'] = string.join(', ')
+        profiles['occupancy'] = string.join(', ')
       end
       if profiles['infiltration'].nil?
         string = []
         string << ':default => [[start,1],[start,0.25],[end+vac*0.35,0.25],[end+vac*0.35,1]]'
         string << ':saturday => [[start,1],[start,0.25],[end+vac*0.25,0.25],[end+vac*0.25,1]]'
         string << ':sunday => [[start,1],[start,0.25],[end+vac*0.25,0.25],[end+vac*0.25,1]]'
-      profiles['infiltration'] = string.join(', ')
+        profiles['infiltration'] = string.join(', ')
       end
       if profiles['hvac_availability'].nil?
         string = []
         string << ':default => [[start,0],[start,1],[end+vac*0.35,1],[end+vac*0.35,0]]'
         string << ':saturday => [[start,0],[start,1],[end+vac*0.25,1],[end+vac*0.25,0]]'
         string << ':sunday => [[start,0],[start,1],[end+vac*0.25,1],[end+vac*0.25,0]]'
-      profiles['hvac_availability'] = string.join(', ')
+        profiles['hvac_availability'] = string.join(', ')
       end
       if profiles['swh'].nil?
         string = []
         string << ':default => [[start-2,0],[start-2,0.07],[start+0.5*occ,0.57],[vac-2,0.33],[vac,0.44],[end+vac*0.35,0.05],[end+vac*0.35,0]]'
         string << ':saturday => [[start-2,0],[start-2,0.07],[start+0.5*occ,0.23],[end+vac*0.25,0.05],[end+vac*0.25,0]]'
         string << ':sunday => [[start-2,0],[start-2,0.04],[start+0.5*occ,0.09],[end+vac*0.25,0.04],[end+vac*0.25,0]]'
-      profiles['swh'] = string.join(', ')
+        profiles['swh'] = string.join(', ')
       end
       if profiles['thermostat_setback'].nil?
         string = []
         string << ':default => [[start-2,floor],[start-2,ceiling],[end+vac*0.35,ceiling],[end+vac*0.35,floor]]'
         string << ':saturday => [[start-2,floor],[start-2,ceiling],[end+vac*0.25,ceiling],[end+vac*0.25,floor]]'
         string << ':sunday => [[start-2,floor],[start-2,ceiling],[end+vac*0.25,ceiling],[end+vac*0.25,floor]]'
-      profiles['thermostat_setback'] = string.join(', ')
+        profiles['thermostat_setback'] = string.join(', ')
       end
-
       return profiles
     end
 
+    ##
+    # gather override profiles
+    ##
+    # @param hoo [string]
+    # @return Array, HoursOfOperation
     def self.get_profile_override(hoo)
       profile_override = []
       if hoo.hours_per_week > 0.0
@@ -232,44 +253,54 @@ module BuildingSync
       return profile_override, hoo
     end
 
-    def self.remove_old_schedules(model, space_type)
+    ##
+    # remove old schedules
+    ##
+    # @param space_type [SpaceType]
+    # @return Array, Array, Array
+    def self.remove_old_schedules(space_type)
       thermostats_to_alter = []
       air_loops_to_alter = []
       water_use_equipment_to_alter = []
-        # remove schedule sets for load instances
-        space_type.electricEquipment.each(&:resetSchedule)
-        space_type.gasEquipment.each(&:resetSchedule)
-        space_type.spaceInfiltrationDesignFlowRates.each(&:resetSchedule)
-        space_type.people.each(&:resetNumberofPeopleSchedule)
-        # don't have to remove HVAC and setpoint schedules, they will be replaced individually
+      # remove schedule sets for load instances
+      space_type.electricEquipment.each(&:resetSchedule)
+      space_type.gasEquipment.each(&:resetSchedule)
+      space_type.spaceInfiltrationDesignFlowRates.each(&:resetSchedule)
+      space_type.people.each(&:resetNumberofPeopleSchedule)
+      # don't have to remove HVAC and setpoint schedules, they will be replaced individually
+      # loop through spaces to populate thermostats and airloops
+      space_type.spaces.each do |space|
+        thermal_zone = space.thermalZone
+        if thermal_zone.is_initialized
+          thermal_zone = thermal_zone.get
 
-        # loop through spaces to populate thermostats and airloops
-        space_type.spaces.each do |space|
-          thermal_zone = space.thermalZone
-          if thermal_zone.is_initialized
-            thermal_zone = thermal_zone.get
-
-            # get thermostat
-            thermostat = thermal_zone.thermostatSetpointDualSetpoint
-            if thermostat.is_initialized
-              thermostats_to_alter << thermostat.get
-            end
-
-            # get air loop
-            air_loop = thermal_zone.airLoopHVAC
-            if air_loop.is_initialized
-              air_loops_to_alter << air_loop.get
-            end
+          # get thermostat
+          thermostat = thermal_zone.thermostatSetpointDualSetpoint
+          if thermostat.is_initialized
+            thermostats_to_alter << thermostat.get
           end
 
-          # get water use equipment
-          space.waterUseEquipment.each do |water_use_equipment|
-            water_use_equipment_to_alter << water_use_equipment
+          # get air loop
+          air_loop = thermal_zone.airLoopHVAC
+          if air_loop.is_initialized
+            air_loops_to_alter << air_loop.get
           end
         end
+
+        # get water use equipment
+        space.waterUseEquipment.each do |water_use_equipment|
+          water_use_equipment_to_alter << water_use_equipment
+        end
+      end
       return thermostats_to_alter, air_loops_to_alter, water_use_equipment_to_alter
     end
 
+    ##
+    # create schedule hours of operations
+    ##
+    # @param model [OpenStudio::Model]
+    # @param hoo [HoursOfOperation]
+    # @return ScheduleRuleset
     def self.create_schedule_hours_of_operations(model, hoo)
       # populate hours of operation schedule for schedule set (this schedule isn't used but in future could be used to dynamically generate schedules)
       ruleset_name = 'Parametric Hours of Operation Schedule'
@@ -305,6 +336,11 @@ module BuildingSync
       return OsLib_Schedules.createComplexSchedule(model, options)
     end
 
+    ##
+    # create schedule activity
+    ##
+    # @param model [OpenStudio::Model]
+    # @return ScheduleRuleset
     def self.create_schedule_activity(model)
       # create activity schedule
       # todo - save this from model or add user argument
@@ -321,10 +357,18 @@ module BuildingSync
       return OsLib_Schedules.createComplexSchedule(model, options)
     end
 
+    ##
+    # create schedule lighting
+    ##
+    # @param model [OpenStudio::Model]
+    # @param lighting_profiles [Array]
+    # @param profile_override [Array]
+    # @param hoo [HoursOfOperation]
+    # @return ScheduleRuleset
     def self.create_schedule_lighting(model, lighting_profiles, profile_override, hoo)
       # generate and apply lighting schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Lighting Schedule'
-      hash = process_hash(lighting_profiles, profile_override, ruleset_name, hoo)
+      hash = process_hash(lighting_profiles, profile_override, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
       winter_design_day = [[24, 0]]
       summer_design_day = [[24, 1]]
@@ -343,10 +387,18 @@ module BuildingSync
       return lighting_sch
     end
 
+    ##
+    # create schedule electric equipment
+    ##
+    # @param model [OpenStudio::Model]
+    # @param electric_equipment_profiles [Array]
+    # @param profile_override [Array]
+    # @param hoo [HoursOfOperation]
+    # @return ScheduleRuleset
     def self.create_schedule_electric_equipment(model, electric_equipment_profiles, profile_override, hoo)
       # generate and apply electric_equipment schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Electric Equipment Schedule'
-      hash = process_hash(electric_equipment_profiles, profile_override, ruleset_name, hoo)
+      hash = process_hash(electric_equipment_profiles, profile_override, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
       winter_design_day = [[24, 0]]
       summer_design_day = [[24, 1]]
@@ -364,10 +416,18 @@ module BuildingSync
       return electric_equipment_sch
     end
 
+    ##
+    # create schedule gas equipment
+    ##
+    # @param model [OpenStudio::Model]
+    # @param gas_equipment_profiles [Array]
+    # @param profile_override [Array]
+    # @param hoo [HoursOfOperation]
+    # @return ScheduleRuleset
     def self.create_schedule_gas_equipment(model, gas_equipment_profiles, profile_override, hoo)
       # generate and apply gas_equipment schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Gas Equipment Schedule'
-      hash = process_hash(gas_equipment_profiles, profile_override, ruleset_name, hoo)
+      hash = process_hash(gas_equipment_profiles, profile_override, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return false end
       winter_design_day = [[24, 0]]
       summer_design_day = [[24, 1]]
@@ -385,10 +445,18 @@ module BuildingSync
       return gas_equipment_sch
     end
 
+    ##
+    # create schedule occupancy
+    ##
+    # @param model [OpenStudio::Model]
+    # @param occupancy_profiles [Array]
+    # @param profile_override [Array]
+    # @param hoo [HoursOfOperation]
+    # @return ScheduleRuleset
     def self.create_schedule_occupancy(model, occupancy_profiles, profile_override, hoo)
       # generate and apply occupancy schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Occupancy Schedule'
-      hash = process_hash(occupancy_profiles, profile_override, ruleset_name, hoo)
+      hash = process_hash(occupancy_profiles, profile_override, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return nil end
       winter_design_day = [[24, 0]] # if DCV would we want this at 1, prototype uses 0
       summer_design_day = [[24, 1]]
@@ -406,10 +474,18 @@ module BuildingSync
       return occupancy_sch
     end
 
+    ##
+    # create schedule infiltration
+    ##
+    # @param model [OpenStudio::Model]
+    # @param infiltration_profiles [Array]
+    # @param profile_override [Array]
+    # @param hoo [HoursOfOperation]
+    # @return ScheduleRuleset
     def self.create_schedule_infiltration(model, infiltration_profiles, profile_override, hoo)
       # generate and apply infiltration schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Infiltration Schedule'
-      hash = process_hash(infiltration_profiles, profile_override, ruleset_name, hoo)
+      hash = process_hash(infiltration_profiles, profile_override, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return nil end
       winter_design_day = [[24, 1]] # TODO: - should it be 1 for both summer and winter
       summer_design_day = [[24, 1]]
@@ -427,10 +503,18 @@ module BuildingSync
       return infiltration_sch
     end
 
+    ##
+    # create schedule hvac availability
+    ##
+    # @param model [OpenStudio::Model]
+    # @param hvac_availability_profiles [Array]
+    # @param profile_override [Array]
+    # @param hoo [HoursOfOperation]
+    # @return ScheduleRuleset
     def self.create_schedule_hvac_availability(model, hvac_availability_profiles, profile_override, hoo)
       # generate and apply hvac_availability schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric HVAC Availability Schedule'
-      hash = process_hash(hvac_availability_profiles, profile_override, ruleset_name, hoo)
+      hash = process_hash(hvac_availability_profiles, profile_override, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return nil end
       winter_design_day = [[24, 1]] # TODO: - confirm proper value
       summer_design_day = [[24, 1]] # todo - confirm proper value
@@ -448,6 +532,17 @@ module BuildingSync
       return hvac_availability_sch
     end
 
+    ##
+    # create schedule heating and cooling temperature setpoints
+    ##
+    # @param model [OpenStudio::Model]
+    # @param thermostat_setback_profiles [Array]
+    # @param htg_setpoint [float]
+    # @param clg_setpoint [float]
+    # @param setback_delta [float]
+    # @param profile_override [Array]
+    # @param hoo [HoursOfOperation]
+    # @return ScheduleRuleset
     def self.create_schedule_heating_cooling(model, thermostat_setback_profiles, htg_setpoint, clg_setpoint, setback_delta, profile_override, hoo)
       # generate and apply heating_setpoint schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric Heating Setpoint Schedule'
@@ -461,7 +556,7 @@ module BuildingSync
       htg_setpoint_profiles = htg_setpoint_profiles.gsub('floor', htg_vac.to_s)
 
       # process hash
-      hash = process_hash(htg_setpoint_profiles, profile_override, ruleset_name, hoo)
+      hash = process_hash(htg_setpoint_profiles, profile_override, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedule', "Failed to generate #{ruleset_name}"); return nil end
 
       winter_design_day = hash[:default].drop(1) # [[24,htg_occ]]
@@ -489,7 +584,7 @@ module BuildingSync
       clg_setpoint_profiles = clg_setpoint_profiles.gsub('floor', clg_vac.to_s)
 
       # process hash
-      hash = process_hash(clg_setpoint_profiles, profile_override, ruleset_name, hoo)
+      hash = process_hash(clg_setpoint_profiles, profile_override, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return nil end
 
       winter_design_day = hash[:default].drop(1) # [[24,clg_occ]]
@@ -507,10 +602,18 @@ module BuildingSync
       return heating_setpoint_sch, cooling_setpoint_sch
     end
 
+    ##
+    # create schedule service hot water
+    ##
+    # @param model [OpenStudio::Model]
+    # @param swh_profiles [Array]
+    # @param profile_override [Array]
+    # @param hoo [HoursOfOperation]
+    # @return ScheduleRuleset
     def self.create_schedule_SHW(model, swh_profiles, profile_override, hoo)
       # generate and apply water use equipment schedule using hours of operation schedule and parametric inputs
       ruleset_name = 'Parametric SWH Schedule'
-      hash = process_hash(swh_profiles, profile_override, ruleset_name, hoo)
+      hash = process_hash(swh_profiles, profile_override, hoo)
       if !hash then OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.LoadsSystem.create_schedue', "Failed to generate #{ruleset_name}"); return nil end
       winter_design_day = hash[:default].drop(1)
       summer_design_day = hash[:default].drop(1)
@@ -528,8 +631,14 @@ module BuildingSync
       return swh_sch
     end
 
+    ##
     # make hash of out string argument in eval. Rescue if can't be made into hash
-    def self.process_hash(string, profile_override, ruleset_name, hoo)
+    ##
+    # @param string [string]
+    # @param profile_override [Array]
+    # @param hoo [HoursOfOperation]
+    # @return ScheduleRuleset
+    def self.process_hash(string, profile_override, hoo)
       begin
         # temp code to make profile_hash from original commit work with updated process hash method that doesn't expose quotes or escape characters
         string = string.delete('{').delete('}')

@@ -35,6 +35,10 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
+##
+# BuildingSync module
+# provides features for reading BldgSync XML files, generating baseline models, creating scenario workflows, running simulations and adding simulation results to the BldgSync file
+##
 module BuildingSync
   VERSION = '0.2.0'.freeze
 

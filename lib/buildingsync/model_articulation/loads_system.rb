@@ -149,6 +149,13 @@ module BuildingSync
       return nil
     end
 
+    ##
+    # adjust people schedule
+    ##
+    # @param space_type [SpaceType]
+    # @param building_section [BuildingSection]
+    # @param model [OpenStudio::Model]
+    # @return boolean
     def adjust_people_schedule(space_type, building_section, model)
       if !building_section.typical_occupant_usage_value_hours.nil?
         puts_string = "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"

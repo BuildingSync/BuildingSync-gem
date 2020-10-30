@@ -36,7 +36,14 @@
 # *******************************************************************************
 
 module BuildingSync
+  ##
+  # this class holds the parameters related to the hours of operation
+  ##
   class HoursOfOperation
+    ##
+    # initialize the hours of operation class and set default values
+    ##
+    # @param hours_per_week [float]
     def initialize(hours_per_week)
       @hours_per_week = hours_per_week
       @start_wkdy = 9.0
@@ -49,8 +56,33 @@ module BuildingSync
       # see: https://github.com/NREL/openstudio-model-articulation-gem/blob/e1da9c43d6cee75012520975cc4b7022414336b6/lib/measures/create_parametric_schedules/measure.rb#L68
     end
 
-    attr_reader :hours_per_week, :start_sat, :end_sat, :start_sun, :end_sun
-    attr_accessor :start_wkdy, :end_wkdy
+    # occupied hours per week
+    # @return [float]
+    attr_reader :hours_per_week
+
+    # start hour on saturdays
+    # @return [float]
+    attr_reader :start_sat
+
+    # end hour on saturdays
+    # @return [float]
+    attr_reader :end_sat
+
+    # start hour on sundays
+    # @return [float]
+    attr_reader :start_sun
+
+    # end hour on sundays
+    # @return [float]
+    attr_reader :end_sun
+
+    # start hour on a weekday
+    # @return [float]
+    attr_accessor :start_wkdy
+
+    # end hour on a weekday
+    # @return [float]
+    attr_accessor :end_wkdy
   end
 end
 

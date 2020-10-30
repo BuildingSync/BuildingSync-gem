@@ -35,6 +35,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 module BuildingSync
+  ##
+  # helper class for helper methods in BuildingSync
   class Helper
     ##
     # get text value from xml element

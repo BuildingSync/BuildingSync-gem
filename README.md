@@ -1,6 +1,6 @@
 # BuildingSync
 
-Repository to store helpers for reading and writing BuildingSync as well as measures for converting a BuildingSync XML to OpenStudio models.
+Repository to store helpers for reading and writing BuildingSync, to generate a baseline OpenStudio Model, and to manage workflows with measures for generating different scenario models.
 
 ## Installation
 
@@ -21,11 +21,12 @@ Or install it yourself as:
 ## Usage
 
 The BuildingSync-Gem 
-- converts your BuildingSync.xml file into 
-  - an OpenStudio Baseline model
-  - an OpenStudio workflow for each scenario defined in the XML file
-- enables simulation of the baseline model and all workflows and 
-- inserts simulation results back into the xml file. 
+
+* converts your BuildingSync.xml file into 
+    * an OpenStudio Baseline model
+    * an OpenStudio workflow for each scenario defined in the XML file
+* enables simulation of the baseline model and all workflows and 
+* inserts simulation results back into the xml file. 
 
 All these features are driven by the translator class.
 
@@ -46,11 +47,13 @@ translator.gather_results(out_path)
 ## Testing
 
 Check out the repository and then execute:
-```ruby
-$ bundle install
-$ bundle update    
-$ bundle exec rake
-```
+
+    $ bundle install
+
+    $ bundle update   
+ 
+    $ bundle exec rake
+    
 
 ## TODO
 
