@@ -41,11 +41,11 @@ require 'openstudio/extension/core/os_lib_model_generation'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
-
   class SpatialElement
-
     include OsLib_ModelGeneration
 
+    ##
+    # initialize SpatialElement class
     def initialize
       @total_floor_area = nil
       @bldg_type = nil
@@ -61,6 +61,12 @@ module BuildingSync
       @custom_conditioned_below_grade_floor_area = nil
     end
 
+    ##
+    # read floor areas
+    ##
+    # @param build_element [REXML::Element]
+    # @param parent_total_floor_area [float]
+    # @param ns [string]
     def read_floor_areas(build_element, parent_total_floor_area, ns)
       build_element.elements.each("#{ns}:FloorAreas/#{ns}:FloorArea") do |floor_area_element|
         next if !floor_area_element.elements["#{ns}:FloorAreaValue"]
@@ -127,6 +133,13 @@ module BuildingSync
       end
     end
 
+    ##
+    # read occupancy type
+    ##
+    # @param xml_element [REXML::Element]
+    # @param occupancy_type [string]
+    # @param ns [string]
+    # @return [string]
     def read_occupancy_type(xml_element, occupancy_type, ns)
       occ_element = xml_element.elements["#{ns}:OccupancyClassification"]
       if !occ_element.nil?
@@ -136,6 +149,12 @@ module BuildingSync
       end
     end
 
+    ##
+    # set building and system type
+    ##
+    # @param occupancy_type [string]
+    # @param total_floor_area [float]
+    # @param raise_exception [boolean]
     def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
       # DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb
       # SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient
@@ -160,6 +179,12 @@ module BuildingSync
       puts "to get @bldg_type #{@bldg_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}"
     end
 
+    ##
+    # process building and system type
+    ##
+    # @param json [string]
+    # @param occupancy_type [string]
+    # @param total_floor_area [float]
     def process_bldg_and_system_type(json, occupancy_type, total_floor_area)
       puts "using occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}"
       min_floor_area_correct = false
@@ -201,17 +226,36 @@ module BuildingSync
       raise "Occupancy type #{occupancy_type} is not available in the bldg_and_system_types.json dictionary"
     end
 
+    ##
+    # validate positive number excluding zero
+    ##
+    # @param name [string]
+    # @param value [float]
+    # @return float
     def validate_positive_number_excluding_zero(name, value)
       puts "Error: parameter #{name} must be positive and not zero." if value <= 0
       return value
     end
 
+    ##
+    # validate positive number including zero
+    ##
+    # @param name [string]
+    # @param value [float]
+    # @return float
     def validate_positive_number_including_zero(name, value)
       puts "Error: parameter #{name} must be positive or zero." if value < 0
       return value
     end
 
+    ##
     # create space types
+    ##
+    # @param model [OpenStudio::Model]
+    # @param total_bldg_floor_area [float]
+    # @param standard_template [string]
+    # @param open_studio_standard [Standard]
+    # @return hash
     def create_space_types(model, total_bldg_floor_area, standard_template, open_studio_standard)
       # create space types from section type
       # mapping lookup_name name is needed for a few methods
@@ -263,6 +307,13 @@ module BuildingSync
       return @space_types_floor_area
     end
 
+    ##
+    # add user defined field to xml file
+    ##
+    # @param user_defined_fields [REXML::Element]
+    # @param ns [string]
+    # @param field_name [string]
+    # @param field_value [string]
     def add_user_defined_field_to_xml_file(user_defined_fields, ns, field_name, field_value)
       user_defined_field = REXML::Element.new("#{ns}:UserDefinedField")
       field_name_element = REXML::Element.new("#{ns}:FieldName")
@@ -278,8 +329,12 @@ module BuildingSync
       end
     end
 
-
-    def write_parameters_to_xml_for_spatial_element(ns, xml_element)
+    ##
+    # write parameters to xml for spatial element
+    ##
+    # @param ns [string]
+    # @param xml_element [REXML::Element]
+    def write_parameters_to_xml_for_spatial_element(xml_element, ns)
       user_defined_fields = REXML::Element.new("#{ns}:UserDefinedFields")
       xml_element.add_element(user_defined_fields)
 
@@ -292,6 +347,11 @@ module BuildingSync
       add_floor_area_field_to_xml_file(xml_element, ns)
     end
 
+    ##
+    # add floor area field to xml file
+    ##
+    # @param xml_element [REXML::Element]
+    # @param ns [string]
     def add_floor_area_field_to_xml_file(xml_element, ns)
       xml_element.elements.each("#{ns}:FloorAreas/#{ns}:FloorArea") do |floor_area_element|
         next if !floor_area_element.elements["#{ns}:FloorAreaValue"]
@@ -320,8 +380,6 @@ module BuildingSync
         end
       end
     end
-
-    def validate_fraction; end
 
     attr_reader :total_floor_area, :bldg_type, :system_type, :space_types
   end

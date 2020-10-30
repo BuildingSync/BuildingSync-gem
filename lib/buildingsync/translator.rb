@@ -304,6 +304,7 @@ module BuildingSync
       save_xml(xml_file_path) if !xml_file_path.nil?
     end
 
+    # osm file path of the baseline model
     attr_reader :osm_baseline_path
   end
 end

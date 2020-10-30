@@ -245,7 +245,7 @@ module BuildingSync
       add_user_defined_field_to_xml_file(building_section, ns, 'BuildingType', @bldg_type)
       add_user_defined_field_to_xml_file(building_section, ns, 'FractionArea', @fraction_area)
 
-      write_parameters_to_xml_for_spatial_element(ns, building_section)
+      write_parameters_to_xml_for_spatial_element(building_section, ns)
     end
 
     def set_bldg_and_system_type

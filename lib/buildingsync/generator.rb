@@ -37,6 +37,15 @@
 module BuildingSync
   class Generator
 
+    ##
+    # creates a minimum building sync snippet
+    ##
+    # @param occupancy_classification [string]
+    # @param year_of_const [int]
+    # @param floor_area_type [string]
+    # @param floor_area_value [float]
+    # @param ns [string]
+    # @return REXML::Document
     def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, ns = 'auc')
       xml_path = File.expand_path('./../../spec/files/building_151_Blank.xml', File.dirname(__FILE__))
 
@@ -72,6 +81,14 @@ module BuildingSync
       return doc
     end
 
+    ##
+    # creates a minimum facility
+    ##
+    # @param occupancy_classification [string]
+    # @param year_of_const [int]
+    # @param floor_area_type [string]
+    # @param floor_area_value [float]
+    # @return BuildingSync::Facility
     def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
       xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
       ns = 'auc'
