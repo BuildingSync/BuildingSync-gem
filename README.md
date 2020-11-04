@@ -49,18 +49,9 @@ translator.gather_results(out_path)
 Check out the repository and then execute:
 
     $ bundle install
-
-    $ bundle update   
  
     $ bundle exec rake
     
-
-## TODO
-
-- [ ] Move BuildingSync specific measures into this gem. See list from [here](https://docs.google.com/spreadsheets/d/1PCB4nZoLQ1cWhnlrlnHwo9kI4G8ChOeblU3L4uZu7bc/edit#gid=1482405742) 
-- [ ] Add ability to perform validation using https://selectiontool.buildingsync.net. Return which use cases existing BuildingSync XML is valid for.
-
-
 # Releasing
 
 * Update change log
