@@ -45,6 +45,8 @@ module BuildingSync
   class WorkflowMaker < WorkflowMakerBase
 
     # initialize - load workflow json file and add necessary measure paths
+    # @param doc [REXML::Document]
+    # @param ns [string]
     def initialize(doc, ns)
       super
 
@@ -70,6 +72,7 @@ module BuildingSync
     end
 
     # iterate over the current measure list in the workflow and check if they are available at the referenced measure directories
+    # @return [bool]
     def check_if_measures_exist
       all_measures_found = true
       @workflow['steps'].each do |step|
@@ -91,9 +94,10 @@ module BuildingSync
       return all_measures_found
     end
 
-    # prints out all available measures across all measure directories
+    # gets all available measures across all measure directories
+    # @return [hash]
     def get_list_of_available_measures
-      list_of_measures = Hash.new
+      list_of_measures = {}
       get_measure_directories_array.each do |potential_measure_path|
         Dir.chdir(potential_measure_path) do
           list_of_measures[potential_measure_path] = Dir.glob('*').select{ |f| File.directory? f }
@@ -103,6 +107,7 @@ module BuildingSync
     end
 
     # collect all measure directories that contain measures needed for BldgSync
+    # @return [array] of measure dirs
     def get_measure_directories_array
       common_measures_instance = OpenStudio::CommonMeasures::Extension.new
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
@@ -112,21 +117,34 @@ module BuildingSync
     end
 
     # insert an EnergyPlus measure to the list of existing measures - by default (item = 0) it gets added as first EnergyPlus measure
+    # @param measure_dir [string]
+    # @param item [int]
+    # @param args_hash [hash]
     def insert_energyplus_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('EnergyPlusMeasure', measure_dir, item, args_hash)
     end
 
     # insert a Reporting measure to the list of existing measures - by default (item = 0) it gets added as first Reporting measure
+    # @param measure_dir [string]
+    # @param item [int]
+    # @param args_hash [hash]
     def insert_reporting_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('ReportingMeasure', measure_dir, item, args_hash)
     end
 
     # insert a Model measure to the list of existing measures - by default (item = 0) it gets added as first Model measure
+    # @param measure_dir [string]
+    # @param item [int]
+    # @param args_hash [hash]
     def insert_model_measure(measure_dir, item = 0, args_hash = {})
       insert_measure('ModelMeasure', measure_dir, item, args_hash)
     end
 
     # inserts any measure
+    # @param measure_goal_type [string]
+    # @param measure_dir [string]
+    # @param item [int]
+    # @param args_hash [hash]
     def insert_measure(measure_goal_type, measure_dir, item = 0, args_hash = {})
       successfully_added = false
       count = 0
@@ -176,6 +194,8 @@ module BuildingSync
     end
 
     # gets the measure type of a measure given its directory - looking up the measure type in the measure.xml file
+    # @param measure_dir [string]
+    # @return [string]
     def get_measure_type(measure_dir)
       measure_type = nil
       get_measure_directories_array.each do |potential_measure_path|
@@ -197,11 +217,15 @@ module BuildingSync
     end
 
     # get the current workflow
+    # @return [hash]
     def get_workflow
       return @workflow
     end
 
     # get the name of a measure within the xml structure
+    # @param measure_category [string]
+    # @param measure [REXML:Element]
+    # @return [string]
     def get_measure_name(measure_category, measure)
       measure_name = ''
       if measure_category == 'Lighting'
@@ -248,6 +272,11 @@ module BuildingSync
       return measure_name
     end
 
+    # set argument details
+    # @param osw [string]
+    # @param argument [hash]
+    # @param measure_dir_name [string]
+    # @param measure_name [string]
     def set_argument_detail(osw, argument, measure_dir_name, measure_name)
       argument_name = ''
       argument_value = ''
@@ -285,6 +314,9 @@ module BuildingSync
       set_measure_argument(osw, measure_dir_name, argument_name, argument_value) if !argument_name.nil? && !argument_name.empty?
     end
 
+    # configure for scenario
+    # @param osw [string]
+    # @param scenario [REXML:Element]
     def configure_for_scenario(osw, scenario)
       successful = true
       measure_ids = []
@@ -332,6 +364,8 @@ module BuildingSync
       return successful
     end
 
+    # get scenario elements
+    # @return [REXML:Element]
     def get_scenario_elements
       if @scenarios.empty?
         get_scenarios.elements.each("#{@ns}:Scenario") do |scenario|
@@ -346,6 +380,8 @@ module BuildingSync
       return @scenarios
     end
 
+    # get scenarios
+    # @return [REXML:Element]
     def get_scenarios
       scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"]
       if scenarios.nil?
@@ -354,18 +390,28 @@ module BuildingSync
       return scenarios
     end
 
+    # check if the scenario is a baseline scenario
+    # @param scenario [REXML:Element]
+    # @return [bool]
     def scenario_is_baseline_scenario(scenario)
       # first we check if we find the new scenario type definition
       return true if scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Modeled"]
       return false
     end
 
+    # check if the scenario is a measured scenario
+    # @param scenario [REXML:Element]
+    # @return [bool]
     def scenario_is_measured_scenario(scenario)
       # first we check if we find the new scenario type definition
       return true if scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Measured"]
       return false
     end
 
+    # write workflows for all scenarios into osw files
+    # @param facility [REXML:Element]
+    # @param dir [string]
+    # @return [bool]
     def write_osws(facility, dir)
       super
 
@@ -449,6 +495,11 @@ module BuildingSync
       return successful
     end
 
+    # get measure result
+    # @param result [hash]
+    # @param measure_dir_name [string]
+    # @param result_name [string]
+    # @return [float]
     def get_measure_result(result, measure_dir_name, result_name)
       result[:steps].each do |step|
         if step[:measure_dir_name] == measure_dir_name
@@ -465,10 +516,14 @@ module BuildingSync
       return nil
     end
 
+    # get failed scenarios
+    # @return [array]
     def get_failed_scenarios
       return @failed_scenarios
     end
 
+    # save BuildingSync xml
+    # @param filename [string]
     def save_xml(filename)
       # first we make sure all directories exist
       FileUtils.mkdir_p(File.dirname(filename))
@@ -478,6 +533,8 @@ module BuildingSync
       end
     end
 
+    # cleanup larger files
+    # @param osw_dir [string]
     def cleanup_larger_files(osw_dir)
       path = File.join(osw_dir, 'eplusout.sql')
       FileUtils.rm_f(path) if File.exist?(path)
@@ -493,6 +550,10 @@ module BuildingSync
       end
     end
 
+    # get results for all scenarios
+    # @param dir [string]
+    # @param baseline_only [bool]
+    # @return [array] of results and monthly results in hashes
     def get_result_for_scenarios(dir, baseline_only)
       results = {}
       monthly_results = {}
