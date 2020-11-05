@@ -70,37 +70,11 @@ RSpec.describe 'LoadSystemSpec' do
     expect(load_system.add_day_lighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
   end
 
-  it 'Should add internal loads and adjust schedules successfully' do
-    model = OpenStudio::Model::Model.new
-    standard = Standard.build('DOE Ref Pre-1980')
-    load_system = BuildingSync::LoadsSystem.new
-    puts 'expected add internal loads : true but got: false} ' if load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', nil, false) != true
-    expect(load_system.add_internal_loads(model, standard, 'DOE Ref Pre-1980', nil, false)).to be true
-
-    new_building_section = BuildingSync::BuildingSection.new(create_minimum_section_xml('auc'), 'Office', '20000', 'auc')
-    expect(load_system.adjust_schedules_new4(standard, nil, new_building_section, model)).to be true
-
-
-    default_schedule_set = model.getBuilding.defaultScheduleSet.get
-
-    puts "default_schedule_set: #{default_schedule_set.name}"
-
-    expect(BuildingSync::Helper.calculate_hours(default_schedule_set.numberofPeopleSchedule, 0.5)). to be 45.0
-    expect(BuildingSync::Helper.calculate_hours(default_schedule_set.hoursofOperationSchedule, 0.5)). to be 54.0
-    expect(BuildingSync::Helper.calculate_hours(default_schedule_set.peopleActivityLevelSchedule, 0.5)). to be 168.0
-    expect(BuildingSync::Helper.calculate_hours(default_schedule_set.lightingSchedule, 0.5)). to be 45.0
-    expect(BuildingSync::Helper.calculate_hours(default_schedule_set.electricEquipmentSchedule, 0.5)). to be 85.0
-    expect(BuildingSync::Helper.calculate_hours(default_schedule_set.gasEquipmentSchedule, 0.5)). to be 85.0
-    expect(BuildingSync::Helper.calculate_hours(default_schedule_set.hotWaterEquipmentSchedule, 0.5)). to be 0.0
-    expect(BuildingSync::Helper.calculate_hours(default_schedule_set.infiltrationSchedule, 0.5)). to be 90.5
-    expect(BuildingSync::Helper.calculate_hours(default_schedule_set.steamEquipmentSchedule, 0.5)). to be 0.0
-    expect(BuildingSync::Helper.calculate_hours(default_schedule_set.otherEquipmentSchedule, 0.5)). to be 0.0
-  end
-
   it 'should parse and write building_151.xml and adjust schedules successfully' do
     translator = test_baseline_creation('building_151.xml', CA_TITLE24)
     model = translator.get_model
 
+    cut_off_value = 0.5
     # read in the schedule
     space_types = model.getSpaceTypes
     expect(space_types.length).to be 4
@@ -110,16 +84,17 @@ RSpec.describe 'LoadSystemSpec' do
 
       BuildingSync::Helper.print_all_schedules("schedules-#{space_type.name}.csv", default_schedule_set)
 
-      #expect(BuildingSync::Helper.calculate_hours(default_schedule_set.numberofPeopleSchedule, 0.5)). to be 45.0
-      #expect(BuildingSync::Helper.calculate_hours(default_schedule_set.hoursofOperationSchedule, 0.5)). to be 54.0
-      #expect(BuildingSync::Helper.calculate_hours(default_schedule_set.peopleActivityLevelSchedule, 0.5)). to be 168.0
-      #expect(BuildingSync::Helper.calculate_hours(default_schedule_set.lightingSchedule, 0.5)). to be 45.0
-      #expect(BuildingSync::Helper.calculate_hours(default_schedule_set.electricEquipmentSchedule, 0.5)). to be 85.0
-      #expect(BuildingSync::Helper.calculate_hours(default_schedule_set.gasEquipmentSchedule, 0.5)). to be 85.0
-      #expect(BuildingSync::Helper.calculate_hours(default_schedule_set.hotWaterEquipmentSchedule , 0.5)). to be 0.0
-      #expect(BuildingSync::Helper.calculate_hours(default_schedule_set.infiltrationSchedule, 0.5)). to be 90.5
-      #expect(BuildingSync::Helper.calculate_hours(default_schedule_set.steamEquipmentSchedule, 0.5)). to be 0.0
-      #expect(BuildingSync::Helper.calculate_hours(default_schedule_set.otherEquipmentSchedule, 0.5)). to be 0.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.numberofPeopleSchedule, cut_off_value).round(1)).to be 47.9
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.hoursofOperationSchedule, cut_off_value).round(1)). to be 40.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.peopleActivityLevelSchedule, cut_off_value).round(1)). to be 168.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.lightingSchedule, cut_off_value).round(1)). to be 67.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.electricEquipmentSchedule, cut_off_value).round(1)).to be 67.4
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.gasEquipmentSchedule, cut_off_value).round(1)).to be 0.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.hotWaterEquipmentSchedule , cut_off_value).round(1)).to be 0.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.infiltrationSchedule, cut_off_value).round(1)).to be 66.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.steamEquipmentSchedule, cut_off_value).round(1)).to be 0.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.otherEquipmentSchedule, cut_off_value).round(1)).to be 0.0
+      break
     end
   end
 

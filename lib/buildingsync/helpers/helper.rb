@@ -242,10 +242,12 @@ module BuildingSync
     end
 
     def self.get_start_time(profile, cut_off_value)
+      last_time = OpenStudio::Time.new
       profile.times.each do |time|
         if profile.getValue(time) >= cut_off_value
-          return time
+          return last_time
         end
+        last_time = time
       end
       return OpenStudio::Time.new
     end
@@ -262,14 +264,23 @@ module BuildingSync
       return OpenStudio::Time.new
     end
 
-    def self.calculate_hours(optional_schedule, cut_off_value = 0.5)
-      calculated_hours_per_week = 0.0
-      if optional_schedule.is_a?(OpenStudio::Model::OptionalSchedule) && optional_schedule.is_initialized
-        schedule = optional_schedule.get
+    def self.get_schedule_rule_set_from_schedule(optional_schedule)
+      if optional_schedule.is_a?(OpenStudio::Model::OptionalSchedule)
+        if optional_schedule.is_initialized
+          schedule = optional_schedule.get
+        else
+          return nil
+        end
       else
         schedule = optional_schedule
       end
-      schedule_rule_set = schedule.to_ScheduleRuleset.get
+      return schedule.to_ScheduleRuleset.get
+    end
+
+    def self.calculate_hours(optional_schedule, cut_off_value = 0.5)
+      calculated_hours_per_week = 0.0
+      schedule_rule_set = get_schedule_rule_set_from_schedule(optional_schedule)
+      return 0.0 if schedule_rule_set.nil?
       puts "schedule_rule_set: #{schedule_rule_set}"
       defaultProfile = schedule_rule_set.defaultDaySchedule
 
@@ -320,6 +331,17 @@ module BuildingSync
       end
 
       return duration_above_cut_off
+    end
+
+    def self.get_default_schedule_set(model)
+      if model.getBuilding.defaultScheduleSet.is_initialized
+        return model.getBuilding.defaultScheduleSet.get
+      else
+        space_types = model.getSpaceTypes
+        space_types.each do |space_type|
+          return space_type.defaultScheduleSet.get
+        end
+      end
     end
   end
 end

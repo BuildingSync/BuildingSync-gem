@@ -80,6 +80,7 @@ module BuildingSync
         # extend space type name to include the template. Consider this as well for load defs
         space_type.setName("#{space_type.name} - #{template}")
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LoadsSystem.add_internal_loads', "Adding loads to space type named #{space_type.name}")
+        return true
       end
 
       # warn if spaces in model without space type
@@ -377,45 +378,47 @@ module BuildingSync
       if !building_section.typical_occupant_usage_value_hours.nil?
         puts_string = "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
         hours_per_week = building_section.typical_occupant_usage_value_hours.to_f
-        wkdy_op_hrs_start_time_hr = 9
-        wkdy_op_hrs_start_time_min = 0
-        wkdy_op_hrs_duration_hr = (hours_per_week / 5.0).to_i
-        wkdy_op_hrs_duration_min = 0
 
-        wknd_op_hrs_start_time_hr = 0
-        wknd_op_hrs_start_time_min = 0
-        wknd_op_hrs_duration_hr = 0
-        wknd_op_hrs_duration_min = 0
+        default_schedule_set = BuildingSync::Helper.get_default_schedule_set(model)
+        existing_number_of_people_sched = BuildingSync::Helper.get_schedule_rule_set_from_schedule(default_schedule_set.numberofPeopleSchedule)
+
+        calc_hours_per_week = BuildingSync::Helper.calculate_hours(existing_number_of_people_sched)
+        ratio_hours_per_week = hours_per_week / calc_hours_per_week
+
+        wkdy_start_time = BuildingSync::Helper.get_start_time_weekday(existing_number_of_people_sched)
+        wkdy_end_time = BuildingSync::Helper.get_end_time_weekday(existing_number_of_people_sched)
+        wkdy_hours = wkdy_end_time - wkdy_start_time
+
+        sat_start_time = BuildingSync::Helper.get_start_time_sat(existing_number_of_people_sched)
+        sat_end_time = BuildingSync::Helper.get_end_time_sat(existing_number_of_people_sched)
+        sat_hours = sat_end_time - sat_start_time
+
+        sun_start_time = BuildingSync::Helper.get_start_time_sun(existing_number_of_people_sched)
+        sun_end_time = BuildingSync::Helper.get_end_time_sun(existing_number_of_people_sched)
+        sun_hours = sun_end_time - sun_start_time
+
+        # determine new end times via ratios
+        wkdy_end_time = wkdy_start_time + OpenStudio::Time.new(ratio_hours_per_week * wkdy_hours.totalDays)
+        sat_end_time = sat_start_time + OpenStudio::Time.new(ratio_hours_per_week * sat_hours.totalDays)
+        sun_end_time = sun_start_time + OpenStudio::Time.new(ratio_hours_per_week * sun_hours.totalDays)
+
         # Infer the current hours of operation schedule for the building
         op_sch = standard.model_infer_hours_of_operation_building(model)
+        default_schedule_set.setHoursofOperationSchedule(op_sch)
+
+        BuildingSync::Helper.print_all_schedules("org_schedules-#{space_type.name}.csv", default_schedule_set)
 
         # Convert existing schedules in the model to parametric schedules based on current hours of operation
         standard.model_setup_parametric_schedules(model)
-
-        # Create start and end times from start time and duration supplied
-        wkdy_start_time = nil
-        wkdy_end_time = nil
-        wknd_start_time = nil
-        wknd_end_time = nil
-        # weekdays
-        if wkdy_op_hrs_duration_hr > 0
-          wkdy_start_time = OpenStudio::Time.new(0, wkdy_op_hrs_start_time_hr, wkdy_op_hrs_start_time_min, 0)
-          wkdy_end_time = wkdy_start_time + OpenStudio::Time.new(0, wkdy_op_hrs_duration_hr, wkdy_op_hrs_duration_min, 0)
-        end
-        # weekends
-        if wknd_op_hrs_duration_hr > 0
-          wknd_start_time = OpenStudio::Time.new(0, wknd_op_hrs_start_time_hr, wknd_op_hrs_start_time_min, 0)
-          wknd_end_time = wknd_start_time + OpenStudio::Time.new(0, wknd_op_hrs_duration_hr, wknd_op_hrs_duration_min, 0)
-        end
 
         # Modify hours of operation, using weekdays values for all weekdays and weekend values for Saturday and Sunday
         standard.schedule_ruleset_set_hours_of_operation(op_sch,
                                                          wkdy_start_time: wkdy_start_time,
                                                          wkdy_end_time: wkdy_end_time,
-                                                         sat_start_time: wknd_start_time,
-                                                         sat_end_time: wknd_end_time,
-                                                         sun_start_time: wknd_start_time,
-                                                         sun_end_time: wknd_end_time)
+                                                         sat_start_time: sat_start_time,
+                                                         sat_end_time: sat_end_time,
+                                                         sun_start_time: sun_start_time,
+                                                         sun_end_time: sun_end_time)
 
         # Apply new operating hours to parametric schedules to make schedules in model reflect modified hours of operation
         parametric_schedules = standard.model_apply_parametric_schedules(model, error_on_out_of_order: false)
