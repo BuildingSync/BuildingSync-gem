@@ -83,5 +83,267 @@ module BuildingSync
       end
       return doc
     end
+
+    def self.print_all_schedules(file_name, default_schedule_set)
+      f = File.open(file_name, 'w')
+      print_schedule(f, default_schedule_set.numberofPeopleSchedule)
+      print_schedule(f, default_schedule_set.hoursofOperationSchedule)
+      print_schedule(f, default_schedule_set.peopleActivityLevelSchedule)
+      print_schedule(f, default_schedule_set.lightingSchedule)
+      print_schedule(f, default_schedule_set.electricEquipmentSchedule)
+      print_schedule(f, default_schedule_set.gasEquipmentSchedule)
+      print_schedule(f, default_schedule_set.hotWaterEquipmentSchedule)
+      print_schedule(f, default_schedule_set.infiltrationSchedule)
+      print_schedule(f, default_schedule_set.steamEquipmentSchedule)
+      print_schedule(f, default_schedule_set.otherEquipmentSchedule)
+      f.close
+    end
+
+    def self.write_profile(f, profile, rule, cut_off_value = 0.5)
+      time_row = "#{profile.name},"
+      if rule.nil?
+        time_row += ',,,,,,,'
+      else
+        if rule.applySunday
+          time_row += 'X,'
+        else
+          time_row += ','
+        end
+        if rule.applyMonday
+          time_row += 'X,'
+        else
+          time_row += ','
+        end
+        if rule.applyTuesday
+          time_row += 'X,'
+        else
+          time_row += ','
+        end
+        if rule.applyWednesday
+          time_row += 'X,'
+        else
+          time_row += ','
+        end
+        if rule.applyThursday
+          time_row += 'X,'
+        else
+          time_row += ','
+        end
+        if rule.applyFriday
+          time_row += 'X,'
+        else
+          time_row += ','
+        end
+        if rule.applySaturday
+          time_row += 'X,'
+        else
+          time_row += ','
+        end
+      end
+      time_row += ','
+      value_row = ",,,,,,,,#{get_duration(profile, cut_off_value)},"
+
+      profile.times.each do |time|
+        time_row += "#{time},"
+        value_row += "#{profile.getValue(time)},"
+      end
+      f.write time_row + "\n"
+      f.write value_row + "\n"
+    end
+
+    def self.print_schedule(f, optional_schedule, cut_off_value = 0.5)
+      if optional_schedule.is_a?(OpenStudio::Model::OptionalSchedule) && optional_schedule.is_initialized
+        schedule = optional_schedule.get
+        if schedule.is_a?(OpenStudio::Model::OptionalSchedule) && schedule.is_initialized
+          schedule = schedule.get
+        end
+      else
+        schedule = optional_schedule
+      end
+      if schedule.is_a?(OpenStudio::Model::Schedule)
+        schedule_rule_set = schedule.to_ScheduleRuleset.get
+        f.puts "schedule_rule_set name: ,#{schedule_rule_set.name}, duration:, #{calculate_hours(optional_schedule, cut_off_value)}"
+        defaultProfile = schedule_rule_set.defaultDaySchedule
+
+        f.puts 'Name, Su, Mo, Tu, We, Th, Fr, Sa, Duration, TimeValue1, TV2, ...'
+        write_profile(f, defaultProfile, nil, cut_off_value)
+
+        schedule_rule_set.scheduleRules.each do |rule|
+          write_profile(f, rule.daySchedule, rule, cut_off_value)
+        end
+        f.puts
+      else
+        puts "schedule: #{schedule}"
+      end
+    end
+
+    def self.get_start_time_weekday(schedule_rule_set, cut_off_value = 0.5)
+      profile = schedule_rule_set.defaultDaySchedule
+      schedule_rule_set.scheduleRules.each do |rule|
+        if rule.applyMonday
+          profile = rule.daySchedule
+        end
+      end
+
+      return get_start_time(profile, cut_off_value)
+    end
+
+    def self.get_end_time_weekday(schedule_rule_set, cut_off_value = 0.5)
+      profile = schedule_rule_set.defaultDaySchedule
+      schedule_rule_set.scheduleRules.each do |rule|
+        if rule.applyMonday
+          profile = rule.daySchedule
+        end
+      end
+
+      return get_end_time(profile, cut_off_value)
+    end
+
+    def self.get_start_time_sat(schedule_rule_set, cut_off_value = 0.5)
+      profile = schedule_rule_set.defaultDaySchedule
+      schedule_rule_set.scheduleRules.each do |rule|
+        if rule.applySaturday
+          profile = rule.daySchedule
+        end
+      end
+
+      return get_start_time(profile, cut_off_value)
+    end
+
+    def self.get_end_time_sat(schedule_rule_set, cut_off_value = 0.5)
+      profile = schedule_rule_set.defaultDaySchedule
+      schedule_rule_set.scheduleRules.each do |rule|
+        if rule.applySaturday
+          profile = rule.daySchedule
+        end
+      end
+
+      return get_end_time(profile, cut_off_value)
+    end
+
+    def self.get_start_time_sun(schedule_rule_set, cut_off_value = 0.5)
+      profile = schedule_rule_set.defaultDaySchedule
+      schedule_rule_set.scheduleRules.each do |rule|
+        if rule.applySunday
+          profile = rule.daySchedule
+        end
+      end
+
+      return get_start_time(profile, cut_off_value)
+    end
+
+    def self.get_end_time_sun(schedule_rule_set, cut_off_value = 0.5)
+      profile = schedule_rule_set.defaultDaySchedule
+      schedule_rule_set.scheduleRules.each do |rule|
+        if rule.applySunday
+          profile = rule.daySchedule
+        end
+      end
+
+      return get_end_time(profile, cut_off_value)
+    end
+
+    def self.get_start_time(profile, cut_off_value)
+      last_time = OpenStudio::Time.new
+      profile.times.each do |time|
+        if profile.getValue(time) >= cut_off_value
+          return last_time
+        end
+        last_time = time
+      end
+      return OpenStudio::Time.new
+    end
+
+    def self.get_end_time(profile, cut_off_value)
+      last_time = nil
+      profile.times.each do |time|
+        if profile.getValue(time) >= cut_off_value
+          last_time = time
+        elsif profile.getValue(time) < cut_off_value && !last_time.nil?
+          return last_time
+        end
+      end
+      return OpenStudio::Time.new
+    end
+
+    def self.get_schedule_rule_set_from_schedule(optional_schedule)
+      if optional_schedule.is_a?(OpenStudio::Model::OptionalSchedule)
+        if optional_schedule.is_initialized
+          schedule = optional_schedule.get
+        else
+          return nil
+        end
+      else
+        schedule = optional_schedule
+      end
+      return schedule.to_ScheduleRuleset.get
+    end
+
+    def self.calculate_hours(optional_schedule, cut_off_value = 0.5)
+      calculated_hours_per_week = 0.0
+      schedule_rule_set = get_schedule_rule_set_from_schedule(optional_schedule)
+      return 0.0 if schedule_rule_set.nil?
+      puts "schedule_rule_set: #{schedule_rule_set}"
+      defaultProfile = schedule_rule_set.defaultDaySchedule
+
+      default_profile_duration = get_duration(defaultProfile, cut_off_value)
+      puts "default_profile_duration: #{default_profile_duration}"
+
+      default_number_of_days = 7
+      schedule_rule_set.scheduleRules.each do |rule|
+        profile_duration = get_duration(rule.daySchedule, cut_off_value)
+        puts "profile_duration: #{profile_duration}"
+
+        number_of_days = count_number_of_days(rule)
+        default_number_of_days -= number_of_days
+        calculated_hours_per_week += profile_duration * number_of_days
+      end
+      calculated_hours_per_week += default_profile_duration * default_number_of_days
+      return calculated_hours_per_week
+    end
+
+    def self.count_number_of_days(rule)
+      count = 0
+      count += 1 if rule.applyFriday
+      count += 1 if rule.applyMonday
+      count += 1 if rule.applySaturday
+      count += 1 if rule.applySunday
+      count += 1 if rule.applyThursday
+      count += 1 if rule.applyTuesday
+      count += 1 if rule.applyWednesday
+      return count
+    end
+
+    def self.get_duration(profile, cut_off_value)
+      last_time = nil
+
+      duration_above_cut_off = 0.0
+
+      profile.times.each do |time|
+
+        puts "time: #{time} value: #{profile.getValue(time)}"
+        if profile.getValue(time) >= cut_off_value
+          if last_time.nil?
+            duration_above_cut_off += time.totalHours
+          else
+            duration_above_cut_off += time.totalHours - last_time.totalHours
+          end
+        end
+        last_time = time
+      end
+
+      return duration_above_cut_off
+    end
+
+    def self.get_default_schedule_set(model)
+      if model.getBuilding.defaultScheduleSet.is_initialized
+        return model.getBuilding.defaultScheduleSet.get
+      else
+        space_types = model.getSpaceTypes
+        space_types.each do |space_type|
+          return space_type.defaultScheduleSet.get
+        end
+      end
+    end
   end
 end

@@ -35,7 +35,6 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_system'
-require_relative '../helpers/parametric_schedule_helper'
 require_relative '../helpers/hours_of_operation'
 require 'openstudio/extension/core/os_lib_schedules.rb'
 
@@ -75,11 +74,12 @@ module BuildingSync
 
         # here we adjust the people schedules according to user input of hours per week and weeks per year
         if !building_sections.empty?
-          adjust_people_schedule(space_type, get_building_section(building_sections, space_type.standardsBuildingType, space_type.standardsSpaceType), model)
+          adjust_schedules(standard, space_type, get_building_section(building_sections, space_type.standardsBuildingType, space_type.standardsSpaceType), model)
         end
         # extend space type name to include the template. Consider this as well for load defs
         space_type.setName("#{space_type.name} - #{template}")
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LoadsSystem.add_internal_loads', "Adding loads to space type named #{space_type.name}")
+        return true
       end
 
       # warn if spaces in model without space type
@@ -156,24 +156,60 @@ module BuildingSync
     # @param building_section [BuildingSection]
     # @param model [OpenStudio::Model]
     # @return boolean
-    def adjust_people_schedule(space_type, building_section, model)
+    def adjust_schedules(standard, space_type, building_section, model)
+      # this uses code from https://github.com/NREL/openstudio-extension-gem/blob/6f8f7a46de496c3ab95ed9c72d4d543bd4b67740/lib/openstudio/extension/core/os_lib_model_generation.rb#L3007
+      #
+      # currently this works for all schedules in the model
+      # in the future we would want to make this more flexible to adjusted based on space_types or building sections
       if !building_section.typical_occupant_usage_value_hours.nil?
         puts_string = "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
-
-        if space_type.nil?
-          puts_string +=  ' for all space types'
-        else
-          puts_string +=  " for space type: #{space_type.name}"
-        end
-        if !building_section.nil?
-          puts_string +=  " in building section: #{building_section.id}"
-        end
-        puts puts_string
-
         hours_per_week = building_section.typical_occupant_usage_value_hours.to_f
-        # setting default values
-        hours_of_operation = HoursOfOperation.new(hours_per_week)
-        return BuildingSync::ParametricScheduleHelper.process_schedules(model, space_type, hours_of_operation)
+
+        default_schedule_set = BuildingSync::Helper.get_default_schedule_set(model)
+        existing_number_of_people_sched = BuildingSync::Helper.get_schedule_rule_set_from_schedule(default_schedule_set.numberofPeopleSchedule)
+
+        calc_hours_per_week = BuildingSync::Helper.calculate_hours(existing_number_of_people_sched)
+        ratio_hours_per_week = hours_per_week / calc_hours_per_week
+
+        wkdy_start_time = BuildingSync::Helper.get_start_time_weekday(existing_number_of_people_sched)
+        wkdy_end_time = BuildingSync::Helper.get_end_time_weekday(existing_number_of_people_sched)
+        wkdy_hours = wkdy_end_time - wkdy_start_time
+
+        sat_start_time = BuildingSync::Helper.get_start_time_sat(existing_number_of_people_sched)
+        sat_end_time = BuildingSync::Helper.get_end_time_sat(existing_number_of_people_sched)
+        sat_hours = sat_end_time - sat_start_time
+
+        sun_start_time = BuildingSync::Helper.get_start_time_sun(existing_number_of_people_sched)
+        sun_end_time = BuildingSync::Helper.get_end_time_sun(existing_number_of_people_sched)
+        sun_hours = sun_end_time - sun_start_time
+
+        # determine new end times via ratios
+        wkdy_end_time = wkdy_start_time + OpenStudio::Time.new(ratio_hours_per_week * wkdy_hours.totalDays)
+        sat_end_time = sat_start_time + OpenStudio::Time.new(ratio_hours_per_week * sat_hours.totalDays)
+        sun_end_time = sun_start_time + OpenStudio::Time.new(ratio_hours_per_week * sun_hours.totalDays)
+
+        # Infer the current hours of operation schedule for the building
+        op_sch = standard.model_infer_hours_of_operation_building(model)
+        default_schedule_set.setHoursofOperationSchedule(op_sch)
+
+        # BuildingSync::Helper.print_all_schedules("org_schedules-#{space_type.name}.csv", default_schedule_set)
+
+        # Convert existing schedules in the model to parametric schedules based on current hours of operation
+        standard.model_setup_parametric_schedules(model)
+
+        # Modify hours of operation, using weekdays values for all weekdays and weekend values for Saturday and Sunday
+        standard.schedule_ruleset_set_hours_of_operation(op_sch,
+                                                         wkdy_start_time: wkdy_start_time,
+                                                         wkdy_end_time: wkdy_end_time,
+                                                         sat_start_time: sat_start_time,
+                                                         sat_end_time: sat_end_time,
+                                                         sun_start_time: sun_start_time,
+                                                         sun_end_time: sun_end_time)
+
+        # Apply new operating hours to parametric schedules to make schedules in model reflect modified hours of operation
+        parametric_schedules = standard.model_apply_parametric_schedules(model, error_on_out_of_order: false)
+        puts "Updated #{parametric_schedules.size} schedules with new hours of operation."
+        return true
       end
       return false
     end
