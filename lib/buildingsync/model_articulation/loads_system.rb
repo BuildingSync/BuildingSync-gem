@@ -153,7 +153,8 @@ module BuildingSync
     def adjust_schedules(standard, space_type, building_section, model)
       # this uses code from https://github.com/NREL/openstudio-extension-gem/blob/6f8f7a46de496c3ab95ed9c72d4d543bd4b67740/lib/openstudio/extension/core/os_lib_model_generation.rb#L3007
       #
-      # hours of operation
+      # currently this works for all schedules in the model
+      # in the future we would want to make this more flexible to adjusted based on space_types or building sections
       if !building_section.typical_occupant_usage_value_hours.nil?
         puts_string = "building_section.typical_occupant_usage_value_hours: #{building_section.typical_occupant_usage_value_hours}"
         hours_per_week = building_section.typical_occupant_usage_value_hours.to_f
@@ -185,7 +186,7 @@ module BuildingSync
         op_sch = standard.model_infer_hours_of_operation_building(model)
         default_schedule_set.setHoursofOperationSchedule(op_sch)
 
-        BuildingSync::Helper.print_all_schedules("org_schedules-#{space_type.name}.csv", default_schedule_set)
+        # BuildingSync::Helper.print_all_schedules("org_schedules-#{space_type.name}.csv", default_schedule_set)
 
         # Convert existing schedules in the model to parametric schedules based on current hours of operation
         standard.model_setup_parametric_schedules(model)
