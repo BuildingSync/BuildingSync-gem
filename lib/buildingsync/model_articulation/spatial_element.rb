@@ -43,8 +43,6 @@ module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpatialElement
     include OsLib_ModelGeneration
-
-    ##
     # initialize SpatialElement class
     def initialize
       @total_floor_area = nil
@@ -61,9 +59,7 @@ module BuildingSync
       @custom_conditioned_below_grade_floor_area = nil
     end
 
-    ##
     # read floor areas
-    ##
     # @param build_element [REXML::Element]
     # @param parent_total_floor_area [float]
     # @param ns [string]
@@ -133,9 +129,7 @@ module BuildingSync
       end
     end
 
-    ##
     # read occupancy type
-    ##
     # @param xml_element [REXML::Element]
     # @param occupancy_type [string]
     # @param ns [string]
@@ -149,9 +143,7 @@ module BuildingSync
       end
     end
 
-    ##
     # set building and system type
-    ##
     # @param occupancy_type [string]
     # @param total_floor_area [float]
     # @param raise_exception [boolean]
@@ -179,9 +171,7 @@ module BuildingSync
       puts "to get @bldg_type #{@bldg_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}"
     end
 
-    ##
     # process building and system type
-    ##
     # @param json [string]
     # @param occupancy_type [string]
     # @param total_floor_area [float]
@@ -226,9 +216,7 @@ module BuildingSync
       raise "Occupancy type #{occupancy_type} is not available in the bldg_and_system_types.json dictionary"
     end
 
-    ##
     # validate positive number excluding zero
-    ##
     # @param name [string]
     # @param value [float]
     # @return float
@@ -237,9 +225,7 @@ module BuildingSync
       return value
     end
 
-    ##
     # validate positive number including zero
-    ##
     # @param name [string]
     # @param value [float]
     # @return float
@@ -248,9 +234,7 @@ module BuildingSync
       return value
     end
 
-    ##
     # create space types
-    ##
     # @param model [OpenStudio::Model]
     # @param total_bldg_floor_area [float]
     # @param standard_template [string]
@@ -307,9 +291,7 @@ module BuildingSync
       return @space_types_floor_area
     end
 
-    ##
     # add user defined field to xml file
-    ##
     # @param user_defined_fields [REXML::Element]
     # @param ns [string]
     # @param field_name [string]
@@ -329,9 +311,7 @@ module BuildingSync
       end
     end
 
-    ##
     # write parameters to xml for spatial element
-    ##
     # @param ns [string]
     # @param xml_element [REXML::Element]
     def write_parameters_to_xml_for_spatial_element(xml_element, ns)
@@ -347,9 +327,7 @@ module BuildingSync
       add_floor_area_field_to_xml_file(xml_element, ns)
     end
 
-    ##
     # add floor area field to xml file
-    ##
     # @param xml_element [REXML::Element]
     # @param ns [string]
     def add_floor_area_field_to_xml_file(xml_element, ns)

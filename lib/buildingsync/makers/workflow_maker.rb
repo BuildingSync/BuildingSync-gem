@@ -72,7 +72,7 @@ module BuildingSync
     end
 
     # iterate over the current measure list in the workflow and check if they are available at the referenced measure directories
-    # @return [bool]
+    # @return [boolean]
     def check_if_measures_exist
       all_measures_found = true
       @workflow['steps'].each do |step|
@@ -392,7 +392,7 @@ module BuildingSync
 
     # check if the scenario is a baseline scenario
     # @param scenario [REXML:Element]
-    # @return [bool]
+    # @return [boolean]
     def scenario_is_baseline_scenario(scenario)
       # first we check if we find the new scenario type definition
       return true if scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Modeled"]
@@ -401,7 +401,7 @@ module BuildingSync
 
     # check if the scenario is a measured scenario
     # @param scenario [REXML:Element]
-    # @return [bool]
+    # @return [boolean]
     def scenario_is_measured_scenario(scenario)
       # first we check if we find the new scenario type definition
       return true if scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Measured"]
@@ -411,7 +411,7 @@ module BuildingSync
     # write workflows for all scenarios into osw files
     # @param facility [REXML:Element]
     # @param dir [string]
-    # @return [bool]
+    # @return [boolean]
     def write_osws(facility, dir)
       super
 
@@ -552,7 +552,7 @@ module BuildingSync
 
     # get results for all scenarios
     # @param dir [string]
-    # @param baseline_only [bool]
+    # @param baseline_only [boolean]
     # @return [array] of results and monthly results in hashes
     def get_result_for_scenarios(dir, baseline_only)
       results = {}

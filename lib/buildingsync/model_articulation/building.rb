@@ -131,6 +131,7 @@ module BuildingSync
       read_other_building_details(build_element, ns)
     end
 
+    # set all function to set all parameters for this building
     def set_all
       if !@all_set
         @all_set = true
@@ -363,8 +364,10 @@ module BuildingSync
       end
     end
 
+    # build zone hash that stores zone lists for buildings and building sections
+    # @return [[hash<string, array<Zone>>]]
     def build_zone_hash
-      zone_hash = Hash.new
+      zone_hash = {}
       if @space_types
         zone_list = []
         @space_types.each do |space_name, space_type|
@@ -382,8 +385,10 @@ module BuildingSync
       return zone_hash
     end
 
+    # build space types hash
+    # @return [hash<string, array<hash<string, string>>]
     def build_space_type_hash
-      space_type_hash = Hash.new
+      space_type_hash = {}
       if @space_types
         space_type_list = []
         @space_types.each do |space_name, space_type|
@@ -401,6 +406,9 @@ module BuildingSync
       return space_type_hash
     end
 
+    # get zones per space type
+    # @param space_type [OpenStudio::Model::SpaceType]
+    # @return [array<OpenStudio::Model::ThermalZone>]
     def get_zones_per_space_type(space_type)
       list_of_zones = []
       model_space_type = @model.getSpaceTypeByName(space_type.name.get).get
@@ -447,6 +455,9 @@ module BuildingSync
       set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
     end
 
+    # determine the open studio standard and call the set_all function
+    # @param standard_to_be_used [string]
+    # @return [Standard]
     def determine_open_studio_standard(standard_to_be_used)
       set_all
       begin
@@ -512,10 +523,14 @@ module BuildingSync
       return @built_year
     end
 
+    # get building template
+    # @return [string]
     def get_building_template
       return @standard_template
     end
 
+    # get system type
+    # @return [string]
     def get_system_type
       set_all
       if !@system_type.nil?
@@ -767,15 +782,11 @@ module BuildingSync
       return true
     end
 
+    # generate baseline model in osm file format
+    # @param standard_to_be_used [string]
     def generate_baseline_osm(standard_to_be_used)
       # this is code refactored from the "create_bar_from_building_type_ratios" measure
       # first we check is there is any data at all in this facility, aka if there is a site in the list
-      # TODO: the original measure contains value range checks, should we implement them here or while importing data??
-      # Fraction: 'bldg_type_b_fract_bldg_area', 'bldg_type_c_fract_bldg_area', 'bldg_type_d_fract_bldg_area', 'wwr', 'party_wall_fraction' 0 =<= 1
-      # Bigger than 0 (excluding 0): 'total_bldg_floor_area' 0 <= nil
-      # Bigger than 1 (including 1): 'num_stories_above_grade' 1 =< nil
-      # Bigger than 0 (including 0): 'bldg_type_a_num_units', 'bldg_type_c_num_units', 'bldg_type_d_num_units', 'num_stories_below_grade', 'floor_height', 'ns_to_ew_ratio', 'party_wall_stories_north',
-      # 'party_wall_stories_south', 'party_wall_stories_east', 'party_wall_stories_west', 'single_floor_area' 0 =<= nil
 
       # TODO: we have not really defined a good logic what happens with multiple sites, versus multiple buildings, here we just take the first building on the first site
       set_building_form_defaults
@@ -792,8 +803,6 @@ module BuildingSync
       @model.getBuilding.setName(name)
 
       create_bldg_space_types(@model)
-      # calculate length and width of bar
-      # todo - update slicing to nicely handle aspect ratio less than 1
 
       # create envelope
       # populate bar_hash and create envelope with data from envelope_data_hash and user arguments
@@ -1059,10 +1068,14 @@ module BuildingSync
       write_parameters_to_xml_for_spatial_element(building, ns)
     end
 
+    # get space types
+    # @return [array<OpenStudio::Model::SpaceType>]
     def get_space_types
       return @model.getSpaceTypes
     end
 
+    # get peak occupancy
+    # @return [hash<string, float>]
     def get_peak_occupancy
       peak_occupancy = {}
       if @occupant_quantity
@@ -1075,8 +1088,10 @@ module BuildingSync
       return peak_occupancy
     end
 
+    # get floor area
+    # @return [hash<string, float>]
     def get_floor_area
-      floor_area = Hash.new
+      floor_area = {}
       if @total_floor_area
         floor_area[@id] = @total_floor_area.to_f
       end

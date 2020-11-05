@@ -35,7 +35,11 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 module BuildingSync
+  # HVACSystem class
   class HVACSystem < BuildingSystem
+    # initialize
+    # @param system_element [REXML::Element]
+    # @param ns [string]
     def initialize(system_element = nil, ns = '')
       # code to initialize
       @principal_hvac_system_type = Hash.new
@@ -43,6 +47,9 @@ module BuildingSync
       read_xml(system_element, ns) if system_element
     end
 
+    # read xml
+    # @param system_element [REXML::Element]
+    # @param ns [string]
     def read_xml(system_element, ns)
       system_element.elements.each("#{ns}:HVACSystem") do |hvac_system|
         system_type = nil
@@ -63,6 +70,8 @@ module BuildingSync
       end
     end
 
+    # get principal hvac system type
+    # @return [string]
     def get_principal_hvac_system_type
       if @principal_hvac_system_type
         return @principal_hvac_system_type.values[0]
@@ -71,6 +80,8 @@ module BuildingSync
     end
 
     # adding the principal hvac system type to the hvac systems, overwrite existing values or create new elements if none are present
+    # @param id [string]
+    # @param principal_hvac_type [string]
     def add_principal_hvac_system_type(id, principal_hvac_type)
       if @systems.nil?
         @systems = REXML::Element.new("#{ns}:HVACSystems")
@@ -105,6 +116,11 @@ module BuildingSync
       principal_hvac_system_type.text = principal_hvac_type
     end
 
+    # add exhaust
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param kitchen_makeup [string]
+    # @param remove_objects [boolean]
     def add_exhaust(model, standard, kitchen_makeup, remove_objects)
       # remove exhaust objects
       if remove_objects
@@ -126,6 +142,10 @@ module BuildingSync
       return true
     end
 
+    # add thermostats
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param remove_objects [boolean]
     def add_thermostats(model, standard, remove_objects)
       # remove thermostats
       if remove_objects
@@ -154,30 +174,44 @@ module BuildingSync
       return true
     end
 
+    # map principal hvac system type to cbecs system type
+    # @param building_sync_principal_hvac_system_type [string]
+    # @param system_type [string]
+    # @return [string]
     def map_principal_hvac_system_type_to_cbecs_system_type(building_sync_principal_hvac_system_type, system_type)
       case building_sync_principal_hvac_system_type
-      when "Packaged Terminal Air Conditioner"
-        return "PTAC with hot water heat"
-      when "Packaged Terminal Heat Pump"
-        return "PTHP"
-      when "Packaged Rooftop Air Conditioner"
-        return "PSZ-AC with gas coil heat"
-      when "Packaged Rooftop Heat Pump"
-        return "PSZ-HP"
-      when "Packaged Rooftop VAV with Hot Water Reheat"
-        return "PVAV with reheat"
-      when "Packaged Rooftop VAV with Electric Reheat"
-        return "PVAV with PFP boxes"
-      when "VAV with Hot Water Reheat"
-        return "VAV with reheat"
-      when "VAV with Electric Reheat"
-        return "VAV with PFP boxes"
+      when 'Packaged Terminal Air Conditioner'
+        return 'PTAC with hot water heat'
+      when 'Packaged Terminal Heat Pump'
+        return 'PTHP'
+      when 'Packaged Rooftop Air Conditioner'
+        return 'PSZ-AC with gas coil heat'
+      when 'Packaged Rooftop Heat Pump'
+        return 'PSZ-HP'
+      when 'Packaged Rooftop VAV with Hot Water Reheat'
+        return 'PVAV with reheat'
+      when 'Packaged Rooftop VAV with Electric Reheat'
+        return 'PVAV with PFP boxes'
+      when 'VAV with Hot Water Reheat'
+        return 'VAV with reheat'
+      when 'VAV with Electric Reheat'
+        return 'VAV with PFP boxes'
       else
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.HVACSystem.map_principal_hvac_system_type_to_cbecs_system_type', "building_sync_principal_hvac_system_type: #{building_sync_principal_hvac_system_type} does not have a mapping to the CBECS system type, using the system type from standards: #{system_type}")
         return system_type
       end
     end
 
+    # add hvac
+    # @param model [OpenStudio::Model]
+    # @param zone_hash [hash]
+    # @param standard [Standard]
+    # @param system_type [string]
+    # @param hvac_delivery_type [string]
+    # @param htg_src [string]
+    # @param clg_src [string]
+    # @param remove_objects [boolean]
+    # @return [boolean]
     def add_hvac(model, zone_hash, standard, system_type, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity', remove_objects = false)
       # remove HVAC objects
       if remove_objects
@@ -259,6 +293,11 @@ module BuildingSync
       return true
     end
 
+    # get system type from zone
+    # @param zone_hash [hash]
+    # @param zones [array<OpenStudio::Model::ThermalZone>]
+    # @param system_type [string]
+    # @return [string]
     def get_system_type_from_zone(zone_hash, zones, system_type)
       if zone_hash
         zone_hash.each do |id, zone_list|
@@ -273,6 +312,14 @@ module BuildingSync
       return system_type
     end
 
+    # apply sizing and assumptions
+    # @param model [OpenStudio::Model]
+    # @param output_path [string]
+    # @param standard [Standard]
+    # @param primary_bldg_type [string]
+    # @param system_type [string]
+    # @param climate_zone [string]
+    # @return [boolean]
     def apply_sizing_and_assumptions(model, output_path, standard, primary_bldg_type, system_type, climate_zone)
       case system_type
       when 'Ideal Air Loads'
@@ -300,8 +347,7 @@ module BuildingSync
       return true
     end
 
+    # principal hvac system type
     attr_reader :principal_hvac_system_type
-
-
   end
 end

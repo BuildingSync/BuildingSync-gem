@@ -36,20 +36,25 @@
 # *******************************************************************************
 require_relative 'building'
 module BuildingSync
+  # Site class
   class Site < LocationElement
     # initialize
+    # @param build_element [REXML::Element]
+    # @param ns [string]
     def initialize(build_element, ns)
-      # code to initialize
       # an array that contains all the buildings
       @buildings = []
       @largest_building = nil
       @premises_notes = nil
       @all_set = false
 
-      # TM: just use the XML snippet to search for the buildings on the site
+      # using the XML snippet to search for the buildings on the site
       read_xml(build_element, ns)
     end
 
+    # read xml
+    # @param build_element [REXML::Element]
+    # @param ns [string]
     def read_xml(build_element, ns)
       # first we check if the number of buildings is ok
       number_of_buildings = 0
@@ -75,6 +80,7 @@ module BuildingSync
       end
     end
 
+    # set all function to set all parameters for each building
     def set_all
       if !@all_set
         @all_set = true
@@ -82,52 +88,78 @@ module BuildingSync
       end
     end
 
+    # build zone hash that stores zone lists for buildings and building sections
+    # @return [hash<string, array<OpenStudio::Model::ThermalZone>>]
     def build_zone_hash
       return get_largest_building.build_zone_hash
     end
 
+    # get the model
+    # @return [OpenStudio::Model]
     def get_model
       return get_largest_building.get_model
     end
 
+    # get space types
+    # @return [array<OpenStudio::Model::SpaceType>]
     def get_space_types
       return get_largest_building.get_space_types
     end
 
+    # get peak occupancy
+    # @return [hash<string, float>]
     def get_peak_occupancy
       return get_largest_building.get_peak_occupancy
     end
 
+    # get floor area
+    # @return [hash<string, float>]
     def get_floor_area
       return get_largest_building.get_floor_area
     end
 
+    # get building sections
+    # @return [array<BuildingSection>]
     def get_building_sections
       return get_largest_building.building_sections
     end
 
+    # determine the open studio standard and call the set_all function
+    # @param standard_to_be_used [string]
+    # @return [Standard]
     def determine_open_studio_standard(standard_to_be_used)
       set_all
       return get_largest_building.determine_open_studio_standard(standard_to_be_used)
     end
 
+    # determine the open studio system standard and call the set_all function
+    # @return [Standard]
     def determine_open_studio_system_standard
       set_all
       return Standard.build(get_building_template)
     end
 
+    # get building template
+    # @return [string]
     def get_building_template
       return get_largest_building.get_building_template
     end
 
+    # get space types from hash
+    # @param id [string]
+    # @return [hash<string, array<hash<string, string>>]
     def get_space_types_from_hash(id)
       return get_largest_building.build_space_type_hash[id]
     end
 
+    # get system type
+    # @return [string]
     def get_system_type
       return get_largest_building.get_system_type
     end
 
+    # get building type
+    # @return [string]
     def get_building_type
       if @bldg_type.nil?
         return get_largest_building.get_building_type
@@ -136,6 +168,8 @@ module BuildingSync
       end
     end
 
+    # get climate zone
+    # @return [string]
     def get_climate_zone
       if @climate_zone.nil?
         return get_largest_building.get_climate_zone
@@ -144,33 +178,35 @@ module BuildingSync
       end
     end
 
+    # get building objects
+    # @return [array<Building>]
     def get_building_objects
       return @buildings
     end
 
+    # get the largest building, if there are more than one building, we look for the one with the largest total florr area
+    # @return [Building]
     def get_largest_building
-      if !@largest_building.nil?
-        return @largest_building
-      else
-        if @buildings.count == 1
-          return @buildings[0]
-        elsif @buildings.count > 1
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
-          @largest_building = nil
-          largest_floor_area = -Float::INFINITY
-          @buildings.each do |building|
-            if largest_floor_area < building.total_floor_area
-              largest_floor_area = building.total_floor_area
-              @largest_building = building
-            end
-          end
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Site.generate_baseline_osm', "The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) was selected.")
-          puts "BuildingSync.Site.generate_baseline_osm: The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) m^2 was selected."
-          return @largest_building
+      return @largest_building if !@largest_building.nil?
+      return @buildings[0] if @buildings.count == 1
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
+      @largest_building = nil
+      largest_floor_area = -Float::INFINITY
+      @buildings.each do |building|
+        if largest_floor_area < building.total_floor_area
+          largest_floor_area = building.total_floor_area
+          @largest_building = building
         end
       end
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Site.generate_baseline_osm', "The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) was selected.")
+      puts "BuildingSync.Site.generate_baseline_osm: The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) m^2 was selected."
+      return @largest_building
     end
 
+    # generate baseline model in osm file format
+    # @param epw_file_path [string]
+    # @param standard_to_be_used [string]
+    # @param ddy_file [string]
     def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
       set_all
       building = get_largest_building
@@ -183,6 +219,9 @@ module BuildingSync
       building.generate_baseline_osm(standard_to_be_used)
     end
 
+    # write model to osm file
+    # @param dir [string]
+    # @return [hash<string, string>]
     def write_osm(dir)
       building = get_largest_building
       building.write_osm(dir)
@@ -193,6 +232,9 @@ module BuildingSync
       return scenario_types
     end
 
+    # write parameters to xml file
+    # @param ns [string]
+    # @param site [Site]
     def write_parameters_to_xml(ns, site)
       site.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text = @climate_zone_ashrae if !@climate_zone_ashrae.nil?
       site.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil?

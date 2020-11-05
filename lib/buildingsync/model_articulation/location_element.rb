@@ -38,8 +38,6 @@
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class LocationElement < SpatialElement
-
-    ##
     # initialize LocationElement class
     def initialize
       @climate_zone = nil
@@ -55,9 +53,7 @@ module BuildingSync
       @postal_code = nil
     end
 
-    ##
     # read location values
-    ##
     # @param build_element [REXML::Element]
     # @param ns [string]
     def read_location_values(build_element, ns)
@@ -73,9 +69,7 @@ module BuildingSync
       read_address_postal_code_notes(build_element, ns)
     end
 
-    ##
     # read climate zone
-    ##
     # @param build_element [REXML::Element]
     # @param ns [string]
     def read_climate_zone(build_element, ns)
@@ -91,9 +85,7 @@ module BuildingSync
       end
     end
 
-    ##
     # read weather file name
-    ##
     # @param build_element [REXML::Element]
     # @param ns [string]
     def read_weather_file_name(build_element, ns)
@@ -109,9 +101,7 @@ module BuildingSync
       end
     end
 
-    ##
     # read city and state name
-    ##
     # @param build_element [REXML::Element]
     # @param ns [string]
     def read_city_and_state_name(build_element, ns)
@@ -127,9 +117,7 @@ module BuildingSync
       end
     end
 
-    ##
     # read address, postal code and premises notes
-    ##
     # @param build_element [REXML::Element]
     # @param ns [string]
     def read_address_postal_code_notes(build_element, ns)
@@ -152,9 +140,7 @@ module BuildingSync
       end
     end
 
-    ##
     # read latitude and longitude
-    ##
     # @param build_element [REXML::Element]
     # @param ns [string]
     def read_latitude_and_longitude(build_element, ns)

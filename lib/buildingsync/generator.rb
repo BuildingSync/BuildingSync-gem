@@ -35,11 +35,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 module BuildingSync
+  # Generator class that generates basic data that is used mostly for testing
   class Generator
-
-    ##
     # creates a minimum building sync snippet
-    ##
     # @param occupancy_classification [string]
     # @param year_of_const [int]
     # @param floor_area_type [string]
@@ -81,9 +79,7 @@ module BuildingSync
       return doc
     end
 
-    ##
     # creates a minimum facility
-    ##
     # @param occupancy_classification [string]
     # @param year_of_const [int]
     # @param floor_area_type [string]
