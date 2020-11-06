@@ -46,6 +46,7 @@ require_relative '../helpers/metered_energy'
 require_relative '../helpers/helper'
 
 module BuildingSync
+  # Facility class
   class Facility
     include OsLib_Geometry
 

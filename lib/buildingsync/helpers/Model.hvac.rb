@@ -1,3 +1,4 @@
+# Model class
 class OpenStudio::Model::Model
   # Adds the HVAC system as derived from the combinations of
   # CBECS 2012 MAINHT and MAINCL fields.

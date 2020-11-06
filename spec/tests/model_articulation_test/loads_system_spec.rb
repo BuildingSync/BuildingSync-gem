@@ -100,7 +100,7 @@ RSpec.describe 'LoadSystemSpec' do
 
   def create_minimum_section_xml(ns, typical_usage_hours = 40)
     section = REXML::Element.new("#{ns}:Section")
-    ## adding the XML elements for the typical hourly usage per week
+    # adding the XML elements for the typical hourly usage per week
     typical_usages = REXML::Element.new("#{ns}:TypicalOccupantUsages")
     section.add_element(typical_usages)
     typical_usage = REXML::Element.new("#{ns}:TypicalOccupantUsage")

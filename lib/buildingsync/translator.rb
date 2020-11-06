@@ -42,10 +42,13 @@ require_relative 'makers/workflow_maker'
 require_relative 'selection_tool'
 require_relative 'extension'
 
+# ASHRAE90.1 string
 ASHRAE90_1 = 'ASHRAE90.1'.freeze
+# CA_TITLE24 string
 CA_TITLE24 = 'CaliforniaTitle24'.freeze
 
 module BuildingSync
+  # Translator class
   class Translator
     # load the building sync file and initiate the model maker and workflow makers
     # @param xml_file_path [string]

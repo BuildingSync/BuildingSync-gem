@@ -35,13 +35,14 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-##
 # BuildingSync module
 # provides features for reading BldgSync XML files, generating baseline models, creating scenario workflows, running simulations and adding simulation results to the BldgSync file
-##
 module BuildingSync
+  # version of the BuildingSync gem
   VERSION = '0.2.0'.freeze
 
+  # baseline string
   BASELINE = 'Baseline'.freeze
+  # measured string
   MEASURED = 'Measured'.freeze
 end

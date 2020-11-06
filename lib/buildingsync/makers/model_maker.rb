@@ -37,10 +37,9 @@
 require_relative '../model_articulation/facility'
 require_relative 'workflow_maker'
 module BuildingSync
+  # ModelMaker class
   class ModelMaker < ModelMakerBase
-    ##
     # initialize the ModelMaker class
-    ##
     # @param doc [REXML::Document]
     # @param ns [string]
     def initialize(doc, ns)
@@ -51,9 +50,7 @@ module BuildingSync
       read_xml
     end
 
-    ##
     # main read xml function that drives all of the reading
-    ##
     def read_xml
       @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
         @facilities.push(Facility.new(facility_element, @ns))
@@ -68,17 +65,13 @@ module BuildingSync
       end
     end
 
-    ##
     # get the facility object
-    ##
     # @return [BldgSync::Facility] facility
     def get_facility
       return @facility
     end
 
-    ##
     # generate the baseline model as osm model
-    ##
     # @param dir [string]
     # @param epw_file_path [string]
     # @param standard_to_be_used [string] 'ASHRAE90.1' or 'CaliforniaTitle24' are supported options for now
@@ -92,25 +85,19 @@ module BuildingSync
       return write_osm(dir)
     end
 
-    ##
     # get the space types of the facility
-    ##
     # @return [Vector<OpenStudio::Model::SpaceType>] vector of space types
     def get_space_types
       return @facilities[0].get_space_types
     end
 
-    ##
     # get model
-    ##
     # @return [OpenStudio::Model] model
     def get_model
       return @facilities[0].get_model
     end
 
-    ##
     # writes the parameters determine during processing back to the BldgSync XML file
-    ##
     def write_parameters_to_xml
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
         @facilities[0].write_parameters_to_xml(@ns, facility)
@@ -119,9 +106,7 @@ module BuildingSync
 
     private
 
-    ##
     # write osm
-    ##
     # @param dir [string]
     def write_osm(dir)
       @facility = @facilities[0].write_osm(dir)

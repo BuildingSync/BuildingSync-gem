@@ -592,6 +592,9 @@ module BuildingSync
       return results, monthly_results
     end
 
+    # delete resource element
+    # @param scenario [REXML::Element]
+    # @param package_of_measures [REXML::Element]
     def delete_resource_element(scenario, package_of_measures)
       if package_of_measures
         package_of_measures.elements.delete("#{@ns}:AnnualSavingsSiteEnergy")
@@ -604,14 +607,23 @@ module BuildingSync
       scenario.elements.delete("#{@ns}AnnualSavingsByFuels")
     end
 
+    # get package of measures
+    # @param scenario [REXML::Element]
+    # @return [REXML::Element]
     def get_package_of_measures(scenario)
       return scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
     end
 
+    # get current building
+    # @param scenario [REXML::Element]
+    # @return [REXML::Element]
     def get_current_building(scenario)
       return scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:CurrentBuilding"]
     end
 
+    # prepare package of measures or current building
+    # @param scenario [REXML::Element]
+    # @return [REXML::Element]
     def prepare_package_of_measures_or_current_building(scenario)
       package_of_measures_or_current_building = get_package_of_measures(scenario)
       if package_of_measures_or_current_building.nil?
@@ -642,6 +654,9 @@ module BuildingSync
       return package_of_measures_or_current_building
     end
 
+    # add calculation method element
+    # @param result [hash]
+    # @return [REXML::Element]
     def add_calc_method_element(result)
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
@@ -664,8 +679,10 @@ module BuildingSync
     end
 
     # add results to xml file and calculate annual savings
+    # @param package_of_measures [REXML::Element]
+    # @param variables [hash]
+    # @return [REXML::Element]
     def calculate_annual_savings_value(package_of_measures, variables)
-
       if(variables.key?('total_site_energy_savings_mmbtu'))
         annual_savings_site_energy = REXML::Element.new("#{@ns}:AnnualSavingsSiteEnergy")
         annual_savings_site_energy.text = variables['total_site_energy_savings_mmbtu']
@@ -727,6 +744,10 @@ module BuildingSync
       return annual_savings
     end
 
+    # get resource uses element
+    # @param scenario_name [string]
+    # @param variables [hash]
+    # @return [REXML::Element]
     def get_resource_uses_element(scenario_name, variables)
       res_uses = REXML::Element.new("#{@ns}:ResourceUses")
       scenario_name_ns = scenario_name.gsub(' ', '_').gsub(/[^0-9a-z_]/i, '')
@@ -783,6 +804,12 @@ module BuildingSync
       return res_uses
     end
 
+    # get timeseries element
+    # @param monthly_results [hash]
+    # @param year_val [int]
+    # @param scenario_name [string]
+    # @param timeseriesdata [REXML:Element]
+    # @param key_value [string]
     def get_timeseries_element(monthly_results, year_val, scenario_name, timeseriesdata, key_value)
       if !monthly_results.nil?
         month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
@@ -832,6 +859,11 @@ module BuildingSync
       end
     end
 
+    # get timeseries data element
+    # @param monthly_results [hash]
+    # @param year_val [int]
+    # @param scenario_name [string]
+    # @return [REXML:Element]
     def get_timeseries_data_element(monthly_results, year_val, scenario_name)
       timeseriesdata = REXML::Element.new("#{@ns}:TimeSeriesData")
 
@@ -847,6 +879,9 @@ module BuildingSync
       return timeseriesdata
     end
 
+    # get all resource totals element
+    # @param variables [hash]
+    # @return [REXML::Element]
     def get_all_resource_totals_element(variables)
       all_res_totals = REXML::Element.new("#{@ns}:AllResourceTotals")
       all_res_total = REXML::Element.new("#{@ns}:AllResourceTotal")
@@ -869,6 +904,13 @@ module BuildingSync
       return all_res_totals
     end
 
+    # gather annual results
+    # @param dir [string]
+    # @param result [hash]
+    # @param scenario_name [string]
+    # @param baseline [hash]
+    # @param is_baseline [boolean]
+    # @return [REXML:Element]
     def gather_annual_results(dir, result, scenario_name, baseline, is_baseline)
       variables = {}
       # Check out.osw "openstudio_results" for output variables
@@ -914,6 +956,10 @@ module BuildingSync
       return variables
     end
 
+    # get result for scenrio
+    # @param results [hash]
+    # @param scenario [REXML:Element]
+    # @return [array]
     def get_result_for_scenario(results, scenario)
       # code here
       scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
