@@ -46,11 +46,14 @@ module BuildingSync
   # BuildingSection class
   class BuildingSection < SpatialElement
     include OpenstudioStandards
-
     # initialize
+    # @param section_element [REXML:Element]
+    # @param occ_type [string]
+    # @param bldg_total_floor_area [float]
+    # @param ns [string]
     def initialize(section_element, occ_type, bldg_total_floor_area, ns)
       @id = nil
-      @doorids = []
+      @door_ids = []
       @wall_ids = []
       @window_ids = []
       @roof_ids = []
@@ -78,6 +81,11 @@ module BuildingSync
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
     end
 
+    # read xml
+    # @param section_element [REXML:Element]
+    # @param occ_type [string]
+    # @param bldg_total_floor_area [float]
+    # @param ns [string]
     def read_xml(section_element, occ_type, bldg_total_floor_area, ns)
       if section_element.attributes['ID']
         @id = section_element.attributes['ID']
@@ -99,10 +107,17 @@ module BuildingSync
       end
     end
 
+    # read building system type based on occupancy type
+    # @param section_element [REXML:Element]
+    # @param occ_type [string]
+    # @param ns [string]
     def read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
       @occupancy_type = read_occupancy_type(section_element, occ_type, ns)
     end
 
+    # read building section type
+    # @param section_element [REXML:Element]
+    # @param ns [string]
     def read_building_section_type(section_element, ns)
       if section_element.elements["#{ns}:SectionType"]
         @section_type = section_element.elements["#{ns}:SectionType"].text
@@ -111,6 +126,9 @@ module BuildingSync
       end
     end
 
+    # read footprint shape
+    # @param section_element [REXML:Element]
+    # @param ns [string]
     def read_footprint_shape(section_element, ns)
       if section_element.elements["#{ns}:FootprintShape"]
         @footprint_shape = section_element.elements["#{ns}:FootprintShape"].text
@@ -119,6 +137,9 @@ module BuildingSync
       end
     end
 
+    # read building section other details
+    # @param section_element [REXML:Element]
+    # @param ns [string]
     def read_building_section_other_detail(section_element, ns)
       if section_element.elements["#{ns}:TypicalOccupantUsages"]
         section_element.elements.each("#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage") do |occ_usage|
@@ -139,6 +160,9 @@ module BuildingSync
       end
     end
 
+    # read principal hvac type
+    # @param section_element [REXML:Element]
+    # @param ns [string]
     def read_principal_hvac_type(section_element, ns)
       if section_element.elements["#{ns}:UserDefinedFields"]
         section_element.elements.each("#{ns}:UserDefinedFields/#{ns}:UserDefinedField") do |user_defined_field|
@@ -161,10 +185,13 @@ module BuildingSync
       end
     end
 
+    # read construction types
+    # @param section_element [REXML:Element]
+    # @param ns [string]
     def read_construction_types(section_element, ns)
       if section_element.elements["#{ns}:Sides"]
         section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:DoorID") do |door|
-          @doorids.push(door.attributes['IDref'])
+          @door_ids.push(door.attributes['IDref'])
         end
         section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:WallID") do |wall|
           @wall_ids.push(wall.attributes['IDref'])
@@ -193,8 +220,9 @@ module BuildingSync
       end
     end
 
+    # add principal hvac type
+    # @param building_section [BuildingSection]
     def add_principal_hvac_type(building_section)
-      # code here
       building_sections = building_section.parent
       building = building_sections.parent
       buildings = building.parent
@@ -225,6 +253,9 @@ module BuildingSync
       hvac_system.add_principal_hvac_system_type(@id, @principal_hvac_type)
     end
 
+    # add principal hvac type
+    # @param ns [string]
+    # @param building_section [BuildingSection]
     def write_parameters_to_xml(ns, building_section)
       building_section.elements["#{ns}:fraction_area"].text = @fraction_area
       building_section.elements["#{ns}:OriginalOccupancyClassification"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
@@ -249,14 +280,19 @@ module BuildingSync
       write_parameters_to_xml_for_spatial_element(building_section, ns)
     end
 
+    # set building and system type
     def set_bldg_and_system_type
       super(@occupancy_type, @total_floor_area, false)
     end
 
+    # get peak occupancy
+    # @return [string]
     def get_peak_occupancy
       return @occupant_quantity
     end
 
+    # get floor area of this building section
+    # @return [float]
     def get_floor_area
       return @total_floor_area
     end
