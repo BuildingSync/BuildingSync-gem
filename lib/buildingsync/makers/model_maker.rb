@@ -92,9 +92,8 @@ module BuildingSync
       return write_osm(dir)
     end
 
-    ##
+
     # get the space types of the facility
-    ##
     # @return [Vector<OpenStudio::Model::SpaceType>] vector of space types
     def get_space_types
       return @facilities[0].get_space_types
