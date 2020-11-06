@@ -36,11 +36,6 @@
 # *******************************************************************************
 
 require 'openstudio-standards'
-require_relative 'fenestration_system_type'
-require_relative 'wall_system_type'
-require_relative 'exterior_floor_system_type'
-require_relative 'foundation_system_type'
-require_relative 'roof_system_type'
 
 module BuildingSync
   # BuildingSection class
