@@ -37,25 +37,22 @@
 
 module BuildingSync
   class FoundationSystemType
-
     def initialize(doc, ns, ref)
       doc.elements.each("#{ns}:Systems/#{ns}:FoundationSystems/#{ns}:FoundationSystem") do |foundation_system|
-        if foundation_system.attributes["ID"] == ref
+        if foundation_system.attributes['ID'] == ref
           read(foundation_system, ns)
         end
       end
     end
 
     def read(section_element, ns)
-      #if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
+      # if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
       #  @fenestration_type = "Door"
-      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
+      # elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
       #  @fenestration_type = "Skylight"
-      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
+      # elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
       #  @fenestration_type = "Window"
-      #end
+      # end
     end
   end
 end
-
-

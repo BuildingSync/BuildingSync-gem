@@ -158,7 +158,7 @@ module BuildingSync
         dir_path = File.dirname(epw_weather_file_path)
         weather_file_name = File.basename(epw_weather_file_path)
 
-        epw_path = File.expand_path("#{$weather_file_path_prefix}", File.dirname(__FILE__))
+        epw_path = File.expand_path($weather_file_path_prefix.to_s, File.dirname(__FILE__))
 
         Dir.glob("#{dir_path}/**/*.*").each do |filename|
           FileUtils.mv(filename, epw_path)
@@ -332,7 +332,7 @@ module BuildingSync
     end
 
     def create_json_file(weather_file_path)
-      weather_file_folder = File.expand_path("#{$weather_file_path_prefix}", File.dirname(__FILE__))
+      weather_file_folder = File.expand_path($weather_file_path_prefix.to_s, File.dirname(__FILE__))
       FileUtils.mkdir_p weather_file_folder
       weather_file = File.new("#{weather_file_folder}/weather_file.json", 'w')
 

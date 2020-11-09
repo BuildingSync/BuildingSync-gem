@@ -36,12 +36,11 @@
 # *******************************************************************************
 module BuildingSync
   class FenestrationSystemType
-
     def initialize(doc, ns, ref)
       @fenestration_type = nil
 
       doc.elements.each("#{ns}:Systems/#{ns}:FenestrationSystems/#{ns}:FenestrationSystem") do |fenestration_system|
-        if fenestration_system.attributes["ID"] == ref
+        if fenestration_system.attributes['ID'] == ref
           read_fenestration_type(fenestration_system, ns)
         end
       end
@@ -49,11 +48,11 @@ module BuildingSync
 
     def read_fenestration_type(section_element, ns)
       if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
-        @fenestration_type = "Door"
+        @fenestration_type = 'Door'
       elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
-        @fenestration_type = "Skylight"
+        @fenestration_type = 'Skylight'
       elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
-        @fenestration_type = "Window"
+        @fenestration_type = 'Window'
       end
     end
   end

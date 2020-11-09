@@ -38,7 +38,7 @@ require 'builder'
 require_relative '../../../lib/buildingsync/generator'
 require_relative './../../spec_helper'
 
-RSpec.describe 'OccupancyTypeSpec' do  
+RSpec.describe 'OccupancyTypeSpec' do
   it 'Should generate osm and simulate baseline for OccupancyType: Hospital' do
     run_minimum_facility('Hospital', '2002', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
   end

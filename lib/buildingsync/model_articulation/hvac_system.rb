@@ -38,7 +38,7 @@ module BuildingSync
   class HVACSystem < BuildingSystem
     def initialize(system_element = nil, ns = '')
       # code to initialize
-      @principal_hvac_system_type = Hash.new
+      @principal_hvac_system_type = {}
       @systems = system_element
       read_xml(system_element, ns) if system_element
     end
@@ -92,7 +92,7 @@ module BuildingSync
             end
           end
         end
-        if hvac_system.nil? and @systems.elements["#{ns}:HVACSystem"].size = 1
+        if hvac_system.nil? && (@systems.elements["#{ns}:HVACSystem"].size = 1)
           hvac_system = @systems.elements["#{ns}:HVACSystem"][0]
         end
       end
@@ -156,22 +156,22 @@ module BuildingSync
 
     def map_principal_hvac_system_type_to_cbecs_system_type(building_sync_principal_hvac_system_type, system_type)
       case building_sync_principal_hvac_system_type
-      when "Packaged Terminal Air Conditioner"
-        return "PTAC with hot water heat"
-      when "Packaged Terminal Heat Pump"
-        return "PTHP"
-      when "Packaged Rooftop Air Conditioner"
-        return "PSZ-AC with gas coil heat"
-      when "Packaged Rooftop Heat Pump"
-        return "PSZ-HP"
-      when "Packaged Rooftop VAV with Hot Water Reheat"
-        return "PVAV with reheat"
-      when "Packaged Rooftop VAV with Electric Reheat"
-        return "PVAV with PFP boxes"
-      when "VAV with Hot Water Reheat"
-        return "VAV with reheat"
-      when "VAV with Electric Reheat"
-        return "VAV with PFP boxes"
+      when 'Packaged Terminal Air Conditioner'
+        return 'PTAC with hot water heat'
+      when 'Packaged Terminal Heat Pump'
+        return 'PTHP'
+      when 'Packaged Rooftop Air Conditioner'
+        return 'PSZ-AC with gas coil heat'
+      when 'Packaged Rooftop Heat Pump'
+        return 'PSZ-HP'
+      when 'Packaged Rooftop VAV with Hot Water Reheat'
+        return 'PVAV with reheat'
+      when 'Packaged Rooftop VAV with Electric Reheat'
+        return 'PVAV with PFP boxes'
+      when 'VAV with Hot Water Reheat'
+        return 'VAV with reheat'
+      when 'VAV with Electric Reheat'
+        return 'VAV with PFP boxes'
       else
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.HVACSystem.map_principal_hvac_system_type_to_cbecs_system_type', "building_sync_principal_hvac_system_type: #{building_sync_principal_hvac_system_type} does not have a mapping to the CBECS system type, using the system type from standards: #{system_type}")
         return system_type
@@ -301,7 +301,5 @@ module BuildingSync
     end
 
     attr_reader :principal_hvac_system_type
-
-
   end
 end

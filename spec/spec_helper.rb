@@ -88,7 +88,6 @@ RSpec.configure do |config|
     osw_path = osm_baseline_path.gsub('.osm', '.osw')
     workflow.saveAs(File.absolute_path(osw_path.to_s))
 
-
     extension = OpenStudio::Extension::Extension.new
     runner_options = { run_simulations: true }
     runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
@@ -230,12 +229,12 @@ RSpec.configure do |config|
       parent_dir_path = File.expand_path('..', dir_path)
 
       successful = translator.gather_results(parent_dir_path)
-      puts "Error during results gathering, please check earlier error messages for issues with measures." if !successful
+      puts 'Error during results gathering, please check earlier error messages for issues with measures.' if !successful
       expect(successful).to be true
       translator.save_xml(File.join(parent_dir_path, 'results.xml'))
       expect(File.exist?(File.join(parent_dir_path, 'results.xml'))).to be true
     else
-      puts "Not simulate"
+      puts 'Not simulate'
     end
   end
 
@@ -251,7 +250,6 @@ RSpec.configure do |config|
   end
 
   def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
-
     out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
 
     translator = test_baseline_creation(file_name, standard_to_be_used, epw_file_name)
@@ -294,8 +292,8 @@ RSpec.configure do |config|
   end
 
   def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    generator = BuildingSync::Generator.new()
-    xml_snippet =generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    generator = BuildingSync::Generator.new
+    xml_snippet = generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
     ns = 'auc'
     site_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
     if !site_element.nil?
@@ -314,8 +312,8 @@ RSpec.configure do |config|
   end
 
   def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used, spec_name)
-    generator = BuildingSync::Generator.new()
-    facility = generator.create_minimum_facility(occupancy_classification,  year_of_const, floor_area_type, floor_area_value)
+    generator = BuildingSync::Generator.new
+    facility = generator.create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
     facility.determine_open_studio_standard(standard_to_be_used)
     epw_file_path = File.expand_path('./weather/CZ01RV2.epw', File.dirname(__FILE__))
     output_path = File.expand_path("./output/#{spec_name}/#{occupancy_classification}", File.dirname(__FILE__))

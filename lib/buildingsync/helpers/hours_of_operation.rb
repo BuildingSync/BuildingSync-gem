@@ -53,4 +53,3 @@ module BuildingSync
     attr_accessor :start_wkdy, :end_wkdy
   end
 end
-

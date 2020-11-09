@@ -38,7 +38,6 @@
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class LocationElement < SpatialElement
-
     ##
     # initialize LocationElement class
     def initialize

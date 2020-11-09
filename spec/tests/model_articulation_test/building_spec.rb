@@ -223,7 +223,7 @@ RSpec.describe 'BuildingSpec' do
 
   def create_minimum_building(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
     ns = 'auc'
-    generator = BuildingSync::Generator.new()
+    generator = BuildingSync::Generator.new
     xml_snippet = generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, ns)
 
     building_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building"]
@@ -233,5 +233,4 @@ RSpec.describe 'BuildingSpec' do
       expect(building_element.nil?).to be false
     end
   end
-
 end

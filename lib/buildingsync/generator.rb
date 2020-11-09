@@ -36,7 +36,6 @@
 # *******************************************************************************
 module BuildingSync
   class Generator
-
     ##
     # creates a minimum building sync snippet
     ##

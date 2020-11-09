@@ -37,24 +37,22 @@
 
 module BuildingSync
   class WallSystemType
-
     def initialize(doc, ns, ref)
       doc.elements.each("#{ns}:Systems/#{ns}:WallSystems/#{ns}:WallSystem") do |wall_system|
-        if wall_system.attributes["ID"] == ref
+        if wall_system.attributes['ID'] == ref
           read(wall_system, ns)
         end
       end
     end
 
     def read(section_element, ns)
-      #if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
+      # if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
       #  @fenestration_type = "Door"
-      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
+      # elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
       #  @fenestration_type = "Skylight"
-      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
+      # elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
       #  @fenestration_type = "Window"
-      #end
+      # end
     end
   end
 end
-

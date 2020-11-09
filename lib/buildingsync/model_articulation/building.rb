@@ -365,7 +365,7 @@ module BuildingSync
     end
 
     def build_zone_hash
-      zone_hash = Hash.new
+      zone_hash = {}
       if @space_types
         zone_list = []
         @space_types.each do |space_name, space_type|
@@ -384,7 +384,7 @@ module BuildingSync
     end
 
     def build_space_type_hash
-      space_type_hash = Hash.new
+      space_type_hash = {}
       if @space_types
         space_type_list = []
         @space_types.each do |space_name, space_type|
@@ -839,7 +839,7 @@ module BuildingSync
         end
 
         # bottom_story_ground_exposed_floor and top_story_exterior_exposed_roof already setup as bool
-        bar_hash[:stories]["key #{i}"] = {story_party_walls: party_walls, story_min_multiplier: 1, story_included_in_building_area: true, below_partial_story: below_partial_story, bottom_story_ground_exposed_floor: true, top_story_exterior_exposed_roof: true}
+        bar_hash[:stories]["key #{i}"] = { story_party_walls: party_walls, story_min_multiplier: 1, story_included_in_building_area: true, below_partial_story: below_partial_story, bottom_story_ground_exposed_floor: true, top_story_exterior_exposed_roof: true }
       end
 
       # store expected floor areas to check after bar made
@@ -1077,7 +1077,7 @@ module BuildingSync
     end
 
     def get_floor_area
-      floor_area = Hash.new
+      floor_area = {}
       if @total_floor_area
         floor_area[@id] = @total_floor_area.to_f
       end
