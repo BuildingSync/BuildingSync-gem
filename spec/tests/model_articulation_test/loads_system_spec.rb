@@ -90,7 +90,7 @@ RSpec.describe 'LoadSystemSpec' do
       expect(BuildingSync::Helper.calculate_hours(default_schedule_set.lightingSchedule, cut_off_value).round(1)). to be 67.0
       expect(BuildingSync::Helper.calculate_hours(default_schedule_set.electricEquipmentSchedule, cut_off_value).round(1)).to be 67.4
       expect(BuildingSync::Helper.calculate_hours(default_schedule_set.gasEquipmentSchedule, cut_off_value).round(1)).to be 0.0
-      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.hotWaterEquipmentSchedule , cut_off_value).round(1)).to be 0.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.hotWaterEquipmentSchedule, cut_off_value).round(1)).to be 0.0
       expect(BuildingSync::Helper.calculate_hours(default_schedule_set.infiltrationSchedule, cut_off_value).round(1)).to be 66.0
       expect(BuildingSync::Helper.calculate_hours(default_schedule_set.steamEquipmentSchedule, cut_off_value).round(1)).to be 0.0
       expect(BuildingSync::Helper.calculate_hours(default_schedule_set.otherEquipmentSchedule, cut_off_value).round(1)).to be 0.0

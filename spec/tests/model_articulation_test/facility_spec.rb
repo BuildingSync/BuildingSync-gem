@@ -48,12 +48,12 @@ RSpec.describe 'FacilitySpec' do
   end
 
   it 'Should create an instance of the facility class with minimal XML snippet' do
-    generator = BuildingSync::Generator.new()
+    generator = BuildingSync::Generator.new
     generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
   end
 
   it 'Should return the boolean value for creating osm file correctly or not.' do
-    generator = BuildingSync::Generator.new()
+    generator = BuildingSync::Generator.new
     facility = generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
     facility.determine_open_studio_standard(ASHRAE90_1)
     epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
@@ -147,7 +147,7 @@ RSpec.describe 'FacilitySpec' do
       get_facility_from_file('report_478.xml')
     rescue StandardError => e
       puts "rescued StandardError: #{e.message}"
-      expect(e.message.include?("Number of stories below grade is larger than")).to be true
+      expect(e.message.include?('Number of stories below grade is larger than')).to be true
     end
   end
 

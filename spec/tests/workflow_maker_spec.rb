@@ -87,7 +87,7 @@ RSpec.describe 'WorkFlow Maker' do
       new_annual_results = workflow_maker_output.extract_annual_results(scenario, scenario_name, package_of_measures_or_current_building)
 
       # for some reason <auc:AnnualSavingsSiteEnergy>100</auc:AnnualSavingsSiteEnergy> and <auc:AnnualSavingsCost>300</auc:AnnualSavingsCost> do not get properly read by REXML
-      #expect(hash_diff(annual_results, new_annual_results)).to be true
+      # expect(hash_diff(annual_results, new_annual_results)).to be true
       # todo: find the problem why REXML is loosing some elements on read in??
     end
   end
@@ -174,7 +174,7 @@ RSpec.describe 'WorkFlow Maker' do
     doc = BuildingSync::Helper.read_xml_file_document(xml_path)
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
 
-    month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
+    month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }
 
     monthly_results = {}
     electricity = 'Electricity'
@@ -187,9 +187,9 @@ RSpec.describe 'WorkFlow Maker' do
       values_e << 10 * month
       values_ng << 10 * month
       electricity_key = electricity.downcase + "_ip_#{month_lookup[month]}"
-      monthly[electricity_key.to_sym] = (10*month).to_s
+      monthly[electricity_key.to_sym] = (10 * month).to_s
       natural_gas_key = natural_gas.downcase + "_ip_#{month_lookup[month]}"
-      monthly[natural_gas_key.to_sym] = (10*month).to_s
+      monthly[natural_gas_key.to_sym] = (10 * month).to_s
     end
     monthly_results[BuildingSync::BASELINE] = monthly
 
@@ -199,10 +199,10 @@ RSpec.describe 'WorkFlow Maker' do
       reading = time_series.elements["#{ns}:IntervalReading"].text.to_f
       if time_series.elements["#{ns}:ResourceUseID"].attributes['IDref'].include? electricity
         shift = values_e.shift * 3.4121416331
-        expect(reading).to eq (shift)
+        expect(reading).to eq shift
       elsif time_series.elements["#{ns}:ResourceUseID"].attributes['IDref'].include? natural_gas
         shift = values_ng.shift * 3.4121416331
-        expect(reading).to eq (shift)
+        expect(reading).to eq shift
       end
     end
     expect(values_e.count).to eq 0

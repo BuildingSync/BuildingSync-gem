@@ -83,5 +83,3 @@ module BuildingSync
     end
   end
 end
-
-

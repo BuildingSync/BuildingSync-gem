@@ -42,7 +42,7 @@ module BuildingSync
     # @param ns [String]
     def initialize(system_element = nil, ns = '')
       # code to initialize
-      @principal_hvac_system_type = Hash.new
+      @principal_hvac_system_type = {}
       @systems = system_element
       read_xml(system_element, ns) if system_element
     end
@@ -103,7 +103,7 @@ module BuildingSync
             end
           end
         end
-        if hvac_system.nil? and @systems.elements["#{ns}:HVACSystem"].size = 1
+        if hvac_system.nil? && (@systems.elements["#{ns}:HVACSystem"].size = 1)
           hvac_system = @systems.elements["#{ns}:HVACSystem"][0]
         end
       end

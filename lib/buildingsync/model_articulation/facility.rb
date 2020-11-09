@@ -110,9 +110,7 @@ module BuildingSync
 
     # set all function that iterates over the sites and calls their set all function
     def set_all
-      @sites.each do |site|
-        site.set_all
-      end
+      @sites.each(&:set_all)
     end
 
     # determine open studio standard
@@ -314,7 +312,7 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
 
-      # todo: systems_xml.elements["#{ns}:LightingSystems"]
+      # TODO: systems_xml.elements["#{ns}:LightingSystems"]
       # Make the open_studio_system_standard applier
       open_studio_system_standard = determine_open_studio_system_standard
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Building Standard with template: #{template}.")

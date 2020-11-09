@@ -227,7 +227,7 @@ module BuildingSync
       measure_steps.push(measure_step)
       adding_workflow_failed = false
       if !workflow.setMeasureSteps(OpenStudio::MeasureType.new('ModelMeasure'), measure_steps)
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.run_osm', "Could not add reporting measure to osw")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.run_osm', 'Could not add reporting measure to osw')
         adding_workflow_failed = true
       end
 
@@ -257,7 +257,7 @@ module BuildingSync
 
     # run osws - running all scenario simulations
     # @param runner_options [hash]
-    def run_osws(runner_options = {run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY})
+    def run_osws(runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
       osw_files = []
       osw_sr_files = []
       Dir.glob("#{@output_dir}/**/in.osw") { |osw| osw_files << osw }

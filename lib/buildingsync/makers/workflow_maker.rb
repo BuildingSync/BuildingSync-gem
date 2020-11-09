@@ -43,7 +43,6 @@ require_relative '../../../lib/buildingsync/extension'
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class WorkflowMaker < WorkflowMakerBase
-
     # initialize - load workflow json file and add necessary measure paths
     # @param doc [REXML::Document]
     # @param ns [String]
@@ -100,7 +99,7 @@ module BuildingSync
       list_of_measures = {}
       get_measure_directories_array.each do |potential_measure_path|
         Dir.chdir(potential_measure_path) do
-          list_of_measures[potential_measure_path] = Dir.glob('*').select{ |f| File.directory? f }
+          list_of_measures[potential_measure_path] = Dir.glob('*').select { |f| File.directory? f }
         end
       end
       return list_of_measures
@@ -683,7 +682,7 @@ module BuildingSync
     # @param variables [hash]
     # @return [REXML::Element]
     def calculate_annual_savings_value(package_of_measures, variables)
-      if(variables.key?('total_site_energy_savings_mmbtu'))
+      if variables.key?('total_site_energy_savings_mmbtu')
         annual_savings_site_energy = REXML::Element.new("#{@ns}:AnnualSavingsSiteEnergy")
         annual_savings_site_energy.text = variables['total_site_energy_savings_mmbtu']
         package_of_measures.add_element(annual_savings_site_energy)
@@ -691,7 +690,7 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'total site energy savings' variable to the BldgSync file since it is missing.")
       end
 
-      if(variables.key?('total_source_energy_savings_mmbtu'))
+      if variables.key?('total_source_energy_savings_mmbtu')
         annual_savings_source_energy = REXML::Element.new("#{@ns}:AnnualSavingsSourceEnergy")
         annual_savings_source_energy.text = variables['total_source_energy_savings_mmbtu']
         package_of_measures.add_element(annual_savings_source_energy)
@@ -699,7 +698,7 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'total source energy savings' variable to the BldgSync file since it is missing.")
       end
 
-      if(variables.key?('total_energy_cost_savings'))
+      if variables.key?('total_energy_cost_savings')
         annual_savings_energy_cost = REXML::Element.new("#{@ns}:AnnualSavingsCost")
         annual_savings_energy_cost.text = variables['total_energy_cost_savings'].to_i # BuildingSync wants an integer, might be a BuildingSync bug
         package_of_measures.add_element(annual_savings_energy_cost)
@@ -709,7 +708,7 @@ module BuildingSync
 
       # KAF: adding annual savings by fuel
       annual_savings = REXML::Element.new("#{@ns}:AnnualSavingsByFuels")
-      if(variables.key?('baseline_fuel_electricity_kbtu') && variables.key?('fuel_electricity_kbtu'))
+      if variables.key?('baseline_fuel_electricity_kbtu') && variables.key?('fuel_electricity_kbtu')
         electricity_savings = variables['baseline_fuel_electricity_kbtu'] - variables['fuel_electricity_kbtu']
         annual_saving = REXML::Element.new("#{@ns}:AnnualSavingsByFuel")
         energy_res = REXML::Element.new("#{@ns}:EnergyResource")
@@ -725,7 +724,7 @@ module BuildingSync
       else
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'baseline fuel electricity' and 'fuel electricity kbtu' variable to the BldgSync file since it is missing.")
       end
-      if(variables.key?('baseline_fuel_natural_gas_kbtu') && variables.key?('fuel_natural_gas_kbtu'))
+      if variables.key?('baseline_fuel_natural_gas_kbtu') && variables.key?('fuel_natural_gas_kbtu')
         natural_gas_savings = variables['baseline_fuel_natural_gas_kbtu'] - variables['fuel_natural_gas_kbtu']
         annual_saving = REXML::Element.new("#{@ns}:AnnualSavingsByFuel")
         energy_res = REXML::Element.new("#{@ns}:EnergyResource")
@@ -750,7 +749,7 @@ module BuildingSync
     # @return [REXML::Element]
     def get_resource_uses_element(scenario_name, variables)
       res_uses = REXML::Element.new("#{@ns}:ResourceUses")
-      scenario_name_ns = scenario_name.gsub(' ', '_').gsub(/[^0-9a-z_]/i, '')
+      scenario_name_ns = scenario_name.tr(' ', '_').gsub(/[^0-9a-z_]/i, '')
       # ELECTRICITY
       res_use = REXML::Element.new("#{@ns}:ResourceUse")
       res_use.add_attribute('ID', scenario_name_ns + '_Electricity')
@@ -812,8 +811,8 @@ module BuildingSync
     # @param key_value [String]
     def get_timeseries_element(monthly_results, year_val, scenario_name, timeseriesdata, key_value)
       if !monthly_results.nil?
-        month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
-        scenario_name_ns = scenario_name.gsub(' ', '_').gsub(/[^0-9a-z_]/i, '')
+        month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }
+        scenario_name_ns = scenario_name.tr(' ', '_').gsub(/[^0-9a-z_]/i, '')
 
         (1..12).each do |month|
           timeseries = REXML::Element.new("#{@ns}:TimeSeries")
@@ -855,7 +854,7 @@ module BuildingSync
           timeseriesdata.add_element(timeseries)
         end
       else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.get_timeseries_element', "Cannot add monthly report values to the BldgSync file since it is missing.")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.get_timeseries_element', 'Cannot add monthly report values to the BldgSync file since it is missing.')
       end
     end
 
@@ -925,7 +924,7 @@ module BuildingSync
       variables['annual_peak_electric_demand_kw'] = get_measure_result(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
       variables['annual_utility_cost'] = get_measure_result(result, 'openstudio_results', 'annual_utility_cost') # in $
 
-      if(!is_baseline)
+      if !is_baseline
         variables['baseline_total_site_energy_kbtu'] = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
         variables['baseline_total_site_eui_kbtu_ft2'] = get_measure_result(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
         # temporary hack
@@ -943,7 +942,7 @@ module BuildingSync
         variables['total_site_energy_savings_mmbtu'] = (variables['baseline_total_site_energy_kbtu'] - variables['total_site_energy_kbtu']) / 1000.0 # in MMBtu
       end
 
-      variables['total_source_energy_savings_mmbtu']= 0
+      variables['total_source_energy_savings_mmbtu'] = 0
       if variables['baseline_total_source_energy_kbtu'] && variables['total_source_energy_kbtu']
         variables['total_source_energy_savings_mmbtu'] = (variables['baseline_total_source_energy_kbtu'] - variables['total_source_energy_kbtu']) / 1000.0 # in MMBtu
       end
@@ -1130,13 +1129,13 @@ module BuildingSync
       variables = {}
 
       if package_of_measures
-        if(package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"])
+        if package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"]
           variables['total_site_energy_savings_mmbtu'] = package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"].text
         end
-        if(package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"])
+        if package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"]
           variables['total_source_energy_savings_mmbtu'] = package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"].text
         end
-        if(package_of_measures.elements["#{@ns}:AnnualSavingsCost"])
+        if package_of_measures.elements["#{@ns}:AnnualSavingsCost"]
           variables['total_energy_cost_savings'] = package_of_measures.elements["#{@ns}:AnnualSavingsCost"].text
         end
       end

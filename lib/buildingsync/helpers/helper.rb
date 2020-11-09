@@ -74,7 +74,7 @@ module BuildingSync
     def self.read_xml_file_document(xml_file_path)
       doc = nil
       File.open(xml_file_path, 'r') do |file_content|
-        doc = REXML::Document.new(file_content, :ignore_whitespace_nodes => :all)
+        doc = REXML::Document.new(file_content, ignore_whitespace_nodes: :all)
       end
       return doc
     end
@@ -364,7 +364,6 @@ module BuildingSync
       duration_above_cut_off = 0.0
 
       profile.times.each do |time|
-
         puts "time: #{time} value: #{profile.getValue(time)}"
         if profile.getValue(time) >= cut_off_value
           if last_time.nil?

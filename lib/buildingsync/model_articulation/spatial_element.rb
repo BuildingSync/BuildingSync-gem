@@ -286,7 +286,7 @@ module BuildingSync
       @space_types.each do |space_type_name, hash|
         ratio_of_bldg_total = hash[:ratio] * @ratio_adjustment_multiplier * @fraction_area
         final_floor_area = ratio_of_bldg_total * total_bldg_floor_area # I think I can just pass ratio but passing in area is cleaner
-        @space_types_floor_area[hash[:space_type]] = {floor_area: final_floor_area}
+        @space_types_floor_area[hash[:space_type]] = { floor_area: final_floor_area }
       end
       return @space_types_floor_area
     end
