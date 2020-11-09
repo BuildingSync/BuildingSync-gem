@@ -72,8 +72,8 @@ RSpec.configure do |config|
   end
 
   # run baseline simulation
-  # @param osm_name [string]
-  # @param epw_file_path [string]
+  # @param osm_name [String]
+  # @param epw_file_path [String]
   def run_baseline_simulation(osm_name, epw_file_path)
     basic_dir = File.dirname(osm_name)
     file_name = File.basename(osm_name)
@@ -100,9 +100,9 @@ RSpec.configure do |config|
   end
 
   # test baseline creation
-  # @param file_name [string]
-  # @param standard_to_be_used [string]
-  # @param epw_file_name [string]
+  # @param file_name [String]
+  # @param standard_to_be_used [String]
+  # @param epw_file_name [String]
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
@@ -131,9 +131,9 @@ RSpec.configure do |config|
   end
 
   # generate baseline idf and compare
-  # @param file_name [string]
-  # @param standard_to_be_used [string]
-  # @param epw_file_name [string]
+  # @param file_name [String]
+  # @param standard_to_be_used [String]
+  # @param epw_file_name [String]
   def generated_baseline_idf_and_compare(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
@@ -183,9 +183,9 @@ RSpec.configure do |config|
   end
 
   # compare two idf files
-  # @param old_idf_file [string]
-  # @param new_idf_file [string]
-  # @return [int] number of lines that did not match
+  # @param old_idf_file [String]
+  # @param new_idf_file [String]
+  # @return [Integer] number of lines that did not match
   def compare_two_idf_files(old_idf_file, new_idf_file)
     idf_file1 = File.open(old_idf_file)
     idf_file2 = File.open(new_idf_file)
@@ -227,8 +227,8 @@ RSpec.configure do |config|
   end
 
   # save idf from osm
-  # @param osm_file [string]
-  # @param idf_file [string]
+  # @param osm_file [String]
+  # @param idf_file [String]
   def save_idf_from_osm(osm_file, idf_file)
     model = OpenStudio::Model::Model.load(osm_file).get
     workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(model)
@@ -237,7 +237,7 @@ RSpec.configure do |config|
 
   # test baseline and scenario creation with simulation
   # @param file_name [String]
-  # @param expected_number_of_measures [int]
+  # @param expected_number_of_measures [Integer]
   # @param standard_to_be_used [String]
   # @param epw_file_name [String]
   # @param simulate [Boolean]
@@ -282,7 +282,7 @@ RSpec.configure do |config|
 
   # test baseline and scenario creation
   # @param file_name [String]
-  # @param expected_number_of_measures [int]
+  # @param expected_number_of_measures [Integer]
   # @param standard_to_be_used [String]
   # @param epw_file_name [String]
   def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)

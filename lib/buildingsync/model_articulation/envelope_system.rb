@@ -46,10 +46,10 @@ module BuildingSync
     # add internal loads from standard definitions
     # @param model [OpenStudio::Model]
     # @param standard [Standard]
-    # @param primary_bldg_type [string]
-    # @param lookup_building_type [string]
-    # @param remove_objects [boolean]
-    # @return [boolean]
+    # @param primary_bldg_type [String]
+    # @param lookup_building_type [String]
+    # @param remove_objects [Boolean]
+    # @return [Boolean]
     def create(model, standard, primary_bldg_type, lookup_building_type, remove_objects)
       # remove default construction sets
       if remove_objects

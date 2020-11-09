@@ -69,7 +69,7 @@ module BuildingSync
     end
 
     # read xml file document
-    # @param xml_file_path [string]
+    # @param xml_file_path [String]
     # @return REXML::Document
     def self.read_xml_file_document(xml_file_path)
       doc = nil
@@ -80,7 +80,7 @@ module BuildingSync
     end
 
     # print all schedules to a file
-    # @param file_name [string]
+    # @param file_name [String]
     # @param default_schedule_set [OpenStudio::Model::DefaultScheduleSet]
     def self.print_all_schedules(file_name, default_schedule_set)
       f = File.open(file_name, 'w')
@@ -101,7 +101,7 @@ module BuildingSync
     # @param f [File]
     # @param profile [OpenStudio::Model::ScheduleDay]
     # @param rule [OpenStudio::Model::ScheduleRule]
-    # @param cut_off_value [float]
+    # @param cut_off_value [Float]
     def self.write_profile(f, profile, rule, cut_off_value = 0.5)
       time_row = "#{profile.name},"
       if rule.nil?
@@ -157,7 +157,7 @@ module BuildingSync
     # print schedule
     # @param f [File]
     # @param optional_schedule [OpenStudio::Model::OptionalSchedule]
-    # @param cut_off_value [float]
+    # @param cut_off_value [Float]
     def self.print_schedule(f, optional_schedule, cut_off_value = 0.5)
       if optional_schedule.is_a?(OpenStudio::Model::OptionalSchedule) && optional_schedule.is_initialized
         schedule = optional_schedule.get
@@ -186,7 +186,7 @@ module BuildingSync
 
     # get start time weekday
     # @param schedule_rule_set [OpenStudio::Model::ScheduleRuleSet]
-    # @param cut_off_value [float]
+    # @param cut_off_value [Float]
     def self.get_start_time_weekday(schedule_rule_set, cut_off_value = 0.5)
       profile = schedule_rule_set.defaultDaySchedule
       schedule_rule_set.scheduleRules.each do |rule|
@@ -200,7 +200,7 @@ module BuildingSync
 
     # get end time weekday
     # @param schedule_rule_set [OpenStudio::Model::ScheduleRuleSet]
-    # @param cut_off_value [float]
+    # @param cut_off_value [Float]
     def self.get_end_time_weekday(schedule_rule_set, cut_off_value = 0.5)
       profile = schedule_rule_set.defaultDaySchedule
       schedule_rule_set.scheduleRules.each do |rule|
@@ -214,7 +214,7 @@ module BuildingSync
 
     # get start time Saturday
     # @param schedule_rule_set [OpenStudio::Model::ScheduleRuleSet]
-    # @param cut_off_value [float]
+    # @param cut_off_value [Float]
     def self.get_start_time_sat(schedule_rule_set, cut_off_value = 0.5)
       profile = schedule_rule_set.defaultDaySchedule
       schedule_rule_set.scheduleRules.each do |rule|
@@ -228,7 +228,7 @@ module BuildingSync
 
     # get end time Saturday
     # @param schedule_rule_set [OpenStudio::Model::ScheduleRuleSet]
-    # @param cut_off_value [float]
+    # @param cut_off_value [Float]
     def self.get_end_time_sat(schedule_rule_set, cut_off_value = 0.5)
       profile = schedule_rule_set.defaultDaySchedule
       schedule_rule_set.scheduleRules.each do |rule|
@@ -242,7 +242,7 @@ module BuildingSync
 
     # get start time Sunday
     # @param schedule_rule_set [OpenStudio::Model::ScheduleRuleSet]
-    # @param cut_off_value [float]
+    # @param cut_off_value [Float]
     def self.get_start_time_sun(schedule_rule_set, cut_off_value = 0.5)
       profile = schedule_rule_set.defaultDaySchedule
       schedule_rule_set.scheduleRules.each do |rule|
@@ -256,7 +256,7 @@ module BuildingSync
 
     # get end time Sunday
     # @param schedule_rule_set [OpenStudio::Model::ScheduleRuleSet]
-    # @param cut_off_value [float]
+    # @param cut_off_value [Float]
     def self.get_end_time_sun(schedule_rule_set, cut_off_value = 0.5)
       profile = schedule_rule_set.defaultDaySchedule
       schedule_rule_set.scheduleRules.each do |rule|
@@ -270,7 +270,7 @@ module BuildingSync
 
     # get start time
     # @param profile [OpenStudio::Model::ScheduleDay]
-    # @param cut_off_value [float]
+    # @param cut_off_value [Float]
     def self.get_start_time(profile, cut_off_value)
       last_time = OpenStudio::Time.new
       profile.times.each do |time|
@@ -284,7 +284,7 @@ module BuildingSync
 
     # get end time
     # @param profile [OpenStudio::Model::ScheduleDay]
-    # @param cut_off_value [float]
+    # @param cut_off_value [Float]
     def self.get_end_time(profile, cut_off_value)
       last_time = nil
       profile.times.each do |time|
@@ -316,7 +316,7 @@ module BuildingSync
     # calculate schedule hours that are at or above the cut off value
     # @param optional_schedule [OpenStudio::Model::OptionalSchedule]
     # @return [OpenStudio::Model::ScheduleRuleSet]
-    # @ return [float]
+    # @ return [Float]
     def self.calculate_hours(optional_schedule, cut_off_value = 0.5)
       calculated_hours_per_week = 0.0
       schedule_rule_set = get_schedule_rule_set_from_schedule(optional_schedule)
@@ -342,7 +342,7 @@ module BuildingSync
 
     # count number of days
     # @param rule [OpenStudio::Model::ScheduleRule]
-    # return [int]
+    # return [Integer]
     def self.count_number_of_days(rule)
       count = 0
       count += 1 if rule.applyFriday
@@ -357,8 +357,8 @@ module BuildingSync
 
     # get duration
     # @param profile [OpenStudio::Model::ScheduleDay]
-    # @param cut_off_value [float]
-    # return [float]
+    # @param cut_off_value [Float]
+    # return [Float]
     def self.get_duration(profile, cut_off_value)
       last_time = nil
       duration_above_cut_off = 0.0

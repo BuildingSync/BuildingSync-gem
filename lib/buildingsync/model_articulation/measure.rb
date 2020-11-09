@@ -40,7 +40,7 @@ module BuildingSync
   class Measure
     # initialize
     # @param measure_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def initialize(measure_element, ns)
       @field_value = nil
       @system_category_affected = nil
@@ -56,14 +56,14 @@ module BuildingSync
 
     # adding a measures to the facility
     # @param measure_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_xml(measure_element, ns)
       read_measure_other_detail(measure_element, ns)
     end
 
     # read measure other details
     # @param measure_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_measure_other_detail(measure_element, ns)
       if measure_element.elements["#{ns}:AnnualSavingsCost"]
         @annual_savings_cost = measure_element.elements["#{ns}:AnnualSavingsCost"].text

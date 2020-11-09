@@ -44,7 +44,7 @@ module BuildingSync
     # initialize the selection tools class
     # @note See documentation here: https://github.com/buildingsync/selection-tool#validator
     # @note Use core Net::HTTPS
-    # @param xml_path [string]
+    # @param xml_path [String]
     def initialize(xml_path)
       @hash_response = nil
       url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
@@ -62,7 +62,7 @@ module BuildingSync
     end
 
     # validate use case
-    # @param use_case [string]
+    # @param use_case [String]
     # @return boolean
     def validate_use_case(use_case)
       if !@hash_response['validation_results']['use_cases'][use_case]['valid']

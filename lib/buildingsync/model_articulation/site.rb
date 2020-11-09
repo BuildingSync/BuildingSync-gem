@@ -40,7 +40,7 @@ module BuildingSync
   class Site < LocationElement
     # initialize
     # @param build_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def initialize(build_element, ns)
       # an array that contains all the buildings
       @buildings = []
@@ -54,7 +54,7 @@ module BuildingSync
 
     # read xml
     # @param build_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_xml(build_element, ns)
       # first we check if the number of buildings is ok
       number_of_buildings = 0
@@ -125,7 +125,7 @@ module BuildingSync
     end
 
     # determine the open studio standard and call the set_all function
-    # @param standard_to_be_used [string]
+    # @param standard_to_be_used [String]
     # @return [Standard]
     def determine_open_studio_standard(standard_to_be_used)
       set_all
@@ -140,26 +140,26 @@ module BuildingSync
     end
 
     # get building template
-    # @return [string]
+    # @return [String]
     def get_building_template
       return get_largest_building.get_building_template
     end
 
     # get space types from hash
-    # @param id [string]
+    # @param id [String]
     # @return [hash<string, array<hash<string, string>>]
     def get_space_types_from_hash(id)
       return get_largest_building.build_space_type_hash[id]
     end
 
     # get system type
-    # @return [string]
+    # @return [String]
     def get_system_type
       return get_largest_building.get_system_type
     end
 
     # get building type
-    # @return [string]
+    # @return [String]
     def get_building_type
       if @bldg_type.nil?
         return get_largest_building.get_building_type
@@ -169,7 +169,7 @@ module BuildingSync
     end
 
     # get climate zone
-    # @return [string]
+    # @return [String]
     def get_climate_zone
       if @climate_zone.nil?
         return get_largest_building.get_climate_zone
@@ -204,9 +204,9 @@ module BuildingSync
     end
 
     # generate baseline model in osm file format
-    # @param epw_file_path [string]
-    # @param standard_to_be_used [string]
-    # @param ddy_file [string]
+    # @param epw_file_path [String]
+    # @param standard_to_be_used [String]
+    # @param ddy_file [String]
     def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
       set_all
       building = get_largest_building
@@ -220,7 +220,7 @@ module BuildingSync
     end
 
     # write model to osm file
-    # @param dir [string]
+    # @param dir [String]
     # @return [hash<string, string>]
     def write_osm(dir)
       building = get_largest_building
@@ -234,7 +234,7 @@ module BuildingSync
 
     # write parameters to xml file
     # @param site [Site]
-    # @param ns [string]
+    # @param ns [String]
     def write_parameters_to_xml(site, ns)
       site.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text = @climate_zone_ashrae if !@climate_zone_ashrae.nil?
       site.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil?

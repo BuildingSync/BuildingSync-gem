@@ -51,19 +51,19 @@ module BuildingSync
     end
 
     # energy resource
-    # @return [string]
+    # @return [String]
     attr_reader :energy_resource
 
     # interval frequency
-    # @return [string]
+    # @return [String]
     attr_reader :interval_frequency
 
     # reading type
-    # @return [string]
+    # @return [String]
     attr_reader :reading_type
 
     # interval reading
-    # @return [string]
+    # @return [String]
     attr_reader :interval_reading
   end
 end

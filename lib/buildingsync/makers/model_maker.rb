@@ -41,7 +41,7 @@ module BuildingSync
   class ModelMaker < ModelMakerBase
     # initialize the ModelMaker class
     # @param doc [REXML::Document]
-    # @param ns [string]
+    # @param ns [String]
     def initialize(doc, ns)
       super
 
@@ -72,11 +72,11 @@ module BuildingSync
     end
 
     # generate the baseline model as osm model
-    # @param dir [string]
-    # @param epw_file_path [string]
-    # @param standard_to_be_used [string] 'ASHRAE90.1' or 'CaliforniaTitle24' are supported options for now
-    # @param ddy_file [string] path to the ddy file
-    # @return [boolean] true if successful
+    # @param dir [String]
+    # @param epw_file_path [String]
+    # @param standard_to_be_used [String] 'ASHRAE90.1' or 'CaliforniaTitle24' are supported options for now
+    # @param ddy_file [String] path to the ddy file
+    # @return [Boolean] true if successful
     def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
       @facilities.each(&:set_all)
       open_studio_standard = @facilities[0].determine_open_studio_standard(standard_to_be_used)
@@ -107,7 +107,7 @@ module BuildingSync
     private
 
     # write osm
-    # @param dir [string]
+    # @param dir [String]
     def write_osm(dir)
       @facility = @facilities[0].write_osm(dir)
     end

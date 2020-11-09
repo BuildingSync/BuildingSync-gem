@@ -50,9 +50,9 @@ module BuildingSync
     end
 
     # gather results (base method)
-    # @param dir [string]
-    # @param year_val [int]
-    # @param baseline_only [boolean]
+    # @param dir [String]
+    # @param year_val [Integer]
+    # @param baseline_only [Boolean]
     # @return [Boolean]
     def gather_results(dir, year_val, baseline_only = false); end
 

@@ -45,8 +45,8 @@ module BuildingSync
     # add
     # @param model [OpenStudio::Model]
     # @param standard [Standard]
-    # @param remove_objects [boolean]
-    # @return [boolean]
+    # @param remove_objects [Boolean]
+    # @return [Boolean]
     def add(model, standard, remove_objects)
       # remove water use equipment and water use connections
       if remove_objects

@@ -50,9 +50,9 @@ module BuildingSync
 
     # initialize
     # @param building_element [REXML::Element]
-    # @param site_occupancy_type [string]
-    # @param site_total_floor_area [string]
-    # @param ns [string]
+    # @param site_occupancy_type [String]
+    # @param site_total_floor_area [String]
+    # @param ns [String]
     def initialize(building_element, site_occupancy_type, site_total_floor_area, ns)
       @building_sections = []
       @building_sections_whole_building = []
@@ -93,16 +93,16 @@ module BuildingSync
     end
 
     # returns number of stories
-    # @return [int]
+    # @return [Integer]
     def num_stories
       return @num_stories_above_grade + @num_stories_below_grade
     end
 
     # read xml
     # @param building_element [REXML::Element]
-    # @param site_occupancy_type [string]
-    # @param site_total_floor_area [string]
-    # @param ns [string]
+    # @param site_occupancy_type [String]
+    # @param site_total_floor_area [String]
+    # @param ns [String]
     def read_xml(building_element, site_occupancy_type, site_total_floor_area, ns)
       # building ID
       if building_element.attributes['ID']
@@ -162,7 +162,7 @@ module BuildingSync
 
     # read built and/or remodel year
     # @param building_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_built_remodel_year(building_element, ns)
       if !building_element.elements["#{ns}:YearOfConstruction"]
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_standard_template_based_on_year', 'Year of Construction is blank in your BuildingSync file.')
@@ -189,7 +189,7 @@ module BuildingSync
 
     # read stories above and below grade
     # @param building_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_stories_above_and_below_grade(building_element, ns)
       if building_element.elements["#{ns}:FloorsAboveGrade"]
         @num_stories_above_grade = building_element.elements["#{ns}:FloorsAboveGrade"].text.to_f
@@ -218,7 +218,7 @@ module BuildingSync
 
     # read aspect ratio
     # @param building_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_aspect_ratio(building_element, ns)
       if building_element.elements["#{ns}:AspectRatio"]
         @ns_to_ew_ratio = building_element.elements["#{ns}:AspectRatio"].text.to_f
@@ -229,7 +229,7 @@ module BuildingSync
 
     # read city and state name
     # @param building_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_city_and_state_name(building_element, ns)
       if building_element.elements["#{ns}:Address/#{ns}:City"]
         @city_name = building_element.elements["#{ns}:Address/#{ns}:City"].text
@@ -244,7 +244,7 @@ module BuildingSync
     end
 
     # get building type
-    # @return [string]
+    # @return [String]
     def get_building_type
       set_all
       # try to get the bldg type at the building level, if it is nil then look at the first section
@@ -261,8 +261,8 @@ module BuildingSync
     end
 
     # get climate zone
-    # @param standard_to_be_used [string]
-    # @return [string]
+    # @param standard_to_be_used [String]
+    # @return [String]
     def get_climate_zone(standard_to_be_used = nil)
       if standard_to_be_used == ASHRAE90_1
         return @climate_zone_ashrae
@@ -331,7 +331,7 @@ module BuildingSync
 
     # read ownership
     # @param building_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_ownership(building_element, ns)
       if building_element.elements["#{ns}:Ownership"]
         @ownership = building_element.elements["#{ns}:Ownership"].text
@@ -348,7 +348,7 @@ module BuildingSync
 
     # read other building details
     # @param building_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_other_building_details(building_element, ns)
       if building_element.elements["#{ns}:PrimaryContactID"]
         @primary_contact_id = building_element.elements["#{ns}:PrimaryContactID"].text
@@ -389,7 +389,7 @@ module BuildingSync
 
     # read building name
     # @param building_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_building_name(building_element, ns)
       name_array = []
       name_element = building_element.elements["#{ns}:PremisesName"]
@@ -505,7 +505,7 @@ module BuildingSync
     end
 
     # determine the open studio standard and call the set_all function
-    # @param standard_to_be_used [string]
+    # @param standard_to_be_used [String]
     # @return [Standard]
     def determine_open_studio_standard(standard_to_be_used)
       set_all
@@ -534,8 +534,8 @@ module BuildingSync
     end
 
     # set standard template
-    # @param standard_to_be_used [string]
-    # @param built_year [int]
+    # @param standard_to_be_used [String]
+    # @param built_year [Integer]
     def set_standard_template(standard_to_be_used, built_year)
       if standard_to_be_used == CA_TITLE24
         if built_year < 1978
@@ -573,19 +573,19 @@ module BuildingSync
     end
 
     # get year building was built
-    # @return [int]
+    # @return [Integer]
     def get_built_year
       return @built_year
     end
 
     # get building template
-    # @return [string]
+    # @return [String]
     def get_building_template
       return @standard_template
     end
 
     # get system type
-    # @return [string]
+    # @return [String]
     def get_system_type
       set_all
       if !@system_type.nil?
@@ -596,12 +596,12 @@ module BuildingSync
     end
 
     # set weather file and climate zone
-    # @param climate_zone [string]
-    # @param epw_file_path [string]
-    # @param standard_to_be_used [string]
-    # @param latitude [string]
-    # @param longitude [string]
-    # @param ddy_file [string]
+    # @param climate_zone [String]
+    # @param epw_file_path [String]
+    # @param standard_to_be_used [String]
+    # @param latitude [String]
+    # @param longitude [String]
+    # @param ddy_file [String]
     # @param weather_argb [array]
     def set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file, *weather_argb)
       initialize_model
@@ -651,10 +651,10 @@ module BuildingSync
     end
 
     # set weather file and climate zone from climate zone
-    # @param climate_zone [string]
-    # @param standard_to_be_used [string]
-    # @param latitude [string]
-    # @param longitude [string]
+    # @param climate_zone [String]
+    # @param standard_to_be_used [String]
+    # @param latitude [String]
+    # @param longitude [String]
     def set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
       climate_zone_standard_string = climate_zone
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone_from_climate_zone', "climate zone: #{climate_zone}")
@@ -689,9 +689,9 @@ module BuildingSync
     end
 
     # set climate zone
-    # @param climate_zone [string]
-    # @param standard_to_be_used [string]
-    # @param stat_file [string]
+    # @param climate_zone [String]
+    # @param standard_to_be_used [String]
+    # @param stat_file [String]
     # @return [Boolean]
     def set_climate_zone(climate_zone, standard_to_be_used, stat_file = nil)
       # Set climate zone
@@ -740,12 +740,12 @@ module BuildingSync
     end
 
     # set weather file and climate zone from EPW file
-    # @param climate_zone [string]
-    # @param epw_file_path [string]
-    # @param standard_to_be_used [string]
-    # @param latitude [string]
-    # @param longitude [string]
-    # @param ddy_file [string]
+    # @param climate_zone [String]
+    # @param epw_file_path [String]
+    # @param standard_to_be_used [String]
+    # @param latitude [String]
+    # @param longitude [String]
+    # @param ddy_file [String]
     def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file = nil)
       epw_file = OpenStudio::EpwFile.new(epw_file_path)
 
@@ -827,8 +827,8 @@ module BuildingSync
     end
 
     # get stat file path
-    # @param epw_file [string]
-    # @return [string]
+    # @param epw_file [String]
+    # @return [String]
     def get_stat_file(epw_file)
       # Add SiteWaterMainsTemperature -- via parsing of STAT file.
       stat_file = "#{File.join(File.dirname(epw_file.path.to_s), File.basename(epw_file.path.to_s, '.*'))}.stat"
@@ -855,8 +855,8 @@ module BuildingSync
     end
 
     # add site water mains temperature -- via parsing of STAT file.
-    # @param stat_file [string]
-    # @return [boolean]
+    # @param stat_file [String]
+    # @return [Boolean]
     def add_site_water_mains_temperature(stat_file)
       stat_model = ::EnergyPlus::StatFile.new(stat_file)
       water_temp = @model.getSiteWaterMainsTemperature
@@ -867,7 +867,7 @@ module BuildingSync
     end
 
     # generate baseline model in osm file format
-    # @param standard_to_be_used [string]
+    # @param standard_to_be_used [String]
     def generate_baseline_osm(standard_to_be_used)
       # this is code refactored from the "create_bar_from_building_type_ratios" measure
       # first we check is there is any data at all in this facility, aka if there is a site in the list
@@ -1119,13 +1119,13 @@ module BuildingSync
     end
 
     # write baseline model to osm file
-    # @param dir [string]
+    # @param dir [String]
     def write_osm(dir)
       @model.save("#{dir}/in.osm", true)
     end
 
     # write parameters to xml file
-    # @param ns [string]
+    # @param ns [String]
     # @param building [:Building]
     def write_parameters_to_xml(building, ns)
       building.elements["#{ns}:PremisesName"].text = @name if !@name.nil?

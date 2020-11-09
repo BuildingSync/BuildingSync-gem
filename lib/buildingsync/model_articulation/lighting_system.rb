@@ -40,7 +40,7 @@ module BuildingSync
   class LightingSystemType
     # initialize
     # @param doc [REXML::Document]
-    # @param ns [string]
+    # @param ns [String]
     def initialize(doc, ns)
       @lighting_type = {}
       @ballast_type = {}
@@ -53,7 +53,7 @@ module BuildingSync
 
     # read
     # @param section_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read(section_element, ns)
       primary_lighting_type = nil
       if section_element.elements["#{ns}:PrimaryLightingSystemType"]

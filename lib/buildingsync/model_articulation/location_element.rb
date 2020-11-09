@@ -55,7 +55,7 @@ module BuildingSync
 
     # read location values
     # @param build_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_location_values(build_element, ns)
       # read in the ASHRAE climate zone
       read_climate_zone(build_element, ns)
@@ -71,7 +71,7 @@ module BuildingSync
 
     # read climate zone
     # @param build_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_climate_zone(build_element, ns)
       if build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE"]
         @climate_zone_ashrae = build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text
@@ -87,7 +87,7 @@ module BuildingSync
 
     # read weather file name
     # @param build_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_weather_file_name(build_element, ns)
       if build_element.elements["#{ns}:WeatherStationName"]
         @weather_file_name = build_element.elements["#{ns}:WeatherStationName"].text
@@ -103,7 +103,7 @@ module BuildingSync
 
     # read city and state name
     # @param build_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_city_and_state_name(build_element, ns)
       if build_element.elements["#{ns}:Address/#{ns}:City"]
         @city_name = build_element.elements["#{ns}:Address/#{ns}:City"].text
@@ -119,7 +119,7 @@ module BuildingSync
 
     # read address, postal code and premises notes
     # @param build_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_address_postal_code_notes(build_element, ns)
       if build_element.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"]
         @street_address = build_element.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"].text
@@ -142,7 +142,7 @@ module BuildingSync
 
     # read latitude and longitude
     # @param build_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def read_latitude_and_longitude(build_element, ns)
       if build_element.elements["#{ns}:Latitude"]
         @latitude = build_element.elements["#{ns}:Latitude"].text

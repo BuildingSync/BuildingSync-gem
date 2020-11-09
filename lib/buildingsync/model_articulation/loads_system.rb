@@ -42,7 +42,7 @@ module BuildingSync
   class LoadsSystem < BuildingSystem
     # initialize
     # @param system_element [REXML::Element]
-    # @param ns [string]
+    # @param ns [String]
     def initialize(system_element = '', ns = '')
       # code to initialize
     end
@@ -50,10 +50,10 @@ module BuildingSync
     # add internal loads from standard definitions
     # @param model [OpenStudio::Model]
     # @param standard [Standard]
-    # @param template [string]
+    # @param template [String]
     # @param building_sections [REXML:Element]
-    # @param remove_objects [boolean]
-    # @return [boolean]
+    # @param remove_objects [Boolean]
+    # @return [Boolean]
     def add_internal_loads(model, standard, template, building_sections, remove_objects)
       # remove internal loads
       if remove_objects
@@ -105,8 +105,8 @@ module BuildingSync
 
     # add occupancy peak
     # @param model [OpenStudio::Model]
-    # @param new_occupancy_peak [string]
-    # @param area [string]
+    # @param new_occupancy_peak [String]
+    # @param area [String]
     # @param space_types [REXML:Element]
     def adjust_occupancy_peak(model, new_occupancy_peak, area, space_types)
       # we assume that the standard always generate people per area
@@ -146,8 +146,8 @@ module BuildingSync
 
     # get building section
     # @param building_sections [array]
-    # @param standard_building_type [string]
-    # @param standard_space_type [string]
+    # @param standard_building_type [String]
+    # @param standard_space_type [String]
     # @return [BuildingSync::Section]
     def get_building_section(building_sections, standard_building_type, standard_space_type)
       if building_sections.count == 1
@@ -234,9 +234,9 @@ module BuildingSync
     # add exterior lights
     # @param model [OpenStudio::Model]
     # @param standard [Standard]
-    # @param onsite_parking_fraction [float]
-    # @param exterior_lighting_zone [string]
-    # @param remove_objects [boolean]
+    # @param onsite_parking_fraction [Float]
+    # @param exterior_lighting_zone [String]
+    # @param remove_objects [Boolean]
     # @return boolean
     def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
       if remove_objects
@@ -285,7 +285,7 @@ module BuildingSync
     # add daylighting controls
     # @param model [OpenStudio::Model]
     # @param standard [Standard]
-    # @param template [string]
+    # @param template [String]
     # @return boolean
     def add_daylighting_controls(model, standard, template)
       # add daylight controls, need to perform a sizing run for 2010

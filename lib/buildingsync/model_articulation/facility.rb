@@ -52,7 +52,7 @@ module BuildingSync
 
     # initialize
     # @param facility_xml [REXML:Element]
-    # @param ns [string]
+    # @param ns [String]
     def initialize(facility_xml, ns)
       # code to initialize
       # an array that contains all the sites

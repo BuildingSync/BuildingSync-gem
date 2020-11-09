@@ -78,8 +78,8 @@ RSpec.describe 'HVACSystemSpec' do
   end
 
   # get hvac system from xml file
-  # @param xml_file_name [string]
-  # @param standard_to_be_used [string]
+  # @param xml_file_name [String]
+  # @param standard_to_be_used [String]
   # @return [BuildingSync::HVACSystem]
   def get_hvac_system_from_file(xml_file_name, standard_to_be_used)
     xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))

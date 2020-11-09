@@ -6,7 +6,7 @@ class OpenStudio::Model::Model
   # http://www.nrel.gov/docs/fy08osti/41956.pdf
   # Table C-31
   # @param standard [Standard]
-  # @param system_type [string]
+  # @param system_type [String]
   # @param zones [Array<OpenStudio::Model::ThermalZone>]
   def add_cbecs_hvac_system(standard, system_type, zones)
     case system_type

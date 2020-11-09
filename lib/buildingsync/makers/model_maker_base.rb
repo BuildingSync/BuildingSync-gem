@@ -42,7 +42,7 @@ module BuildingSync
   class ModelMakerBase
     # initialize
     # @param doc [REXML::Document]
-    # @param ns [string]
+    # @param ns [String]
     def initialize(doc, ns)
       @doc = doc
       @ns = ns
