@@ -160,7 +160,7 @@ module BuildingSync
 
         default_schedule_set = BuildingSync::Helper.get_default_schedule_set(model)
         existing_number_of_people_sched = BuildingSync::Helper.get_schedule_rule_set_from_schedule(default_schedule_set.numberofPeopleSchedule)
-
+        return false if existing_number_of_people_sched.nil?
         calc_hours_per_week = BuildingSync::Helper.calculate_hours(existing_number_of_people_sched)
         ratio_hours_per_week = hours_per_week / calc_hours_per_week
 
@@ -202,6 +202,7 @@ module BuildingSync
         # Apply new operating hours to parametric schedules to make schedules in model reflect modified hours of operation
         parametric_schedules = standard.model_apply_parametric_schedules(model, error_on_out_of_order: false)
         puts "Updated #{parametric_schedules.size} schedules with new hours of operation."
+        return true
       end
     end
 
