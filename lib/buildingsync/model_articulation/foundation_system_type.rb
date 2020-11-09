@@ -44,15 +44,9 @@ module BuildingSync
         end
       end
     end
-
-    def read(section_element, ns)
-      # if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
-      #  @fenestration_type = "Door"
-      # elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
-      #  @fenestration_type = "Skylight"
-      # elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
-      #  @fenestration_type = "Window"
-      # end
+    
+    # TODO: Define method
+    def read(section_element, ns)    
     end
   end
 end

@@ -44,5 +44,9 @@ module BuildingSync
         end
       end
     end
+
+    # TODO: Define method
+    def read(section_element, ns)
+    end
   end
 end
