@@ -37,7 +37,6 @@
 module BuildingSync
   # Generator class that generates basic data that is used mostly for testing
   class Generator
-
     # creates a minimum building sync snippet
     # @param occupancy_classification [String]
     # @param year_of_const [Integer]
