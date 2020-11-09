@@ -184,7 +184,7 @@ module BuildingSync
 
         default_schedule_set = BuildingSync::Helper.get_default_schedule_set(model)
         existing_number_of_people_sched = BuildingSync::Helper.get_schedule_rule_set_from_schedule(default_schedule_set.numberofPeopleSchedule)
-
+        return false if existing_number_of_people_sched.nil?
         calc_hours_per_week = BuildingSync::Helper.calculate_hours(existing_number_of_people_sched)
         ratio_hours_per_week = hours_per_week / calc_hours_per_week
 
