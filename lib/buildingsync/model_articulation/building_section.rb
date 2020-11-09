@@ -251,7 +251,7 @@ module BuildingSync
     # add principal hvac type
     # @param ns [string]
     # @param building_section [BuildingSection]
-    def write_parameters_to_xml(ns, building_section)
+    def write_parameters_to_xml(building_section, ns)
       building_section.elements["#{ns}:fraction_area"].text = @fraction_area
       building_section.elements["#{ns}:OriginalOccupancyClassification"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
 

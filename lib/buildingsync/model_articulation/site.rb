@@ -233,9 +233,9 @@ module BuildingSync
     end
 
     # write parameters to xml file
-    # @param ns [string]
     # @param site [Site]
-    def write_parameters_to_xml(ns, site)
+    # @param ns [string]
+    def write_parameters_to_xml(site, ns)
       site.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text = @climate_zone_ashrae if !@climate_zone_ashrae.nil?
       site.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil?
       site.elements["#{ns}:WeatherStationName"].text = @weather_file_name if !@weather_file_name.nil?
@@ -250,7 +250,7 @@ module BuildingSync
       write_parameters_to_xml_for_spatial_element(site, ns)
 
       site.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
-        @buildings[0].write_parameters_to_xml(ns, buildings_element)
+        @buildings[0].write_parameters_to_xml(buildings_element, ns)
       end
     end
   end

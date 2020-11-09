@@ -100,7 +100,7 @@ module BuildingSync
     # writes the parameters determine during processing back to the BldgSync XML file
     def write_parameters_to_xml
       @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
-        @facilities[0].write_parameters_to_xml(@ns, facility)
+        @facilities[0].write_parameters_to_xml(facility, @ns)
       end
     end
 

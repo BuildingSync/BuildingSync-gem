@@ -1127,7 +1127,7 @@ module BuildingSync
     # write parameters to xml file
     # @param ns [string]
     # @param building [:Building]
-    def write_parameters_to_xml(ns, building)
+    def write_parameters_to_xml(building, ns)
       building.elements["#{ns}:PremisesName"].text = @name if !@name.nil?
       building.elements["#{ns}:YearOfConstruction"].text = @built_year if !@built_year.nil?
       building.elements["#{ns}:Ownership"].text = @ownership if !@ownership.nil?
