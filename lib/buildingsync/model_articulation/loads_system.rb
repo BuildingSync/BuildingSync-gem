@@ -178,7 +178,7 @@ module BuildingSync
       #
       # currently this works for all schedules in the model
       # in the future we would want to make this more flexible to adjusted based on space_types or building sections
-      return unless building_section.typical_occupant_usage_value_hours.nil?
+      return unless !building_section.typical_occupant_usage_value_hours.nil?
       hours_per_week = building_section.typical_occupant_usage_value_hours.to_f
 
       default_schedule_set = BuildingSync::Helper.get_default_schedule_set(model)
