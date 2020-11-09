@@ -281,17 +281,11 @@ module BuildingSync
       calculated_hours_per_week = 0.0
       schedule_rule_set = get_schedule_rule_set_from_schedule(optional_schedule)
       return 0.0 if schedule_rule_set.nil?
-      puts "schedule_rule_set: #{schedule_rule_set}"
       defaultProfile = schedule_rule_set.defaultDaySchedule
-
       default_profile_duration = get_duration(defaultProfile, cut_off_value)
-      puts "default_profile_duration: #{default_profile_duration}"
-
       default_number_of_days = 7
       schedule_rule_set.scheduleRules.each do |rule|
         profile_duration = get_duration(rule.daySchedule, cut_off_value)
-        puts "profile_duration: #{profile_duration}"
-
         number_of_days = count_number_of_days(rule)
         default_number_of_days -= number_of_days
         calculated_hours_per_week += profile_duration * number_of_days
@@ -316,9 +310,7 @@ module BuildingSync
       last_time = nil
 
       duration_above_cut_off = 0.0
-
       profile.times.each do |time|
-        puts "time: #{time} value: #{profile.getValue(time)}"
         if profile.getValue(time) >= cut_off_value
           if last_time.nil?
             duration_above_cut_off += time.totalHours
