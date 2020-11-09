@@ -51,6 +51,8 @@ module BuildingSync
     include OsLib_Geometry
 
     # initialize
+    # @param facility_xml [REXML:Element]
+    # @param ns [string]
     def initialize(facility_xml, ns)
       # code to initialize
       # an array that contains all the sites

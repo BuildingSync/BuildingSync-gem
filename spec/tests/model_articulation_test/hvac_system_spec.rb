@@ -77,6 +77,10 @@ RSpec.describe 'HVACSystemSpec' do
     expect(hvac_system.get_principal_hvac_system_type == expected_value).to be true
   end
 
+  # get hvac system from xml file
+  # @param xml_file_name [string]
+  # @param standard_to_be_used [string]
+  # @return [BuildingSync::HVACSystem]
   def get_hvac_system_from_file(xml_file_name, standard_to_be_used)
     xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
     File.open(xml_file_path, 'r') do |file|

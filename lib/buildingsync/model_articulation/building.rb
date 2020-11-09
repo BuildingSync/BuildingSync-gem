@@ -692,7 +692,7 @@ module BuildingSync
     # @param climate_zone [string]
     # @param standard_to_be_used [string]
     # @param stat_file [string]
-    # @return [boolean]
+    # @return [Boolean]
     def set_climate_zone(climate_zone, standard_to_be_used, stat_file = nil)
       # Set climate zone
       if climate_zone.nil?

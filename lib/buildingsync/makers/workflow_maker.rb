@@ -956,7 +956,7 @@ module BuildingSync
       return variables
     end
 
-    # get result for scenrio
+    # get result for scenario
     # @param results [hash]
     # @param scenario [REXML:Element]
     # @return [array]
@@ -987,6 +987,13 @@ module BuildingSync
     end
 
     # adding results to a specific scenario
+    # @param package_of_measures [REXML:Element]
+    # @param scenario [REXML:Element]
+    # @param scenario_name [string]
+    # @param annual_results [hash]
+    # @param result [hash]
+    # @param monthly_results [hash]
+    # @param year_val [int]
     def add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, monthly_results, year_val)
       # first we need to check if we have any result variables
       if !annual_results || annual_results.empty?
@@ -1019,11 +1026,20 @@ module BuildingSync
       return true
     end
 
+    # get osw dir
+    # @param dir [string]
+    # @param scenario [REXML:Element]
+    # @return [string]
     def get_osw_dir(dir, scenario)
       scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
       return File.join(dir, scenario_name)
     end
 
+    # gather results
+    # @param dir [string]
+    # @param year_val [int]
+    # @param baseline_only [boolean]
+    # @return [Boolean]
     def gather_results(dir, year_val = Date.today.year, baseline_only = false)
       results_counter = 0
       successful = true
@@ -1082,9 +1098,12 @@ module BuildingSync
       return successful
     end
 
-    # DLM: total hack because these are not reported in the out.osw
-    # output is array of [source_energy, source_eui] in kBtu and kBtu/ft2
+    # get source energy array
+    # @param eplustbl_path [string]
+    # @return [array]
     def get_source_energy_array(eplustbl_path)
+      # DLM: total hack because these are not reported in the out.osw
+      # output is array of [source_energy, source_eui] in kBtu and kBtu/ft2
       result = []
       File.open(eplustbl_path, 'r') do |f|
         while line = f.gets
@@ -1102,6 +1121,11 @@ module BuildingSync
       return result[0], result[1]
     end
 
+    # extract annual results
+    # @param scenario [REXML:Element]
+    # @param scenario_name [string]
+    # @param package_of_measures [REXML:Element]
+    # @return [hash]
     def extract_annual_results(scenario, scenario_name, package_of_measures)
       variables = {}
 
