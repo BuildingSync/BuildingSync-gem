@@ -66,7 +66,51 @@ RSpec.describe 'LoadSystemSpec' do
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref Pre-1980')
     load_system = BuildingSync::LoadsSystem.new
-    puts 'expected add day lighting controls : true but got: false} ' if load_system.add_day_lighting_controls(model, standard, 'DOE Ref Pre-1980') != true
-    expect(load_system.add_day_lighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
+    puts 'expected add day lighting controls : true but got: false} ' if load_system.add_daylighting_controls(model, standard, 'DOE Ref Pre-1980') != true
+    expect(load_system.add_daylighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
+  end
+
+  it 'should parse and write building_151.xml and adjust schedules successfully' do
+    translator = test_baseline_creation('building_151.xml', CA_TITLE24)
+    model = translator.get_model
+
+    cut_off_value = 0.5
+    # read in the schedule
+    space_types = model.getSpaceTypes
+    expect(space_types.length).to be 4
+    space_types.each do |space_type|
+      default_schedule_set = space_type.defaultScheduleSet.get
+      puts "default_schedule_set: #{default_schedule_set.name} for space type: #{space_type.name}"
+
+      BuildingSync::Helper.print_all_schedules("schedules-#{space_type.name}.csv", default_schedule_set)
+
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.numberofPeopleSchedule, cut_off_value).round(1)).to be 47.9
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.hoursofOperationSchedule, cut_off_value).round(1)). to be 40.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.peopleActivityLevelSchedule, cut_off_value).round(1)). to be 168.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.lightingSchedule, cut_off_value).round(1)). to be 67.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.electricEquipmentSchedule, cut_off_value).round(1)).to be 67.4
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.gasEquipmentSchedule, cut_off_value).round(1)).to be 0.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.hotWaterEquipmentSchedule, cut_off_value).round(1)).to be 0.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.infiltrationSchedule, cut_off_value).round(1)).to be 66.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.steamEquipmentSchedule, cut_off_value).round(1)).to be 0.0
+      expect(BuildingSync::Helper.calculate_hours(default_schedule_set.otherEquipmentSchedule, cut_off_value).round(1)).to be 0.0
+      break
+    end
+  end
+
+  def create_minimum_section_xml(ns, typical_usage_hours = 40)
+    section = REXML::Element.new("#{ns}:Section")
+    # adding the XML elements for the typical hourly usage per week
+    typical_usages = REXML::Element.new("#{ns}:TypicalOccupantUsages")
+    section.add_element(typical_usages)
+    typical_usage = REXML::Element.new("#{ns}:TypicalOccupantUsage")
+    typical_usages.add_element(typical_usage)
+    typical_usage_unit = REXML::Element.new("#{ns}:TypicalOccupantUsageUnits")
+    typical_usage_unit.text = 'Hours per week'
+    typical_usage.add_element(typical_usage_unit)
+    typical_usage_value = REXML::Element.new("#{ns}:TypicalOccupantUsageValue")
+    typical_usage_value.text = typical_usage_hours
+    typical_usage.add_element(typical_usage_value)
+    return section
   end
 end

@@ -36,26 +36,27 @@
 # *******************************************************************************
 
 module BuildingSync
+  # Foundation System Type
   class FoundationSystemType
-
+    # initialize a foundation system type given a ref
+    # @param doc [REXML::Document]
+    # @param ns [String]
+    # @param ref [String]
     def initialize(doc, ns, ref)
+      @id = nil
       doc.elements.each("#{ns}:Systems/#{ns}:FoundationSystems/#{ns}:FoundationSystem") do |foundation_system|
-        if foundation_system.attributes["ID"] == ref
+        if foundation_system.attributes['ID'] == ref
           read(foundation_system, ns)
         end
       end
     end
 
-    def read(section_element, ns)
-      #if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
-      #  @fenestration_type = "Door"
-      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
-      #  @fenestration_type = "Skylight"
-      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
-      #  @fenestration_type = "Window"
-      #end
+    # read
+    # @param foundation_system [REXML:Element]
+    # @param ns [String]
+    def read(foundation_system, ns)
+      # ID
+      @id = foundation_system.attributes['ID'] if foundation_system.attributes['ID']
     end
   end
 end
-
-

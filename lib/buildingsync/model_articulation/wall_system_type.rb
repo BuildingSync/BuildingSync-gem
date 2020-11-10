@@ -36,25 +36,27 @@
 # *******************************************************************************
 
 module BuildingSync
+  # Wall System Type
   class WallSystemType
-
+    # initialize a specific floor system type given a ref
+    # @param doc [REXML::Document]
+    # @param ns [String]
+    # @param ref [String]
     def initialize(doc, ns, ref)
+      @id = nil
       doc.elements.each("#{ns}:Systems/#{ns}:WallSystems/#{ns}:WallSystem") do |wall_system|
-        if wall_system.attributes["ID"] == ref
+        if wall_system.attributes['ID'] == ref
           read(wall_system, ns)
         end
       end
     end
 
-    def read(section_element, ns)
-      #if section_element.elements["#{ns}:FenestrationType/#{ns}:Door"]
-      #  @fenestration_type = "Door"
-      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Skylight"]
-      #  @fenestration_type = "Skylight"
-      #elsif section_element.elements["#{ns}:FenestrationType/#{ns}:Window"]
-      #  @fenestration_type = "Window"
-      #end
+    # read
+    # @param wall_system [REXML:Element]
+    # @param ns [String]
+    def read(wall_system, ns)
+      # ID
+      @id = wall_system.attributes['ID'] if wall_system.attributes['ID']
     end
   end
 end
-

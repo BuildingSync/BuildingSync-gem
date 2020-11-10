@@ -35,7 +35,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 module BuildingSync
+  # BuildingSystem class to share functionality between system classes
   class BuildingSystem
-    # TODO: - Do we need this class to share functionality of the system
+    # no features here yet
   end
 end
