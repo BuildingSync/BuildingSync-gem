@@ -71,6 +71,9 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
+  # run baseline simulation
+  # @param osm_name [String]
+  # @param epw_file_path [String]
   def run_baseline_simulation(osm_name, epw_file_path)
     basic_dir = File.dirname(osm_name)
     file_name = File.basename(osm_name)
@@ -95,6 +98,10 @@ RSpec.configure do |config|
     expect(File.exist?(osw_path.gsub('in.osw', 'eplusout.sql'))).to be true
   end
 
+  # test baseline creation
+  # @param file_name [String]
+  # @param standard_to_be_used [String]
+  # @param epw_file_name [String]
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
@@ -122,6 +129,10 @@ RSpec.configure do |config|
     return translator
   end
 
+  # generate baseline idf and compare
+  # @param file_name [String]
+  # @param standard_to_be_used [String]
+  # @param epw_file_name [String]
   def generated_baseline_idf_and_compare(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
@@ -170,6 +181,10 @@ RSpec.configure do |config|
     expect(line_not_match_counter == 0).to be true
   end
 
+  # compare two idf files
+  # @param old_idf_file [String]
+  # @param new_idf_file [String]
+  # @return [Integer] number of lines that did not match
   def compare_two_idf_files(old_idf_file, new_idf_file)
     idf_file1 = File.open(old_idf_file)
     idf_file2 = File.open(new_idf_file)
@@ -190,6 +205,8 @@ RSpec.configure do |config|
     return line_not_match_counter
   end
 
+  # generate idf file#
+  # @param model [OpenStudio::Model]
   def generate_idf_file(model)
     workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(model)
     new_file_path = "#{@osm_file_path}/in.idf"
@@ -197,7 +214,7 @@ RSpec.configure do |config|
     File.delete(new_file_path) if File.exist?(new_file_path)
 
     # now create idf file.
-    p 'IDF file successfully saved' if workspace.save(new_file_path)
+    puts 'IDF file successfully saved' if workspace.save(new_file_path)
 
     original_file_path = "#{@osm_file_path}/originalfiles"
     old_model = OpenStudio::Model::Model.load("#{original_file_path}/in.osm").get
@@ -205,15 +222,24 @@ RSpec.configure do |config|
     # first delete the file if exist
     File.delete("#{original_file_path}/in.idf") if File.exist?("#{original_file_path}/in.idf")
 
-    p 'IDF file 2 successfully saved' if workspace.save("#{original_file_path}/in.idf")
+    puts 'IDF file 2 successfully saved' if workspace.save("#{original_file_path}/in.idf")
   end
 
+  # save idf from osm
+  # @param osm_file [String]
+  # @param idf_file [String]
   def save_idf_from_osm(osm_file, idf_file)
     model = OpenStudio::Model::Model.load(osm_file).get
     workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(model)
     puts "IDF file (#{File.basename(idf_file)})successfully saved" if workspace.save(idf_file)
   end
 
+  # test baseline and scenario creation with simulation
+  # @param file_name [String]
+  # @param expected_number_of_measures [Integer]
+  # @param standard_to_be_used [String]
+  # @param epw_file_name [String]
+  # @param simulate [Boolean]
   def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, simulate = true)
     current_year = Date.today.year
     translator = test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used, epw_file_name)
@@ -238,6 +264,10 @@ RSpec.configure do |config|
     end
   end
 
+  # test baseline creation with simulation
+  # @param file_name [String]
+  # @param standard_to_be_used [String]
+  # @param epw_file_name [String]
   def test_baseline_creation_and_simulation(filename, standard_to_be_used, epw_file)
     current_year = Date.today.year
     translator = test_baseline_creation(filename, standard_to_be_used, epw_file)
@@ -249,6 +279,11 @@ RSpec.configure do |config|
     expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
   end
 
+  # test baseline and scenario creation
+  # @param file_name [String]
+  # @param expected_number_of_measures [Integer]
+  # @param standard_to_be_used [String]
+  # @param epw_file_name [String]
   def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
 
@@ -265,6 +300,10 @@ RSpec.configure do |config|
     return translator
   end
 
+  # test baseline creation
+  # @param file_name [String]
+  # @param standard_to_be_used [String]
+  # @param epw_file_name [String]
   def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
@@ -291,6 +330,12 @@ RSpec.configure do |config|
     return translator
   end
 
+  # create minimum site
+  # @param occupancy_classification [String]
+  # @param year_of_const [Integer]
+  # @param floor_area_type [String]
+  # @param floor_area_value [Float]
+  # @return [BuildingSync::Site]
   def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
     generator = BuildingSync::Generator.new
     xml_snippet = generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
@@ -303,6 +348,9 @@ RSpec.configure do |config|
     end
   end
 
+  # create xml file object
+  # @param xml_file_path [String]
+  # @return [REXML::Document]
   def create_xml_file_object(xml_file_path)
     doc = nil
     File.open(xml_file_path, 'r') do |file|
@@ -311,6 +359,13 @@ RSpec.configure do |config|
     return doc
   end
 
+  # run minimum facility
+  # @param occupancy_classification [String]
+  # @param year_of_const [Integer]
+  # @param floor_area_type [String]
+  # @param floor_area_value [Float]
+  # @param standard_to_be_used [String]
+  # @param spec_name [String]
   def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used, spec_name)
     generator = BuildingSync::Generator.new
     facility = generator.create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
@@ -321,13 +376,5 @@ RSpec.configure do |config|
     facility.write_osm(output_path)
 
     run_baseline_simulation(output_path + '/in.osm', epw_file_path)
-  end
-
-  def create_xml_file_object(xml_file_path)
-    doc = nil
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-    return doc
   end
 end

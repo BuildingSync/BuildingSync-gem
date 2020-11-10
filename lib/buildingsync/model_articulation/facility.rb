@@ -46,10 +46,13 @@ require_relative '../helpers/metered_energy'
 require_relative '../helpers/helper'
 
 module BuildingSync
+  # Facility class
   class Facility
     include OsLib_Geometry
 
     # initialize
+    # @param facility_xml [REXML:Element]
+    # @param ns [String]
     def initialize(facility_xml, ns)
       # code to initialize
       # an array that contains all the sites
@@ -88,7 +91,9 @@ module BuildingSync
       read_xml(facility_xml, ns)
     end
 
-    # adding a site to the facility
+    # read xml
+    # @param facility_xml [REXML:Element]
+    # @param ns [String]
     def read_xml(facility_xml, ns)
       facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
         @sites.push(Site.new(site_element, ns))
@@ -103,15 +108,24 @@ module BuildingSync
       read_systems(facility_xml, ns)
     end
 
+    # set all function that iterates over the sites and calls their set all function
     def set_all
       @sites.each(&:set_all)
     end
 
+    # determine open studio standard
+    # @param standard_to_be_used [String]
+    # @return [Standard]
     def determine_open_studio_standard(standard_to_be_used)
       return @sites[0].determine_open_studio_standard(standard_to_be_used)
     end
 
     # generating the OpenStudio model based on the imported BuildingSync Data
+    # @param epw_file_path [String]
+    # @param output_path [String]
+    # @param standard_to_be_used [String]
+    # @param ddy_file [String]
+    # @return [Boolean]
     def generate_baseline_osm(epw_file_path, output_path, standard_to_be_used, ddy_file = nil)
       if @sites.count == 0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', 'There are no sites attached to this facility in your BuildingSync file.')
@@ -129,22 +143,34 @@ module BuildingSync
       return true
     end
 
+    # build zone hash
+    # @param site [BuildingSync::Site]
+    # @return [Hash]
     def build_zone_hash(site)
       return site.build_zone_hash
     end
 
+    # get sites
+    # return [Array]
     def get_sites
       return @sites
     end
 
+    # get space types
+    # @return [Array<OpenStudio::Model::SpaceType>]
     def get_space_types
       return @sites[0].get_space_types
     end
 
+    # determine OpenStudio system standard
+    # @return [Standard]
     def determine_open_studio_system_standard
       return @sites[0].determine_open_studio_system_standard
     end
 
+    # read interval reading
+    # @param facility_xml [REXML::Element]
+    # @param ns [String]
     def read_interval_reading(facility_xml, ns)
       interval_frequency = ''
       reading_type = ''
@@ -174,6 +200,9 @@ module BuildingSync
       end
     end
 
+    # read systems
+    # @param facility_xml [REXML::Element]
+    # @param ns [String]
     def read_systems(facility_xml, ns)
       systems_xml = facility_xml.elements["#{ns}:Systems"]
       if systems_xml
@@ -185,6 +214,9 @@ module BuildingSync
       end
     end
 
+    # read other details
+    # @param facility_xml [REXML::Element]
+    # @param ns [String]
     def read_other_details(facility_xml, ns)
       facility_xml.elements.each("#{ns}:Contacts/#{ns}:Contact") do |contact|
         contact.elements.each("#{ns}:ContactRoles/#{ns}:ContactRole") do |role|
@@ -250,6 +282,21 @@ module BuildingSync
       end
     end
 
+    # create building systems
+    # @param output_path [String]
+    # @param zone_hash [Hash]
+    # @param hvac_delivery_type [String]
+    # @param htg_src [String]
+    # @param clg_src [String]
+    # @param add_space_type_loads [Boolean]
+    # @param add_constructions [Boolean]
+    # @param add_elevators [Boolean]
+    # @param add_exterior_lights [Boolean]
+    # @param add_exhaust [Boolean]
+    # @param add_swh [Boolean]
+    # @param add_hvac [Boolean]
+    # @param add_thermostat [Boolean]
+    # @param remove_objects [Boolean]
     def create_building_systems(output_path, zone_hash = nil, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity',
                                 add_space_type_loads = true, add_constructions = true, add_elevators = false, add_exterior_lights = false,
                                 add_exhaust = true, add_swh = true, add_hvac = true, add_thermostat = true, remove_objects = false)
@@ -330,7 +377,7 @@ module BuildingSync
         service_hot_water_system.add(model, open_studio_system_standard, remove_objects)
       end
 
-      @load_system.add_day_lighting_controls(model, open_studio_system_standard, template)
+      @load_system.add_daylighting_controls(model, open_studio_system_standard, template)
 
       # TODO: - add refrigeration
       # remove refrigeration equipment
@@ -379,6 +426,9 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building finished with #{model.getModelObjects.size} objects.")
     end
 
+    # write osm
+    # @param dir [String]
+    # @return [Array]
     def write_osm(dir)
       scenario_types = {}
       @sites.each do |site|
@@ -387,7 +437,10 @@ module BuildingSync
       return scenario_types
     end
 
-    def write_parameters_to_xml(ns, facility)
+    # write parameters to xml
+    # @param facility [REXML::Element]
+    # @param ns [String]
+    def write_parameters_to_xml(facility, ns)
       report = facility.elements["#{ns}:Reports/#{ns}:Report"]
       report.elements.each("#{ns}:Scenarios/#{ns}:Scenario") do |scenario|
         scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"].text = @energy_resource if !@energy_resource.nil?
@@ -398,10 +451,12 @@ module BuildingSync
         scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"].text = @annual_fuel_use_native_units if !@annual_fuel_use_native_units.nil?
       end
       facility.elements.each("#{ns}:Sites/#{ns}:Site") do |site|
-        @sites[0].write_parameters_to_xml(ns, site)
+        @sites[0].write_parameters_to_xml(site, ns)
       end
     end
 
+    # get OpenStudio model
+    # @return [OpenStudio::Model]
     def get_model
       return @sites[0].get_model
     end

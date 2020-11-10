@@ -66,8 +66,8 @@ RSpec.describe 'LoadSystemSpec' do
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref Pre-1980')
     load_system = BuildingSync::LoadsSystem.new
-    puts 'expected add day lighting controls : true but got: false} ' if load_system.add_day_lighting_controls(model, standard, 'DOE Ref Pre-1980') != true
-    expect(load_system.add_day_lighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
+    puts 'expected add day lighting controls : true but got: false} ' if load_system.add_daylighting_controls(model, standard, 'DOE Ref Pre-1980') != true
+    expect(load_system.add_daylighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
   end
 
   it 'should parse and write building_151.xml and adjust schedules successfully' do
@@ -100,7 +100,7 @@ RSpec.describe 'LoadSystemSpec' do
 
   def create_minimum_section_xml(ns, typical_usage_hours = 40)
     section = REXML::Element.new("#{ns}:Section")
-    ## adding the XML elements for the typical hourly usage per week
+    # adding the XML elements for the typical hourly usage per week
     typical_usages = REXML::Element.new("#{ns}:TypicalOccupantUsages")
     section.add_element(typical_usages)
     typical_usage = REXML::Element.new("#{ns}:TypicalOccupantUsage")

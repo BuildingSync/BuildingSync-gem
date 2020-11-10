@@ -35,12 +35,18 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 module BuildingSync
+  # ServiceHotWaterSystem class to add a SHW system to the model
   class ServiceHotWaterSystem < BuildingSystem
     # initialize
     def initialize
       # code to initialize
     end
 
+    # add
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param remove_objects [Boolean]
+    # @return [Boolean]
     def add(model, standard, remove_objects)
       # remove water use equipment and water use connections
       if remove_objects

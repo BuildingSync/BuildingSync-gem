@@ -36,7 +36,11 @@
 # *******************************************************************************
 
 module BuildingSync
+  # LightingSystemType class
   class LightingSystemType
+    # initialize
+    # @param doc [REXML::Document]
+    # @param ns [String]
     def initialize(doc, ns)
       @lighting_type = {}
       @ballast_type = {}
@@ -47,6 +51,9 @@ module BuildingSync
       end
     end
 
+    # read
+    # @param section_element [REXML::Element]
+    # @param ns [String]
     def read(section_element, ns)
       primary_lighting_type = nil
       if section_element.elements["#{ns}:PrimaryLightingSystemType"]
@@ -62,7 +69,7 @@ module BuildingSync
         linked_building = section_element.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref']
         puts "found primary lighting type: #{primary_lighting_type} for linked building: #{linked_building}"
         @primary_lighting_system_type[linked_building] = primary_lighting_type
-        @lighting_type[linked_building] = lighting_type
+        lighting_type[linked_building] = lighting_type
         @ballast_type[linked_building] = ballast_type
       elsif section_element.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"]
         linked_section = section_element.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"].attributes['IDref']

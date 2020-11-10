@@ -41,12 +41,10 @@ require 'net/http/post/multipart'
 module BuildingSync
   # Class for communicating with SelectionTool
   class SelectionTool
-    ##
     # initialize the selection tools class
-    ##
     # @note See documentation here: https://github.com/buildingsync/selection-tool#validator
     # @note Use core Net::HTTPS
-    # @param xml_path [string]
+    # @param xml_path [String]
     def initialize(xml_path)
       @hash_response = nil
       url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
@@ -63,10 +61,8 @@ module BuildingSync
       @hash_response = JSON.parse(response.read_body)
     end
 
-    ##
     # validate use case
-    ##
-    # @param use_case [string]
+    # @param use_case [String]
     # @return boolean
     def validate_use_case(use_case)
       if !@hash_response['validation_results']['use_cases'][use_case]['valid']
@@ -78,9 +74,7 @@ module BuildingSync
       return @hash_response['validation_results']['use_cases'][use_case]['valid']
     end
 
-    ##
     # validate schema
-    ##
     # @return boolean
     def validate_schema
       if !@hash_response['validation_results']['schema']['valid']

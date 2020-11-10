@@ -1,7 +1,18 @@
 # BuildingSync
 
-Repository to store helpers for reading and writing BuildingSync as well as measures for converting a BuildingSync XML to OpenStudio models.
+The BuildingSync-Gem is a repository of helpers for reading and writing BuildingSync XML files, and for using that data to drive energy simulations of the subject building. 
 
+All of the following are supported: 
+
+* convert BuildingSync XML file into: 
+
+    * an OpenStudio Baseline model 
+
+    * an OpenStudio workflow for each scenario defined in the XML file 
+
+* enables simulation of the baseline model and all workflows and 
+
+* insert simulation results back into the Building XML file. 
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -20,14 +31,7 @@ Or install it yourself as:
 
 ## Usage
 
-The BuildingSync-Gem 
-- converts your BuildingSync.xml file into 
-  - an OpenStudio Baseline model
-  - an OpenStudio workflow for each scenario defined in the XML file
-- enables simulation of the baseline model and all workflows and 
-- inserts simulation results back into the xml file. 
-
-All these features are driven by the translator class.
+All of the features described above are provided by the translator class, as shown in the following sample code: 
 
 ```ruby
 # initializing the translator 
@@ -46,18 +50,20 @@ translator.gather_results(out_path)
 ## Testing
 
 Check out the repository and then execute:
-```ruby
-$ bundle install
-$ bundle update    
-$ bundle exec rake
-```
 
-## TODO
+    $ bundle install
+ 
+    $ bundle exec rake
+    
+## Documentation
 
-- [ ] Move BuildingSync specific measures into this gem. See list from [here](https://docs.google.com/spreadsheets/d/1PCB4nZoLQ1cWhnlrlnHwo9kI4G8ChOeblU3L4uZu7bc/edit#gid=1482405742) 
-- [ ] Add ability to perform validation using https://selectiontool.buildingsync.net. Return which use cases existing BuildingSync XML is valid for.
+The documentation of the BuildingSync-Gem is done with Yard (https://yardoc.org)
+To generate the documentation do the following:
 
-
+     $ gem install yard
+     
+     $ yardoc - README.md 
+    
 # Releasing
 
 * Update change log

@@ -39,6 +39,7 @@ require 'openstudio/model_articulation/version'
 require 'openstudio/extension'
 
 module BuildingSync
+  # Extension class
   class Extension < OpenStudio::Extension::Extension
     # Override the base class
     # The Extension class contains both the instance of the BuildingSync file (in XML) and the

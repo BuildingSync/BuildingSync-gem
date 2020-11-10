@@ -40,13 +40,18 @@ require 'json'
 module BuildingSync
   # base class for objects that will configure model maker based on building sync files
   class ModelMakerBase
+    # initialize
+    # @param doc [REXML::Document]
+    # @param ns [String]
     def initialize(doc, ns)
       @doc = doc
       @ns = ns
     end
 
+    # generate baseline model
     def generate_baseline; end
 
+    # write ism file
     def write_osm; end
   end
 end

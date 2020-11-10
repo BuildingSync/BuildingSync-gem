@@ -36,6 +36,7 @@
 # *******************************************************************************
 require_relative 'building_system'
 module BuildingSync
+  # EnvelopeSystem class
   class EnvelopeSystem < BuildingSystem
     # initialize
     def initialize
@@ -43,6 +44,12 @@ module BuildingSync
     end
 
     # add internal loads from standard definitions
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param primary_bldg_type [String]
+    # @param lookup_building_type [String]
+    # @param remove_objects [Boolean]
+    # @return [Boolean]
     def create(model, standard, primary_bldg_type, lookup_building_type, remove_objects)
       # remove default construction sets
       if remove_objects

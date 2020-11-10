@@ -35,17 +35,25 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require_relative 'building_system'
-require_relative '../helpers/hours_of_operation'
 require 'openstudio/extension/core/os_lib_schedules.rb'
 
 module BuildingSync
+  # LoadsSystem class that manages internal and external loads
   class LoadsSystem < BuildingSystem
     # initialize
+    # @param system_element [REXML::Element]
+    # @param ns [String]
     def initialize(system_element = '', ns = '')
       # code to initialize
     end
 
     # add internal loads from standard definitions
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param template [String]
+    # @param building_sections [REXML:Element]
+    # @param remove_objects [Boolean]
+    # @return [Boolean]
     def add_internal_loads(model, standard, template, building_sections, remove_objects)
       # remove internal loads
       if remove_objects
@@ -95,6 +103,11 @@ module BuildingSync
       return true
     end
 
+    # add occupancy peak
+    # @param model [OpenStudio::Model]
+    # @param new_occupancy_peak [String]
+    # @param area [String]
+    # @param space_types [REXML:Element]
     def adjust_occupancy_peak(model, new_occupancy_peak, area, space_types)
       # we assume that the standard always generate people per area
       sum_of_people_per_area = 0.0
@@ -131,6 +144,11 @@ module BuildingSync
       end
     end
 
+    # get building section
+    # @param building_sections [array]
+    # @param standard_building_type [String]
+    # @param standard_space_type [String]
+    # @return [BuildingSync::Section]
     def get_building_section(building_sections, standard_building_type, standard_space_type)
       if building_sections.count == 1
         return building_sections[0]
@@ -149,6 +167,12 @@ module BuildingSync
       return nil
     end
 
+    # adjust schedules
+    # @param standard [Standard]
+    # @param space_type [SpaceType]
+    # @param building_section [BuildingSection]
+    # @param model [OpenStudio::Model]
+    # @return boolean
     def adjust_schedules(standard, space_type, building_section, model)
       # this uses code from https://github.com/NREL/openstudio-extension-gem/blob/6f8f7a46de496c3ab95ed9c72d4d543bd4b67740/lib/openstudio/extension/core/os_lib_model_generation.rb#L3007
       #
@@ -204,6 +228,13 @@ module BuildingSync
       return true
     end
 
+    # add exterior lights
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param onsite_parking_fraction [Float]
+    # @param exterior_lighting_zone [String]
+    # @param remove_objects [Boolean]
+    # @return boolean
     def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
       if remove_objects
         model.getExteriorLightss.each do |ext_light|
@@ -220,6 +251,10 @@ module BuildingSync
       return true
     end
 
+    # add elevator
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @return boolean
     def add_elevator(model, standard)
       # remove elevators as spaceLoads or exteriorLights
       model.getSpaceLoads.each do |instance|
@@ -244,7 +279,12 @@ module BuildingSync
       return true
     end
 
-    def add_day_lighting_controls(model, standard, template)
+    # add daylighting controls
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param template [String]
+    # @return boolean
+    def add_daylighting_controls(model, standard, template)
       # add daylight controls, need to perform a sizing run for 2010
       if template == '90.1-2010'
         if standard.model_run_sizing_run(model, "#{Dir.pwd}/SRvt") == false
