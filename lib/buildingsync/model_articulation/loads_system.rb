@@ -82,7 +82,7 @@ module BuildingSync
 
         # here we adjust the people schedules according to user input of hours per week and weeks per year
         if !building_sections.empty?
-          adjust_schedules(standard, space_type, get_building_section(building_sections, space_type.standardsBuildingType, space_type.standardsSpaceType), model)
+          adjust_schedules(standard, space_type, get_building_occupancy_hours(building_sections), model)
         end
         # extend space type name to include the template. Consider this as well for load defs
         space_type.setName("#{space_type.name} - #{template}")
@@ -144,42 +144,37 @@ module BuildingSync
       end
     end
 
-    # get building section
+    # get building occupancy hours
     # @param building_sections [array]
-    # @param standard_building_type [String]
-    # @param standard_space_type [String]
-    # @return [BuildingSync::Section]
-    def get_building_section(building_sections, standard_building_type, standard_space_type)
+    # @return [Float]
+    def get_building_occupancy_hours(building_sections)
       if building_sections.count == 1
-        return building_sections[0]
+        return building_sections[0].typical_occupant_usage_value_hours.to_f
       end
+      occupancy_hours = nil
+      count = 0.0
       building_sections.each do |section|
-        if section.occupancy_type.to_s == standard_building_type.to_s
-          return section if section.space_types
-          section.space_types.each do |space_type_name, hash|
-            if space_type_name == standard_space_type
-              puts "space_type_name #{space_type_name}"
-              return section
-            end
-          end
-        end
+        occupancy_hours = 0.0 if occupancy_hours.nil?
+        occupancy_hours += section.typical_occupant_usage_value_hours.to_f if section.typical_occupant_usage_value_hours.nil?
+        count += 1 if section.typical_occupant_usage_value_hours.nil?
       end
-      return nil
+      return nil if occupancy_hours.nil?
+      return occupancy_hours / count
     end
 
     # adjust schedules
     # @param standard [Standard]
-    # @param space_type [SpaceType]
-    # @param building_section [BuildingSection]
+    # @param space_type [OpenStudio::Model::SpaceType]
+    # @param building_occupant_hours_per_week [Float]
     # @param model [OpenStudio::Model]
     # @return boolean
-    def adjust_schedules(standard, space_type, building_section, model)
+    def adjust_schedules(standard, space_type, building_occupant_hours_per_week, model)
       # this uses code from https://github.com/NREL/openstudio-extension-gem/blob/6f8f7a46de496c3ab95ed9c72d4d543bd4b67740/lib/openstudio/extension/core/os_lib_model_generation.rb#L3007
       #
       # currently this works for all schedules in the model
       # in the future we would want to make this more flexible to adjusted based on space_types or building sections
-      return unless !building_section.typical_occupant_usage_value_hours.nil?
-      hours_per_week = building_section.typical_occupant_usage_value_hours.to_f
+      return unless !building_occupant_hours_per_week.nil?
+      hours_per_week = building_occupant_hours_per_week
 
       default_schedule_set = BuildingSync::Helper.get_default_schedule_set(model)
       existing_number_of_people_sched = BuildingSync::Helper.get_schedule_rule_set_from_schedule(default_schedule_set.numberofPeopleSchedule)
