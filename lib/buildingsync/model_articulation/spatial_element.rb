@@ -146,8 +146,9 @@ module BuildingSync
     # set building and system type
     # @param occupancy_type [String]
     # @param total_floor_area [Float]
+    # @param total_number_floors [Integer]
     # @param raise_exception [Boolean]
-    def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
+    def set_bldg_and_system_type(occupancy_type, total_floor_area, total_number_floors, raise_exception)
       # DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb
       # SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient
       # Hospital, SmallHotel, LargeHotel, QuickServiceRestaurant, FullServiceRestaurant, MidriseApartment, HighriseApartment, Warehouse
@@ -156,7 +157,7 @@ module BuildingSync
         json_file_path = File.expand_path('bldg_and_system_types.json', File.dirname(__FILE__))
         json = eval(File.read(json_file_path))
 
-        process_bldg_and_system_type(json, occupancy_type, total_floor_area)
+        process_bldg_and_system_type(json, occupancy_type, total_floor_area, total_number_floors)
 
         if @bldg_type == ''
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
@@ -175,7 +176,8 @@ module BuildingSync
     # @param json [String]
     # @param occupancy_type [String]
     # @param total_floor_area [Float]
-    def process_bldg_and_system_type(json, occupancy_type, total_floor_area)
+    # @param total_number_floors [Integer]
+    def process_bldg_and_system_type(json, occupancy_type, total_floor_area, total_number_floors)
       puts "using occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}"
       min_floor_area_correct = false
       max_floor_area_correct = false
@@ -190,6 +192,20 @@ module BuildingSync
                 max_floor_area_correct = true
               end
               if (min_floor_area_correct && max_floor_area_correct) || (!occ_type[:min_floor_area] && max_floor_area_correct) || (min_floor_area_correct && !occ_type[:max_floor_area])
+                puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
+                @bldg_type = occ_type[:bldg_type]
+                @bar_division_method = occ_type[:bar_division_method]
+                @system_type = occ_type[:system_type]
+                return
+              end
+            elsif occ_type[:min_number_floors] || occ_type[:max_number_floors]
+              if occ_type[:min_number_floors] && occ_type[:min_number_floors].to_i <= total_number_floors
+                puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
+                @bldg_type = occ_type[:bldg_type]
+                @bar_division_method = occ_type[:bar_division_method]
+                @system_type = occ_type[:system_type]
+                return
+              elsif occ_type[:max_number_floors] && occ_type[:max_number_floors].to_i > total_number_floors
                 puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
                 @bldg_type = occ_type[:bldg_type]
                 @bar_division_method = occ_type[:bar_division_method]
@@ -237,13 +253,14 @@ module BuildingSync
     # create space types
     # @param model [OpenStudio::Model]
     # @param total_bldg_floor_area [Float]
+    # @param total_number_floors [Integer]
     # @param standard_template [String]
     # @param open_studio_standard [Standard]
     # @return hash
-    def create_space_types(model, total_bldg_floor_area, standard_template, open_studio_standard)
+    def create_space_types(model, total_bldg_floor_area, total_number_floors, standard_template, open_studio_standard)
       # create space types from section type
       # mapping lookup_name name is needed for a few methods
-      set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false) if @bldg_type.nil?
+      set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, total_number_floors, false) if @bldg_type.nil?
       if open_studio_standard.nil?
         begin
           open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")

@@ -123,7 +123,7 @@ module BuildingSync
       @occupancy_type = read_occupancy_type(building_element, site_occupancy_type, ns)
 
       building_element.elements.each("#{ns}:Sections/#{ns}:Section") do |section_element|
-        section = BuildingSection.new(section_element, @occupancy_type, @total_floor_area, ns)
+        section = BuildingSection.new(section_element, @occupancy_type, @total_floor_area, num_stories, ns)
         if section.section_type == 'Whole building'
           @building_sections_whole_building.push(section)
         elsif section.section_type == 'Space function' || section.section_type.nil?
@@ -403,7 +403,7 @@ module BuildingSync
     # @param model [OpenStudio::Model]
     def create_bldg_space_types(model)
       @building_sections.each do |bldg_subsec|
-        bldg_subsec.create_space_types(model, @total_floor_area, @standard_template, @open_studio_standard)
+        bldg_subsec.create_space_types(model, @total_floor_area, num_stories, @standard_template, @open_studio_standard)
       end
     end
 
@@ -501,7 +501,7 @@ module BuildingSync
     def set_bldg_and_system_type_for_building_and_section
       @building_sections.each(&:set_bldg_and_system_type)
 
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
+      set_bldg_and_system_type(@occupancy_type, @total_floor_area, num_stories, false)
     end
 
     # determine the open studio standard and call the set_all function

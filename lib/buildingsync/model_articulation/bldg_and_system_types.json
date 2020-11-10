@@ -30,72 +30,90 @@
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PSZ-AC with gas coil heat"
   }],
-  "PrimarySchool": [{
+  "Education-Primary": [{
     "bldg_type": "PrimarySchool",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PVAV with reheat"
   }],
-  "SecondarySchool": [{
+  "Education-Secondary": [{
     "bldg_type": "SecondarySchool",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "VAV with reheat"
   }],
-  "Outpatient": [{
+  "Health care-Outpatient rehabilitation": [{
     "bldg_type": "Outpatient",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PVAV with reheat"
   }],
-  "Hospital": [{
+  "Health care-Outpatient facility": [{
+    "bldg_type": "Outpatient",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PVAV with reheat"
+  }],
+  "Health care-Outpatient non-diagnostic": [{
+    "bldg_type": "Outpatient",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PVAV with reheat"
+  }],
+  "Health care-Outpatient surgical": [{
+    "bldg_type": "Outpatient",
+    "bar_division_method": "Single Space Type - Core and Perimeter",
+    "system_type": "PVAV with reheat"
+  }],
+  "Health care-Inpatient hospital": [{
     "bldg_type": "Hospital",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "VAV with reheat"
   }],
-  "SmallHotel": [{
-    "bldg_type": "SmallHotel",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PTAC with electric baseboard heat"
-  }],
-  "LargeHotel": [{
-    "bldg_type": "LargeHotel",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "VAV with reheat"
-  }],
-  "QuickServiceRestaurant": [{
+  "Lodging": [
+    {
+      "bldg_type": "SmallHotel",
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PTAC with electric baseboard heat",
+      "max_floor_area": "50000"
+    },
+    {
+      "bldg_type": "LargeHotel",
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "VAV with reheat",
+      "min_floor_area": "50000"
+    }
+  ],
+  "Food service-Fast": [{
     "bldg_type": "QuickServiceRestaurant",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PSZ-AC with gas coil heat"
   }],
-  "FullServiceRestaurant": [{
+  "Food service-Full": [{
     "bldg_type": "FullServiceRestaurant",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PSZ-AC with gas coil heat"
   }],
-  "Restaurant": [{
+  "Food service": [{
     "bldg_type": "FullServiceRestaurant",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PSZ-AC with gas coil heat"
   }],
-  "MidriseApartment": [{
-    "bldg_type": "MidriseApartment",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PTAC"
-  }],
-  "Multifamily": [{
-    "bldg_type": "MidriseApartment",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PTAC"
-  }],
-  "HighriseApartment": [{
-    "bldg_type": "HighriseApartment",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PSZ-HP"
-  }],
+  "Multifamily": [
+    {
+      "bldg_type": "MidriseApartment",
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PTAC",
+      "max_number_floors": "10"
+    },
+    {
+      "bldg_type": "HighriseApartment",
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PSZ-HP",
+      "min_number_floors": "10"
+    }
+  ],
   "Warehouse": [{
     "bldg_type": "Warehouse",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PSZ-AC with gas coil heat"
   }],
-  "SuperMarket": [{
+  "Food sales-Grocery store": [{
     "bldg_type": "SuperMarket",
     "bar_division_method": "Single Space Type - Core and Perimeter",
     "system_type": "PSZ-AC with gas coil heat"

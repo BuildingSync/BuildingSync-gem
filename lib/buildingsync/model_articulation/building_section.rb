@@ -46,7 +46,7 @@ module BuildingSync
     # @param occ_type [String]
     # @param bldg_total_floor_area [Float]
     # @param ns [String]
-    def initialize(section_element, occ_type, bldg_total_floor_area, ns)
+    def initialize(section_element, occ_type, bldg_total_floor_area, num_stories, ns)
       @id = nil
       @door_ids = []
       @wall_ids = []
@@ -71,6 +71,7 @@ module BuildingSync
       @spaces_conditioned_percent = nil
       @dwelling_quantity = nil
       @dwellings_occupied_percent = nil
+      @num_stories = num_stories
 
       # code to initialize
       read_xml(section_element, occ_type, bldg_total_floor_area, ns)
@@ -277,7 +278,7 @@ module BuildingSync
 
     # set building and system type
     def set_bldg_and_system_type
-      super(@occupancy_type, @total_floor_area, false)
+      super(@occupancy_type, @total_floor_area, @number_floors, false)
     end
 
     # get peak occupancy
