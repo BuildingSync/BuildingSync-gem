@@ -366,9 +366,9 @@ RSpec.configure do |config|
   # @param floor_area_value [Float]
   # @param standard_to_be_used [String]
   # @param spec_name [String]
-  def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used, spec_name)
+  def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used, spec_name, floors_above_grade = 1)
     generator = BuildingSync::Generator.new
-    facility = generator.create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    facility = generator.create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade)
     facility.determine_open_studio_standard(standard_to_be_used)
     epw_file_path = File.expand_path('./weather/CZ01RV2.epw', File.dirname(__FILE__))
     output_path = File.expand_path("./output/#{spec_name}/#{occupancy_classification}", File.dirname(__FILE__))
