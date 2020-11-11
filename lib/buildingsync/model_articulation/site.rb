@@ -69,14 +69,14 @@ module BuildingSync
         raise "Error: There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file."
       end
       # check occupancy type at the site level
-      @occupancy_type = read_occupancy_type(build_element, nil, ns)
+      @bldgsync_occupancy_type = read_bldgsync_occupancy_type(build_element, nil, ns)
       # check floor areas at the site level
       @total_floor_area = read_floor_areas(build_element, nil, ns)
       # read location specific values
       read_location_values(build_element, ns)
       # code to create a building
       build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
-        @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, ns))
+        @buildings.push(Building.new(buildings_element, @bldgsync_occupancy_type, @total_floor_area, ns))
       end
     end
 
