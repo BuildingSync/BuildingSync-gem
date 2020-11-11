@@ -72,7 +72,7 @@ RSpec.describe 'BuildingSpec' do
       doc = REXML::Document.new(file)
       ns = 'auc'
       doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building/#{ns}:Sections/#{ns}:Section") do |building_section|
-        return BuildingSync::BuildingSection.new(building_section, 'Office', '20000', ns)
+        return BuildingSync::BuildingSection.new(building_section, 'Office', '20000', 1, ns)
       end
     end
   end
