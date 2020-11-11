@@ -50,10 +50,10 @@ module BuildingSync
 
     # initialize
     # @param building_element [REXML::Element]
-    # @param site_occupancy_type [String]
+    # @param site_bldgsync_occupancy_type [String]
     # @param site_total_floor_area [String]
     # @param ns [String]
-    def initialize(building_element, site_occupancy_type, site_total_floor_area, ns)
+    def initialize(building_element, site_bldgsync_occupancy_type, site_total_floor_area, ns)
       @building_sections = []
       @building_sections_whole_building = []
       @model = nil
@@ -89,7 +89,7 @@ module BuildingSync
       @number_of_units = nil
       @fraction_area = 1.0
       # code to initialize
-      read_xml(building_element, site_occupancy_type, site_total_floor_area, ns)
+      read_xml(building_element, site_bldgsync_occupancy_type, site_total_floor_area, ns)
     end
 
     # returns number of stories
@@ -100,10 +100,10 @@ module BuildingSync
 
     # read xml
     # @param building_element [REXML::Element]
-    # @param site_occupancy_type [String]
+    # @param site_bldgsync_occupancy_type [String]
     # @param site_total_floor_area [String]
     # @param ns [String]
-    def read_xml(building_element, site_occupancy_type, site_total_floor_area, ns)
+    def read_xml(building_element, site_bldgsync_occupancy_type, site_total_floor_area, ns)
       # building ID
       if building_element.attributes['ID']
         @id = building_element.attributes['ID']
@@ -120,10 +120,10 @@ module BuildingSync
       # aspect ratio
       read_aspect_ratio(building_element, ns)
       # read occupancy
-      @occupancy_type = read_occupancy_type(building_element, site_occupancy_type, ns)
+      @bldgsync_occupancy_type = read_bldgsync_occupancy_type(building_element, site_bldgsync_occupancy_type, ns)
 
       building_element.elements.each("#{ns}:Sections/#{ns}:Section") do |section_element|
-        section = BuildingSection.new(section_element, @occupancy_type, @total_floor_area, ns)
+        section = BuildingSection.new(section_element, @bldgsync_occupancy_type, @total_floor_area, num_stories, ns)
         if section.section_type == 'Whole building'
           @building_sections_whole_building.push(section)
         elsif section.section_type == 'Space function' || section.section_type.nil?
@@ -403,7 +403,7 @@ module BuildingSync
     # @param model [OpenStudio::Model]
     def create_bldg_space_types(model)
       @building_sections.each do |bldg_subsec|
-        bldg_subsec.create_space_types(model, @total_floor_area, @standard_template, @open_studio_standard)
+        bldg_subsec.create_space_types(model, @total_floor_area, num_stories, @standard_template, @open_studio_standard)
       end
     end
 
@@ -475,7 +475,7 @@ module BuildingSync
       elsif @building_sections.count == 0
         @space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
         puts " Space types: #{@space_types} selected for building type: #{@bldg_type} and standard template: #{@standard_template}"
-        space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @open_studio_standard)
+        space_types_floor_area = create_space_types(@model, @total_floor_area, num_stories, @standard_template, @open_studio_standard)
         space_types_floor_area.each do |space_type, hash|
           new_hash[space_type] = hash
         end
@@ -501,7 +501,7 @@ module BuildingSync
     def set_bldg_and_system_type_for_building_and_section
       @building_sections.each(&:set_bldg_and_system_type)
 
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
+      set_bldg_and_system_type(@bldgsync_occupancy_type, @total_floor_area, num_stories, false)
     end
 
     # determine the open studio standard and call the set_all function

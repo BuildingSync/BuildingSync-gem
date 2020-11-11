@@ -44,7 +44,7 @@ module BuildingSync
     # @param floor_area_value [Float]
     # @param ns [String]
     # @return REXML::Document
-    def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, ns = 'auc')
+    def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade = 1, ns = 'auc')
       xml_path = File.expand_path('./../../spec/files/building_151_Blank.xml', File.dirname(__FILE__))
 
       doc = create_xml_file_object(xml_path)
@@ -72,6 +72,10 @@ module BuildingSync
       floor_areas_element.add_element(floor_area_element)
       building_element.add_element(floor_areas_element)
 
+      floors_above_grade_element = REXML::Element.new("#{ns}:FloorsAboveGrade")
+      floors_above_grade_element.text = floors_above_grade
+      building_element.add_element(floors_above_grade_element)
+
       occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
       occupancy_classification_element.text = occupancy_classification
       building_element.add_element(occupancy_classification_element)
@@ -85,8 +89,8 @@ module BuildingSync
     # @param floor_area_type [String]
     # @param floor_area_value [Float]
     # @return BuildingSync::Facility
-    def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-      xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade = 1)
+      xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade)
       ns = 'auc'
       facility_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"]
       if !facility_element.nil?

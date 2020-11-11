@@ -134,7 +134,7 @@ module BuildingSync
     # @param occupancy_type [String]
     # @param ns [String]
     # @return [String]
-    def read_occupancy_type(xml_element, occupancy_type, ns)
+    def read_bldgsync_occupancy_type(xml_element, occupancy_type, ns)
       occ_element = xml_element.elements["#{ns}:OccupancyClassification"]
       if !occ_element.nil?
         return occ_element.text
@@ -146,8 +146,9 @@ module BuildingSync
     # set building and system type
     # @param occupancy_type [String]
     # @param total_floor_area [Float]
+    # @param total_number_floors [Integer]
     # @param raise_exception [Boolean]
-    def set_bldg_and_system_type(occupancy_type, total_floor_area, raise_exception)
+    def set_bldg_and_system_type(occupancy_type, total_floor_area, total_number_floors, raise_exception)
       # DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb
       # SmallOffice, MediumOffice, LargeOffice, RetailStandalone, RetailStripmall, PrimarySchool, SecondarySchool, Outpatient
       # Hospital, SmallHotel, LargeHotel, QuickServiceRestaurant, FullServiceRestaurant, MidriseApartment, HighriseApartment, Warehouse
@@ -156,7 +157,7 @@ module BuildingSync
         json_file_path = File.expand_path('bldg_and_system_types.json', File.dirname(__FILE__))
         json = eval(File.read(json_file_path))
 
-        process_bldg_and_system_type(json, occupancy_type, total_floor_area)
+        process_bldg_and_system_type(json, occupancy_type, total_floor_area, total_number_floors)
 
         if @bldg_type == ''
           raise "Building type '#{occupancy_type}' is beyond BuildingSync scope"
@@ -171,11 +172,28 @@ module BuildingSync
       puts "to get @bldg_type #{@bldg_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}"
     end
 
+    # gets the standards occupancy type from the building type or the potential overwrite occupancy type
+    # @param occ_type [Hash]
+    # @return [Boolean]
+    def sets_occupancy_bldg_system_types(occ_type)
+      if occ_type[:occupancy_type]
+        @standards_building_type = occ_type[:occupancy_type]
+      else
+        @standards_building_type = occ_type[:bldg_type]
+      end
+      @bldg_type = occ_type[:bldg_type]
+      @bar_division_method = occ_type[:bar_division_method]
+      @system_type = occ_type[:system_type]
+      return true
+    end
+
     # process building and system type
     # @param json [String]
     # @param occupancy_type [String]
     # @param total_floor_area [Float]
-    def process_bldg_and_system_type(json, occupancy_type, total_floor_area)
+    # @param total_number_floors [Integer]
+    # @return [Boolean]
+    def process_bldg_and_system_type(json, occupancy_type, total_floor_area, total_number_floors)
       puts "using occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}"
       min_floor_area_correct = false
       max_floor_area_correct = false
@@ -191,29 +209,38 @@ module BuildingSync
               end
               if (min_floor_area_correct && max_floor_area_correct) || (!occ_type[:min_floor_area] && max_floor_area_correct) || (min_floor_area_correct && !occ_type[:max_floor_area])
                 puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
-                @bldg_type = occ_type[:bldg_type]
-                @bar_division_method = occ_type[:bar_division_method]
-                @system_type = occ_type[:system_type]
-                return
+                return sets_occupancy_bldg_system_types(occ_type)
+              end
+            elsif occ_type[:min_number_floors] || occ_type[:max_number_floors]
+              if occ_type[:min_number_floors] && occ_type[:min_number_floors].to_i <= total_number_floors
+                puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
+                return sets_occupancy_bldg_system_types(occ_type)
+              elsif occ_type[:max_number_floors] && occ_type[:max_number_floors].to_i > total_number_floors
+                puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
+                return sets_occupancy_bldg_system_types(occ_type)
               end
             else
               # otherwise we assume the first one is correct and we select this
               puts "selected the following occupancy type: #{occ_type[:bldg_type]}"
-              @bldg_type = occ_type[:bldg_type]
-              @bar_division_method = occ_type[:bar_division_method]
-              @system_type = occ_type[:system_type]
-              return
+              return sets_occupancy_bldg_system_types(occ_type)
             end
           else
             # otherwise we assume the first one is correct and we select this
-            @bldg_type = occ_type[:bldg_type]
-            @bar_division_method = occ_type[:bar_division_method]
-            @system_type = occ_type[:system_type]
-            return
+            return sets_occupancy_bldg_system_types(occ_type)
+          end
+        end
+      else
+        # if the bldgsync occupancy type is not found, we try to match it with the bldg_type (for backwards compatibility)
+        json.each do |full_occ_type|
+          full_occ_type[1].each do |occ_type|
+            if occ_type[:bldg_type] == occupancy_type
+              return sets_occupancy_bldg_system_types(occ_type)
+            end
           end
         end
       end
-      raise "Occupancy type #{occupancy_type} is not available in the bldg_and_system_types.json dictionary"
+      raise "BuildingSync Occupancy type #{occupancy_type} is not available in the bldg_and_system_types.json dictionary"
+      return false
     end
 
     # validate positive number excluding zero
@@ -237,13 +264,14 @@ module BuildingSync
     # create space types
     # @param model [OpenStudio::Model]
     # @param total_bldg_floor_area [Float]
+    # @param total_number_floors [Integer]
     # @param standard_template [String]
     # @param open_studio_standard [Standard]
     # @return hash
-    def create_space_types(model, total_bldg_floor_area, standard_template, open_studio_standard)
+    def create_space_types(model, total_bldg_floor_area, total_number_floors, standard_template, open_studio_standard)
       # create space types from section type
       # mapping lookup_name name is needed for a few methods
-      set_bldg_and_system_type(@occupancy_type, total_bldg_floor_area, false) if @bldg_type.nil?
+      set_bldg_and_system_type(@bldgsync_occupancy_type, total_bldg_floor_area, total_number_floors, false) if @bldg_type.nil?
       if open_studio_standard.nil?
         begin
           open_studio_standard = Standard.build("#{standard_template}_#{bldg_type}")
@@ -254,8 +282,6 @@ module BuildingSync
           raise(e)
         end
       end
-      lookup_name = open_studio_standard.model_get_lookup_name(@occupancy_type)
-      puts " Building type: #{lookup_name} selected for occupancy type: #{@occupancy_type}"
 
       @space_types = get_space_types_from_building_type(@bldg_type, standard_template, true)
       puts " Space types: #{@space_types} selected for building type: #{@bldg_type} and standard template: #{standard_template}"
@@ -265,9 +291,9 @@ module BuildingSync
       @space_types.each do |space_type_name, hash|
         # create space type
         space_type = OpenStudio::Model::SpaceType.new(model)
-        space_type.setStandardsBuildingType(@occupancy_type)
+        space_type.setStandardsBuildingType(@standards_building_type)
         space_type.setStandardsSpaceType(space_type_name)
-        space_type.setName("#{@occupancy_type} #{space_type_name}")
+        space_type.setName("#{@standards_building_type} #{space_type_name}")
 
         # set color
         test = open_studio_standard.space_type_apply_rendering_color(space_type) # this uses openstudio-standards

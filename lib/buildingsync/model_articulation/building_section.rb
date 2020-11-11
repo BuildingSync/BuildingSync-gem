@@ -43,10 +43,10 @@ module BuildingSync
     include OpenstudioStandards
     # initialize
     # @param section_element [REXML:Element]
-    # @param occ_type [String]
+    # @param bldgsync_occ_type [String]
     # @param bldg_total_floor_area [Float]
     # @param ns [String]
-    def initialize(section_element, occ_type, bldg_total_floor_area, ns)
+    def initialize(section_element, bldgsync_occ_type, bldg_total_floor_area, num_stories, ns)
       @id = nil
       @door_ids = []
       @wall_ids = []
@@ -59,6 +59,7 @@ module BuildingSync
       # parameter to read and write.
       @fraction_area = nil
       @bldg_type = {}
+      @standards_building_type = nil
       @occupancy_classification_original = nil
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
@@ -71,24 +72,25 @@ module BuildingSync
       @spaces_conditioned_percent = nil
       @dwelling_quantity = nil
       @dwellings_occupied_percent = nil
+      @num_stories = num_stories
 
       # code to initialize
-      read_xml(section_element, occ_type, bldg_total_floor_area, ns)
+      read_xml(section_element, bldgsync_occ_type, bldg_total_floor_area, ns)
     end
 
     # read xml
     # @param section_element [REXML:Element]
-    # @param occ_type [String]
+    # @param bldgsync_occ_type [String]
     # @param bldg_total_floor_area [Float]
     # @param ns [String]
-    def read_xml(section_element, occ_type, bldg_total_floor_area, ns)
+    def read_xml(section_element, bldgsync_occ_type, bldg_total_floor_area, ns)
       if section_element.attributes['ID']
         @id = section_element.attributes['ID']
       end
       # floor areas
       @total_floor_area = read_floor_areas(section_element, bldg_total_floor_area, ns)
       # based on the occupancy type set building type, system type and bar division method
-      read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
+      read_bldg_system_type_based_on_occupancy_type(section_element, bldgsync_occ_type, ns)
       read_building_section_type(section_element, ns)
       read_building_section_other_detail(section_element, ns)
       read_footprint_shape(section_element, ns)
@@ -104,10 +106,10 @@ module BuildingSync
 
     # read building system type based on occupancy type
     # @param section_element [REXML:Element]
-    # @param occ_type [String]
+    # @param bldgsync_occ_type [String]
     # @param ns [String]
-    def read_bldg_system_type_based_on_occupancy_type(section_element, occ_type, ns)
-      @occupancy_type = read_occupancy_type(section_element, occ_type, ns)
+    def read_bldg_system_type_based_on_occupancy_type(section_element, bldgsync_occ_type, ns)
+      @bldgsync_occupancy_type = read_bldgsync_occupancy_type(section_element, bldgsync_occ_type, ns)
     end
 
     # read building section type
@@ -277,7 +279,7 @@ module BuildingSync
 
     # set building and system type
     def set_bldg_and_system_type
-      super(@occupancy_type, @total_floor_area, false)
+      super(@bldgsync_occupancy_type, @total_floor_area, @number_floors, false)
     end
 
     # get peak occupancy
@@ -292,7 +294,7 @@ module BuildingSync
       return @total_floor_area
     end
 
-    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type, :id
+    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :standards_building_type, :bldgsync_occupancy_type, :section_type, :id
     attr_accessor :fraction_area
   end
 end
