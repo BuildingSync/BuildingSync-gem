@@ -176,9 +176,9 @@ module BuildingSync
     # @param occ_type [Hash]
     def sets_occupancy_bldg_system_types(occ_type)
       if occ_type[:occupancy_type]
-        @standards_occupancy_type = occ_type[:occupancy_type]
+        @standards_building_type = occ_type[:occupancy_type]
       else
-        @standards_occupancy_type = occ_type[:bldg_type]
+        @standards_building_type = occ_type[:bldg_type]
       end
       @bldg_type = occ_type[:bldg_type]
       @bar_division_method = occ_type[:bar_division_method]
@@ -283,9 +283,9 @@ module BuildingSync
       @space_types.each do |space_type_name, hash|
         # create space type
         space_type = OpenStudio::Model::SpaceType.new(model)
-        space_type.setStandardsBuildingType(@standards_occupancy_type)
+        space_type.setStandardsBuildingType(@standards_building_type)
         space_type.setStandardsSpaceType(space_type_name)
-        space_type.setName("#{@standards_occupancy_type} #{space_type_name}")
+        space_type.setName("#{@standards_building_type} #{space_type_name}")
 
         # set color
         test = open_studio_standard.space_type_apply_rendering_color(space_type) # this uses openstudio-standards
@@ -297,7 +297,7 @@ module BuildingSync
         if space_type.defaultConstructionSet.is_initialized
           puts "Construction type is set to: #{space_type.defaultConstructionSet.get.name}"
         else
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.SpatialElement.create_space_types', "Construction set not available for ! #{@standards_occupancy_type}-#{space_type_name}")
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.SpatialElement.create_space_types', "Construction set not available for ! #{@standards_building_type}-#{space_type_name}")
         end
         # add to sum_of_ratios counter for adjustment multiplier
         sum_of_ratios += hash[:ratio]
