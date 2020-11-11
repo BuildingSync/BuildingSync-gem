@@ -294,7 +294,7 @@ module BuildingSync
       return @total_floor_area
     end
 
-    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :occupancy_type, :section_type, :id
+    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :standards_building_type, :bldgsync_occupancy_type, :section_type, :id
     attr_accessor :fraction_area
   end
 end

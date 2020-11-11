@@ -48,8 +48,8 @@ RSpec.describe 'BuildingSpec' do
   it 'Should return occupancy_type ' do
     building_section = get_building_section_from_file('building_151_level1.xml', ASHRAE90_1)
     expected_value = 'Retail'
-    puts "expected occupancy_type : #{expected_value} but got: #{building_section.occupancy_type} " if building_section.occupancy_type != expected_value
-    expect(building_section.occupancy_type == expected_value).to be true
+    puts "expected bldgsync_occupancy_type : #{expected_value} but got: #{building_section.bldgsync_occupancy_type} " if building_section.bldgsync_occupancy_type != expected_value
+    expect(building_section.bldgsync_occupancy_type == expected_value).to be true
   end
 
   it 'Should return typical_occupant_usage_value_hours ' do

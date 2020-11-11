@@ -1,5 +1,6 @@
 {
   "Retail": [{
+    "occupancy_type": "Retail",
     "bldg_type": "RetailStandalone",
     "bar_division_method": "Multiple Space Types - Individual Stories Sliced",
     "system_type": "PSZ-AC with gas coil heat"

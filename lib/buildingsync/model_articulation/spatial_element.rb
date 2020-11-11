@@ -293,12 +293,6 @@ module BuildingSync
         # extend hash to hold new space type object
         hash[:space_type] = space_type
 
-        # check if the construction are set otherwise there will be all kinds of problems later on
-        if space_type.defaultConstructionSet.is_initialized
-          puts "Construction type is set to: #{space_type.defaultConstructionSet.get.name}"
-        else
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.SpatialElement.create_space_types', "Construction set not available for ! #{@standards_building_type}-#{space_type_name}")
-        end
         # add to sum_of_ratios counter for adjustment multiplier
         sum_of_ratios += hash[:ratio]
       end
