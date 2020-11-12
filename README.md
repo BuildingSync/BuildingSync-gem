@@ -37,13 +37,13 @@ All of the features described above are provided by the translator class, as sho
 ```ruby
 # initializing the translator 
 translator = BuildingSync::Translator.new(building_sync_xml_file_path, out_path)
-# generating the OpenStudio Model and writing the osm file  
+# generating the OpenStudio Model and writing the osm file. this performs a sizing run
 translator.write_osm
 # generating the OpenStudio workflows and writing the osw files
 translator.write_osws
-# running the baseline simulations
-translator.run_osm
-# running all simulations
+# running the baseline simulation
+translator.run_baseline_osm
+# run all simulations
 translator.run_osws
 # gather the results and save them to an BuildingSync.XML
 translator.gather_results(out_path)
