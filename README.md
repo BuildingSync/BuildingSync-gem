@@ -59,11 +59,21 @@ Check out the repository and then execute:
 ## Documentation
 
 The documentation of the BuildingSync-Gem is done with Yard (https://yardoc.org)
-To generate the documentation do the following:
+To generate the documentation locally do the following:
 
      $ gem install yard
      
      $ yardoc - README.md 
+     
+## Updating Rubydoc.info
+Publish documentation for each release.
+
+1. Tag release on GitHub
+1. Go to rubydoc.info and click `Add Project` in the upper right
+1. Input the git address: `git://github/BuildingSync/BuildingSync-gem.git`
+1. Input the release tag for the desired version, eg: `v0.1.0`
+1. Click `Go`
+1. Profit
     
 # Releasing
 
