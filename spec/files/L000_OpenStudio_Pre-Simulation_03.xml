@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<auc:BuildingSync xmlns:auc='http://buildingsync.net/schemas/bedes-auc/2019' xsi:schemaLocation='http://buildingsync.net/schemas/bedes-auc/2019 https://cdn.rawgit.com/BuildingSync/schema/develop/BuildingSync.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+  <auc:Facilities>
+    <auc:Facility>
+      <auc:Sites>
+        <auc:Site>
+          <auc:ClimateZoneType>
+            <auc:ASHRAE>
+              <auc:ClimateZone>1A</auc:ClimateZone>
+            </auc:ASHRAE>
+          </auc:ClimateZoneType>
+          <auc:Buildings>
+            <auc:Building ID='Building0'>
+              <auc:PremisesName>Premises 0</auc:PremisesName>
+              <auc:BuildingClassification>Commercial</auc:BuildingClassification>
+              <auc:OccupancyClassification>Retail</auc:OccupancyClassification>
+              <auc:FloorAreas>
+                <auc:FloorArea>
+                  <auc:FloorAreaType>Gross</auc:FloorAreaType>
+                  <auc:FloorAreaValue>10000</auc:FloorAreaValue>
+                </auc:FloorArea>
+              </auc:FloorAreas>
+              <auc:YearOfConstruction>1975</auc:YearOfConstruction>
+            </auc:Building>
+          </auc:Buildings>
+        </auc:Site>
+      </auc:Sites>
+      <auc:Systems/>
+      <auc:Reports>
+        <auc:Report>
+          <auc:Scenarios>
+            <auc:Scenario ID='Baseline'>
+              <auc:ScenarioName>Baseline</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:CurrentBuilding>
+                  <auc:CalculationMethod>
+                    <auc:Modeled/>
+                  </auc:CalculationMethod>
+                </auc:CurrentBuilding>
+              </auc:ScenarioType>
+            </auc:Scenario>
+          </auc:Scenarios>
+        </auc:Report>
+      </auc:Reports>
+    </auc:Facility>
+  </auc:Facilities>
+</auc:BuildingSync>
