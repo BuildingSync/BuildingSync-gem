@@ -168,6 +168,9 @@ RSpec.describe 'BuildingSync' do
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, CA_TITLE24)
     translator.write_osm
     translator.write_osws
-    translator.write_parameters_to_xml(File.join(out_path, 'results.xml'))
+
+    results_xml = File.join(out_path, 'results.xml')
+    translator.write_parameters_to_xml(results_xml)
+    expect(File.exist?(results_xml)).to be true
   end
 end
