@@ -35,22 +35,23 @@ Or install it yourself as:
 All of the features described above are provided by the translator class, as shown in the following sample code: 
 
 ```ruby
-building_sync_xml_file_path = path/to/bsync.xml
-out_path = path/to/output_dir
+building_sync_xml_file_path = 'path/to/bsync.xml'
+out_path = 'path/to/output_dir'
+
 # initializing the translator 
 translator = BuildingSync::Translator.new(building_sync_xml_file_path, out_path)
 
 # generating the OpenStudio Model and writing the osm file.
- # path/to/output_dir/SR and path/to/output_dir/in.osm created 
+# path/to/output_dir/SR and path/to/output_dir/in.osm created
 translator.write_osm
 
 # generating the OpenStudio workflows and writing the osw files
- # auc:Scenario elements with measures are turned into new simulation dirs
- # path/to/output_dir/scenario_name
+# auc:Scenario elements with measures are turned into new simulation dirs
+# path/to/output_dir/scenario_name
 translator.write_osws
 
 # running the baseline simulation
- # path/to/output_dir/Baseline/in.osm 
+# path/to/output_dir/Baseline/in.osm 
 translator.run_baseline_osm
 
 # run all simulations
