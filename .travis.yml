@@ -25,6 +25,12 @@ install:
 jobs:
   include:
     - script:
+      - $SH "bundle exec rspec spec/tests/translator_write_osm.rb"
+      name: "translator.write_osm Test"
+    - script:
+      - $SH "bundle exec rspec spec/tests/translator_run_baseline_osm.rb"
+      name: "translator.run_baseline_osm with now EPW Tests"
+    - script:
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb"
