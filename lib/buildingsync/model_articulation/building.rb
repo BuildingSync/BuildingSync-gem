@@ -62,6 +62,7 @@ module BuildingSync
       @all_set = false
 
       # parameter to read and write.
+      @epw_file_path = nil
       @standard_template = nil
       @building_rotation = 0.0
       @floor_height = 0.0
@@ -271,6 +272,12 @@ module BuildingSync
       else
         return @climate_zone
       end
+    end
+
+    # get full path to epw file
+    # return [String]
+    def get_epw_file_path
+      return @epw_file_path
     end
 
     # set building form defaults
@@ -515,9 +522,9 @@ module BuildingSync
         @open_studio_standard = Standard.build("#{@standard_template}_#{building_type}")
         update_name
       rescue StandardError => e
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.BuildingSection.read_xml', e.message)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.determine_open_studio_standard', e.message)
       end
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSection.read_xml', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.determine_open_studio_standard', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
       return @open_studio_standard
     end
 
@@ -567,9 +574,9 @@ module BuildingSync
         end
         # TODO: add ASHRAE 2016 once it is available
       else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.get_standard_template', "Unknown standard_to_be_used #{standard_to_be_used}.")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_standard_template', "Unknown standard_to_be_used #{standard_to_be_used}.")
       end
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.get_standard_template', "Using the following standard for default values #{@standard_template}.")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.get_standard_template', "Using the following standard for default values #{@standard_template}.")
     end
 
     # get year building was built
@@ -608,8 +615,9 @@ module BuildingSync
 
       # here we check if there is an valid EPW file, if there is we use that file otherwise everything will be generated from climate zone
       if !epw_file_path.nil? && File.exist?(epw_file_path)
+        @epw_file_path = epw_file_path
         puts "case 1: epw file exists #{epw_file_path} and climate_zone is: #{climate_zone}"
-        set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file)
+        set_weather_and_climate_zone_from_epw(climate_zone, standard_to_be_used, latitude, longitude, ddy_file)
       elsif climate_zone.nil?
         weather_station_id = weather_argb[1]
         state_name = weather_argb[2]
@@ -617,28 +625,29 @@ module BuildingSync
         puts "case 2: climate_zone is nil #{climate_zone}"
         if !weather_station_id.nil?
           puts "case 2.1: weather_station_id is not nil #{weather_station_id}"
-          epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
+          @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
         elsif !city_name.nil? && !state_name.nil?
           puts "case 2.2: SITE LEVEL city_name and state_name is not nil #{city_name} #{state_name}"
-          epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
+          @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
         elsif !@city_name.nil? && !@state_name.nil?
           puts "case 2.3: BUILDING LEVEL city_name and state_name is not nil #{@city_name} #{@state_name}"
-          epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(@state_name, @city_name)
+          @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(@state_name, @city_name)
         end
 
-        # Ensure a file path gets set, else raise error
-        if epw_file_path.nil?
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path is nil and no way to set from Site or Building parameters.')
-          raise 'Error : epw_file_path is nil and no way to set from Site or Building parameters.'
-        elsif !File.exist?(epw_file_path)
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path file does not exist.')
-          raise 'Error : epw_file_path file does not exist.'
-        end
 
-        set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
       else
         puts "case 3: climate zone #{climate_zone} lat #{latitude} long #{longitude}"
-        set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
+        @epw_file_path = set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
+        @epw_file_path = @epw_file_path.to_s
+      end
+
+      # Ensure a file path gets set, else raise error
+      if @epw_file_path.nil?
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path is nil and no way to set from Site or Building parameters.')
+        raise 'Error : epw_file_path is nil and no way to set from Site or Building parameters.'
+      elsif !File.exist?(@epw_file_path)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "epw_file_path does not exist: #{@epw_file_path}")
+        raise "Error : epw_file_path does not exist: #{@epw_file_path}"
       end
 
       # setting the current year, so we do not get these annoying log messages:
@@ -647,7 +656,8 @@ module BuildingSync
       year_description.setCalendarYear(::Date.today.year)
 
       # add final condition
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone', "The path to the epw file is: #{@epw_file_path}")
     end
 
     # set weather file and climate zone from climate zone
@@ -657,7 +667,7 @@ module BuildingSync
     # @param longitude [String]
     def set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
       climate_zone_standard_string = climate_zone
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone_from_climate_zone', "climate zone: #{climate_zone}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_climate_zone', "climate zone: #{climate_zone}")
       if standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
         climate_zone_standard_string = "CEC T24-CEC#{climate_zone.gsub('Climate Zone', '').strip}"
       elsif standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
@@ -667,7 +677,7 @@ module BuildingSync
       end
 
       if !@open_studio_standard.nil? && !@open_studio_standard.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weater_and_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
       end
 
       # overwrite latitude and longitude if available
@@ -683,9 +693,10 @@ module BuildingSync
 
       weather_file = @model.getWeatherFile
 
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{weather_file.city}. State is #{weather_file.stateProvinceRegion}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_climate_zone', "city is #{weather_file.city}. State is #{weather_file.stateProvinceRegion}")
 
       set_climate_zone(climate_zone, standard_to_be_used)
+      return weather_file.path.get
     end
 
     # set climate zone
@@ -720,7 +731,7 @@ module BuildingSync
       climate_zones.clear
       if standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
         climate_zones.setClimateZone('ASHRAE', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climate_zones.getClimateZones('ASHRAE').first.value}")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_climate_zone', "Setting Climate Zone to #{climate_zones.getClimateZones('ASHRAE').first.value}")
         puts "setting ASHRAE climate zone to: #{climate_zone}"
         return true
       elsif standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
@@ -730,24 +741,23 @@ module BuildingSync
         climate_zone = climate_zone.delete('B').strip
         climate_zone = climate_zone.delete('C').strip
         climate_zones.setClimateZone('CEC', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climate_zone}")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_climate_zone', "Setting Climate Zone to #{climate_zone}")
         puts "setting CA_TITLE24 climate zone to: #{climate_zone}"
         return true
       end
       puts "could not set climate_zone #{climate_zone}"
-      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.set_climate_zone', "Cannot set the #{climate_zone} in context of this standard #{standard_to_be_used}")
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_climate_zone', "Cannot set the #{climate_zone} in context of this standard #{standard_to_be_used}")
       return false
     end
 
     # set weather file and climate zone from EPW file
     # @param climate_zone [String]
-    # @param epw_file_path [String]
     # @param standard_to_be_used [String]
     # @param latitude [String]
     # @param longitude [String]
     # @param ddy_file [String]
-    def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file = nil)
-      epw_file = OpenStudio::EpwFile.new(epw_file_path)
+    def set_weather_and_climate_zone_from_epw(climate_zone, standard_to_be_used, latitude, longitude, ddy_file = nil)
+      epw_file = OpenStudio::EpwFile.new(@epw_file_path)
 
       weather_lat = epw_file.latitude
       if !latitude.nil?
@@ -782,7 +792,7 @@ module BuildingSync
       site.setTimeZone(weather_time)
       site.setElevation(weather_elev)
 
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{epw_file.city}. State is #{epw_file.stateProvinceRegion}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', "city is #{epw_file.city}. State is #{epw_file.stateProvinceRegion}")
 
       stat_file = get_stat_file(epw_file)
       add_site_water_mains_temperature(stat_file) if !stat_file.nil?
@@ -797,11 +807,11 @@ module BuildingSync
       unless File.exist? ddy_file
         ddy_files = Dir["#{File.dirname(epw_file.path.to_s)}/*.ddy"]
         if ddy_files.size > 1
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'More than one ddy file in the EPW directory')
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', 'More than one ddy file in the EPW directory')
           return false
         end
         if ddy_files.empty?
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'could not find the ddy file in the EPW directory')
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', 'could not find the ddy file in the EPW directory')
           return false
         end
 
@@ -818,7 +828,7 @@ module BuildingSync
         # grab only the ones that matter
         ddy_list = /(Htg 99.6. Condns DB)|(Clg .4. Condns WB=>MDB)|(Clg .4% Condns DB=>MWB)/
         if d.name.get =~ ddy_list
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Adding object #{d.name}")
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone', "Adding object #{d.name}")
 
           # add the object to the existing model
           @model.addObject(d.clone)
@@ -833,22 +843,22 @@ module BuildingSync
       # Add SiteWaterMainsTemperature -- via parsing of STAT file.
       stat_file = "#{File.join(File.dirname(epw_file.path.to_s), File.basename(epw_file.path.to_s, '.*'))}.stat"
       unless File.exist? stat_file
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find STAT file by filename, looking in the directory')
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.get_stat_file', 'Could not find STAT file by filename, looking in the directory')
         stat_files = Dir["#{File.dirname(epw_file.path.to_s)}/*.stat"]
         if stat_files.size > 1
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'More than one stat file in the EPW directory')
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_stat_file', 'More than one stat file in the EPW directory')
           return nil
         end
         if stat_files.empty?
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Cound not find the stat file in the EPW directory')
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_stat_file', 'Cound not find the stat file in the EPW directory')
           return nil
         end
 
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Using STAT file: #{stat_files.first}")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.get_stat_file', "Using STAT file: #{stat_files.first}")
         stat_file = stat_files.first
       end
       unless stat_file
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find stat file')
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_stat_file', 'Could not find stat file')
         return nil
       end
       return stat_file
@@ -862,7 +872,7 @@ module BuildingSync
       water_temp = @model.getSiteWaterMainsTemperature
       water_temp.setAnnualAverageOutdoorAirTemperature(stat_model.mean_dry_bulb)
       water_temp.setMaximumDifferenceInMonthlyAverageOutdoorAirTemperatures(stat_model.delta_dry_bulb)
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "mean dry bulb is #{stat_model.mean_dry_bulb}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.add_site_water_mains_temperature', "mean dry bulb is #{stat_model.mean_dry_bulb}")
       return true
     end
 

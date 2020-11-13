@@ -138,6 +138,7 @@ module BuildingSync
       end
       @sites[0].generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file)
 
+      @epw_file_path = @sites[0].get_epw_file_path
       zone_hash = build_zone_hash(@sites[0])
       create_building_systems(output_path, zone_hash)
       return true
@@ -160,6 +161,12 @@ module BuildingSync
     # @return [Array<OpenStudio::Model::SpaceType>]
     def get_space_types
       return @sites[0].get_space_types
+    end
+
+    # get epw_file_path
+    # @return [String]
+    def get_epw_file_path
+      @sites[0].get_epw_file_path
     end
 
     # determine OpenStudio system standard

@@ -184,6 +184,12 @@ module BuildingSync
       return @buildings
     end
 
+    # get full path to epw file
+    # @return [String]
+    def get_epw_file_path
+      return get_largest_building.get_epw_file_path
+    end
+
     # get the largest building, if there are more than one building, we look for the one with the largest total florr area
     # @return [Building]
     def get_largest_building
