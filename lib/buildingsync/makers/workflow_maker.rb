@@ -140,7 +140,7 @@ module BuildingSync
     end
 
     # inserts any measure
-    # @param measure_goal_type [String]
+    # @param measure_goal_type [String] one of: 'EnergyPlusMeasure', 'ReportingMeasure', or 'ModelMeasure'
     # @param measure_dir [String]
     # @param item [Integer]
     # @param args_hash [hash]
