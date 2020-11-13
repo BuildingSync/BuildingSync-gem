@@ -58,7 +58,7 @@ RSpec.describe 'BuildingSync::Translator' do
     expect(success).to be true
     doc = translator.get_doc
     expect(doc).to be_an_instance_of(REXML::Document)
-    expect(translator.get_failed_scenarios.empty?).to be true, "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
+    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
 
     # There should be one Modeled scenario
     current_building_modeled_scenario = REXML::XPath.match(doc, "//auc:Scenarios/auc:Scenario[auc:ScenarioType/auc:CurrentBuilding/auc:CalculationMethod/auc:Modeled]")
@@ -87,7 +87,7 @@ RSpec.describe 'BuildingSync::Translator' do
     # gather_results simply prepares all of the results in memory as an REXML::Document
     success = translator.gather_results(output_path)
     expect(success).to be true
-    expect(translator.get_failed_scenarios.empty?).to be true, "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
+    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
 
     # Check that results XML file gets written
     results_file_path = File.join(output_path, 'results.xml')
