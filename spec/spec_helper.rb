@@ -271,9 +271,9 @@ RSpec.configure do |config|
   def test_baseline_creation_and_simulation(filename, standard_to_be_used, epw_file)
     current_year = Date.today.year
     translator = test_baseline_creation(filename, standard_to_be_used, epw_file)
-    expect(translator.run_osm(epw_file)).to be true
-    expect(File.exist?(translator.osm_baseline_path.gsub('in.osm', 'eplusout.sql'))).to be true
-    out_path = File.dirname(translator.osm_baseline_path)
+    expect(translator.run_baseline_osm(epw_file)).to be true
+    expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+    out_path = File.dirname(translator.osm_baseline_file_path)
     translator.gather_results(out_path, current_year, true)
     translator.save_xml(File.join(out_path, 'results.xml'))
     expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
@@ -376,5 +376,43 @@ RSpec.configure do |config|
     facility.write_osm(output_path)
 
     run_baseline_simulation(output_path + '/in.osm', epw_file_path)
+  end
+
+  # @param xml_path [String] full path to BuildingSync XML file
+  # @param output_path [String] full path to output directory where new files should be saved
+  def translator_write_osm_checks(xml_path, output_path)
+    # Delete the directory and start over if it does exist so we are not checking old results
+    if File.exist?(output_path)
+      puts "Removing dir: #{output_path}"
+      FileUtils.rm_rf(output_path)
+      expect(Dir.exist?(output_path)).to be false
+    end
+    FileUtils.mkdir_p(output_path) if !File.exist?(output_path)
+    expect(Dir.exist?(output_path)).to be true
+
+    # Create a new Translator and write the OSM
+    translator = BuildingSync::Translator.new(xml_path, output_path)
+    translator.write_osm
+
+    # Check SR path exists
+    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/SR
+    sr_path = File.join(output_path, 'SR')
+    expect(Dir.exist?(sr_path)).to be true
+
+    # Check SR has finished successfully
+    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/SR/run/finished.job
+    sr_success_file = File.join(sr_path, 'run/finished.job')
+    expect(File.exist?(sr_success_file)).to be true
+
+    # Check SR has not failed
+    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/SR/run/failed.job
+    sr_failed_file = File.join(sr_path, 'run/failed.job')
+    expect(File.exist?(sr_failed_file)).to be false
+
+    # Check in.osm written to the main output_path
+    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/in.osm
+    expect(File.exist?(File.join(output_path, 'in.osm'))).to be true
+
+    return translator
   end
 end
