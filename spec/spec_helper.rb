@@ -108,24 +108,11 @@ RSpec.configure do |config|
 
     out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
 
-    if File.exist?(out_path)
-      FileUtils.rm_rf(out_path)
-    end
-    # expect(File.exist?(out_path)).not_to be true
-
-    FileUtils.mkdir_p(out_path)
-    expect(File.exist?(out_path)).to be true
-
     epw_file_path = nil
     if !epw_file_name.nil?
       epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
     end
-
-    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
-    translator.write_osm
-
-    puts "Looking for the following OSM file: #{out_path}/in.osm"
-    expect(File.exist?("#{out_path}/in.osm")).to be true
+    translator = translator_write_osm_checks(xml_path, out_path, epw_file_path, standard_to_be_used)
     return translator
   end
 
@@ -380,7 +367,7 @@ RSpec.configure do |config|
 
   # @param xml_path [String] full path to BuildingSync XML file
   # @param output_path [String] full path to output directory where new files should be saved
-  def translator_write_osm_checks(xml_path, output_path)
+  def translator_write_osm_checks(xml_path, output_path, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
     # Delete the directory and start over if it does exist so we are not checking old results
     if File.exist?(output_path)
       puts "Removing dir: #{output_path}"
@@ -391,7 +378,7 @@ RSpec.configure do |config|
     expect(Dir.exist?(output_path)).to be true
 
     # Create a new Translator and write the OSM
-    translator = BuildingSync::Translator.new(xml_path, output_path)
+    translator = BuildingSync::Translator.new(xml_path, output_path, epw_file_path, standard_to_be_used)
     translator.write_osm
 
     # Check SR path exists
