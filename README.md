@@ -1,6 +1,6 @@
 # BuildingSync
 
-The BuildingSync-Gem is a repository of helpers for reading and writing BuildingSync XML files, and for using that data to drive energy simulations of the subject building. 
+The BuildingSync-Gem is a repository of helpers for reading and writing BuildingSync XML files, and for using that data to drive energy simulations of the subject building. See full documentation on [RubyDoc](https://www.rubydoc.info/github/BuildingSync/BuildingSync-gem).
 
 All of the following are supported: 
 
@@ -65,11 +65,11 @@ To generate the documentation locally do the following:
      
      $ yardoc - README.md 
      
-## Updating Rubydoc.info
-Publish documentation for each release.
+## Updating published documentation
+Publish documentation for each release:
 
 1. Tag release on GitHub
-1. Go to rubydoc.info and click `Add Project` in the upper right
+1. Go to [rubydoc.info](https://www.rubydoc.info) and click `Add Project` in the upper right
 1. Input the git address: `git://github/BuildingSync/BuildingSync-gem.git`
 1. Input the release tag for the desired version, eg: `v0.1.0`
 1. Click `Go`
