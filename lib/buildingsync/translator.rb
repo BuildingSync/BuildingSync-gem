@@ -53,7 +53,7 @@ module BuildingSync
     # load the building sync file and initiate the model maker and workflow makers
     # @param xml_file_path [String]
     # @param output_dir [String]
-    # @param epw_file_path [String]
+    # @param epw_file_path [String] if provided, full/path/to/my.epw
     # @param standard_to_be_used [String]
     # @param validate_xml_file_against_schema [Boolean]
     def initialize(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1, validate_xml_file_against_schema = true)
@@ -63,8 +63,7 @@ module BuildingSync
       @output_dir = output_dir
       @standard_to_be_used = standard_to_be_used
       @epw_path = epw_file_path
-      @osm_baseline_path = nil
-      @facilities = []
+      @osm_baseline_file_path = nil
 
       # to further reduce the log messages we can change the log level with this command
       # OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Error)
@@ -102,19 +101,6 @@ module BuildingSync
       @ns = 'auc'
       @doc.root.namespaces.each_pair do |k, v|
         @ns = k if /bedes-auc/.match(v)
-      end
-
-      # validate the doc
-      facilities_arr = []
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
-        facilities_arr << facility
-        @facilities.push(Facility.new(facility, @ns))
-      end
-
-      # raise 'BuildingSync file must have exactly 1 facility' if facilities.size != 1
-      if facilities_arr.size != 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', 'BuildingSync file must have exactly 1 facility')
-        raise 'BuildingSync file must have exactly 1 facility'
       end
 
       # we use only one model maker and one workflow maker that we set init here
@@ -205,38 +191,18 @@ module BuildingSync
       return @model_maker.get_model
     end
 
-    # run osm - running the baseline simulation
-    # @param epw_name [String]
-    # @param runner_options [hash]
-    def run_osm(epw_name, runner_options = { run_simulations: true, verbose: false, num_parallel: 1, max_to_run: Float::INFINITY })
-      file_name = 'in.osm'
-
-      osm_baseline_dir = File.join(@output_dir, BASELINE)
-      if !File.exist?(osm_baseline_dir)
-        FileUtils.mkdir_p(osm_baseline_dir)
-      end
-      @osm_baseline_path = File.join(osm_baseline_dir, file_name)
-      FileUtils.cp("#{@output_dir}/in.osm", osm_baseline_dir)
-      puts "osm_baseline_path: #{@osm_baseline_path}"
+    # create an osw file for the baseline scenario and save it to disk
+    # @param reporting [Boolean] true means openstudio_results will be added to the workflow
+    # @return osw_path [String] full path to in.osw file
+    def create_baseline_osw(reporting = true)
       workflow = OpenStudio::WorkflowJSON.new
-      workflow.setSeedFile(@osm_baseline_path)
-      workflow.setWeatherFile(File.join('../../../weather', epw_name))
-      # we need to add the report measure, too
-      measure_step = OpenStudio::MeasureStep.new('openstudio_results')
-      measure_steps = OpenStudio::MeasureStepVector.new
-      measure_steps.push(measure_step)
-      adding_workflow_failed = false
-      if !workflow.setMeasureSteps(OpenStudio::MeasureType.new('ModelMeasure'), measure_steps)
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.run_osm', 'Could not add reporting measure to osw')
-        adding_workflow_failed = true
-      end
+      workflow.setSeedFile(@osm_baseline_file_path)
+      workflow.setWeatherFile(@epw_file_path)
 
-      osw_path = osm_baseline_path.gsub('.osm', '.osw')
+      osw_path = @osm_baseline_file_path.gsub('.osm', '.osw')
       workflow.saveAs(File.absolute_path(osw_path.to_s))
 
-      # this is a workaround if the above code fails
-      if adding_workflow_failed
-        # if this does not work we add it directly into the JSON file
+      if reporting
         json_workflow = nil
         File.open(osw_path, 'r') do |file|
           json_workflow = JSON.parse(file.read)
@@ -248,7 +214,35 @@ module BuildingSync
         File.open(osw_path, 'w') do |file|
           file << JSON.generate(json_workflow)
         end
+        workflow = json_workflow
       end
+
+      OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.create_baseline_osw", "WorkflowJSON: #{workflow.to_s}")
+      return osw_path
+    end
+
+    # run osm - running the baseline simulation
+    # @param path_to_epw_file [String] if provided and file exists, overrides the attribute building.@epw_file_path
+    # @param runner_options [hash]
+    def run_baseline_osm(path_to_epw_file = nil, runner_options = {run_simulations: true, verbose: false, num_parallel: 1, max_to_run: Float::INFINITY})
+      if !path_to_epw_file.nil? && File.exist?(path_to_epw_file) && File.to_s.end_with?('.epw')
+        @epw_file_path = path_to_epw_file
+      else
+        @epw_file_path = @model_maker.get_facility.get_epw_file_path
+      end
+      file_name = 'in.osm'
+
+      # Create a new baseline directory: dir/@output_dir/Baseline
+      osm_baseline_dir = File.join(@output_dir, BASELINE)
+      if !File.exist?(osm_baseline_dir)
+        FileUtils.mkdir_p(osm_baseline_dir)
+      end
+
+      # Copy the osm file from dir/@output_dir/in.osm
+      # to dir/@output_dir/Baseline/in.osm
+      @osm_baseline_file_path = File.join(osm_baseline_dir, file_name)
+      FileUtils.cp("#{@output_dir}/in.osm", osm_baseline_dir)
+      osw_path = create_baseline_osw
 
       extension = OpenStudio::Extension::Extension.new
       runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
@@ -257,7 +251,7 @@ module BuildingSync
 
     # run osws - running all scenario simulations
     # @param runner_options [hash]
-    def run_osws(runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
+    def run_osws(runner_options = {run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY})
       osw_files = []
       osw_sr_files = []
       Dir.glob("#{@output_dir}/**/in.osw") { |osw| osw_files << osw }
@@ -280,6 +274,6 @@ module BuildingSync
     end
 
     # osm file path of the baseline model
-    attr_reader :osm_baseline_path
+    attr_reader :osm_baseline_file_path
   end
 end
