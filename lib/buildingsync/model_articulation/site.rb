@@ -259,7 +259,7 @@ module BuildingSync
       write_parameters_to_xml_for_spatial_element
 
       @site_xml.elements.each("#{@ns}:Buildings/#{@ns}:Building") do |buildings_element|
-        @buildings[0].write_parameters_to_xml(buildings_element, @ns)
+        @buildings[0].write_parameters_to_xml
       end
     end
   end
