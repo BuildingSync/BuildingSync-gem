@@ -115,19 +115,22 @@ module BuildingSync
     end
 
     # gather results from simulated scenarios, for all or just the baseline scenario
-    # @param dir [String]
+    # @param dir [String] output_path where all scenarios are being run: i.e output_path/Baseline output_path/SR
     # @param year_val [Integer]
     # @param baseline_only [Boolean]
     def gather_results(dir, year_val = Date.today.year, baseline_only = false)
-      puts "dir: #{dir}"
-      dir_split = dir.split(File::SEPARATOR)
-      puts "dir_split: #{dir_split}"
-      puts "dir_split[]: #{dir_split[dir_split.length - 1]}"
-      if dir_split[dir_split.length - 1] == BASELINE
-        dir = dir.gsub('/Baseline', '')
+      children_dirs = Dir.glob("#{dir}/*").select {|f| File.directory? f }
+      baseline_dir_found = false
+      children_dirs.each do |child|
+        if child.end_with?(BASELINE)
+          baseline_dir_found = true
+        end
       end
-      puts "dir: #{dir}"
-      @workflow_maker.gather_results(dir, year_val, baseline_only)
+      OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.gather_results", "Children dirs: #{children_dirs}")
+      if !baseline_dir_found
+        OpenStudio.logFree(OpenStudio::Error, "BuildingSync.Translator.gather_results", "A Baseline directory was not found.  Will not gather_results.")
+      end
+      return @workflow_maker.gather_results(dir, year_val, baseline_only)
     end
 
     # save xml that includes the results
@@ -174,6 +177,12 @@ module BuildingSync
     # @param args_hash [hash]
     def insert_reporting_measure(measure_dir, position = 0, args_hash = {})
       @workflow_maker.insert_reporting_measure(measure_dir, position, args_hash)
+    end
+
+    # get xml document
+    # @return [REXML::Document]
+    def get_doc
+      return @doc
     end
 
     # get workflow from workflow maker

@@ -87,25 +87,26 @@ module BuildingSync
       @load_system = nil
       @hvac_system = nil
 
+      @facility_xml = facility_xml
+      @ns = ns
+
       # reading the xml
-      read_xml(facility_xml, ns)
+      read_xml
     end
 
     # read xml
-    # @param facility_xml [REXML:Element]
-    # @param ns [String]
-    def read_xml(facility_xml, ns)
-      facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-        @sites.push(Site.new(site_element, ns))
+    def read_xml
+      @facility_xml.elements.each("#{@ns}:Sites/#{@ns}:Site") do |site_element|
+        @sites.push(Site.new(site_element, @ns))
       end
 
-      facility_xml.elements.each("#{ns}:Measures/#{ns}:Measure") do |measure_element|
-        @measures.push(Measure.new(measure_element, ns))
+      @facility_xml.elements.each("#{@ns}:Measures/#{@ns}:Measure") do |measure_element|
+        @measures.push(Measure.new(measure_element, @ns))
       end
 
-      read_other_details(facility_xml, ns)
-      read_interval_reading(facility_xml, ns)
-      read_systems(facility_xml, ns)
+      read_other_details
+      read_interval_reading
+      read_systems
     end
 
     # set all function that iterates over the sites and calls their set all function
@@ -176,28 +177,26 @@ module BuildingSync
     end
 
     # read interval reading
-    # @param facility_xml [REXML::Element]
-    # @param ns [String]
-    def read_interval_reading(facility_xml, ns)
+    def read_interval_reading
       interval_frequency = ''
       reading_type = ''
       interval_reading = ''
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"]
-        @energy_resource = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"].text
+      if @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario/#{@ns}:ResourceUses/#{@ns}:ResourceUse/#{@ns}:EnergyResource"]
+        @energy_resource = @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario/#{@ns}:ResourceUses/#{@ns}:ResourceUse/#{@ns}:EnergyResource"].text
       else
         @energy_resource = nil
       end
 
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalFrequency"]
-        interval_frequency = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalFrequency"].text
+      if @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario/#{@ns}:TimeSeriesData/#{@ns}:TimeSeriesType/#{@ns}:IntervalFrequency"]
+        interval_frequency = @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario/#{@ns}:TimeSeriesData/#{@ns}:TimeSeriesType/#{@ns}:IntervalFrequency"].text
       end
 
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:ReadingType"]
-        reading_type = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:ReadingType"].text
+      if @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario/#{@ns}:TimeSeriesData/#{@ns}:TimeSeriesType/#{@ns}:ReadingType"]
+        reading_type = @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario/#{@ns}:TimeSeriesData/#{@ns}:TimeSeriesType/#{@ns}:ReadingType"].text
       end
 
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalReading"]
-        interval_reading = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalReading"].text
+      if @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario/#{@ns}:TimeSeriesData/#{@ns}:TimeSeriesType/#{@ns}:IntervalReading"]
+        interval_reading = @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario/#{@ns}:TimeSeriesData/#{@ns}:TimeSeriesType/#{@ns}:IntervalReading"].text
       end
 
       if interval_frequency == 'Month'
@@ -208,13 +207,11 @@ module BuildingSync
     end
 
     # read systems
-    # @param facility_xml [REXML::Element]
-    # @param ns [String]
-    def read_systems(facility_xml, ns)
-      systems_xml = facility_xml.elements["#{ns}:Systems"]
+    def read_systems
+      systems_xml = @facility_xml.elements["#{@ns}:Systems"]
       if systems_xml
-        @load_system = LoadsSystem.new(systems_xml.elements["#{ns}:PlugLoads"], ns)
-        @hvac_system = HVACSystem.new(systems_xml.elements["#{ns}:HVACSystems"], ns)
+        @load_system = LoadsSystem.new(systems_xml.elements["#{@ns}:PlugLoads"], @ns)
+        @hvac_system = HVACSystem.new(systems_xml.elements["#{@ns}:HVACSystems"], @ns)
       else
         @load_system = LoadsSystem.new
         @hvac_system = HVACSystem.new
@@ -222,69 +219,67 @@ module BuildingSync
     end
 
     # read other details
-    # @param facility_xml [REXML::Element]
-    # @param ns [String]
-    def read_other_details(facility_xml, ns)
-      facility_xml.elements.each("#{ns}:Contacts/#{ns}:Contact") do |contact|
-        contact.elements.each("#{ns}:ContactRoles/#{ns}:ContactRole") do |role|
+    def read_other_details
+      @facility_xml.elements.each("#{@ns}:Contacts/#{@ns}:Contact") do |contact|
+        contact.elements.each("#{@ns}:ContactRoles/#{@ns}:ContactRole") do |role|
           if role.text == 'Energy Auditor'
-            @contact_auditor_name = contact.elements["#{ns}:ContactName"].text
+            @contact_auditor_name = contact.elements["#{@ns}:ContactName"].text
           elsif role.text == 'Owner'
-            @contact_owner_name = contact.elements["#{ns}:ContactName"].text
+            @contact_owner_name = contact.elements["#{@ns}:ContactName"].text
           end
         end
       end
 
-      report = facility_xml.elements["#{ns}:Reports/#{ns}:Report"]
+      report = @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report"]
       if !report.nil?
-        @auditor_contact_id = BuildingSync::Helper.get_text_value(report.elements["#{ns}:AuditorContactID"])
-        report.elements.each("#{ns}:AuditDates/#{ns}:AuditDate") do |audit_date|
-          if audit_date.elements["#{ns}:CustomDateType"].text == 'Level 1: Walk-through'
-            @audit_date_level_1 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
+        @auditor_contact_id = BuildingSync::Helper.get_text_value(report.elements["#{@ns}:AuditorContactID"])
+        report.elements.each("#{@ns}:AuditDates/#{@ns}:AuditDate") do |audit_date|
+          if audit_date.elements["#{@ns}:CustomDateType"].text == 'Level 1: Walk-through'
+            @audit_date_level_1 = BuildingSync::Helper.get_date_value(audit_date.elements["#{@ns}:Date"])
             @audit_date = @audit_date_level_1
-          elsif audit_date.elements["#{ns}:CustomDateType"].text == 'Level 2: Energy Survey and Analysis'
-            @audit_date_level_2 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
+          elsif audit_date.elements["#{@ns}:CustomDateType"].text == 'Level 2: Energy Survey and Analysis'
+            @audit_date_level_2 = BuildingSync::Helper.get_date_value(audit_date.elements["#{@ns}:Date"])
             @audit_date = @audit_date_level_2
-          elsif audit_date.elements["#{ns}:CustomDateType"].text == 'Level 3: Detailed Survey and Analysis'
-            @audit_date_level_3 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
+          elsif audit_date.elements["#{@ns}:CustomDateType"].text == 'Level 3: Detailed Survey and Analysis'
+            @audit_date_level_3 = BuildingSync::Helper.get_date_value(audit_date.elements["#{@ns}:Date"])
             @audit_date = @audit_date_level_3
           end
         end
 
         # here we iterate over the scenarios to find the one "currentBuilding" and "benchmark"
-        report.elements.each("#{ns}:Scenarios/#{ns}:Scenario") do |scenario|
-          if scenario.elements["#{ns}:ScenarioType/#{ns}:CurrentBuilding"]
-            @building_eui = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"])
-            @annual_fuel_use_native_units = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"])
-            @energy_cost = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"])
-          elsif scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark"]
-            @building_eui_benchmark = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"])
-            @benchmark_source = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"])
+        report.elements.each("#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+          if scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding"]
+            @building_eui = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:SiteEnergyUseIntensity"])
+            @annual_fuel_use_native_units = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:ResourceUses/#{@ns}:ResourceUse/#{@ns}:AnnualFuelUseNativeUnits"])
+            @energy_cost = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:EnergyCost"])
+          elsif scenario.elements["#{@ns}:ScenarioType/#{@ns}:Benchmark"]
+            @building_eui_benchmark = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:SiteEnergyUseIntensity"])
+            @benchmark_source = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:ScenarioType/#{@ns}:Benchmark/#{@ns}:BenchmarkType/#{@ns}:Other"])
           end
         end
 
-        report.elements.each("#{ns}:UserDefinedFields/#{ns}:UserDefinedField") do |user_defined_field|
-          if user_defined_field.elements["#{ns}:FieldName"].text == 'Audit Notes'
-            @audit_notes = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Audit Team Notes'
-            @audit_team_notes = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Auditor Years Of Experience'
-            @auditor_years_experience = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Spaces Excluded From Gross Floor Area'
-            @spaces_excluded_from_gross_floor_area = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Premises Notes For Not Applicable'
-            @premises_notes_for_not_applicable = user_defined_field.elements["#{ns}:FieldValue"].text
+        report.elements.each("#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField") do |user_defined_field|
+          if user_defined_field.elements["#{@ns}:FieldName"].text == 'Audit Notes'
+            @audit_notes = user_defined_field.elements["#{@ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Audit Team Notes'
+            @audit_team_notes = user_defined_field.elements["#{@ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Auditor Years Of Experience'
+            @auditor_years_experience = user_defined_field.elements["#{@ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Spaces Excluded From Gross Floor Area'
+            @spaces_excluded_from_gross_floor_area = user_defined_field.elements["#{@ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Premises Notes For Not Applicable'
+            @premises_notes_for_not_applicable = user_defined_field.elements["#{@ns}:FieldValue"].text
           end
         end
       end
 
-      utilities = facility_xml.elements["#{ns}:Utilities"]
+      utilities = @facility_xml.elements["#{@ns}:Utilities"]
       if utilities
-        @utility_meter_number = BuildingSync::Helper.get_text_value(utilities.elements["#{ns}:UtilityMeterNumbers/#{ns}:UtilityMeterNumber"])
-        utilities.elements.each("#{ns}:Utility") do |utility|
-          @utility_name = BuildingSync::Helper.get_text_value(utility.elements["#{ns}:UtilityName"])
-          @metering_configuration = BuildingSync::Helper.get_text_value(utility.elements["#{ns}:MeteringConfiguration"])
-          @rate_schedules = BuildingSync::Helper.get_text_value(utility.elements["#{ns}:RateSchedules"])
+        @utility_meter_number = BuildingSync::Helper.get_text_value(utilities.elements["#{@ns}:UtilityMeterNumbers/#{@ns}:UtilityMeterNumber"])
+        utilities.elements.each("#{@ns}:Utility") do |utility|
+          @utility_name = BuildingSync::Helper.get_text_value(utility.elements["#{@ns}:UtilityName"])
+          @metering_configuration = BuildingSync::Helper.get_text_value(utility.elements["#{@ns}:MeteringConfiguration"])
+          @rate_schedules = BuildingSync::Helper.get_text_value(utility.elements["#{@ns}:RateSchedules"])
         end
       end
     end
@@ -319,7 +314,7 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
 
-      # TODO: systems_xml.elements["#{ns}:LightingSystems"]
+      # TODO: systems_xml.elements["#{@ns}:LightingSystems"]
       # Make the open_studio_system_standard applier
       open_studio_system_standard = determine_open_studio_system_standard
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Building Standard with template: #{template}.")
@@ -445,20 +440,18 @@ module BuildingSync
     end
 
     # write parameters to xml
-    # @param facility [REXML::Element]
-    # @param ns [String]
-    def write_parameters_to_xml(facility, ns)
-      report = facility.elements["#{ns}:Reports/#{ns}:Report"]
-      report.elements.each("#{ns}:Scenarios/#{ns}:Scenario") do |scenario|
-        scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"].text = @energy_resource if !@energy_resource.nil?
-        scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"].text = @benchmark_source if !@benchmark_source.nil?
-        scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text = @building_eui if !@building_eui.nil?
-        scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text = @building_eui_benchmark if !@building_eui_benchmark.nil?
-        scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"].text = @energy_cost if !@energy_cost.nil?
-        scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"].text = @annual_fuel_use_native_units if !@annual_fuel_use_native_units.nil?
+    def write_parameters_to_xml
+      report = @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report"]
+      report.elements.each("#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
+        scenario.elements["#{@ns}:ResourceUses/#{@ns}:ResourceUse/#{@ns}:EnergyResource"].text = @energy_resource if !@energy_resource.nil?
+        scenario.elements["#{@ns}:ScenarioType/#{@ns}:Benchmark/#{@ns}:BenchmarkType/#{@ns}:Other"].text = @benchmark_source if !@benchmark_source.nil?
+        scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:SiteEnergyUseIntensity"].text = @building_eui if !@building_eui.nil?
+        scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:SiteEnergyUseIntensity"].text = @building_eui_benchmark if !@building_eui_benchmark.nil?
+        scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:EnergyCost"].text = @energy_cost if !@energy_cost.nil?
+        scenario.elements["#{@ns}:ResourceUses/#{@ns}:ResourceUse/#{@ns}:AnnualFuelUseNativeUnits"].text = @annual_fuel_use_native_units if !@annual_fuel_use_native_units.nil?
       end
-      facility.elements.each("#{ns}:Sites/#{ns}:Site") do |site|
-        @sites[0].write_parameters_to_xml(site, ns)
+      @facility_xml.elements.each("#{@ns}:Sites/#{@ns}:Site") do |site|
+        @sites[0].write_parameters_to_xml
       end
     end
 

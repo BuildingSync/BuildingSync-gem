@@ -1035,7 +1035,7 @@ module BuildingSync
     end
 
     # gather results
-    # @param dir [String]
+    # @param dir [String] output_path where all scenarios are being run: i.e output_path/Baseline output_path/SR
     # @param year_val [Integer]
     # @param baseline_only [Boolean]
     # @return [Boolean]
@@ -1092,6 +1092,7 @@ module BuildingSync
       end
 
       if results_counter > 0
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.gather_results', "#{results_counter} successfully simulated and results processed")
         puts "#{results_counter} scenarios successfully simulated and results processed"
       end
       return successful

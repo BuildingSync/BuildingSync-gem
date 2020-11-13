@@ -261,7 +261,9 @@ RSpec.configure do |config|
     expect(translator.run_baseline_osm(epw_file)).to be true
     expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
     out_path = File.dirname(translator.osm_baseline_file_path)
-    translator.gather_results(out_path, current_year, true)
+    success = translator.gather_results(out_path, current_year, true)
+
+    expect(success).to be true
     translator.save_xml(File.join(out_path, 'results.xml'))
     expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
   end
@@ -401,5 +403,21 @@ RSpec.configure do |config|
     expect(File.exist?(File.join(output_path, 'in.osm'))).to be true
 
     return translator
+  end
+
+  def translator_run_baseline_osm_checks(output_path)
+    # Check Baseline directory gets created
+    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/Baseline
+    baseline_path = File.join(output_path, 'Baseline')
+    expect(Dir.exist?(baseline_path)).to be true
+
+    # Expect job not to have failed
+    failed_path = File.join(baseline_path, 'failed.job')
+    expect(File.exist?(failed_path)).to be false
+
+    # Expect job finished
+    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/Baseline/finished.job
+    finished_path = File.join(baseline_path, 'finished.job')
+    expect(File.exist?(finished_path)).to be true
   end
 end

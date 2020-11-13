@@ -42,11 +42,16 @@ module BuildingSync
   class BuildingSection < SpatialElement
     include OpenstudioStandards
     # initialize
-    # @param section_element [REXML:Element]
+    # @param section_xml [REXML:Element] an element corresponding to a single auc:Section
     # @param bldgsync_occ_type [String]
     # @param bldg_total_floor_area [Float]
-    # @param ns [String]
-    def initialize(section_element, bldgsync_occ_type, bldg_total_floor_area, num_stories, ns)
+    # @param num_stories [Float]
+    # @param ns [String] namespace, likely 'auc'
+    def initialize(section_xml, bldgsync_occ_type, bldg_total_floor_area, num_stories, ns)
+      super(section_xml, ns)
+      @section_xml = section_xml
+      @ns = ns
+
       @id = nil
       @door_ids = []
       @wall_ids = []
@@ -75,151 +80,136 @@ module BuildingSync
       @num_stories = num_stories
 
       # code to initialize
-      read_xml(section_element, bldgsync_occ_type, bldg_total_floor_area, ns)
+      read_xml(bldgsync_occ_type, bldg_total_floor_area)
     end
 
     # read xml
-    # @param section_element [REXML:Element]
     # @param bldgsync_occ_type [String]
     # @param bldg_total_floor_area [Float]
-    # @param ns [String]
-    def read_xml(section_element, bldgsync_occ_type, bldg_total_floor_area, ns)
-      if section_element.attributes['ID']
-        @id = section_element.attributes['ID']
+    def read_xml(bldgsync_occ_type, bldg_total_floor_area)
+      if @section_xml.attributes['ID']
+        @id = @section_xml.attributes['ID']
       end
       # floor areas
-      @total_floor_area = read_floor_areas(section_element, bldg_total_floor_area, ns)
+      @total_floor_area = read_floor_areas(bldg_total_floor_area)
       # based on the occupancy type set building type, system type and bar division method
-      read_bldg_system_type_based_on_occupancy_type(section_element, bldgsync_occ_type, ns)
-      read_building_section_type(section_element, ns)
-      read_building_section_other_detail(section_element, ns)
-      read_footprint_shape(section_element, ns)
-      read_principal_hvac_type(section_element, ns)
-      read_construction_types(section_element, ns)
+      read_bldg_system_type_based_on_occupancy_type(bldgsync_occ_type)
+      read_building_section_type
+      read_building_section_other_detail
+      read_footprint_shape
+      read_principal_hvac_type
+      read_construction_types
 
-      if section_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"]
-        @occupant_quantity = section_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text
+      if @section_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"]
+        @occupant_quantity = @section_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"].text
       else
         @occupant_quantity = nil
       end
     end
 
     # read building system type based on occupancy type
-    # @param section_element [REXML:Element]
     # @param bldgsync_occ_type [String]
-    # @param ns [String]
-    def read_bldg_system_type_based_on_occupancy_type(section_element, bldgsync_occ_type, ns)
-      @bldgsync_occupancy_type = read_bldgsync_occupancy_type(section_element, bldgsync_occ_type, ns)
+    def read_bldg_system_type_based_on_occupancy_type(bldgsync_occ_type)
+      @bldgsync_occupancy_type = read_bldgsync_occupancy_type(bldgsync_occ_type)
     end
 
     # read building section type
-    # @param section_element [REXML:Element]
-    # @param ns [String]
-    def read_building_section_type(section_element, ns)
-      if section_element.elements["#{ns}:SectionType"]
-        @section_type = section_element.elements["#{ns}:SectionType"].text
+    def read_building_section_type
+      if @section_xml.elements["#{@ns}:SectionType"]
+        @section_type = @section_xml.elements["#{@ns}:SectionType"].text
       else
         @section_type = nil
       end
     end
 
     # read footprint shape
-    # @param section_element [REXML:Element]
-    # @param ns [String]
-    def read_footprint_shape(section_element, ns)
-      if section_element.elements["#{ns}:FootprintShape"]
-        @footprint_shape = section_element.elements["#{ns}:FootprintShape"].text
+    def read_footprint_shape
+      if @section_xml.elements["#{@ns}:FootprintShape"]
+        @footprint_shape = @section_xml.elements["#{@ns}:FootprintShape"].text
       else
         @footprint_shape = nil
       end
     end
 
     # read building section other details
-    # @param section_element [REXML:Element]
-    # @param ns [String]
-    def read_building_section_other_detail(section_element, ns)
-      if section_element.elements["#{ns}:TypicalOccupantUsages"]
-        section_element.elements.each("#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage") do |occ_usage|
-          if occ_usage.elements["#{ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'
-            @typical_occupant_usage_value_hours = occ_usage.elements["#{ns}:TypicalOccupantUsageValue"].text
-          elsif occ_usage.elements["#{ns}:TypicalOccupantUsageUnits"].text == 'Weeks per year'
-            @typical_occupant_usage_value_weeks = occ_usage.elements["#{ns}:TypicalOccupantUsageValue"].text
+    def read_building_section_other_detail
+      if @section_xml.elements["#{@ns}:TypicalOccupantUsages"]
+        @section_xml.elements.each("#{@ns}:TypicalOccupantUsages/#{@ns}:TypicalOccupantUsage") do |occ_usage|
+          if occ_usage.elements["#{@ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'
+            @typical_occupant_usage_value_hours = occ_usage.elements["#{@ns}:TypicalOccupantUsageValue"].text
+          elsif occ_usage.elements["#{@ns}:TypicalOccupantUsageUnits"].text == 'Weeks per year'
+            @typical_occupant_usage_value_weeks = occ_usage.elements["#{@ns}:TypicalOccupantUsageValue"].text
           end
         end
       end
 
-      if section_element.elements["#{ns}:OccupancyLevels"]
-        section_element.elements.each("#{ns}:OccupancyLevels/#{ns}:OccupancyLevel") do |occ_level|
-          if occ_level.elements["#{ns}:OccupantQuantityType"].text == 'Peak total occupants'
-            @occupant_quantity = occ_level.elements["#{ns}:OccupantQuantity"].text
+      if @section_xml.elements["#{@ns}:OccupancyLevels"]
+        @section_xml.elements.each("#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel") do |occ_level|
+          if occ_level.elements["#{@ns}:OccupantQuantityType"].text == 'Peak total occupants'
+            @occupant_quantity = occ_level.elements["#{@ns}:OccupantQuantity"].text
           end
         end
       end
     end
 
     # read principal hvac type
-    # @param section_element [REXML:Element]
-    # @param ns [String]
-    def read_principal_hvac_type(section_element, ns)
-      if section_element.elements["#{ns}:UserDefinedFields"]
-        section_element.elements.each("#{ns}:UserDefinedFields/#{ns}:UserDefinedField") do |user_defined_field|
-          if user_defined_field.elements["#{ns}:FieldName"].text == 'Principal HVAC System Type'
-            @principal_hvac_type = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Principal Lighting System Type'
-            @principal_lighting_system_type = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Miscellaneous Electric Load'
-            @miscellaneous_electric_load = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Original Occupancy Classification'
-            @occupancy_classification_original = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Percentage Dwellings Occupied'
-            @spaces_conditioned_percent = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Quantity Of Dwellings'
-            @dwelling_quantity = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Percentage Dwellings Occupied'
-            @dwellings_occupied_percent = user_defined_field.elements["#{ns}:FieldValue"].text
+    def read_principal_hvac_type
+      if @section_xml.elements["#{@ns}:UserDefinedFields"]
+        @section_xml.elements.each("#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField") do |user_defined_field|
+          if user_defined_field.elements["#{@ns}:FieldName"].text == 'Principal HVAC System Type'
+            @principal_hvac_type = user_defined_field.elements["#{@ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Principal Lighting System Type'
+            @principal_lighting_system_type = user_defined_field.elements["#{@ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Miscellaneous Electric Load'
+            @miscellaneous_electric_load = user_defined_field.elements["#{@ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Original Occupancy Classification'
+            @occupancy_classification_original = user_defined_field.elements["#{@ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Percentage Dwellings Occupied'
+            @spaces_conditioned_percent = user_defined_field.elements["#{@ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Quantity Of Dwellings'
+            @dwelling_quantity = user_defined_field.elements["#{@ns}:FieldValue"].text
+          elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Percentage Dwellings Occupied'
+            @dwellings_occupied_percent = user_defined_field.elements["#{@ns}:FieldValue"].text
           end
         end
       end
     end
 
     # read construction types
-    # @param section_element [REXML:Element]
-    # @param ns [String]
-    def read_construction_types(section_element, ns)
-      if section_element.elements["#{ns}:Sides"]
-        section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:DoorID") do |door|
+    def read_construction_types
+      if @section_xml.elements["#{@ns}:Sides"]
+        @section_xml.elements.each("#{@ns}:Sides/#{@ns}:Side/#{@ns}:DoorID") do |door|
           @door_ids.push(door.attributes['IDref'])
         end
-        section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:WallID") do |wall|
+        @section_xml.elements.each("#{@ns}:Sides/#{@ns}:Side/#{@ns}:WallID") do |wall|
           @wall_ids.push(wall.attributes['IDref'])
         end
-        section_element.elements.each("#{ns}:Sides/#{ns}:Side/#{ns}:WindowID") do |window|
+        @section_xml.elements.each("#{@ns}:Sides/#{@ns}:Side/#{@ns}:WindowID") do |window|
           @window_ids.push(window.attributes['IDref'])
         end
       end
-      if section_element.elements["#{ns}:Roofs"]
-        section_element.elements.each("#{ns}:Roofs/#{ns}:Roof/#{ns}:RoofID") do |roof|
+      if @section_xml.elements["#{@ns}:Roofs"]
+        @section_xml.elements.each("#{@ns}:Roofs/#{@ns}:Roof/#{@ns}:RoofID") do |roof|
           @roof_ids.push(roof.attributes['IDref'])
         end
-        section_element.elements.each("#{ns}:Roofs/#{ns}:Roof/#{ns}:RoofID/#{ns}:SkylightIDs/#{ns}:SkylightID") do |skylight|
+        @section_xml.elements.each("#{@ns}:Roofs/#{@ns}:Roof/#{@ns}:RoofID/#{@ns}:SkylightIDs/#{@ns}:SkylightID") do |skylight|
           @skylight_ids.push(skylight.attributes['IDref'])
         end
       end
-      if section_element.elements["#{ns}:ExteriorFloors"]
-        section_element.elements.each("#{ns}:ExteriorFloors/#{ns}:ExteriorFloor/#{ns}:ExteriorFloorID ") do |floor|
+      if @section_xml.elements["#{@ns}:ExteriorFloors"]
+        @section_xml.elements.each("#{@ns}:ExteriorFloors/#{@ns}:ExteriorFloor/#{@ns}:ExteriorFloorID ") do |floor|
           @exterior_floor_ids.push(floor.attributes['IDref'])
         end
       end
-      if section_element.elements["#{ns}:Foundations"]
-        section_element.elements.each("#{ns}:Foundations/#{ns}:Foundation/#{ns}:FoundationID  ") do |foundation|
+      if @section_xml.elements["#{@ns}:Foundations"]
+        @section_xml.elements.each("#{@ns}:Foundations/#{@ns}:Foundation/#{@ns}:FoundationID  ") do |foundation|
           @foundation_ids.push(foundation.attributes['IDref'])
         end
       end
     end
 
     # add principal hvac type
-    # @param building_section [BuildingSection]
-    def add_principal_hvac_type(building_section)
+    def add_principal_hvac_type
       building_sections = building_section.parent
       building = building_sections.parent
       buildings = building.parent
@@ -227,54 +217,52 @@ module BuildingSync
       sites = site.parent
       facility = sites.parent
 
-      if facility.elements["#{ns}:Systems"].nil?
-        systems = REXML::Element.new("#{ns}:Systems")
+      if facility.elements["#{@ns}:Systems"].nil?
+        systems = REXML::Element.new("#{@ns}:Systems")
         facility.add_element(systems)
       else
-        systems = facility.elements["#{ns}:Systems"]
+        systems = facility.elements["#{@ns}:Systems"]
       end
 
-      if systems.elements["#{ns}:HVACSystems"].nil?
-        hvac_systems = REXML::Element.new("#{ns}:HVACSystems")
+      if systems.elements["#{@ns}:HVACSystems"].nil?
+        hvac_systems = REXML::Element.new("#{@ns}:HVACSystems")
         systems.add_element(hvac_systems)
       else
-        hvac_systems = facility.elements["#{ns}:HVACSystems"]
+        hvac_systems = facility.elements["#{@ns}:HVACSystems"]
       end
 
-      if hvac_systems.elements["#{ns}:HVACSystem"].nil?
+      if hvac_systems.elements["#{@ns}:HVACSystem"].nil?
         hvac_system = BuildingSync::HVACSystem.new
       else
-        hvac_system = facility.elements["#{ns}:HVACSystem"]
+        hvac_system = facility.elements["#{@ns}:HVACSystem"]
       end
 
       hvac_system.add_principal_hvac_system_type(@id, @principal_hvac_type)
     end
 
     # add principal hvac type
-    # @param ns [String]
-    # @param building_section [BuildingSection]
-    def write_parameters_to_xml(building_section, ns)
-      building_section.elements["#{ns}:fraction_area"].text = @fraction_area
-      building_section.elements["#{ns}:OriginalOccupancyClassification"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
+    def write_parameters_to_xml
+      @section_xml.elements["#{@ns}:fraction_area"].text = @fraction_area
+      @section_xml.elements["#{@ns}:OriginalOccupancyClassification"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
 
-      add_principal_hvac_type(building_section) if !@principal_hvac_type.nil?
+      add_principal_hvac_type if !@principal_hvac_type.nil?
 
-      building_section.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @principal_lighting_system_type if !@principal_lighting_system_type.nil?
-      building_section.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @miscellaneous_electric_load if !@miscellaneous_electric_load.nil?
-      building_section.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @spaces_conditioned_percent if !@spaces_conditioned_percent.nil?
-      building_section.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwelling_quantity if !@dwelling_quantity.nil?
-      building_section.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text = @dwellings_occupied_percent if !@dwellings_occupied_percent.nil?
-      building_section.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_hours if !@typical_occupant_usage_value_hours.nil?
-      building_section.elements["#{ns}:TypicalOccupantUsages/#{ns}:TypicalOccupantUsage/#{ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_weeks if !@typical_occupant_usage_value_weeks.nil?
-      building_section.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
-      building_section.elements["#{ns}:FootprintShape"].text = @footprint_shape if !@footprint_shape.nil?
-      building_section.elements["#{ns}:SectionType"].text = @section_type if !@section_type.nil?
+      @section_xml.elements["#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField/#{@ns}:FieldValue"].text = @principal_lighting_system_type if !@principal_lighting_system_type.nil?
+      @section_xml.elements["#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField/#{@ns}:FieldValue"].text = @miscellaneous_electric_load if !@miscellaneous_electric_load.nil?
+      @section_xml.elements["#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField/#{@ns}:FieldValue"].text = @spaces_conditioned_percent if !@spaces_conditioned_percent.nil?
+      @section_xml.elements["#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField/#{@ns}:FieldValue"].text = @dwelling_quantity if !@dwelling_quantity.nil?
+      @section_xml.elements["#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField/#{@ns}:FieldValue"].text = @dwellings_occupied_percent if !@dwellings_occupied_percent.nil?
+      @section_xml.elements["#{@ns}:TypicalOccupantUsages/#{@ns}:TypicalOccupantUsage/#{@ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_hours if !@typical_occupant_usage_value_hours.nil?
+      @section_xml.elements["#{@ns}:TypicalOccupantUsages/#{@ns}:TypicalOccupantUsage/#{@ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_weeks if !@typical_occupant_usage_value_weeks.nil?
+      @section_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
+      @section_xml.elements["#{@ns}:FootprintShape"].text = @footprint_shape if !@footprint_shape.nil?
+      @section_xml.elements["#{@ns}:SectionType"].text = @section_type if !@section_type.nil?
 
       # Add new element in the XML file
-      add_user_defined_field_to_xml_file(building_section, ns, 'BuildingType', @bldg_type)
-      add_user_defined_field_to_xml_file(building_section, ns, 'FractionArea', @fraction_area)
+      add_user_defined_field_to_xml_file('BuildingType', @bldg_type)
+      add_user_defined_field_to_xml_file('FractionArea', @fraction_area)
 
-      write_parameters_to_xml_for_spatial_element(building_section, ns)
+      write_parameters_to_xml_for_spatial_element
     end
 
     # set building and system type

@@ -39,26 +39,29 @@ module BuildingSync
   # Site class
   class Site < LocationElement
     # initialize
-    # @param build_element [REXML::Element]
-    # @param ns [String]
-    def initialize(build_element, ns)
+    # @param site_xml [REXML::Element] an element corresponding to a single auc:Site
+    # @param ns [String] namespace, likely 'auc'
+    def initialize(site_xml, ns)
+      super(site_xml, ns)
+      @site_xml = site_xml
+      @ns = ns
+
       # an array that contains all the buildings
       @buildings = []
       @largest_building = nil
       @premises_notes = nil
       @all_set = false
 
+
       # using the XML snippet to search for the buildings on the site
-      read_xml(build_element, ns)
+      read_xml
     end
 
     # read xml
-    # @param build_element [REXML::Element]
-    # @param ns [String]
-    def read_xml(build_element, ns)
+    def read_xml
       # first we check if the number of buildings is ok
       number_of_buildings = 0
-      build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
+      @site_xml.elements.each("#{@ns}:Buildings/#{@ns}:Building") do |buildings_element|
         number_of_buildings += 1
       end
       if number_of_buildings == 0
@@ -69,14 +72,14 @@ module BuildingSync
         raise "Error: There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file."
       end
       # check occupancy type at the site level
-      @bldgsync_occupancy_type = read_bldgsync_occupancy_type(build_element, nil, ns)
+      @bldgsync_occupancy_type = read_bldgsync_occupancy_type(nil)
       # check floor areas at the site level
-      @total_floor_area = read_floor_areas(build_element, nil, ns)
+      @total_floor_area = read_floor_areas(nil)
       # read location specific values
-      read_location_values(build_element, ns)
+      read_location_values
       # code to create a building
-      build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
-        @buildings.push(Building.new(buildings_element, @bldgsync_occupancy_type, @total_floor_area, ns))
+      @site_xml.elements.each("#{@ns}:Buildings/#{@ns}:Building") do |buildings_element|
+        @buildings.push(Building.new(buildings_element, @bldgsync_occupancy_type, @total_floor_area, @ns))
       end
     end
 
@@ -241,22 +244,22 @@ module BuildingSync
     # write parameters to xml file
     # @param site [Site]
     # @param ns [String]
-    def write_parameters_to_xml(site, ns)
-      site.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text = @climate_zone_ashrae if !@climate_zone_ashrae.nil?
-      site.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil?
-      site.elements["#{ns}:WeatherStationName"].text = @weather_file_name if !@weather_file_name.nil?
-      site.elements["#{ns}:WeatherDataStationID"].text = @weather_station_id if !@weather_station_id.nil?
-      site.elements["#{ns}:Address/#{ns}:City"].text = @city_name if !@city_name.nil?
-      site.elements["#{ns}:Address/#{ns}:State"].text = @state_name if !@state_name.nil?
-      site.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"].text = @street_address if !@street_address.nil?
-      site.elements["#{ns}:Address/#{ns}:PostalCode"].text = @postal_code if !@postal_code.nil?
-      site.elements["#{ns}:Latitude"].text = @latitude if !@latitude.nil?
-      site.elements["#{ns}:Longitude"].text = @longitude if !@longitude.nil?
+    def write_parameters_to_xml
+      @site_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE/#{@ns}:ClimateZone"].text = @climate_zone_ashrae if !@climate_zone_ashrae.nil?
+      @site_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24/#{@ns}:ClimateZone"].text = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil?
+      @site_xml.elements["#{@ns}:WeatherStationName"].text = @weather_file_name if !@weather_file_name.nil?
+      @site_xml.elements["#{@ns}:WeatherDataStationID"].text = @weather_station_id if !@weather_station_id.nil?
+      @site_xml.elements["#{@ns}:Address/#{@ns}:City"].text = @city_name if !@city_name.nil?
+      @site_xml.elements["#{@ns}:Address/#{@ns}:State"].text = @state_name if !@state_name.nil?
+      @site_xml.elements["#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"].text = @street_address if !@street_address.nil?
+      @site_xml.elements["#{@ns}:Address/#{@ns}:PostalCode"].text = @postal_code if !@postal_code.nil?
+      @site_xml.elements["#{@ns}:Latitude"].text = @latitude if !@latitude.nil?
+      @site_xml.elements["#{@ns}:Longitude"].text = @longitude if !@longitude.nil?
 
-      write_parameters_to_xml_for_spatial_element(site, ns)
+      write_parameters_to_xml_for_spatial_element
 
-      site.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
-        @buildings[0].write_parameters_to_xml(buildings_element, ns)
+      @site_xml.elements.each("#{@ns}:Buildings/#{@ns}:Building") do |buildings_element|
+        @buildings[0].write_parameters_to_xml(buildings_element, @ns)
       end
     end
   end

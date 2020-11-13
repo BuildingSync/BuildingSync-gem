@@ -39,7 +39,14 @@ module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class LocationElement < SpatialElement
     # initialize LocationElement class
-    def initialize
+    # @param location_element_xml [REXML::Element] an element corresponding to a locational element
+    #   either an auc:Site or auc:Building
+    # @param ns [String] namespace, likely 'auc'
+    def initialize(location_element_xml, ns)
+      super(location_element_xml, ns)
+      @location_element_xml = location_element_xml
+      @ns = ns
+
       @climate_zone = nil
       @climate_zone_ashrae = nil
       @climate_zone_ca_t24 = nil
@@ -54,103 +61,91 @@ module BuildingSync
     end
 
     # read location values
-    # @param build_element [REXML::Element]
-    # @param ns [String]
-    def read_location_values(build_element, ns)
+    def read_location_values
       # read in the ASHRAE climate zone
-      read_climate_zone(build_element, ns)
+      read_climate_zone
       # read in the weather station name
-      read_weather_file_name(build_element, ns)
+      read_weather_file_name
       # read city and state name
-      read_city_and_state_name(build_element, ns)
+      read_city_and_state_name
       # read latitude and longitude
-      read_latitude_and_longitude(build_element, ns)
+      read_latitude_and_longitude
       # read site address
-      read_address_postal_code_notes(build_element, ns)
+      read_address_postal_code_notes
     end
 
     # read climate zone
-    # @param build_element [REXML::Element]
-    # @param ns [String]
-    def read_climate_zone(build_element, ns)
-      if build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE"]
-        @climate_zone_ashrae = build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text
+    def read_climate_zone
+      if @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE"]
+        @climate_zone_ashrae = @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE/#{@ns}:ClimateZone"].text
       else
         @climate_zone_ashrae = nil
       end
-      if build_element.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24"]
-        @climate_zone_ca_t24 = build_element.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text
+      if @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24"]
+        @climate_zone_ca_t24 = @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24/#{@ns}:ClimateZone"].text
       else
         @climate_zone_ca_t24 = nil
       end
     end
 
     # read weather file name
-    # @param build_element [REXML::Element]
-    # @param ns [String]
-    def read_weather_file_name(build_element, ns)
-      if build_element.elements["#{ns}:WeatherStationName"]
-        @weather_file_name = build_element.elements["#{ns}:WeatherStationName"].text
+    def read_weather_file_name
+      if @location_element_xml.elements["#{@ns}:WeatherStationName"]
+        @weather_file_name = @location_element_xml.elements["#{@ns}:WeatherStationName"].text
       else
         @weather_file_name = nil
       end
-      if build_element.elements["#{ns}:WeatherDataStationID"]
-        @weather_station_id = build_element.elements["#{ns}:WeatherDataStationID"].text
+      if @location_element_xml.elements["#{@ns}:WeatherDataStationID"]
+        @weather_station_id = @location_element_xml.elements["#{@ns}:WeatherDataStationID"].text
       else
         @weather_station_id = nil
       end
     end
 
     # read city and state name
-    # @param build_element [REXML::Element]
-    # @param ns [String]
-    def read_city_and_state_name(build_element, ns)
-      if build_element.elements["#{ns}:Address/#{ns}:City"]
-        @city_name = build_element.elements["#{ns}:Address/#{ns}:City"].text
+    def read_city_and_state_name
+      if @location_element_xml.elements["#{@ns}:Address/#{@ns}:City"]
+        @city_name = @location_element_xml.elements["#{@ns}:Address/#{@ns}:City"].text
       else
         @city_name = nil
       end
-      if build_element.elements["#{ns}:Address/#{ns}:State"]
-        @state_name = build_element.elements["#{ns}:Address/#{ns}:State"].text
+      if @location_element_xml.elements["#{@ns}:Address/#{@ns}:State"]
+        @state_name = @location_element_xml.elements["#{@ns}:Address/#{@ns}:State"].text
       else
         @state_name = nil
       end
     end
 
     # read address, postal code and premises notes
-    # @param build_element [REXML::Element]
-    # @param ns [String]
-    def read_address_postal_code_notes(build_element, ns)
-      if build_element.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"]
-        @street_address = build_element.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"].text
+    def read_address_postal_code_notes
+      if @location_element_xml.elements["#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"]
+        @street_address = @location_element_xml.elements["#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"].text
       else
         @street_address = nil
       end
 
-      if build_element.elements["#{ns}:Address/#{ns}:PostalCode"]
-        @postal_code = build_element.elements["#{ns}:Address/#{ns}:PostalCode"].text.to_i
+      if @location_element_xml.elements["#{@ns}:Address/#{@ns}:PostalCode"]
+        @postal_code = @location_element_xml.elements["#{@ns}:Address/#{@ns}:PostalCode"].text.to_i
       else
         @postal_code = nil
       end
 
-      if build_element.elements["#{ns}:PremisesNotes"]
-        @premises_notes = build_element.elements["#{ns}:PremisesNotes"].text
+      if @location_element_xml.elements["#{@ns}:PremisesNotes"]
+        @premises_notes = @location_element_xml.elements["#{@ns}:PremisesNotes"].text
       else
         @premises_notes = nil
       end
     end
 
     # read latitude and longitude
-    # @param build_element [REXML::Element]
-    # @param ns [String]
-    def read_latitude_and_longitude(build_element, ns)
-      if build_element.elements["#{ns}:Latitude"]
-        @latitude = build_element.elements["#{ns}:Latitude"].text
+    def read_latitude_and_longitude
+      if @location_element_xml.elements["#{@ns}:Latitude"]
+        @latitude = @location_element_xml.elements["#{@ns}:Latitude"].text
       else
         @latitude = nil
       end
-      if build_element.elements["#{ns}:Longitude"]
-        @longitude = build_element.elements["#{ns}:Longitude"].text
+      if @location_element_xml.elements["#{@ns}:Longitude"]
+        @longitude = @location_element_xml.elements["#{@ns}:Longitude"].text
       else
         @longitude = nil
       end

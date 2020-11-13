@@ -49,11 +49,15 @@ module BuildingSync
     include OsLib_ModelGeneration
 
     # initialize
-    # @param building_element [REXML::Element]
+    # @param building_element [REXML::Element] an element corresponding to a single auc:Building
     # @param site_bldgsync_occupancy_type [String]
     # @param site_total_floor_area [String]
-    # @param ns [String]
-    def initialize(building_element, site_bldgsync_occupancy_type, site_total_floor_area, ns)
+    # @param ns [String] namespace, likely 'auc'
+    def initialize(building_xml, site_bldgsync_occupancy_type, site_total_floor_area, ns)
+      super(building_xml, ns)
+      @building_xml = building_xml
+      @ns = ns
+
       @building_sections = []
       @building_sections_whole_building = []
       @model = nil
@@ -90,7 +94,7 @@ module BuildingSync
       @number_of_units = nil
       @fraction_area = 1.0
       # code to initialize
-      read_xml(building_element, site_bldgsync_occupancy_type, site_total_floor_area, ns)
+      read_xml(site_bldgsync_occupancy_type, site_total_floor_area)
     end
 
     # returns number of stories
@@ -100,31 +104,27 @@ module BuildingSync
     end
 
     # read xml
-    # @param building_element [REXML::Element]
     # @param site_bldgsync_occupancy_type [String]
     # @param site_total_floor_area [String]
-    # @param ns [String]
-    def read_xml(building_element, site_bldgsync_occupancy_type, site_total_floor_area, ns)
+    def read_xml(site_bldgsync_occupancy_type, site_total_floor_area)
       # building ID
-      if building_element.attributes['ID']
-        @id = building_element.attributes['ID']
+      if @building_xml.attributes['ID']
+        @id = @building_xml.attributes['ID']
       end
 
       # read location specific values
-      read_location_values(building_element, ns)
-      # floor areas
-      read_floor_areas(building_element, site_total_floor_area, ns)
+      read_location_values
       # standard template
-      read_built_remodel_year(building_element, ns)
+      read_built_remodel_year
       # deal with stories above and below grade
-      read_stories_above_and_below_grade(building_element, ns)
+      read_stories_above_and_below_grade
       # aspect ratio
-      read_aspect_ratio(building_element, ns)
+      read_aspect_ratio
       # read occupancy
-      @bldgsync_occupancy_type = read_bldgsync_occupancy_type(building_element, site_bldgsync_occupancy_type, ns)
+      @bldgsync_occupancy_type = read_bldgsync_occupancy_type(site_bldgsync_occupancy_type)
 
-      building_element.elements.each("#{ns}:Sections/#{ns}:Section") do |section_element|
-        section = BuildingSection.new(section_element, @bldgsync_occupancy_type, @total_floor_area, num_stories, ns)
+      @building_xml.elements.each("#{@ns}:Sections/#{@ns}:Section") do |section_element|
+        section = BuildingSection.new(section_element, @bldgsync_occupancy_type, @total_floor_area, num_stories, @ns)
         if section.section_type == 'Whole building'
           @building_sections_whole_building.push(section)
         elsif section.section_type == 'Space function' || section.section_type.nil?
@@ -135,13 +135,12 @@ module BuildingSync
       end
 
       # floor areas
-      @total_floor_area = read_floor_areas(building_element, site_total_floor_area, ns)
+      @total_floor_area = read_floor_areas(site_total_floor_area)
 
       # generate building name
-      read_building_name(building_element, ns)
-
-      read_ownership(building_element, ns)
-      read_other_building_details(building_element, ns)
+      read_building_name
+      read_ownership
+      read_other_building_details
     end
 
     # set all function to set all parameters for this building
@@ -162,40 +161,36 @@ module BuildingSync
     end
 
     # read built and/or remodel year
-    # @param building_element [REXML::Element]
-    # @param ns [String]
-    def read_built_remodel_year(building_element, ns)
-      if !building_element.elements["#{ns}:YearOfConstruction"]
+    def read_built_remodel_year
+      if !@building_xml.elements["#{@ns}:YearOfConstruction"]
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_standard_template_based_on_year', 'Year of Construction is blank in your BuildingSync file.')
         raise 'Error : Year of Construction is blank in your BuildingSync file.'
       end
 
-      @built_year = building_element.elements["#{ns}:YearOfConstruction"].text.to_i
+      @built_year = @building_xml.elements["#{@ns}:YearOfConstruction"].text.to_i
 
-      if building_element.elements["#{ns}:YearOfLastMajorRemodel"]
-        @year_major_remodel = building_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_i
+      if @building_xml.elements["#{@ns}:YearOfLastMajorRemodel"]
+        @year_major_remodel = @building_xml.elements["#{@ns}:YearOfLastMajorRemodel"].text.to_i
         @built_year = @year_major_remodel if @year_major_remodel > @built_year
       end
 
-      if building_element.elements["#{ns}:YearOfLastEnergyAudit"]
-        @year_of_last_energy_audit = building_element.elements["#{ns}:YearOfLastEnergyAudit"].text.to_i
+      if @building_xml.elements["#{@ns}:YearOfLastEnergyAudit"]
+        @year_of_last_energy_audit = @building_xml.elements["#{@ns}:YearOfLastEnergyAudit"].text.to_i
       end
 
-      if building_element.elements["#{ns}:RetrocommissioningDate"]
-        @year_last_commissioning = Date.parse building_element.elements["#{ns}:RetrocommissioningDate"].text
+      if @building_xml.elements["#{@ns}:RetrocommissioningDate"]
+        @year_last_commissioning = Date.parse @building_xml.elements["#{@ns}:RetrocommissioningDate"].text
       else
         @year_last_commissioning = nil
       end
     end
 
     # read stories above and below grade
-    # @param building_element [REXML::Element]
-    # @param ns [String]
-    def read_stories_above_and_below_grade(building_element, ns)
-      if building_element.elements["#{ns}:FloorsAboveGrade"]
-        @num_stories_above_grade = building_element.elements["#{ns}:FloorsAboveGrade"].text.to_f
-      elsif building_element.elements["#{ns}:ConditionedFloorsAboveGrade"]
-        @num_stories_above_grade = building_element.elements["#{ns}:ConditionedFloorsAboveGrade"].text.to_f
+    def read_stories_above_and_below_grade
+      if @building_xml.elements["#{@ns}:FloorsAboveGrade"]
+        @num_stories_above_grade = @building_xml.elements["#{@ns}:FloorsAboveGrade"].text.to_f
+      elsif @building_xml.elements["#{@ns}:ConditionedFloorsAboveGrade"]
+        @num_stories_above_grade = @building_xml.elements["#{@ns}:ConditionedFloorsAboveGrade"].text.to_f
       else
         @num_stories_above_grade = 1.0 # setDefaultValue
       end
@@ -204,10 +199,10 @@ module BuildingSync
         @num_stories_above_grade = 1.0
       end
 
-      if building_element.elements["#{ns}:FloorsBelowGrade"]
-        @num_stories_below_grade = building_element.elements["#{ns}:FloorsBelowGrade"].text.to_f
-      elsif building_element.elements["#{ns}:ConditionedFloorsBelowGrade"]
-        @num_stories_below_grade = building_element.elements["#{ns}:ConditionedFloorsBelowGrade"].text.to_f
+      if @building_xml.elements["#{@ns}:FloorsBelowGrade"]
+        @num_stories_below_grade = @building_xml.elements["#{@ns}:FloorsBelowGrade"].text.to_f
+      elsif @building_xml.elements["#{@ns}:ConditionedFloorsBelowGrade"]
+        @num_stories_below_grade = @building_xml.elements["#{@ns}:ConditionedFloorsBelowGrade"].text.to_f
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
@@ -218,29 +213,11 @@ module BuildingSync
     end
 
     # read aspect ratio
-    # @param building_element [REXML::Element]
-    # @param ns [String]
-    def read_aspect_ratio(building_element, ns)
-      if building_element.elements["#{ns}:AspectRatio"]
-        @ns_to_ew_ratio = building_element.elements["#{ns}:AspectRatio"].text.to_f
+    def read_aspect_ratio
+      if @building_xml.elements["#{@ns}:AspectRatio"]
+        @ns_to_ew_ratio = @building_xml.elements["#{@ns}:AspectRatio"].text.to_f
       else
         @ns_to_ew_ratio = 0.0 # setDefaultValue
-      end
-    end
-
-    # read city and state name
-    # @param building_element [REXML::Element]
-    # @param ns [String]
-    def read_city_and_state_name(building_element, ns)
-      if building_element.elements["#{ns}:Address/#{ns}:City"]
-        @city_name = building_element.elements["#{ns}:Address/#{ns}:City"].text
-      else
-        @city_name = nil
-      end
-      if building_element.elements["#{ns}:Address/#{ns}:State"]
-        @state_name = building_element.elements["#{ns}:Address/#{ns}:State"].text
-      else
-        @state_name = nil
       end
     end
 
@@ -337,69 +314,63 @@ module BuildingSync
     end
 
     # read ownership
-    # @param building_element [REXML::Element]
-    # @param ns [String]
-    def read_ownership(building_element, ns)
-      if building_element.elements["#{ns}:Ownership"]
-        @ownership = building_element.elements["#{ns}:Ownership"].text
+    def read_ownership
+      if @building_xml.elements["#{@ns}:Ownership"]
+        @ownership = @building_xml.elements["#{@ns}:Ownership"].text
       else
         @ownership = nil
       end
 
-      if building_element.elements["#{ns}:OccupancyClassification"]
-        @occupancy_classification = building_element.elements["#{ns}:OccupancyClassification"].text
+      if @building_xml.elements["#{@ns}:OccupancyClassification"]
+        @occupancy_classification = @building_xml.elements["#{@ns}:OccupancyClassification"].text
       else
         @occupancy_classification = nil
       end
     end
 
     # read other building details
-    # @param building_element [REXML::Element]
-    # @param ns [String]
-    def read_other_building_details(building_element, ns)
-      if building_element.elements["#{ns}:PrimaryContactID"]
-        @primary_contact_id = building_element.elements["#{ns}:PrimaryContactID"].text
+    def read_other_building_details
+      if @building_xml.elements["#{@ns}:PrimaryContactID"]
+        @primary_contact_id = @building_xml.elements["#{@ns}:PrimaryContactID"].text
       else
         @primary_contact_id = nil
       end
 
-      if building_element.elements["#{ns}:BuildingAutomationSystem"]
-        @building_automation_system = building_element.elements["#{ns}:BuildingAutomationSystem"].text.to_bool
+      if @building_xml.elements["#{@ns}:BuildingAutomationSystem"]
+        @building_automation_system = @building_xml.elements["#{@ns}:BuildingAutomationSystem"].text.to_bool
       else
         @building_automation_system = nil
       end
 
-      if building_element.elements["#{ns}:HistoricalLandmark"]
-        @historical_landmark = building_element.elements["#{ns}:HistoricalLandmark"].text.to_bool
+      if @building_xml.elements["#{@ns}:HistoricalLandmark"]
+        @historical_landmark = @building_xml.elements["#{@ns}:HistoricalLandmark"].text.to_bool
       else
         @historical_landmark = nil
       end
 
-      if building_element.elements["#{ns}:PercentOccupiedByOwner"]
-        @percent_occupied_by_owner = building_element.elements["#{ns}:PercentOccupiedByOwner"].text
+      if @building_xml.elements["#{@ns}:PercentOccupiedByOwner"]
+        @percent_occupied_by_owner = @building_xml.elements["#{@ns}:PercentOccupiedByOwner"].text
       else
         @percent_occupied_by_owner = nil
       end
 
-      if building_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"]
-        @occupant_quantity = building_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text
+      if @building_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"]
+        @occupant_quantity = @building_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"].text
       else
         @occupant_quantity = nil
       end
 
-      if building_element.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"]
-        @number_of_units = building_element.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text
+      if @building_xml.elements["#{@ns}:SpatialUnits/#{@ns}:SpatialUnit/#{@ns}:NumberOfUnits"]
+        @number_of_units = @building_xml.elements["#{@ns}:SpatialUnits/#{@ns}:SpatialUnit/#{@ns}:NumberOfUnits"].text
       else
         @number_of_units = nil
       end
     end
 
     # read building name
-    # @param building_element [REXML::Element]
-    # @param ns [String]
-    def read_building_name(building_element, ns)
+    def read_building_name
       name_array = []
-      name_element = building_element.elements["#{ns}:PremisesName"]
+      name_element = @building_xml.elements["#{@ns}:PremisesName"]
       if !name_element.nil?
         name_array << name_element.text
       end
@@ -1135,37 +1106,35 @@ module BuildingSync
     end
 
     # write parameters to xml file
-    # @param ns [String]
-    # @param building [:Building]
-    def write_parameters_to_xml(building, ns)
-      building.elements["#{ns}:PremisesName"].text = @name if !@name.nil?
-      building.elements["#{ns}:YearOfConstruction"].text = @built_year if !@built_year.nil?
-      building.elements["#{ns}:Ownership"].text = @ownership if !@ownership.nil?
-      building.elements["#{ns}:OccupancyClassification"].text = @occupancy_classification if !@occupancy_classification.nil?
-      building.elements["#{ns}:YearOfLastMajorRemodel"].text = @year_major_remodel if !@year_major_remodel.nil?
-      building.elements["#{ns}:YearOfLastEnergyAudit"].text = @year_of_last_energy_audit if !@year_of_last_energy_audit.nil?
-      building.elements["#{ns}:RetrocommissioningDate"].text = @year_last_commissioning if !@year_last_commissioning.nil?
-      building.elements["#{ns}:BuildingAutomationSystem"].text = @building_automation_system if !@building_automation_system.nil?
-      building.elements["#{ns}:HistoricalLandmark"].text = @historical_landmark if !@historical_landmark.nil?
-      building.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
-      building.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text = @number_of_units if !@number_of_units.nil?
-      building.elements["#{ns}:PercentOccupiedByOwner"].text = @percent_occupied_by_owner if !@percent_occupied_by_owner.nil?
+    def write_parameters_to_xml
+      @building_xml.elements["#{@ns}:PremisesName"].text = @name if !@name.nil?
+      @building_xml.elements["#{@ns}:YearOfConstruction"].text = @built_year if !@built_year.nil?
+      @building_xml.elements["#{@ns}:Ownership"].text = @ownership if !@ownership.nil?
+      @building_xml.elements["#{@ns}:OccupancyClassification"].text = @occupancy_classification if !@occupancy_classification.nil?
+      @building_xml.elements["#{@ns}:YearOfLastMajorRemodel"].text = @year_major_remodel if !@year_major_remodel.nil?
+      @building_xml.elements["#{@ns}:YearOfLastEnergyAudit"].text = @year_of_last_energy_audit if !@year_of_last_energy_audit.nil?
+      @building_xml.elements["#{@ns}:RetrocommissioningDate"].text = @year_last_commissioning if !@year_last_commissioning.nil?
+      @building_xml.elements["#{@ns}:BuildingAutomationSystem"].text = @building_automation_system if !@building_automation_system.nil?
+      @building_xml.elements["#{@ns}:HistoricalLandmark"].text = @historical_landmark if !@historical_landmark.nil?
+      @building_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
+      @building_xml.elements["#{@ns}:SpatialUnits/#{@ns}:SpatialUnit/#{@ns}:NumberOfUnits"].text = @number_of_units if !@number_of_units.nil?
+      @building_xml.elements["#{@ns}:PercentOccupiedByOwner"].text = @percent_occupied_by_owner if !@percent_occupied_by_owner.nil?
 
       # Add new element in the XML file
-      add_user_defined_field_to_xml_file(building, ns, 'StandardTemplate', @standard_template)
-      add_user_defined_field_to_xml_file(building, ns, 'BuildingRotation', @building_rotation)
-      add_user_defined_field_to_xml_file(building, ns, 'FloorHeight', @floor_height)
-      add_user_defined_field_to_xml_file(building, ns, 'WindowWallRatio', @wwr)
-      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesNorth', @party_wall_stories_north)
-      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesSouth', @party_wall_stories_south)
-      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesEast', @party_wall_stories_east)
-      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesWest', @party_wall_stories_west)
-      add_user_defined_field_to_xml_file(building, ns, 'Width', @width)
-      add_user_defined_field_to_xml_file(building, ns, 'Length', @length)
-      add_user_defined_field_to_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
-      add_user_defined_field_to_xml_file(building, ns, 'FractionArea', @fraction_area)
+      add_user_defined_field_to_xml_file('StandardTemplate', @standard_template)
+      add_user_defined_field_to_xml_file('BuildingRotation', @building_rotation)
+      add_user_defined_field_to_xml_file('FloorHeight', @floor_height)
+      add_user_defined_field_to_xml_file('WindowWallRatio', @wwr)
+      add_user_defined_field_to_xml_file('PartyWallStoriesNorth', @party_wall_stories_north)
+      add_user_defined_field_to_xml_file('PartyWallStoriesSouth', @party_wall_stories_south)
+      add_user_defined_field_to_xml_file('PartyWallStoriesEast', @party_wall_stories_east)
+      add_user_defined_field_to_xml_file('PartyWallStoriesWest', @party_wall_stories_west)
+      add_user_defined_field_to_xml_file('Width', @width)
+      add_user_defined_field_to_xml_file('Length', @length)
+      add_user_defined_field_to_xml_file('PartyWallFraction', @party_wall_fraction)
+      add_user_defined_field_to_xml_file('FractionArea', @fraction_area)
 
-      write_parameters_to_xml_for_spatial_element(building, ns)
+      write_parameters_to_xml_for_spatial_element
     end
 
     # get space types

@@ -49,7 +49,7 @@ module BuildingSync
 
       @facilities = []
       @facility = nil
-      @facility_xml_element = nil
+      @facility_xml = nil
       @scenario_types = nil
       read_xml
     end
@@ -65,8 +65,8 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMaker.read_xml', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
         raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
       else
-        @facility_xml_element = facility_elements.first()
-        @facility = Facility.new(@facility_xml_element, @ns)
+        @facility_xml = facility_elements.first()
+        @facility = Facility.new(@facility_xml, @ns)
       end
     end
 
@@ -104,7 +104,7 @@ module BuildingSync
 
     # writes the parameters determine during processing back to the BldgSync XML file
     def write_parameters_to_xml
-      @facility.write_parameters_to_xml(@facility_xml_element, @ns)
+      @facility.write_parameters_to_xml
     end
 
     private
