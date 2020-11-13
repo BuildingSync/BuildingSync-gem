@@ -31,6 +31,9 @@ jobs:
       - $SH "bundle exec rspec spec/tests/translator_run_baseline_osm.rb"
       name: "translator.run_baseline_osm with no epw file provided Tests"
     - script:
+      - $SH "bundle exec rspec spec/tests/translator_gather_save_results_spec.rb"
+      name: "translator.translator_gather_save_results_spec Tests"
+    - script:
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb"
