@@ -330,14 +330,13 @@ module BuildingSync
       field_value_element = REXML::Element.new("#{@ns}:FieldValue")
 
       if !field_value.nil?
-        user_defined_fields.add_element(user_defined_field)
+        @user_defined_fields.add_element(user_defined_field)
         user_defined_field.add_element(field_name_element)
         user_defined_field.add_element(field_value_element)
 
         field_name_element.text = field_name
         field_value_element.text = field_value
       end
-      @user_defined_fields.add_element(user_defined_field)
     end
 
     # write parameters to xml for spatial element
