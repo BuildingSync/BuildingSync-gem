@@ -376,7 +376,7 @@ RSpec.configure do |config|
     translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, standard_to_be_used)
 
     # -- Setup
-    epw_file_path = '' if !File.exist?(epw_file_path)
+    epw_file_path = '' if epw_file_path.nil? || !File.exist?(epw_file_path)
     translator.run_baseline_osm(epw_file_path)
 
     # -- Assert translator.run_baseline_osm checks
