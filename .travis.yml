@@ -25,14 +25,14 @@ install:
 jobs:
   include:
     - script:
-      - $SH "bundle exec rspec spec/tests/translator_write_osm.rb"
-      name: "translator.write_osm Test"
+      - $SH "bundle exec rspec spec/tests/translator_write_osm_spec.rb"
+      name: "Translator Perform SR, Create in.osm Spec"
     - script:
       - $SH "bundle exec rspec spec/tests/translator_run_baseline_osm_spec.rb"
-      name: "translator.run_baseline_osm with no epw file provided Tests"
+      name: "Translator Perform SR, Create in.osm, Simulate Baseline Spec"
     - script:
       - $SH "bundle exec rspec spec/tests/translator_write_osm_run_baseline_gather_results_save_xml_spec.rb"
-      name: "translator.translator_gather_save_results_spec Tests"
+      name: "Translator Perform SR, Create in.osm, Simulate Baseline, Gather Results, Save XML Spec"
     - script:
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
@@ -49,12 +49,11 @@ jobs:
       name: "Translator Spec"
     - script:
       - travis_wait 40 $SH "bundle exec rspec spec/tests/model_articulation_test/hospital_occupancy_type_spec.rb"
-      name: "Hospital Occupancy Type Spec"
+      name: "Model Articulation Hospital Occupancy Type Spec"
     - script:
       - $SH "bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb"
-      name: "Occupancy Types Spec"
+      name: "Model Articulation Occupancy Types Spec"
     - script:
-      - $SH "bundle exec rspec spec/tests/translator_write_osm_spec.rb"
       - $SH "bundle exec rspec spec/tests/translator_scenario_generation_spec.rb"
       name: "Translator Generation Specs"
     - script:
@@ -66,5 +65,7 @@ jobs:
     - script:
       - $SH "bundle exec rspec spec/tests/building_sync_spec.rb"
       - $SH "bundle exec rspec spec/tests/epw_test_spec.rb"
+      - $SH "bundle exec rspec spec/tests/constants_spec.rb"
+      - $SH "bundle exec rspec spec/tests/workflow_maker_spec.rb"
       # - $SH "bundle exec rspec spec/tests/selection_tool_spec.rb"  # selection tool is not working with ASHRAE level 1.5 yet
       name: "Other Specs"
