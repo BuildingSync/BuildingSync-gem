@@ -37,6 +37,75 @@
 require_relative './../spec_helper'
 
 RSpec.describe 'WorkFlow Maker' do
+  it 'should get_measure_directories_array for CommonMeasures, ModelArticulation, EeMeasures, and BSyncMeasures' do
+    # -- Setup
+    # For initialization, needs no substantial info.
+    doc = REXML::Document.new
+    ns = 'auc'
+    wm = BuildingSync::WorkflowMaker.new(doc, ns)
+    # Currently support measures from 4 Extensions
+    cm = OpenStudio::CommonMeasures::Extension.new
+    ma = OpenStudio::ModelArticulation::Extension.new
+    ee = OpenStudio::EeMeasures::Extension.new
+    bsync = BuildingSync::Extension.new
+
+    expected_measure_paths = Set[cm.measures_dir, ma.measures_dir, ee.measures_dir, bsync.measures_dir]
+    actual = wm.get_measure_directories_array
+
+    # -- Assert
+    expect(actual).to be_an_instance_of(Array)
+    expect(actual.to_set == expected_measure_paths).to be true
+  end
+
+  it 'should initialize a workflow as a hash, have expected @workflow["measure_paths"]' do
+    # -- Setup
+    # For initialization, needs no substantial info.
+    doc = REXML::Document.new
+    ns = 'auc'
+    wm = BuildingSync::WorkflowMaker.new(doc, ns)
+
+    # -- Assert
+    expect(wm.check_if_measures_exist).to be true
+    expect(wm.get_workflow).to be_an_instance_of(Hash)
+
+    # -- Setup
+    # Currently support measures from 4 Extensions
+    cm = OpenStudio::CommonMeasures::Extension.new
+    ma = OpenStudio::ModelArticulation::Extension.new
+    ee = OpenStudio::EeMeasures::Extension.new
+    bsync = BuildingSync::Extension.new
+    # Create a set of expected measure paths
+    expected_measure_paths = Set[cm.measures_dir, ma.measures_dir, ee.measures_dir, bsync.measures_dir]
+
+    # -- Assert
+    # Check the measure_paths defined in the workflow
+    actual_measure_paths = wm.get_workflow['measure_paths'].to_set
+    expect(expected_measure_paths == actual_measure_paths).to be true
+  end
+
+  it 'should get_available_measures_hash with correct structure, expected keys format' do
+    # -- Setup
+    # For initialization, needs no substantial info.
+    doc = REXML::Document.new
+    ns = 'auc'
+    wm = BuildingSync::WorkflowMaker.new(doc, ns)
+    available_measures = wm.get_available_measures_hash
+
+    # -- Assert
+    expect(available_measures).to be_an_instance_of(Hash)
+
+    # -- Setup
+    # The structure of the get_available_measures Hash should look like:
+    # {path_to_measure_dir: [measure_name1, mn2, etc.], path_to_measure_dir_2: [...]}
+    cm = OpenStudio::CommonMeasures::Extension.new
+    expect(available_measures.key?(cm.measures_dir)).to be true
+
+    # -- Assert
+    # Just check the name of one measure we know is in the common measures gem
+    expect(available_measures[cm.measures_dir].find { |item | item == "SetEnergyPlusMinimumOutdoorAirFlowRate"}).to_not be nil
+  end
+
+  # TODO: Come back to and verify - what is difference between this and next test?
   it 'should save annual results to xml file and verify them' do
     file_name = 'building_151.xml'
     xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
@@ -92,6 +161,7 @@ RSpec.describe 'WorkFlow Maker' do
     end
   end
 
+  # TODO: What does this accomplish that previous test doesn't
   it 'should save baseline annual results to xml file and verify them' do
     file_name = 'building_151.xml'
     xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
@@ -144,38 +214,46 @@ RSpec.describe 'WorkFlow Maker' do
     end
   end
 
-  it 'should process results correctly' do
+  it 'create_calculation_method_element(result) should correctly create and return an auc:CalculationMethod element' do
+    # -- Setup
     file_name = 'building_151.xml'
     xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
-
     ns = 'auc'
     doc = BuildingSync::Helper.read_xml_file_document(xml_path)
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
 
-    result = {}
-    result[:completed_status] = 'Success'
-    calc_method = workflow_maker.add_calc_method_element(result)
-    expect(calc_method.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to be == 'Finished'
-    result[:completed_status] = 'Failed'
-    calc_method = workflow_maker.add_calc_method_element(result)
-    expect(calc_method.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to eq 'Failed'
-    result[:completed_status] = 'XXX'
-    calc_method = workflow_maker.add_calc_method_element(result)
-    expect(calc_method.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to eq 'Failed'
+    # -- Setup
+    # Create a dummy result
+    result_success = {}
+    result_failed = {}
+    result_xxx = {}
+
+    result_success[:completed_status] = 'Success'
+    result_failed[:completed_status] = 'Failed'
+    result_xxx[:completed_status] = 'XXX'
+
+    calc_method_success = workflow_maker.create_calculation_method_element(result_success)
+    calc_method_failed = workflow_maker.create_calculation_method_element(result_failed)
+    calc_method_xxx = workflow_maker.create_calculation_method_element(result_xxx)
+
+    # -- Assert
+    expect(calc_method_success.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to be == 'Finished'
+    expect(calc_method_failed.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to eq 'Failed'
+    expect(calc_method_xxx.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to eq 'Failed'
   end
 
+  # TODO: Come back to
   it 'should process monthly data correctly' do
+    # -- Setup
     file_name = 'building_151.xml'
     xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
     expect(File.exist?(xml_path)).to be true
-
     ns = 'auc'
     doc = BuildingSync::Helper.read_xml_file_document(xml_path)
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
 
     month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }
-
     monthly_results = {}
     electricity = 'Electricity'
     natural_gas = 'NaturalGas'
