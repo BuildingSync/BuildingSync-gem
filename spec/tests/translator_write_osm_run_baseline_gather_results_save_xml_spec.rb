@@ -26,7 +26,7 @@
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 # THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 # ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER(S), ANY CONTRIBUTORS, THE
-# UNITED STATES GOVERNMENT, OR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
+# UNITED STATES GOVERNMENT, OR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF1
 # THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
 # EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
 # OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -40,18 +40,28 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync::Translator' do
-  it 'BuildingSync::Translator.write_osm should perform a sizing run: L000_OpenStudio_Pre-Simulation_03.xml' do
+
+  it 'L000_OpenStudio_Pre-Simulation_03.xml: should perform all steps to parse xml file, generate osm, simulate a baseline, gather and save the results' do
     file_name = 'L000_OpenStudio_Pre-Simulation_03.xml'
     xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
-    puts xml_path
 
     # The output_path will look like:
     # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03
     output_path = File.join("../output", "#{File.basename(__FILE__ , File.extname(__FILE__ ))}/#{File.basename(xml_path, File.extname(xml_path))}")
     output_path = File.expand_path(output_path, File.dirname(__FILE__))
 
-    translator = translator_write_osm_checks(xml_path, output_path)
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path)
   end
 
+  def create_xml_path_and_output_path(file_name, std)
+    xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
+
+    # The output path will look something like:
+    # to/spec/output/translator_baseline_generation_spec/building_151/Caliornia
+    output_path = File.join("../output", "#{File.basename(__FILE__ , File.extname(__FILE__ ))}/#{File.basename(xml_path, File.extname(xml_path))}")
+    output_path = File.expand_path(output_path, File.dirname(__FILE__))
+    output_path = File.join(output_path, "#{std.split('.')[0]}")
+
+    return xml_path, output_path
+  end
 end
