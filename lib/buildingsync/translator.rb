@@ -35,6 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'rexml/document'
+require 'buildingsync/constants'
 
 require_relative 'model_articulation/spatial_element'
 require_relative 'makers/model_maker'
@@ -42,10 +43,6 @@ require_relative 'makers/workflow_maker'
 require_relative 'selection_tool'
 require_relative 'extension'
 
-# ASHRAE90.1 string
-ASHRAE90_1 = 'ASHRAE90.1'.freeze
-# CA_TITLE24 string
-CA_TITLE24 = 'CaliforniaTitle24'.freeze
 
 module BuildingSync
   # Translator class
@@ -227,6 +224,7 @@ module BuildingSync
       end
 
       OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.create_baseline_osw", "WorkflowJSON: #{workflow.to_s}")
+      OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.create_baseline_osw", "osw_path #{osw_path}")
       return osw_path
     end
 
@@ -236,8 +234,10 @@ module BuildingSync
     def run_baseline_osm(path_to_epw_file = nil, runner_options = {run_simulations: true, verbose: false, num_parallel: 1, max_to_run: Float::INFINITY})
       if !path_to_epw_file.nil? && File.exist?(path_to_epw_file) && File.to_s.end_with?('.epw')
         @epw_file_path = path_to_epw_file
+        OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.run_baseline_osm", "EPW path updated to: #{path_to_epw_file}")
       else
         @epw_file_path = @model_maker.get_facility.get_epw_file_path
+        OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.run_baseline_osm", "EPW path not updated.  Using: #{path_to_epw_file}")
       end
       file_name = 'in.osm'
 
