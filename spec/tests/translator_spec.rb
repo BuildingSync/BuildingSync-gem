@@ -42,7 +42,7 @@ require 'parallel'
 RSpec.describe 'BuildingSync' do
   it 'should print out all available measure paths' do
     workflow_maker = BuildingSync::WorkflowMaker.new(nil, nil)
-    list_of_measures = workflow_maker.get_list_of_available_measures
+    list_of_measures = workflow_maker.get_available_measures_hash
     count = 0
     list_of_measures.each do |path, list|
       puts "measure path: #{path} with #{list.length} measures"

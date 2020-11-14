@@ -49,7 +49,7 @@ RSpec.describe 'BuildingSync::Translator' do
     # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03
     output_path = File.join("../output", "#{File.basename(__FILE__ , File.extname(__FILE__ ))}/#{File.basename(xml_path, File.extname(xml_path))}")
     output_path = File.expand_path(output_path, File.dirname(__FILE__))
-    translator = translator_write_osm_checks(xml_path, output_path)
+    translator = translator_write_osm_and_perform_checks(xml_path, output_path)
     translator.run_baseline_osm('')
     translator_run_baseline_osm_checks(output_path)
   end
