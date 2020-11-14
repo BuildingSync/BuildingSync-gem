@@ -34,11 +34,13 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative 'workflow_maker_base'
 require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
 require 'openstudio/ee_measures'
-require_relative '../../../lib/buildingsync/extension'
+
+require 'buildingsync/extension'
+require 'buildingsync/constants'
+require 'buildingsync/makers/workflow_maker_base'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
@@ -47,26 +49,22 @@ module BuildingSync
     # @param doc [REXML::Document]
     # @param ns [String]
     def initialize(doc, ns)
-      super
+      super(doc, ns)
 
       # load the workflow
-      @workflow = nil
       @facility = nil
 
       # log failed scenarios
       @failed_scenarios = []
       @scenarios = []
 
-      # select base osw for standalone, small office, medium office
-      base_osw = 'phase_zero_base.osw'
-
-      workflow_path = File.join(File.dirname(__FILE__), base_osw)
-      raise "File '#{workflow_path}' does not exist" unless File.exist?(workflow_path)
-
-      File.open(workflow_path, 'r') do |file|
+      File.open(PHASE_0_BASE_OSW_FILE_PATH, 'r') do |file|
         @workflow = JSON.parse(file.read)
-        set_measure_paths(@workflow, get_measure_directories_array)
       end
+
+      # Add all of the measure directories from the extension gems
+      # into the @workflow, then check they exist
+      set_measure_paths(get_measure_directories_array)
       check_if_measures_exist
     end
 
@@ -74,6 +72,7 @@ module BuildingSync
     # @return [Boolean]
     def check_if_measures_exist
       all_measures_found = true
+      number_measures_found = 0
       @workflow['steps'].each do |step|
         measure_is_valid = false
         measure_dir_name = step['measure_dir_name']
@@ -81,7 +80,8 @@ module BuildingSync
           measure_dir_full_path = "#{potential_measure_path}/#{measure_dir_name}"
           if Dir.exist?(measure_dir_full_path)
             measure_is_valid = true
-            puts "measure found in: #{measure_dir_full_path}/"
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.check_if_measures_exist', "Measure: #{measure_dir_name} found at: #{measure_dir_full_path}")
+            number_measures_found += 1
             break
           end
         end
@@ -90,19 +90,23 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.check_if_measures_exist', "CANNOT find measure with name (#{measure_dir_name}) in any of the measure paths  ")
         end
       end
+      if all_measures_found
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.check_if_measures_exist', "Total measures found: #{number_measures_found}. All measures defined by @workflow found.")
+        puts "Total measures found: #{number_measures_found}. All measures defined by @workflow found."
+      end
       return all_measures_found
     end
 
     # gets all available measures across all measure directories
-    # @return [hash]
-    def get_list_of_available_measures
-      list_of_measures = {}
+    # @return [hash] Looks as follows {path_to_measure_dir: [measure_name1, mn2, etc.], path_to_measure_dir_2: [...]}
+    def get_available_measures_hash
+      measures_hash = {}
       get_measure_directories_array.each do |potential_measure_path|
         Dir.chdir(potential_measure_path) do
-          list_of_measures[potential_measure_path] = Dir.glob('*').select { |f| File.directory? f }
+          measures_hash[potential_measure_path] = Dir.glob('*').select { |f| File.directory? f }
         end
       end
-      return list_of_measures
+      return measures_hash
     end
 
     # collect all measure directories that contain measures needed for BldgSync
@@ -383,9 +387,6 @@ module BuildingSync
     # @return [REXML:Element]
     def get_scenarios
       scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"]
-      if scenarios.nil?
-        scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Report/#{@ns}:Scenarios"]
-      end
       return scenarios
     end
 
@@ -602,7 +603,7 @@ module BuildingSync
         package_of_measures.elements.delete("#{@ns}AnnualSavingsByFuels")
       end
       scenario.elements.delete("#{@ns}AllResourceTotals")
-      scenario.elements.delete("#{@ns}RsourceUses")
+      scenario.elements.delete("#{@ns}ResourceUses")
       scenario.elements.delete("#{@ns}AnnualSavingsByFuels")
     end
 
@@ -653,10 +654,15 @@ module BuildingSync
       return package_of_measures_or_current_building
     end
 
-    # add calculation method element
-    # @param result [hash]
+    # create and return the set of elements:
+    #   auc:CalculationMethod/auc:Modeled/
+    #     auc:SoftwareProgramUsed = OpenStudio
+    #     auc:SoftwareProgramVersion = ...
+    #     auc:WeatherDataType = TMY
+    #     auc:SimulationCompletionStatus = Success or Failed, depending on result[:completion_status]
+    # @param result [hash] must have key: result[:completion_status]
     # @return [REXML::Element]
-    def add_calc_method_element(result)
+    def create_calculation_method_element(result)
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
       calc_method = REXML::Element.new("#{@ns}:CalculationMethod")
@@ -1002,7 +1008,7 @@ module BuildingSync
       # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
       # options are: Not Started, Started, Finished, Failed, Unknown
       if package_of_measures
-        package_of_measures.add_element(add_calc_method_element(result))
+        package_of_measures.add_element(create_calculation_method_element(result))
         package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, annual_results))
       else
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.add_results_to_scenario', "Scenario: #{scenario_name} does not have a package of measures xml element defined.")

@@ -41,7 +41,16 @@ require_relative 'model_maker_base'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
-  class WorkflowMakerBase < ModelMakerBase
+  class WorkflowMakerBase
+    # initialize
+    # @param doc [REXML::Document]
+    # @param ns [String]
+    def initialize(doc, ns)
+      @doc = doc
+      @ns = ns
+      @workflow = nil
+    end
+
     # write OpenStudio workflows in osw files (base method)
     # @param facility [REXML::Element]
     # @param dir [String]
@@ -78,10 +87,9 @@ module BuildingSync
     end
 
     # set multiple measure paths
-    # @param osw [OpenStudio::WorkflowJSON]
     # @param measures_dir_array [Array]
-    def set_measure_paths(osw, measures_dir_array)
-      osw['measure_paths'] = measures_dir_array
+    def set_measure_paths(measures_dir_array)
+      @workflow['measure_paths'] = measures_dir_array
     end
 
     # clear all measures from the list in the workflow
