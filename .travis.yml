@@ -31,7 +31,7 @@ jobs:
       - $SH "bundle exec rspec spec/tests/translator_run_baseline_osm.rb"
       name: "translator.run_baseline_osm with no epw file provided Tests"
     - script:
-      - $SH "bundle exec rspec spec/tests/translator_gather_save_results_spec.rb"
+      - $SH "bundle exec rspec spec/tests/translator_write_osm_run_baseline_gather_results_save_xml_spec.rb"
       name: "translator.translator_gather_save_results_spec Tests"
     - script:
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
@@ -54,7 +54,7 @@ jobs:
       - $SH "bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb"
       name: "Occupancy Types Spec"
     - script:
-      - $SH "bundle exec rspec spec/tests/translator_baseline_generation_spec.rb"
+      - $SH "bundle exec rspec spec/tests/translator_write_osm_spec.rb"
       - $SH "bundle exec rspec spec/tests/translator_scenario_generation_spec.rb"
       name: "Translator Generation Specs"
     - script:
