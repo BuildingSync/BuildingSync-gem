@@ -100,20 +100,22 @@
           </auc:Buildings>
         </auc:Site>
       </auc:Sites>
-      <auc:Report>
-        <auc:Scenarios>
-          <auc:Scenario ID="Baseline">
-            <auc:ScenarioName>Baseline</auc:ScenarioName>
-            <auc:ScenarioType>
-              <auc:CurrentBuilding>
-                <auc:CalculationMethod>
-                  <auc:Modeled/>
-                </auc:CalculationMethod>
-              </auc:CurrentBuilding>
-            </auc:ScenarioType>
-          </auc:Scenario>
-        </auc:Scenarios>
-      </auc:Report>
+      <auc:Reports>
+        <auc:Report>
+          <auc:Scenarios>
+            <auc:Scenario ID="Baseline">
+              <auc:ScenarioName>Baseline</auc:ScenarioName>
+              <auc:ScenarioType>
+                <auc:CurrentBuilding>
+                  <auc:CalculationMethod>
+                    <auc:Modeled/>
+                  </auc:CalculationMethod>
+                </auc:CurrentBuilding>
+              </auc:ScenarioType>
+            </auc:Scenario>
+          </auc:Scenarios>
+        </auc:Report>
+      </auc:Reports>
     </auc:Facility>
   </auc:Facilities>
 </auc:BuildingSync>
