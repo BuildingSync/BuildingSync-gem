@@ -105,6 +105,29 @@ RSpec.describe 'WorkFlow Maker' do
     expect(available_measures[cm.measures_dir].find { |item | item == "SetEnergyPlusMinimumOutdoorAirFlowRate"}).to_not be nil
   end
 
+  it 'get_scenarios should return "nil" if no scenario elements are found' do
+    # -- Setup
+    # For initialization, needs no substantial info.
+    doc = REXML::Document.new
+    ns = 'auc'
+    wm = BuildingSync::WorkflowMaker.new(doc, ns)
+
+    scenarios = wm.get_scenarios
+    expect(scenarios).to be nil
+  end
+
+  it 'get_scenario_elements should return an empty array if no scenario elements are found' do
+    # -- Setup
+    # For initialization, needs no substantial info.
+    doc = REXML::Document.new
+    ns = 'auc'
+    wm = BuildingSync::WorkflowMaker.new(doc, ns)
+
+    scenarios = wm.get_scenario_elements
+    expect(scenarios).to be_an_instance_of(Array)
+    expect(scenarios.empty?).to be true
+  end
+
   # TODO: Come back to and verify - what is difference between this and next test?
   it 'should save annual results to xml file and verify them' do
     file_name = 'building_151.xml'

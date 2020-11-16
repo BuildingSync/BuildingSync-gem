@@ -371,9 +371,12 @@ module BuildingSync
     # @return [REXML:Element]
     def get_scenario_elements
       if @scenarios.empty?
-        get_scenarios.elements.each("#{@ns}:Scenario") do |scenario|
-          if scenario.is_a? REXML::Element
-            @scenarios.push(scenario)
+        scenarios = get_scenarios
+        if !scenarios.nil?
+          scenarios.elements.each("#{@ns}:Scenario") do |scenario|
+            if scenario.is_a? REXML::Element
+              @scenarios.push(scenario)
+            end
           end
         end
         if @scenarios.empty?
