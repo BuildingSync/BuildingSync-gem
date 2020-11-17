@@ -331,7 +331,8 @@ module BuildingSync
     # read other building details
     def read_other_building_details
       if @building_xml.elements["#{@ns}:PrimaryContactID"]
-        @primary_contact_id = @building_xml.elements["#{@ns}:PrimaryContactID"].text
+        pc_id = @building_xml.elements["#{@ns}:PrimaryContactID"]
+        @primary_contact_id = BuildingSync::Helper.get_attribute_value(pc_id, 'IDref')
       else
         @primary_contact_id = nil
       end

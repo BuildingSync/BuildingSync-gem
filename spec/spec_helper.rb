@@ -352,6 +352,19 @@ RSpec.configure do |config|
     end
   end
 
+  def create_minimum_building(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    ns = 'auc'
+    generator = BuildingSync::Generator.new
+    xml_snippet = generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, ns)
+
+    building_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building"]
+    if !building_element.nil?
+      return BuildingSync::Building.new(building_element, '', '', ns)
+    else
+      expect(building_element.nil?).to be false
+    end
+  end
+
   # create xml file object
   # @param xml_file_path [String]
   # @return [REXML::Document]
@@ -619,6 +632,16 @@ RSpec.configure do |config|
       ns = 'auc'
       doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility|
         return BuildingSync::Facility.new(facility, ns)
+      end
+    end
+  end
+
+  def get_building_from_file(xml_file_path)
+    File.open(xml_file_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+      ns = 'auc'
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building|
+        return BuildingSync::Building.new(building, 'Office', '20000', ns)
       end
     end
   end

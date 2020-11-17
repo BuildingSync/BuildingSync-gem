@@ -93,118 +93,171 @@ RSpec.describe 'BuildingSpec' do
   end
 
   it 'Should return the year of last energy audit' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = 2010
+
+    # -- Assert
     puts "expected year_of_last_energy_audit: #{expected_value} but got: #{building.year_of_last_energy_audit} " if building.year_of_last_energy_audit != expected_value
     expect(building.year_of_last_energy_audit == expected_value).to be true
   end
 
   it 'Should return ownership' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = 'Property management company'
+
+    # -- Assert
     puts "expected ownership: #{expected_value} but got: #{building.ownership} " if building.ownership != expected_value
     expect(building.ownership == expected_value).to be true
   end
 
   it 'Should return occupancy_classification' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = 'Hospital'
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
+    expected_value = 'Health care-Inpatient hospital'
+
+    # -- Assert
     puts "expected occupancy_classification: #{expected_value} but got: #{building.occupancy_classification} " if building.occupancy_classification != expected_value
     expect(building.occupancy_classification == expected_value).to be true
   end
 
-  it 'Should return PrimaryContactID' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = '12345'
+  it 'Should return the IDref attribute for PrimaryContactID' do
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
+    expected_value = 'Contact1'
+
+    # -- Assert
     puts "expected primary_contact_id: #{expected_value} but got: #{building.primary_contact_id} " if building.primary_contact_id != expected_value
     expect(building.primary_contact_id == expected_value).to be true
   end
 
   it 'Should return RetrocommissioningDate' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = Date.parse '1/1/2019'
+
+    # -- Assert
     puts "expected retro_commissioning_date: #{expected_value} but got: #{building.year_last_commissioning} " if building.year_last_commissioning != expected_value
     expect(building.year_last_commissioning == expected_value).to be true
   end
 
   it 'Should return BuildingAutomationSystem' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = true
+
+    # -- Assert
     puts "expected building_automation_system: #{expected_value} but got: #{building.building_automation_system} " if building.building_automation_system != expected_value
     expect(building.building_automation_system == expected_value).to be true
   end
 
   it 'Should return HistoricalLandmark' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = true
+
+    # -- Assert
     puts "expected historical_landmark: #{expected_value} but got: #{building.historical_landmark} " if building.historical_landmark != expected_value
     expect(building.historical_landmark == expected_value).to be true
   end
 
   it 'Should return PercentOccupiedByOwner' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = '60'
+
+    # -- Assert
     puts "expected percent_occupied_by_owner: #{expected_value} but got: #{building.percent_occupied_by_owner} " if building.percent_occupied_by_owner != expected_value
     expect(building.percent_occupied_by_owner == expected_value).to be true
   end
 
   it 'Should return OccupantQuantity' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = '15000'
+
+    # -- Assert
     puts "expected occupant_quantity: #{expected_value} but got: #{building.occupant_quantity} " if building.occupant_quantity != expected_value
     expect(building.occupant_quantity == expected_value).to be true
   end
 
   it 'Should return NumberOfUnits' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = '18'
+
+    # -- Assert
     puts "expected number_of_units: #{expected_value} but got: #{building.number_of_units} " if building.number_of_units != expected_value
     expect(building.number_of_units == expected_value).to be true
   end
 
   it 'Should return built_year' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = Integer('2003')
+
+    # -- Assert
     puts "expected built_year: #{expected_value} but got: #{building.built_year} " if building.built_year != expected_value
     expect(building.built_year == expected_value).to be true
   end
 
   it 'Should return major_remodel_year' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = Integer('2003')
+
+    # -- Assert
     puts "expected major_remodel_year: #{expected_value} but got: #{building.year_major_remodel} " if building.year_major_remodel != expected_value
     expect(building.year_major_remodel == expected_value).to be true
   end
 
   it 'Should return year_of_last_energy_audit' do
-    building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building = get_building_from_file(xml_path)
     expected_value = Integer('2010')
+
+    # -- Assert
     puts "expected year_of_last_energy_audit: #{expected_value} but got: #{building.year_of_last_energy_audit} " if building.year_of_last_energy_audit != expected_value
     expect(building.year_of_last_energy_audit == expected_value).to be true
-  end
-
-  # we skip the method "set_weater_and_climate_zone" function because this method doesn't return any value
-  def get_building_from_file(xml_file_name, standard_to_be_used)
-    xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-      ns = 'auc'
-      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building|
-        return BuildingSync::Building.new(building, 'Office', '20000', ns)
-      end
-    end
-  end
-
-  def create_minimum_building(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    ns = 'auc'
-    generator = BuildingSync::Generator.new
-    xml_snippet = generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, ns)
-
-    building_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building"]
-    if !building_element.nil?
-      return BuildingSync::Building.new(building_element, '', '', ns)
-    else
-      expect(building_element.nil?).to be false
-    end
   end
 end
