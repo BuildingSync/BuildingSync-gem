@@ -35,7 +35,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'builder'
-require_relative '../../../lib/buildingsync/generator'
+require 'buildingsync/generator'
+
 require_relative './../../spec_helper'
 
 RSpec.describe 'OccupancyTypeSpec' do

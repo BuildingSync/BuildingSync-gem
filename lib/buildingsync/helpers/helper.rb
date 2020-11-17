@@ -39,16 +39,22 @@ module BuildingSync
   class Helper
     # get text value from xml element
     # @param xml_element [REXML::Element]
-    # @return string
+    # @return [String] if text value exists
+    # @return [nil] if text value doesnt exist or element is complex (has children)
     def self.get_text_value(xml_element)
-      if xml_element
+      if xml_element && !xml_element.text.nil?
         return xml_element.text
       end
       return nil
     end
 
+    # get attribute value from xml element
+    # @param xml_element [REXML::Element]
+    # @param attribute_name [String] name of attribute to get the value for
+    # @return [String] if attribute
+    # @return [nil] if attribute doesnt exist
     def self.get_attribute_value(xml_element, attribute_name)
-      if xml_element
+      if xml_element && !xml_element.attribute(attribute_name).nil?
         return xml_element.attribute(attribute_name).value
       end
       return nil
@@ -56,10 +62,15 @@ module BuildingSync
 
     # get date value from xml element
     # @param xml_element [REXML::Element]
-    # @return string
+    # @return [Date] if the text can be parsed as a date
+    # @return [nil] if the text cant be parsed as a date
     def self.get_date_value(xml_element)
-      if xml_element
-        return Date.parse(xml_element.text)
+      if xml_element && !xml_element.text.nil?
+        begin
+          return Date.parse(xml_element.text)
+        rescue ArgumentError
+          return nil
+        end
       end
       return nil
     end

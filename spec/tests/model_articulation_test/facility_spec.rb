@@ -35,7 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'builder'
-require_relative '../../../lib/buildingsync/generator'
+require 'buildingsync/generator'
 
 RSpec.describe 'FacilitySpec' do
   it 'Should generate meaningful error when passing empty XML data' do
@@ -62,7 +62,8 @@ RSpec.describe 'FacilitySpec' do
     file_name = 'building_151.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = File.join('../../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    expect(File.exist?(epw_path)).to be true
 
     generator = BuildingSync::Generator.new
     facility = generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')

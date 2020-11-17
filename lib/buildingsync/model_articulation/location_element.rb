@@ -78,14 +78,21 @@ module BuildingSync
     def read_climate_zone
       if @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE"]
         @climate_zone_ashrae = @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE/#{@ns}:ClimateZone"].text
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LocationElement.read_climate_zone', "Element ID: #{@id} - ASHRAE Climate Zone: #{@climate_zone_ashrae}")
       else
         @climate_zone_ashrae = nil
       end
       if @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24"]
         @climate_zone_ca_t24 = @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24/#{@ns}:ClimateZone"].text
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LocationElement.read_climate_zone', "Element ID: #{@id} - Title24 Climate Zone: #{@climate_zone_ca_t24}")
       else
         @climate_zone_ca_t24 = nil
       end
+
+      if @climate_zone_ashrae.nil? && @climate_zone_ca_t24.nil?
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LocationElement.read_climate_zone', "Element ID: #{@id} - Title24 Climate Zone and ASHRAE Climate Zone not found")
+      end
+
     end
 
     # read weather file name

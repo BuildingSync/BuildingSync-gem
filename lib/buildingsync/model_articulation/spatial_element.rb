@@ -39,6 +39,8 @@ require 'fileutils'
 require 'json'
 require 'openstudio/extension/core/os_lib_model_generation'
 
+require 'buildingsync/helpers/helper'
+
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpatialElement
@@ -50,6 +52,7 @@ module BuildingSync
     def initialize(spatial_element_xml, ns)
       @spatial_element_xml = spatial_element_xml
       @ns = ns
+      @id = BuildingSync::Helper.get_attribute_value(spatial_element_xml, 'ID')
 
       @total_floor_area = nil
       @bldg_type = nil

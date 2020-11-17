@@ -36,8 +36,9 @@
 # *******************************************************************************
 require 'rexml/xpath'
 
-require_relative '../model_articulation/facility'
-require_relative 'workflow_maker'
+require 'buildingsync/model_articulation/facility'
+require 'buildingsync/makers/workflow_maker'
+
 module BuildingSync
   # ModelMaker class
   class ModelMaker < ModelMakerBase

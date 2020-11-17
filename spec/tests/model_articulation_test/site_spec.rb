@@ -84,10 +84,11 @@ RSpec.describe 'SiteSpec' do
     # call generate_baseline_osm
     # call write_osm
     # compare this osm file with a file that was previously generated.
-    @osm_file_path = File.expand_path('../../files/filecomparison', File.dirname(__FILE__))
+    @osm_file_path = File.join(SPEC_FILES_DIR, 'filecomparison')
     @site = create_minimum_site('Retail', '1980', 'Gross', '20000')
     @site.determine_open_studio_standard(ASHRAE90_1)
-    @site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    @site.generate_baseline_osm(epw_file_path, ASHRAE90_1)
     @site.write_osm(@osm_file_path)
 
     generate_idf_file(@site.get_model)

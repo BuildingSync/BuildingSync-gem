@@ -45,7 +45,7 @@ RSpec.describe 'BuildingSync' do
       file_name = 'building_151.xml'
       std = ASHRAE90_1
       xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-      epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+      epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
       expect(File.exist?(epw_file_path)).to be true
 
       # -- Assert
@@ -57,7 +57,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'L100_Audit.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     expect(File.exist?(epw_file_path)).to be true
 
     # -- Assert
@@ -69,7 +69,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'L000_OpenStudio_Pre-Simulation_01.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     # -- Assert
     translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
@@ -100,7 +100,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'L000_OpenStudio_Pre-Simulation_04.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     # -- Assert
     translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
@@ -111,7 +111,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'Office_Carolina.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     # -- Assert
     translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)

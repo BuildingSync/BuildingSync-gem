@@ -34,7 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative '../../../lib/buildingsync/model_articulation/building'
+require 'buildingsync/model_articulation/building'
 
 RSpec.describe 'BuildingSpec' do
   it 'Should generate meaningful error when passing empty XML data' do

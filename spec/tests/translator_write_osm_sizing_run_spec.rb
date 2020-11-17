@@ -64,7 +64,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'L100_Audit.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     # -- Assert
     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -86,7 +86,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'DC GSA Headquarters.xml'
     std = CA_TITLE24
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     begin
       translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -101,7 +101,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'DC GSA Headquarters.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     # -- Assert
     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -112,7 +112,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'DC GSA HeadquartersWithClimateZone.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     # -- Assert
     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -123,7 +123,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'BuildingSync Website Valid Schema.xml'
     std = CA_TITLE24
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     # -- Assert
     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -134,7 +134,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'BuildingSync Website Valid Schema.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     # -- Assert
     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -145,7 +145,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'Golden Test File.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     begin
       # -- Assert
@@ -161,7 +161,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'AT_example_property_report_25.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     begin
       # -- Assert
       translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -175,7 +175,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'AT_example_report_332.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     begin
       # -- Assert
       translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -211,7 +211,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'L000_OpenStudio_Pre-Simulation_03.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     puts epw_path
     # epw_path = nil
 
@@ -224,7 +224,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'L000_OpenStudio_Pre-Simulation_04.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     puts epw_path
     # epw_path = nil
 

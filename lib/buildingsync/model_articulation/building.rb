@@ -655,7 +655,7 @@ module BuildingSync
       puts @open_studio_standard.class
       puts climate_zone_standard_string
       if !@open_studio_standard.nil? && !@open_studio_standard.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone_from_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
       end
 
       # overwrite latitude and longitude if available
@@ -756,7 +756,7 @@ module BuildingSync
       weather_file.setLongitude(weather_lon)
       weather_file.setTimeZone(epw_file.timeZone)
       weather_file.setElevation(epw_file.elevation)
-      weather_file.setString(10, "file:///#{epw_file.path}")
+      weather_file.setString(10, "#{epw_file.path}")
 
       weather_name = "#{epw_file.city}_#{epw_file.stateProvinceRegion}_#{epw_file.country}"
       weather_time = epw_file.timeZone
@@ -806,7 +806,7 @@ module BuildingSync
         # grab only the ones that matter
         ddy_list = /(Htg 99.6. Condns DB)|(Clg .4. Condns WB=>MDB)|(Clg .4% Condns DB=>MWB)/
         if d.name.get =~ ddy_list
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone', "Adding object #{d.name}")
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', "Adding object #{d.name}")
 
           # add the object to the existing model
           @model.addObject(d.clone)

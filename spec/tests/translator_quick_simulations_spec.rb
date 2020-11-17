@@ -42,7 +42,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'L000_OpenStudio_Pre-Simulation_01.xml'
     std = CA_TITLE24
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, std, epw_file_path)
   end

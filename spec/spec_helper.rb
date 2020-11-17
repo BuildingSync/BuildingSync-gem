@@ -71,8 +71,9 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  SPEC_OUTPUT_DIR = File.join(__dir__, 'output')
-  SPEC_FILES_DIR = File.join(__dir__, 'files')
+  SPEC_OUTPUT_DIR = File.expand_path('output', __dir__)
+  SPEC_FILES_DIR = File.expand_path('files', __dir__)
+  SPEC_WEATHER_DIR = File.expand_path('weather', __dir__)
 
   def create_xml_path_and_output_path(file_name, std, spec_file_name, version = nil)
     if version.nil?

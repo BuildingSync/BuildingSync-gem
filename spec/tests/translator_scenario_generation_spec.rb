@@ -57,7 +57,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'Golden Test File.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
 
     begin
       test_baseline_and_scenario_creation_with_simulation('Golden Test File.xml', 1, std, 'CZ01RV2.epw', false)
