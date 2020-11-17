@@ -40,7 +40,7 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and all simulations' do
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for CA_TITLE24 and all simulations' do
     # -- Setup
     file_name = 'building_151.xml'
     std = CA_TITLE24
