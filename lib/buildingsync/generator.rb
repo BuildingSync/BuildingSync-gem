@@ -34,12 +34,14 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'builder/xmlmarkup'
+
 module BuildingSync
   # Generator class that generates basic data that is used mostly for testing
   class Generator
 
     # @param version [String] version of BuildingSync
-    def initialize(version = "2.2.0")
+    def initialize(version = "2.2.0", ns = 'auc')
       supported_versions = ["2.0", "2.2.0"]
       if !supported_versions.include? version
         @version = nil
@@ -47,6 +49,7 @@ module BuildingSync
       else
         @version = version
       end
+      @ns = ns
     end
 
     # Starts from scratch and creates all necessary elements up to and including an
@@ -59,18 +62,18 @@ module BuildingSync
       location = "https://raw.githubusercontent.com/BuildingSync/schema/v#{@version}/BuildingSync.xsd"
       xml.instruct! :xml
       xml.tag!('auc:BuildingSync', {
-          :"xmlns:auc" => auc_ns,
+          :"xmlns:#{@ns}" => auc_ns,
           :"xsi:schemaLocation" => "#{auc_ns} #{location}",
           :"xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
           :version => "#{@version}"
       }) do |buildsync|
 
-        buildsync.tag!('auc:Facilities') do |faclts|
-          faclts.tag!('auc:Facility', {:ID => "Facility1"}) do |faclt|
-            faclt.tag!('auc:Sites') do |sites|
-              sites.tag!('auc:Site', {:ID => "Site1"}) do |site|
-                site.tag!('auc:Buildings') do |builds|
-                  builds.tag!('auc:Building', {:ID => "Building1"}) do |build|
+        buildsync.tag!("#{@ns}:Facilities") do |faclts|
+          faclts.tag!("#{@ns}:Facility", {:ID => "Facility1"}) do |faclt|
+            faclt.tag!("#{@ns}:Sites") do |sites|
+              sites.tag!("#{@ns}:Site", {:ID => "Site1"}) do |site|
+                site.tag!("#{@ns}:Buildings") do |builds|
+                  builds.tag!("#{@ns}:Building", {:ID => "Building1"}) do |build|
                   end
                 end
               end
@@ -90,23 +93,23 @@ module BuildingSync
     def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade = 1, ns = 'auc')
       doc_string = create_bsync_root_to_building
       doc = REXML::Document.new(doc_string)
-      site_element = doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
+      site_element = doc.elements["/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site"]
 
-      occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
+      occupancy_classification_element = REXML::Element.new("#{@ns}:OccupancyClassification")
       occupancy_classification_element.text = occupancy_classification
       site_element.add_element(occupancy_classification_element)
 
-      building_element = site_element.elements["#{ns}:Buildings/#{ns}:Building"]
+      building_element = site_element.elements["#{@ns}:Buildings/#{@ns}:Building"]
 
-      year_of_construction_element = REXML::Element.new("#{ns}:YearOfConstruction")
+      year_of_construction_element = REXML::Element.new("#{@ns}:YearOfConstruction")
       year_of_construction_element.text = year_of_const
       building_element.add_element(year_of_construction_element)
 
-      floor_areas_element = REXML::Element.new("#{ns}:FloorAreas")
-      floor_area_element = REXML::Element.new("#{ns}:FloorArea")
-      floor_area_type_element = REXML::Element.new("#{ns}:FloorAreaType")
+      floor_areas_element = REXML::Element.new("#{@ns}:FloorAreas")
+      floor_area_element = REXML::Element.new("#{@ns}:FloorArea")
+      floor_area_type_element = REXML::Element.new("#{@ns}:FloorAreaType")
       floor_area_type_element.text = floor_area_type
-      floor_area_value_element = REXML::Element.new("#{ns}:FloorAreaValue")
+      floor_area_value_element = REXML::Element.new("#{@ns}:FloorAreaValue")
       floor_area_value_element.text = floor_area_value
 
       floor_area_element.add_element(floor_area_type_element)
@@ -114,11 +117,11 @@ module BuildingSync
       floor_areas_element.add_element(floor_area_element)
       building_element.add_element(floor_areas_element)
 
-      floors_above_grade_element = REXML::Element.new("#{ns}:FloorsAboveGrade")
+      floors_above_grade_element = REXML::Element.new("#{@ns}:FloorsAboveGrade")
       floors_above_grade_element.text = floors_above_grade
       building_element.add_element(floors_above_grade_element)
 
-      occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
+      occupancy_classification_element = REXML::Element.new("#{@ns}:OccupancyClassification")
       occupancy_classification_element.text = occupancy_classification
       building_element.add_element(occupancy_classification_element)
 
@@ -134,11 +137,39 @@ module BuildingSync
     def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade = 1)
       xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade)
       ns = 'auc'
-      facility_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"]
+      facility_element = xml_snippet.elements["/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility"]
       if !facility_element.nil?
-        return BuildingSync::Facility.new(facility_element, 'auc')
+        return BuildingSync::Facility.new(facility_element, @ns)
       else
         expect(facility_element.nil?).to be false
+      end
+    end
+
+
+    # create minimum site
+    # @param occupancy_classification [String]
+    # @param year_of_const [Integer]
+    # @param floor_area_type [String]
+    # @param floor_area_value [Float]
+    # @return [BuildingSync::Site]
+    def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+      xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+      site_element = xml_snippet.elements["/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site"]
+      if !site_element.nil?
+        return BuildingSync::Site.new(site_element, @ns)
+      else
+        expect(site_element.nil?).to be false
+      end
+    end
+
+    def create_minimum_building(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+      xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+
+      building_element = xml_snippet.elements["/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building"]
+      if !building_element.nil?
+        return BuildingSync::Building.new(building_element, '', '', @ns)
+      else
+        expect(building_element.nil?).to be false
       end
     end
 

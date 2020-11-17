@@ -34,6 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'buildingsync/generator'
 
 RSpec.describe 'LoadSystemSpec' do
   it 'Should add internal loads successfully' do
@@ -45,7 +46,8 @@ RSpec.describe 'LoadSystemSpec' do
   end
 
   it 'Should add exterior lights successfully' do
-    site = create_minimum_site('Retail', '1980', 'Gross', '20000')
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Retail', '1980', 'Gross', '20000')
     site.determine_open_studio_standard(ASHRAE90_1)
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     site.generate_baseline_osm(epw_file_path, ASHRAE90_1)

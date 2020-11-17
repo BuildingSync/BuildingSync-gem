@@ -37,6 +37,8 @@
 require 'rexml/document'
 require 'openstudio/workflow/util/energyplus'
 
+require 'buildingsync/generator'
+
 RSpec.describe 'SiteSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
     # -- Setup
@@ -52,30 +54,37 @@ RSpec.describe 'SiteSpec' do
   end
 
   it 'Should create an instance of the site class with minimal XML snippet' do
-    create_minimum_site('Retail', '1954', 'Gross', '69452')
+    g = BuildingSync::Generator.new
+    g.create_minimum_site('Retail', '1954', 'Gross', '69452')
   end
 
   it 'Should return the correct building template' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
     site.determine_open_studio_standard(ASHRAE90_1)
+
+    # -- Assert
     puts "expected building template: DOE Ref Pre-1980 but got: #{site.get_building_template} " if site.get_building_template != 'DOE Ref Pre-1980'
     expect(site.get_building_template == 'DOE Ref Pre-1980').to be true
   end
 
   it 'Should return the correct system type' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
     puts "expected system type: PSZ-AC with gas coil heat but got: #{site.get_system_type} " if site.get_system_type != 'PSZ-AC with gas coil heat'
     expect(site.get_system_type == 'PSZ-AC with gas coil heat').to be true
   end
 
   it 'Should return the correct building type' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
     puts "expected building type: RetailStandalone but got: #{site.get_building_type} " if site.get_building_type != 'RetailStandalone'
     expect(site.get_building_type == 'RetailStandalone').to be true
   end
 
   it 'Should return the correct climate zone' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
     puts "expected climate zone: nil but got: #{site.get_climate_zone} " if !site.get_climate_zone.nil?
     expect(site.get_climate_zone.nil?).to be true
   end
@@ -84,8 +93,9 @@ RSpec.describe 'SiteSpec' do
     # call generate_baseline_osm
     # call write_osm
     # compare this osm file with a file that was previously generated.
+    g = BuildingSync::Generator.new
     @osm_file_path = File.join(SPEC_FILES_DIR, 'filecomparison')
-    @site = create_minimum_site('Retail', '1980', 'Gross', '20000')
+    @site = g.create_minimum_site('Retail', '1980', 'Gross', '20000')
     @site.determine_open_studio_standard(ASHRAE90_1)
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     @site.generate_baseline_osm(epw_file_path, ASHRAE90_1)

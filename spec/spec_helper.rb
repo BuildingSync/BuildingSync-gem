@@ -335,37 +335,6 @@ RSpec.configure do |config|
   #   return translator
   # end
 
-  # create minimum site
-  # @param occupancy_classification [String]
-  # @param year_of_const [Integer]
-  # @param floor_area_type [String]
-  # @param floor_area_value [Float]
-  # @return [BuildingSync::Site]
-  def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    generator = BuildingSync::Generator.new
-    xml_snippet = generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    ns = 'auc'
-    site_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
-    if !site_element.nil?
-      return BuildingSync::Site.new(site_element, 'auc')
-    else
-      expect(site_element.nil?).to be false
-    end
-  end
-
-  def create_minimum_building(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    ns = 'auc'
-    generator = BuildingSync::Generator.new
-    xml_snippet = generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, ns)
-
-    building_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building"]
-    if !building_element.nil?
-      return BuildingSync::Building.new(building_element, '', '', ns)
-    else
-      expect(building_element.nil?).to be false
-    end
-  end
-
   # create xml file object
   # @param xml_file_path [String]
   # @return [REXML::Document]
@@ -598,7 +567,7 @@ RSpec.configure do |config|
     building_xml = create_building_object(doc, ns)
 
     building_xml.elements.each("#{ns}:Sections/#{ns}:Section") do |building_element|
-      building_sections.push(BuildingSync::BuildingSection.new(building_element, occupancy_type, total_floor_area, ns))
+      building_sections.push(BuildingSync::BuildingSection.new(building_element, occupancy_type, total_floor_area, 1, ns))
     end
     return building_sections
   end
