@@ -170,6 +170,20 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
+  it 'AT_example_report_332.xml ASHRAE90_1 CZ01RV2.epw - should error since Occupancy type: "Food Service" is not defined in bldg_and_system_types.json' do
+    # -- Setup
+    file_name = 'AT_example_report_332.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
+    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    begin
+      # -- Assert
+      translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+    rescue StandardError => e
+      expect(e.message.include?('Occupancy type Food service is not available in the bldg_and_system_types.json dictionary')).to be true
+    end
+  end
+
   it 'L000_OpenStudio_Pre-Simulation_02.xml ASHRAE90_1 - perform a sizing run, and create an in.osm' do
     # -- Setup
     file_name = 'L000_OpenStudio_Pre-Simulation_02.xml'
