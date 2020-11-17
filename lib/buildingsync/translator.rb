@@ -92,7 +92,7 @@ module BuildingSync
         puts "File '#{xml_file_path}' was not validated against the BuildingSync schema"
       end
 
-      @doc = BuildingSync::Helper.read_xml_file_document(xml_file_path)
+      @doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_file_path)
 
       # test for the namespace
       @ns = 'auc'

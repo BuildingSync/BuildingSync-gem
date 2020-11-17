@@ -61,7 +61,7 @@ module BuildingSync
       auc_ns = "http://buildingsync.net/schemas/bedes-auc/2019"
       location = "https://raw.githubusercontent.com/BuildingSync/schema/v#{@version}/BuildingSync.xsd"
       xml.instruct! :xml
-      xml.tag!('auc:BuildingSync', {
+      xml.tag!("#{@ns}BuildingSync", {
           :"xmlns:#{@ns}" => auc_ns,
           :"xsi:schemaLocation" => "#{auc_ns} #{location}",
           :"xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",

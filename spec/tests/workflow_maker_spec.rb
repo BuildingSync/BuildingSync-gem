@@ -149,12 +149,13 @@ RSpec.describe 'WorkFlow Maker' do
 
   # TODO: Come back to and verify - what is difference between this and next test?
   it 'should save annual results to xml file and verify them' do
+    # -- Setup
     file_name = 'building_151.xml'
-    xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
     ns = 'auc'
-    doc = BuildingSync::Helper.read_xml_file_document(xml_path)
+    doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path)
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
     result = {}
     result[:completed_status] = 'Success'
@@ -186,7 +187,7 @@ RSpec.describe 'WorkFlow Maker' do
     FileUtils.mkdir_p(File.dirname(xml_path_output))
     workflow_maker.save_xml(xml_path_output)
 
-    doc_output = BuildingSync::Helper.read_xml_file_document(xml_path_output)
+    doc_output = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path_output)
     workflow_maker_output = BuildingSync::WorkflowMaker.new(doc_output, ns)
 
     scenarios = workflow_maker_output.get_scenario_elements
@@ -205,12 +206,13 @@ RSpec.describe 'WorkFlow Maker' do
 
   # TODO: What does this accomplish that previous test doesn't
   it 'should save baseline annual results to xml file and verify them' do
+    # -- Setup
     file_name = 'building_151.xml'
-    xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
     ns = 'auc'
-    doc = BuildingSync::Helper.read_xml_file_document(xml_path)
+    doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path)
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
     result = {}
     result[:completed_status] = 'Success'
@@ -240,7 +242,7 @@ RSpec.describe 'WorkFlow Maker' do
     xml_path_output = xml_path.sub! '/files/', '/output/'
     workflow_maker.save_xml(xml_path_output)
 
-    doc_output = BuildingSync::Helper.read_xml_file_document(xml_path_output)
+    doc_output = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path_output)
     workflow_maker_output = BuildingSync::WorkflowMaker.new(doc_output, ns)
 
     scenarios = workflow_maker_output.get_scenario_elements
@@ -257,12 +259,9 @@ RSpec.describe 'WorkFlow Maker' do
   end
 
   it 'create_calculation_method_element(result) should correctly create and return an auc:CalculationMethod element' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
+    doc = REXML::Document.new
     ns = 'auc'
-    doc = BuildingSync::Helper.read_xml_file_document(xml_path)
+
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
 
     # -- Setup
@@ -279,6 +278,7 @@ RSpec.describe 'WorkFlow Maker' do
     calc_method_failed = workflow_maker.create_calculation_method_element(result_failed)
     calc_method_xxx = workflow_maker.create_calculation_method_element(result_xxx)
 
+    puts calc_method_success
     # -- Assert
     expect(calc_method_success.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to be == 'Finished'
     expect(calc_method_failed.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to eq 'Failed'
@@ -289,10 +289,11 @@ RSpec.describe 'WorkFlow Maker' do
   it 'should process monthly data correctly' do
     # -- Setup
     file_name = 'building_151.xml'
-    xml_path = File.expand_path("./../files/#{file_name}", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
     ns = 'auc'
-    doc = BuildingSync::Helper.read_xml_file_document(xml_path)
+    doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path)
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
 
     month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }

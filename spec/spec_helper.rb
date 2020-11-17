@@ -265,26 +265,6 @@ RSpec.configure do |config|
     end
   end
 
-  # test baseline creation with simulation
-  # @param file_name [String]
-  # @param standard_to_be_used [String]
-  # @param epw_file_name [String]
-  # def test_baseline_creation_and_simulation(xml_path, output_path, standard_to_be_used, epw_file)
-  #   # -- Setup
-  #   current_year = Date.today.year
-  #   translator = translator_write_osm_and_perform_checks(xml_path, output_path, standard_to_be_used, epw_file)
-  #   expect(translator.run_baseline_osm(epw_file)).to be true
-  #
-  #   # -- Assert translator.run_baseline_osm checks
-  #   translator_run_baseline_osm_checks(output_path)
-  #
-  #   success = translator.gather_results(output_path, current_year, true)
-  #
-  #   expect(success).to be true
-  #   translator.save_xml(File.join(output_path, 'results.xml'))
-  #   expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
-  # end
-
   # test baseline and scenario creation
   # @param file_name [String]
   # @param expected_number_of_measures [Integer]
@@ -305,46 +285,6 @@ RSpec.configure do |config|
     return translator
   end
 
-  # # test baseline creation
-  # # @param file_name [String]
-  # # @param standard_to_be_used [String]
-  # # @param epw_file_name [String]
-  # def test_baseline_creation(file_name, output_path, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
-  #   xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
-  #   expect(File.exist?(xml_path)).to be true
-  #
-  #   out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
-  #
-  #   if File.exist?(out_path)
-  #     FileUtils.rm_rf(out_path)
-  #   end
-  #
-  #   FileUtils.mkdir_p(out_path)
-  #   expect(File.exist?(out_path)).to be true
-  #
-  #   epw_file_path = nil
-  #   if !epw_file_name.nil?
-  #     epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
-  #   end
-  #
-  #   translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
-  #   translator.write_osm
-  #
-  #   expect(File.exist?("#{out_path}/in.osm")).to be true
-  #
-  #   return translator
-  # end
-
-  # create xml file object
-  # @param xml_file_path [String]
-  # @return [REXML::Document]
-  def create_rexml_document_from_file_path(xml_file_path)
-    doc = nil
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-    return doc
-  end
 
   # run minimum facility
   # @param occupancy_classification [String]
@@ -529,7 +469,7 @@ RSpec.configure do |config|
   # -- Generate Baseline functions
   def generate_baseline_facilities(xml_path, ns)
     facilities = []
-    doc = create_rexml_document_from_file_path(xml_path)
+    doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path)
 
     doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_element|
       facilities.push(BuildingSync::Facility.new(facility_element, ns))
@@ -539,7 +479,7 @@ RSpec.configure do |config|
 
   def generate_baseline_sites(xml_path, ns)
     sites = []
-    doc = create_rexml_document_from_file_path(xml_path)
+    doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path)
     facility_xml = create_facility_object(doc, ns)
 
     facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
@@ -551,7 +491,7 @@ RSpec.configure do |config|
   def generate_baseline_buildings(xml_path, occupancy_type, total_floor_area, ns)
     buildings = []
 
-    doc = create_rexml_document_from_file_path(xml_path)
+    doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path)
     site_xml = create_site_object(doc, ns)
 
     site_xml.elements.each("#{ns}:Buildings/#{ns}:Building") do |building_element|
@@ -563,7 +503,7 @@ RSpec.configure do |config|
   def generate_baseline_building_sections(xml_path, occupancy_type, total_floor_area, ns)
     building_sections = []
 
-    doc = create_rexml_document_from_file_path(xml_path)
+    doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path)
     building_xml = create_building_object(doc, ns)
 
     building_xml.elements.each("#{ns}:Sections/#{ns}:Section") do |building_element|

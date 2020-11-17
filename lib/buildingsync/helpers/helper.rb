@@ -89,7 +89,7 @@ module BuildingSync
     # read xml file document
     # @param xml_file_path [String]
     # @return REXML::Document
-    def self.read_xml_file_document(xml_file_path)
+    def self.create_rexml_document_from_file_path(xml_file_path)
       doc = nil
       File.open(xml_file_path, 'r') do |file_content|
         doc = REXML::Document.new(file_content, ignore_whitespace_nodes: :all)

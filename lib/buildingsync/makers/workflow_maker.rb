@@ -820,7 +820,7 @@ module BuildingSync
     # @param key_value [String]
     def get_timeseries_element(monthly_results, year_val, scenario_name, timeseriesdata, key_value)
       if !monthly_results.nil?
-        month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }
+        month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
         scenario_name_ns = scenario_name.tr(' ', '_').gsub(/[^0-9a-z_]/i, '')
 
         (1..12).each do |month|
