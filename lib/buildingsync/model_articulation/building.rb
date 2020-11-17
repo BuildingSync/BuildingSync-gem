@@ -307,7 +307,7 @@ module BuildingSync
         end
         if building_fraction.round(3) < 0.0
           puts "building fraction is #{building_fraction}"
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_fraction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
         end
       end
@@ -863,7 +863,7 @@ module BuildingSync
       # TODO: we have not really defined a good logic what happens with multiple sites, versus multiple buildings, here we just take the first building on the first site
       set_building_form_defaults
 
-      # checking that the factions add up
+      # checking that the fractions add up
       check_building_fraction
 
       # set building rotation

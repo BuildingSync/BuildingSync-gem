@@ -245,7 +245,6 @@ RSpec.configure do |config|
     current_year = Date.today.year
     translator = test_baseline_and_scenario_creation(xml_path, output_path, expected_number_of_measures, standard_to_be_used, epw_file_name)
 
-    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
     osw_files = []
     Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
 
