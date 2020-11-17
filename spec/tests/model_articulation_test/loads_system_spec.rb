@@ -77,9 +77,9 @@ RSpec.describe 'LoadSystemSpec' do
     # -- Setup
     file_name = 'building_151.xml'
     std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = nil
-    translator = test_baseline_creation('building_151.xml', CA_TITLE24)
+    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
     model = translator.get_model
 
     cut_off_value = 0.5
