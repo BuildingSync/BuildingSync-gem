@@ -40,95 +40,80 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  it 'building_151.xml CA_TITLE24 - SR, Baseline' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+    it 'building_151.xml ASHRAE90_1 - SR, Baseline, gather_results and save_xml' do
+      # -- Setup
+      file_name = 'building_151.xml'
+      std = ASHRAE90_1
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+      epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+      expect(File.exist?(epw_file_path)).to be true
 
-    # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
-    translator.run_baseline_osm(epw_file_path)
-    translator_run_baseline_osm_checks(output_path)
-  end
-
-  it 'building_151.xml ASHRAE90_1 - SR, Baseline' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
-
-    # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
-    translator.run_baseline_osm(epw_file_path)
-    translator_run_baseline_osm_checks(output_path)
-  end
-
-  it 'building_151_level1.xml ASHRAE90_1 - SR, Baseline' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
-
-    # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
-    translator.run_baseline_osm(epw_file_path)
-    translator_run_baseline_osm_checks(output_path)
-  end
-
-  it 'DC GSA Headquarters.xml ASHRAE90_1 - SR, Baseline' do
-    # -- Setup
-    file_name = 'DC GSA Headquarters.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
-
-    # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
-    translator.run_baseline_osm(epw_file_path)
-    translator_run_baseline_osm_checks(output_path)
-  end
-
-  it 'BuildingSync Website Valid Schema.xml CA_TITLE24 - SR, Baseline' do
-    # -- Setup
-    file_name = 'BuildingSync Website Valid Schema.xml'
-    std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
-
-    # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
-    translator.run_baseline_osm(epw_file_path)
-    translator_run_baseline_osm_checks(output_path)
-  end
-
-  it 'BuildingSync Website Valid Schema.xml ASHRAE90_1 - SR, Baseline' do
-    # -- Setup
-    file_name = 'BuildingSync Website Valid Schema.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
-
-    # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
-    translator.run_baseline_osm(epw_file_path)
-    translator_run_baseline_osm_checks(output_path)
-  end
-
-  it 'should parse report_478.xml and issue an exception that it contains 2 basement stories' do
-    # -- Setup
-    file_name = 'report_478.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
-    begin
-      translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
-    rescue StandardError => e
-      puts "e.message #{e.message}"
-      expect(e.message.include?('Number of stories below grade is larger than 1: 2.0, currently only one basement story is supported.')).to be true
+      # -- Assert
+      translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
     end
+
+  it 'L100_Audit.xml ASHRAE90_1 - SR, Baseline, gather_results and save_xml' do
+    # -- Setup
+    file_name = 'L100_Audit.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+    expect(File.exist?(epw_file_path)).to be true
+
+    # -- Assert
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
+  end
+
+  it 'L000_OpenStudio_Pre-Simulation_01.xml ASHRAE90_1 - SR, Baseline, gather_results and save_xml' do
+    # -- Setup
+    file_name = 'L000_OpenStudio_Pre-Simulation_01.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+
+    # -- Assert
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
+  end
+
+  it 'L000_OpenStudio_Pre-Simulation_02.xml ASHRAE90_1 - SR, Baseline, gather_results and save_xml' do
+    # -- Setup
+    file_name = 'L000_OpenStudio_Pre-Simulation_02.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__,'v2.2.0')
+    epw_path = nil
+
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_path, std)
+  end
+
+  it 'L000_OpenStudio_Pre-Simulation_03.xml ASHRAE90_1 - SR, Baseline, gather_results and save_xml' do
+    # -- Setup
+    file_name = 'L000_OpenStudio_Pre-Simulation_03.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__,'v2.2.0')
+    epw_path = nil
+
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_path, std)
+  end
+
+  it 'L000_OpenStudio_Pre-Simulation_04.xml ASHRAE90_1 - SR, Baseline, gather_results and save_xml' do
+    # -- Setup
+    file_name = 'L000_OpenStudio_Pre-Simulation_04.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+
+    # -- Assert
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
+  end
+
+  it 'Office_Carolina.xml ASHRAE90_1 - SR, Baseline, gather_results and save_xml' do
+    # -- Setup
+    file_name = 'Office_Carolina.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+
+    # -- Assert
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
   end
 end

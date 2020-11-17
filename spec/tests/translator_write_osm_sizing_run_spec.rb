@@ -59,7 +59,7 @@ RSpec.describe 'BuildingSync' do
     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
   end
 
-  it 'L100_Audit.xml ASHRAE90_1 CZ01RV2.epw - perform a sizing run, and create an in.osm' do
+  xit 'L100_Audit.xml ASHRAE90_1 CZ01RV2.epw - perform a sizing run, and create an in.osm' do
     # -- Setup
     file_name = 'L100_Audit.xml'
     std = ASHRAE90_1
@@ -184,6 +184,17 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
+  it 'L000_OpenStudio_Pre-Simulation_01.xml ASHRAE90_1 - perform a sizing run, and create an in.osm' do
+    # -- Setup
+    file_name = 'L000_OpenStudio_Pre-Simulation_01.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_path = nil
+
+    # -- Assert
+    translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  end
+
   it 'L000_OpenStudio_Pre-Simulation_02.xml ASHRAE90_1 - perform a sizing run, and create an in.osm' do
     # -- Setup
     file_name = 'L000_OpenStudio_Pre-Simulation_02.xml'
@@ -198,6 +209,19 @@ RSpec.describe 'BuildingSync' do
   it 'L000_OpenStudio_Pre-Simulation_03.xml ASHRAE90_1 - perform a sizing run, and create an in.osm' do
     # -- Setup
     file_name = 'L000_OpenStudio_Pre-Simulation_03.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    puts epw_path
+    # epw_path = nil
+
+    # -- Assert
+    translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  end
+
+  it 'L000_OpenStudio_Pre-Simulation_04.xml ASHRAE90_1 - perform a sizing run, and create an in.osm' do
+    # -- Setup
+    file_name = 'L000_OpenStudio_Pre-Simulation_04.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = File.join('../weather', 'CZ01RV2.epw')

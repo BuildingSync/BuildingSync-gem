@@ -25,9 +25,6 @@ install:
 jobs:
   include:
     - script:
-      - $SH "bundle exec rspec spec/tests/translator_write_osm_sizing_run_spec.rb"
-      name: "Translator Perform SR, Create in.osm Spec"
-    - script:
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb"
@@ -39,20 +36,26 @@ jobs:
       # - $SH "bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb"  // fails sometimes due to connection issues, so we exclude it here
       name: "Model Articulation Tests"
     - script:
+        - travis_wait 40 $SH "bundle exec rspec spec/tests/model_articulation_test/hospital_occupancy_type_spec.rb"
+      name: "Model Articulation Hospital Occupancy Type Spec"
+    - script:
+        - $SH "bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb"
+      name: "Model Articulation Occupancy Types Spec"
+    - script:
       - travis_wait 50 $SH "bundle exec rspec spec/tests/translator_spec.rb"
       name: "Translator Spec"
     - script:
-      - travis_wait 40 $SH "bundle exec rspec spec/tests/model_articulation_test/hospital_occupancy_type_spec.rb"
-      name: "Model Articulation Hospital Occupancy Type Spec"
+        - $SH "bundle exec rspec spec/tests/translator_write_osm_sizing_run_spec.rb"
+      name: "Translator Perform SR, Create in.osm Spec"
     - script:
-      - $SH "bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb"
-      name: "Model Articulation Occupancy Types Spec"
+        - $SH "bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb"
+      name: "Translator Perform SR and Baseline Simulation Spec"
+    - script:
+        - $SH "bundle exec rspec spec/tests/translator_baseline_gather_save_spec.rb"
+      name: "Translator Perform SR and Baseline Simulations, Gather and Save Results Spec"
     - script:
       - $SH "bundle exec rspec spec/tests/translator_scenario_generation_spec.rb"
       name: "Translator Generation Specs"
-    - script:
-      - $SH "bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb"
-      name: "Translator Baseline Simulation Spec"
     - script:
       - $SH "bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb"
       name: "Translator Scenario Simulation Spec"
