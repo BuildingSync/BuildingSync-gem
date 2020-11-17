@@ -43,7 +43,7 @@ RSpec.describe 'BuildingSpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     begin
-      generate_baseline_buildings(xml_path, '', '', 'auc')
+      BuildingSync::Generator.new.generate_baseline_buildings(xml_path, '', '', 'auc')
     rescue StandardError => e
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
     end
@@ -104,7 +104,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = 2010
 
     # -- Assert
@@ -117,7 +117,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = 'Property management company'
 
     # -- Assert
@@ -130,7 +130,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = 'Health care-Inpatient hospital'
 
     # -- Assert
@@ -143,7 +143,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = 'Contact1'
 
     # -- Assert
@@ -156,7 +156,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = Date.parse '1/1/2019'
 
     # -- Assert
@@ -169,7 +169,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = true
 
     # -- Assert
@@ -182,7 +182,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = true
 
     # -- Assert
@@ -195,7 +195,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = '60'
 
     # -- Assert
@@ -208,7 +208,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = '15000'
 
     # -- Assert
@@ -221,7 +221,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = '18'
 
     # -- Assert
@@ -234,7 +234,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = Integer('2003')
 
     # -- Assert
@@ -247,7 +247,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = Integer('2003')
 
     # -- Assert
@@ -260,7 +260,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = get_building_from_file(xml_path)
+    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     expected_value = Integer('2010')
 
     # -- Assert

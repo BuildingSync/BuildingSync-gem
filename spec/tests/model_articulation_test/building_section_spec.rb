@@ -42,7 +42,7 @@ RSpec.describe 'BuildingSpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     begin
-      generate_baseline_building_sections(xml_path, nil, nil, 'auc')
+      BuildingSync::Generator.new.generate_baseline_building_sections(xml_path, nil, nil, 'auc')
     rescue StandardError => e
       puts "expected error message:Building type '' is nil but got: #{e.message} " if !e.message.include?("Building type '' is nil")
       expect(e.message.include?("Building type '' is nil")).to be true
@@ -54,7 +54,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building_section = get_building_section_from_file(xml_path)
+    building_section = BuildingSync::Generator.new.get_building_section_from_file(xml_path)
     expected_value = 'Retail'
 
     # -- Assert
@@ -67,7 +67,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building_section = get_building_section_from_file(xml_path)
+    building_section = BuildingSync::Generator.new.get_building_section_from_file(xml_path)
     expected_value = '40.0'
 
     # -- Assert
@@ -80,7 +80,7 @@ RSpec.describe 'BuildingSpec' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building_section = get_building_section_from_file(xml_path)
+    building_section = BuildingSync::Generator.new.get_building_section_from_file(xml_path)
     expected_value = '50.0'
 
     # -- Assert

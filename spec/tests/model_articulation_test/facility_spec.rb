@@ -44,7 +44,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     begin
-      generate_baseline_facilities(xml_path, 'auc')
+      BuildingSync::Generator.new.generate_baseline_facilities(xml_path, 'auc')
     rescue StandardError => e
       puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
@@ -121,7 +121,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = '9.7'
 
     # -- Assert
@@ -135,7 +135,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = '10.5'
     puts "expected eui_building: #{expected_value} but got: #{facility.building_eui} " if facility.building_eui != expected_value
     expect(facility.building_eui == expected_value).to be true
@@ -147,7 +147,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = 'Contact1'
     puts "expected auditor_contact_id: #{expected_value} but got: #{facility.auditor_contact_id} " if facility.auditor_contact_id != expected_value
     expect(facility.auditor_contact_id == expected_value).to be true
@@ -159,7 +159,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = 'Portfolio Manager'
 
     # -- Assert
@@ -173,7 +173,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = '123'
 
     # -- Assert
@@ -187,7 +187,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = '1000'
 
     # -- Assert
@@ -201,7 +201,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = Date.parse('2019-05-01')
 
     # -- Assert
@@ -216,7 +216,7 @@ RSpec.describe 'FacilitySpec' do
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
 
     begin
-      get_facility_from_file(xml_path)
+      BuildingSync::Generator.new.get_facility_from_file(xml_path)
     rescue StandardError => e
       # -- Assert
       puts "rescued StandardError: #{e.message}"
@@ -230,7 +230,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = 'John Doe'
 
     # -- Assert
@@ -244,7 +244,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = 'an utility'
 
     # -- Assert
@@ -258,7 +258,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = 'Direct metering'
 
     # -- Assert
@@ -272,7 +272,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = REXML::Element.new("auc:CriticalPeakPricing")
     rate_schedule = facility.rate_schedules_xml[0]
     rate_structure_type = rate_schedule.get_elements("auc:TypeOfRateStructure/*")[0]
@@ -288,7 +288,7 @@ RSpec.describe 'FacilitySpec' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-    facility = get_facility_from_file(xml_path)
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
     expected_value = '0123456'
     meter_number = facility.utility_meter_numbers[0]
 
