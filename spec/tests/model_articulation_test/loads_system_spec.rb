@@ -71,6 +71,11 @@ RSpec.describe 'LoadSystemSpec' do
   end
 
   it 'should parse and write building_151.xml and adjust schedules successfully' do
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = CA_TITLE24
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
+    epw_path = nil
     translator = test_baseline_creation('building_151.xml', CA_TITLE24)
     model = translator.get_model
 

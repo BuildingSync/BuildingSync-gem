@@ -70,8 +70,11 @@ RSpec.describe 'HVACSystemSpec' do
   end
 
   it 'Should return expected system type ' do
-    hvac_system = get_hvac_system_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = 'VAVwReheat'
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    hvac_system = get_hvac_system_from_file(xml_path, std)
+    expected_value = 'VAV with Hot Water Reheat'
     puts "hvac_system #{hvac_system}"
     puts "expected primary_hvac_system_type : #{expected_value} but got: #{hvac_system.get_principal_hvac_system_type} " if hvac_system.get_principal_hvac_system_type != expected_value
     expect(hvac_system.get_principal_hvac_system_type == expected_value).to be true
@@ -81,8 +84,7 @@ RSpec.describe 'HVACSystemSpec' do
   # @param xml_file_name [String]
   # @param standard_to_be_used [String]
   # @return [BuildingSync::HVACSystem]
-  def get_hvac_system_from_file(xml_file_name, standard_to_be_used)
-    xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
+  def get_hvac_system_from_file(xml_file_path, standard_to_be_used)
     File.open(xml_file_path, 'r') do |file|
       doc = REXML::Document.new(file)
       ns = 'auc'

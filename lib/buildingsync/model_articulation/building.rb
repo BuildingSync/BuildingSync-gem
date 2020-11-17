@@ -616,6 +616,9 @@ module BuildingSync
       if @epw_file_path.nil?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path is nil and no way to set from Site or Building parameters.')
         raise 'Error : epw_file_path is nil and no way to set from Site or Building parameters.'
+      elsif !@epw_file_path
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "epw_file_path is false: #{@epw_file_path}")
+        raise "Error : epw_file_path is false: #{@epw_file_path}"
       elsif !File.exist?(@epw_file_path)
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "epw_file_path does not exist: #{@epw_file_path}")
         raise "Error : epw_file_path does not exist: #{@epw_file_path}"
@@ -647,6 +650,9 @@ module BuildingSync
         climate_zone_standard_string = ''
       end
 
+      puts @open_studio_standard
+      puts @open_studio_standard.class
+      puts climate_zone_standard_string
       if !@open_studio_standard.nil? && !@open_studio_standard.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
       end

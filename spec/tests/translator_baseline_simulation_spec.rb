@@ -40,141 +40,171 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  # TODO: Update
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and perform a baseline simulation' do
-    translator = test_baseline_creation('building_151.xml', CA_TITLE24)
-    expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-    expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
-  end
+  # # TODO: Update
+  # it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and perform a baseline simulation' do
+  #   translator = test_baseline_creation('building_151.xml', CA_TITLE24)
+  #   expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
+  #   expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+  # end
+  #
+  # # TODO: Update
+  # it 'should parse and write building_151_level1.xml (phase zero) with auc namespace for ASHRAE 90.1 and perform a baseline simulation' do
+  #   translator = test_baseline_creation('building_151_level1.xml', ASHRAE90_1)
+  #   expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
+  #   expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+  # end
+  #
+  # # TODO: Update
+  # it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1 and perform a baseline simulation' do
+  #   translator = test_baseline_creation('building_151.xml', ASHRAE90_1)
+  #   expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
+  #   expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+  # end
+  #
+  # # TODO: Update
+  # it 'should parse and write DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+  #   translator = test_baseline_creation('DC GSA Headquarters.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  #   expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
+  #   expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+  # end
+  #
+  # # TODO: Update
+  # it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with Title 24 and perform a baseline simulation' do
+  #   translator = test_baseline_creation('BuildingSync Website Valid Schema.xml', CA_TITLE24, 'CZ01RV2.epw')
+  #   expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
+  #   expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+  # end
+  #
+  # # TODO: Update
+  # it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+  #   translator = test_baseline_creation('BuildingSync Website Valid Schema.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  #   expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
+  #   expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+  # end
+  #
+  # # TODO: Update
+  # it 'should parse and write Golden Test File.xml (phase zero) with  Title 24 and perform a baseline simulation' do
+  #   begin
+  #     translator = test_baseline_creation('Golden Test File.xml', CA_TITLE24, 'CZ01RV2.epw')
+  #     expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
+  #     expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+  #   rescue StandardError => e
+  #     expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
+  #   end
+  # end
+  #
+  # # TODO: Update
+  # it 'should parse and write AT_example_property_report_25.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+  #   begin
+  #     translator = test_baseline_creation('AT_example_property_report_25.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  #     expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
+  #     expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+  #   rescue StandardError => e
+  #     expect(e.message.include?('Error: There is more than one (3) building attached to this site in your BuildingSync file.')).to be true
+  #   end
+  # end
+  #
+  # # TODO: Update
+  # it 'should parse and write AT_example_report_332.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
+  #   begin
+  #     translator = test_baseline_creation('AT_example_report_332.xml', ASHRAE90_1, 'CZ01RV2.epw')
+  #     expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
+  #     expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+  #   rescue StandardError => e
+  #     puts "e.message #{e.message}"
+  #     expect(e.message.include?('Occupancy type Food service is not available in the bldg_and_system_types.json dictionary')).to be true
+  #   end
+  # end
 
-  # TODO: Update
-  it 'should parse and write building_151_level1.xml (phase zero) with auc namespace for ASHRAE 90.1 and perform a baseline simulation' do
-    translator = test_baseline_creation('building_151_level1.xml', ASHRAE90_1)
-    expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-    expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
-  end
-
-  # TODO: Update
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for ASHRAE 90.1 and perform a baseline simulation' do
-    translator = test_baseline_creation('building_151.xml', ASHRAE90_1)
-    expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-    expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
-  end
-
-  # TODO: Update
-  it 'should parse and write DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
-    translator = test_baseline_creation('DC GSA Headquarters.xml', ASHRAE90_1, 'CZ01RV2.epw')
-    expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-    expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
-  end
-
-  # TODO: Update
-  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with Title 24 and perform a baseline simulation' do
-    translator = test_baseline_creation('BuildingSync Website Valid Schema.xml', CA_TITLE24, 'CZ01RV2.epw')
-    expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-    expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
-  end
-
-  # TODO: Update
-  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
-    translator = test_baseline_creation('BuildingSync Website Valid Schema.xml', ASHRAE90_1, 'CZ01RV2.epw')
-    expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-    expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
-  end
-
-  # TODO: Update
-  it 'should parse and write Golden Test File.xml (phase zero) with  Title 24 and perform a baseline simulation' do
-    begin
-      translator = test_baseline_creation('Golden Test File.xml', CA_TITLE24, 'CZ01RV2.epw')
-      expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-      expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
-    rescue StandardError => e
-      expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
-    end
-  end
-
-  # TODO: Update
-  it 'should parse and write AT_example_property_report_25.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
-    begin
-      translator = test_baseline_creation('AT_example_property_report_25.xml', ASHRAE90_1, 'CZ01RV2.epw')
-      expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-      expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
-    rescue StandardError => e
-      expect(e.message.include?('Error: There is more than one (3) building attached to this site in your BuildingSync file.')).to be true
-    end
-  end
-
-  # TODO: Update
-  it 'should parse and write AT_example_report_332.xml (phase zero) with ASHRAE 90.1 and perform a baseline simulation' do
-    begin
-      translator = test_baseline_creation('AT_example_report_332.xml', ASHRAE90_1, 'CZ01RV2.epw')
-      expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-      expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
-    rescue StandardError => e
-      puts "e.message #{e.message}"
-      expect(e.message.include?('Occupancy type Food service is not available in the bldg_and_system_types.json dictionary')).to be true
-    end
-  end
-
-  # TODO: Update
   it 'should parse report_478.xml and issue an exception that it contains 2 basement stories' do
+    # -- Setup
+    file_name = 'report_478.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
     begin
-      translator = test_baseline_creation('report_478.xml', ASHRAE90_1, 'CZ01RV2.epw')
-      expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-      expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+      translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
     rescue StandardError => e
       puts "e.message #{e.message}"
       expect(e.message.include?('Number of stories below grade is larger than 1: 2.0, currently only one basement story is supported.')).to be true
     end
   end
 
-  # TODO: Update
   it 'building_151.xml: should perform all steps to parse xml file, generate osm, simulate a baseline, gather and save the results' do
     # -- Setup
     file_name = 'building_151.xml'
-    xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
-
-    # The output_path will look like:
-    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03
-    output_path = File.join("../output", "#{File.basename(__FILE__ , File.extname(__FILE__ ))}/#{File.basename(xml_path, File.extname(xml_path))}")
-    output_path = File.expand_path(output_path, File.dirname(__FILE__))
-
-    # Use different EPW file path than that resolved by write_osm: spec/weather/CZ01RV2.epw
-    epw_file_path = File.join('../weather/CZ01RV2.epw')
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+    expect(File.exist?(epw_file_path)).to be true
 
     # -- Assert
-    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, CA_TITLE24)
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
   end
 
-  # TODO: Update
   it 'should parse and write L100_Audit.xml (phase zero) with auc namespace for ASHRAE 90.1' do
-    translator = test_baseline_creation('L100_Audit.xml', ASHRAE90_1, 'CZ01RV2.epw')
-    expect(translator.run_baseline_osm('CZ01RV2.epw')).to be true
-    expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
+    # -- Setup
+    file_name = 'L100_Audit.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+    expect(File.exist?(epw_file_path)).to be true
 
-    out_path = File.dirname(translator.osm_baseline_file_path)
-    translator.gather_results(out_path, Date.today.year, true)
-    translator.save_xml(File.join(out_path, 'results.xml'))
-    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
+    # -- Assert
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
   end
 
-  # TODO: Update
-  it 'should parse and write L000_OpenStudio_Simulation_01.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('L000_OpenStudio_Simulation_01.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+  it 'should parse and write L000_OpenStudio_Pre-Simulation_01.xml (phase zero) and perform a baseline simulation and gather results' do
+    # -- Setup
+    file_name = 'L000_OpenStudio_Pre-Simulation_01.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+
+    # -- Assert
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
   end
 
-  # TODO: Update
-  it 'should parse and write L000_OpenStudio_Simulation_02.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('L000_OpenStudio_Simulation_02.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+  it 'L000_OpenStudio_Pre-Simulation_03.xml: should perform all steps to parse xml file, generate osm, simulate a baseline, gather and save the results' do
+    # -- Setup
+    file_name = 'L000_OpenStudio_Pre-Simulation_03.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__,'v2.2.0')
+    epw_path = nil
+
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_path, std)
   end
 
-  # TODO: Update
+  it 'should parse and write L000_OpenStudio_Pre-Simulation_04.xml (phase zero) and perform a baseline simulation and gather results' do
+    # -- Setup
+    file_name = 'L000_OpenStudio_Pre-Simulation_04.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+
+    # -- Assert
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
+  end
+
   it 'should parse and write L100_Audit.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('L100_Audit.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+    # -- Setup
+    file_name = 'L100_Audit.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+
+    # -- Assert
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
   end
 
-  # TODO: Update
   it 'should parse and write Office_Carolina.xml (phase zero) and perform a baseline simulation and gather results' do
-    test_baseline_creation_and_simulation('Office_Carolina.xml',  ASHRAE90_1, 'CZ01RV2.epw')
+    # -- Setup
+    file_name = 'Office_Carolina.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join('../weather', 'CZ01RV2.epw')
+
+    # -- Assert
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
   end
 end

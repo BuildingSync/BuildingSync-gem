@@ -218,9 +218,9 @@ module BuildingSync
         standard.model_remove_prm_hvac(model)
       end
 
-      puts "system_type derived from standards: #{system_type} and principal hvac system type override is: #{@principal_hvac_system_type}"
+      puts "system_type derived from standards: #{system_type} and principal hvac system type override is: #{get_principal_hvac_system_type}"
       if !@principal_hvac_system_type.empty?
-        system_type = map_principal_hvac_system_type_to_cbecs_system_type(@principal_hvac_system_type.first.first, system_type)
+        system_type = map_principal_hvac_system_type_to_cbecs_system_type(get_principal_hvac_system_type, system_type)
       end
 
       case system_type

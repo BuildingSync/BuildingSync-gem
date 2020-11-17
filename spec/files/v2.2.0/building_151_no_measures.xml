@@ -1,9 +1,11 @@
-<!-- edited with XMLSpy v2016 rel. 2 sp1 (x64) (http://www.altova.com) by Dan Macumber (NREL) -->
-<auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://cdn.rawgit.com/BuildingSync/schema/develop/BuildingSync.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="UTF-8"?>
+<auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019"
+  xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.2.0">
   <auc:Facilities>
-    <auc:Facility>
+    <auc:Facility ID="Facility-1">
       <auc:Sites>
-        <auc:Site>
+        <auc:Site ID="Site-1">
           <auc:Address>
             <auc:StreetAddressDetail>
               <auc:Simplified>
@@ -101,7 +103,7 @@
         </auc:Site>
       </auc:Sites>
       <auc:Reports>
-        <auc:Report>
+        <auc:Report ID="Report-1">
           <auc:Scenarios>
             <auc:Scenario ID="Baseline">
               <auc:ScenarioName>Baseline</auc:ScenarioName>

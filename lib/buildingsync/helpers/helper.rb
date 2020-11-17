@@ -47,6 +47,13 @@ module BuildingSync
       return nil
     end
 
+    def self.get_attribute_value(xml_element, attribute_name)
+      if xml_element
+        return xml_element.attribute(attribute_name).value
+      end
+      return nil
+    end
+
     # get date value from xml element
     # @param xml_element [REXML::Element]
     # @return string

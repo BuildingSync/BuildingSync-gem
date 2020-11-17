@@ -39,8 +39,12 @@ require 'openstudio/workflow/util/energyplus'
 
 RSpec.describe 'SiteSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
+    # -- Setup
+    file_name = 'building_151_Blank.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     begin
-      generate_baseline('building_151_Blank', 'auc')
+      generate_baseline_sites(xml_path, 'auc')
     rescue StandardError => e
       puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
@@ -101,25 +105,4 @@ RSpec.describe 'SiteSpec' do
     expect(line_not_match_counter == 0).to be true
   end
 
-  def generate_baseline(file_name, ns)
-    sites = []
-    @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
-    expect(File.exist?(@xml_path)).to be true
-    @doc = create_xml_file_object(@xml_path)
-    # @doc = create_blank_xml_file(ns)
-    facility_xml = create_facility_object(@doc, ns)
-
-    facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-      sites.push(BuildingSync::Site.new(site_element, ns))
-    end
-    return sites
-  end
-
-  def create_facility_object(doc, ns)
-    facilities = []
-    doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_xml|
-      facilities.push(facility_xml)
-    end
-    return facilities[0]
-  end
 end

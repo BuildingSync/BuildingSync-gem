@@ -37,6 +37,25 @@
 require_relative './../spec_helper'
 
 RSpec.describe 'WorkFlow Maker' do
+  it 'should print out all available measure paths' do
+    workflow_maker = BuildingSync::WorkflowMaker.new(nil, nil)
+    list_of_measures = workflow_maker.get_available_measures_hash
+    count = 0
+    list_of_measures.each do |path, list|
+      puts "measure path: #{path} with #{list.length} measures"
+      count += list.length
+      list.each do |measure_path_name|
+        puts "     measure name : #{measure_path_name}"
+      end
+    end
+    puts "found #{count} measures"
+  end
+
+  it 'should check if all measures are available' do
+    workflow_maker = BuildingSync::WorkflowMaker.new(nil, nil)
+    expect(workflow_maker.check_if_measures_exist).to be true
+  end
+
   it 'should get_measure_directories_array for CommonMeasures, ModelArticulation, EeMeasures, and BSyncMeasures' do
     # -- Setup
     # For initialization, needs no substantial info.

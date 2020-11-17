@@ -39,54 +39,75 @@ require_relative '../../../lib/buildingsync/generator'
 
 RSpec.describe 'FacilitySpec' do
   it 'Should generate meaningful error when passing empty XML data' do
+    # -- Setup
+    file_name = 'building_151_Blank.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     begin
-      generate_baseline('building_151_Blank', 'auc')
+      generate_baseline_facilities(xml_path, 'auc')
     rescue StandardError => e
       puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
     end
   end
 
+  # TODO: Add actual assertions
   it 'Should create an instance of the facility class with minimal XML snippet' do
     generator = BuildingSync::Generator.new
     generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
   end
 
   it 'Should return the boolean value for creating osm file correctly or not.' do
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_path = File.join('../../weather', 'CZ01RV2.epw')
+
     generator = BuildingSync::Generator.new
     facility = generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
-    facility.determine_open_studio_standard(ASHRAE90_1)
-    epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
-    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
-    expect(facility.generate_baseline_osm(epw_file_path, output_path, ASHRAE90_1)).to be true
+    facility.determine_open_studio_standard(std)
+
+    # -- Assert
+    expect(facility.generate_baseline_osm(epw_path, output_path, std)).to be true
   end
 
+  # TODO: Add actual assertions
   it 'Should create a building system with parameters set to true' do
-    xml_file_path = File.expand_path('./../../files/building_151.xml', File.dirname(__FILE__))
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     doc = nil
-    File.open(xml_file_path, 'r') do |file|
+    File.open(xml_path, 'r') do |file|
       doc = REXML::Document.new(file)
     end
     ns = 'auc'
+
+    # -- Act
     facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
     facility.determine_open_studio_standard(ASHRAE90_1)
-    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
     facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
     facility.create_building_systems(output_path, nil, 'Forced Air', 'Electricity', 'Electricity',
                                      true, true, true, true,
                                      true, true, true, true, true)
   end
 
+  # TODO: Add actual assertions
   it 'Should create a building system with parameters set to false' do
-    xml_file_path = File.expand_path('./../../files/building_151.xml', File.dirname(__FILE__))
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     doc = nil
-    File.open(xml_file_path, 'r') do |file|
+    File.open(xml_path, 'r') do |file|
       doc = REXML::Document.new(file)
     end
+
+    # -- Act
     ns = 'auc'
     facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
     facility.determine_open_studio_standard(ASHRAE90_1)
-    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
     facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
     facility.create_building_systems(output_path, 'Forced Air', 'Electricity', 'Electricity',
                                      false, false, false, false,
@@ -94,150 +115,185 @@ RSpec.describe 'FacilitySpec' do
   end
 
   it 'Should return benchmark_eui' do
-    facility = get_facility_from_file('building_151_level1.xml')
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
     expected_value = '9.7'
+
+    # -- Assert
     puts "expected benchmark_eui: #{expected_value} but got: #{facility.building_eui_benchmark} " if facility.building_eui_benchmark != expected_value
     expect(facility.building_eui_benchmark == expected_value).to be true
   end
 
   it 'Should return eui_building' do
-    facility = get_facility_from_file('building_151_level1.xml')
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
     expected_value = '10.5'
     puts "expected eui_building: #{expected_value} but got: #{facility.building_eui} " if facility.building_eui != expected_value
     expect(facility.building_eui == expected_value).to be true
   end
 
   it 'Should return auditor_contact_id' do
-    facility = get_facility_from_file('building_151_level1.xml')
-    expected_value = '123'
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
+    expected_value = 'Contact1'
     puts "expected auditor_contact_id: #{expected_value} but got: #{facility.auditor_contact_id} " if facility.auditor_contact_id != expected_value
     expect(facility.auditor_contact_id == expected_value).to be true
   end
 
-  it 'Should return benchmark_source' do
-    facility = get_facility_from_file('building_151_level1.xml')
-    expected_value = 'Benchmark Type 1'
-    puts "expected benchmark_source: #{expected_value} but got: #{facility.benchmark_source} " if facility.benchmark_source != expected_value
-    expect(facility.benchmark_source == expected_value).to be true
+  it 'Should return benchmark_tool' do
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
+    expected_value = 'Portfolio Manager'
+
+    # -- Assert
+    puts "expected benchmark_tool: #{expected_value} but got: #{facility.benchmark_tool} " if facility.benchmark_tool != expected_value
+    expect(facility.benchmark_tool == expected_value).to be true
   end
 
   it 'Should return annual_fuel_use_native_units' do
-    facility = get_facility_from_file('building_151_level1.xml')
-    expected_value = 'kBtu/ft2'
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
+    expected_value = '123'
+
+    # -- Assert
     puts "expected annual_fuel_use_native_units: #{expected_value} but got: #{facility.annual_fuel_use_native_units} " if facility.annual_fuel_use_native_units != expected_value
     expect(facility.annual_fuel_use_native_units == expected_value).to be true
   end
 
   it 'Should return energy_cost' do
-    facility = get_facility_from_file('building_151_level1.xml')
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
     expected_value = '1000'
+
+    # -- Assert
     puts "expected energy_cost: #{expected_value} but got: #{facility.energy_cost} " if facility.energy_cost != expected_value
     expect(facility.energy_cost == expected_value).to be true
   end
 
   it 'Should return audit_date' do
-    facility = get_facility_from_file('report_479.xml')
-    expected_value = Date.parse('26/10/2019')
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
+    expected_value = Date.parse('2019-05-01')
+
+    # -- Assert
     puts "expected audit_date: #{expected_value} but got: #{facility.audit_date} " if facility.audit_date != expected_value
     expect(facility.audit_date == expected_value).to be true
   end
 
   it 'Should return error about number of stories below grade' do
+    # -- Setup
+    file_name = 'report_479.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
+
     begin
-      get_facility_from_file('report_478.xml')
+      get_facility_from_file(xml_path)
     rescue StandardError => e
+      # -- Assert
       puts "rescued StandardError: #{e.message}"
       expect(e.message.include?('Number of stories below grade is larger than')).to be true
     end
   end
 
   it 'Should return contact_name' do
-    facility = get_facility_from_file('report_479.xml')
+    # -- Setup
+    file_name = 'report_479.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
+
+    facility = get_facility_from_file(xml_path)
     expected_value = 'John Doe'
+
+    # -- Assert
     puts "expected contact_name: #{expected_value} but got: #{facility.contact_auditor_name} " if facility.contact_auditor_name != expected_value
     expect(facility.contact_auditor_name == expected_value).to be true
   end
 
   it 'Should return utility_name' do
-    facility = get_facility_from_file('building_151_level1.xml')
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
     expected_value = 'an utility'
+
+    # -- Assert
     puts "expected utility_name: #{expected_value} but got: #{facility.utility_name} " if facility.utility_name != expected_value
     expect(facility.utility_name == expected_value).to be true
   end
 
   it 'Should return metering_configuration ' do
-    facility = get_facility_from_file('building_151_level1.xml')
-    expected_value = 'metering config'
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
+    expected_value = 'Direct metering'
+
+    # -- Assert
     puts "expected metering_configuration: #{expected_value} but got: #{facility.metering_configuration} " if facility.metering_configuration != expected_value
     expect(facility.metering_configuration == expected_value).to be true
   end
 
   it 'Should return rate_schedules ' do
-    facility = get_facility_from_file('building_151_level1.xml')
-    expected_value = 'rate schedule'
-    puts "expected rate_schedules: #{expected_value} but got: #{facility.rate_schedules} " if facility.rate_schedules != expected_value
-    expect(facility.rate_schedules == expected_value).to be true
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
+    expected_value = REXML::Element.new("auc:CriticalPeakPricing")
+    rate_schedule = facility.rate_schedules_xml[0]
+    rate_structure_type = rate_schedule.get_elements("auc:TypeOfRateStructure/*")[0]
+
+    # -- Assert
+    puts "expected rate_schedules: #{expected_value.to_s} but got: #{rate_structure_type.to_s} " if rate_structure_type != expected_value
+    expect(rate_structure_type.to_s == expected_value.to_s).to be true
   end
 
-  it 'Should return rate_schedules ' do
-    facility = get_facility_from_file('building_151_level1.xml')
-    expected_value = 'meter 1'
-    puts "expected utility_meter_number: #{expected_value} but got: #{facility.utility_meter_number} " if facility.utility_meter_number != expected_value
-    expect(facility.utility_meter_number == expected_value).to be true
+  it 'Should return utility_meter_numbers' do
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    facility = get_facility_from_file(xml_path)
+    expected_value = '0123456'
+    meter_number = facility.utility_meter_numbers[0]
+
+    # -- Assert
+    puts "expected utility_meter_number: #{expected_value} but got: #{meter_number} " if meter_number != expected_value
+    expect(meter_number == expected_value).to be true
   end
 
-  def get_facility_from_file(xml_file_name)
-    xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-      ns = 'auc'
-      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility|
-        return BuildingSync::Facility.new(facility, ns)
-      end
-    end
-  end
-
-  def generate_baseline(file_name, ns)
-    facilities = []
-    @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
-    expect(File.exist?(@xml_path)).to be true
-    @doc = create_xml_file_object(@xml_path)
-
-    @doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_element|
-      facilities.push(BuildingSync::Facility.new(facility_element, ns))
-    end
-    return facilities
-  end
-
-  def create_xml_file_object(xml_file_path)
-    doc = nil
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-    return doc
-  end
-
-  def create_blank_xml_file1
-    xml = Builder::XmlMarkup.new(indent: 2)
-    xml.instruct! :xml, encoding: 'ASCII'
-    xml.tag!('auc:BuildingSync') do |buildsync|
-      buildsync.tag!('auc:Facilities') do |faclts|
-        faclts.tag!('auc:Facility') do |faclt|
-          faclt.tag!('auc:Sites') do |sites|
-            sites.tag!('auc:Site') do |site|
-              site.tag!('auc:Buildings') do |builds|
-                builds.tag!('auc:Building') do |build|
-                  build.tag!('auc:Sections') do |subsects|
-                    subsects.tag!('auc:Section') do |subsect|
-                      subsect.Perimeter 1325
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-  end
 end

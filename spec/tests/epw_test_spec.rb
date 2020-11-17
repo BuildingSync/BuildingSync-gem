@@ -36,6 +36,7 @@
 # *******************************************************************************
 
 RSpec.describe 'BuildingSync' do
+  # TODO: Add assertion
   it 'should support an absolute path of EPW' do
     standard_template = '90.1-2004'
     bldg_type = 'SmallOffice'
@@ -48,7 +49,7 @@ RSpec.describe 'BuildingSync' do
     begin
       open_studio_standards.model_add_design_days_and_weather_file(model, climate_zone_standard_string, epw_file_path)
     rescue StandardError => e
-      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.epq_test_spec', e.message)
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.epw_test_spec', e.message)
     end
   end
 end

@@ -34,12 +34,14 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require_relative './../spec_helper'
+
 RSpec.describe 'BuildingSync' do
   it 'building_151.xml CA_TITLE24 - perform a sizing run, and create an in.osm' do
     # -- Setup
     file_name = 'building_151.xml'
     std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = nil
 
     # -- Assert
@@ -50,7 +52,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = nil
 
     # -- Assert
@@ -61,7 +63,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'L100_Audit.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = File.join('../weather', 'CZ01RV2.epw')
 
     # -- Assert
@@ -72,7 +74,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'building_151_n1.xml'
     std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = nil
 
     # -- Assert
@@ -83,7 +85,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'DC GSA Headquarters.xml'
     std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     epw_path = File.join('../weather', 'CZ01RV2.epw')
 
     begin
@@ -98,7 +100,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'DC GSA Headquarters.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     epw_path = File.join('../weather', 'CZ01RV2.epw')
 
     # -- Assert
@@ -109,7 +111,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'DC GSA HeadquartersWithClimateZone.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     epw_path = File.join('../weather', 'CZ01RV2.epw')
 
     # -- Assert
@@ -120,7 +122,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'BuildingSync Website Valid Schema.xml'
     std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     epw_path = File.join('../weather', 'CZ01RV2.epw')
 
     # -- Assert
@@ -131,7 +133,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'BuildingSync Website Valid Schema.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     epw_path = File.join('../weather', 'CZ01RV2.epw')
 
     # -- Assert
@@ -142,7 +144,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'Golden Test File.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = File.join('../weather', 'CZ01RV2.epw')
 
     begin
@@ -158,7 +160,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'AT_example_property_report_25.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     epw_path = File.join('../weather', 'CZ01RV2.epw')
     begin
       # -- Assert
@@ -172,7 +174,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'L000_OpenStudio_Pre-Simulation_02.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = nil
 
     # -- Assert
@@ -183,22 +185,13 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'L000_OpenStudio_Pre-Simulation_03.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std)
-    epw_path = nil
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_path = File.join('../weather', 'CZ01RV2.epw')
+    puts epw_path
+    # epw_path = nil
 
     # -- Assert
     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
   end
 
-  def create_xml_path_and_output_path(file_name, std)
-    xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
-
-    # The output path will look something like:
-    # to/spec/output/translator_baseline_generation_spec/building_151/Caliornia
-    output_path = File.join("../output", "#{File.basename(__FILE__ , File.extname(__FILE__ ))}/#{File.basename(xml_path, File.extname(xml_path))}")
-    output_path = File.expand_path(output_path, File.dirname(__FILE__))
-    output_path = File.join(output_path, "#{std.split('.')[0]}")
-
-    return xml_path, output_path
-  end
 end

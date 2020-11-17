@@ -198,7 +198,7 @@ module BuildingSync
     def get_largest_building
       return @largest_building if !@largest_building.nil?
       return @buildings[0] if @buildings.count == 1
-      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.get_largest_building', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
       @largest_building = nil
       largest_floor_area = -Float::INFINITY
       @buildings.each do |building|
@@ -207,8 +207,8 @@ module BuildingSync
           @largest_building = building
         end
       end
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Site.generate_baseline_osm', "The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) was selected.")
-      puts "BuildingSync.Site.generate_baseline_osm: The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) m^2 was selected."
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Site.get_largest_building', "The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) was selected.")
+      puts "BuildingSync.Site.get_largest_building: The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) m^2 was selected."
       return @largest_building
     end
 

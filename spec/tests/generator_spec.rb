@@ -26,7 +26,7 @@
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 # THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 # ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER(S), ANY CONTRIBUTORS, THE
-# UNITED STATES GOVERNMENT, OR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF1
+# UNITED STATES GOVERNMENT, OR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
 # THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
 # EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
 # OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -34,24 +34,22 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative './../spec_helper'
+require 'buildingsync/generator'
 
-require 'fileutils'
-require 'parallel'
-
-RSpec.describe 'BuildingSync::Translator' do
-  it 'BuildingSync::Translator.run_osm("") should successfully run a baseline model: L000_OpenStudio_Pre-Simulation_03.xml' do
-    file_name = 'L000_OpenStudio_Pre-Simulation_03.xml'
-    xml_path = File.expand_path("../files/#{file_name}", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
-
-    # The output_path will look like:
-    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03
-    output_path = File.join("../output", "#{File.basename(__FILE__ , File.extname(__FILE__ ))}/#{File.basename(xml_path, File.extname(xml_path))}")
-    output_path = File.expand_path(output_path, File.dirname(__FILE__))
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path)
-    translator.run_baseline_osm('')
-    translator_run_baseline_osm_checks(output_path)
+RSpec.describe 'BuildingSync::Generator' do
+  it 'should set the version to nil if it doesnt exist' do
+    g = BuildingSync::Generator.new("asdflkj")
+    expect(g.version.nil?).to be true
   end
-
+  it 'create_bsync_root_to_section should return a String' do
+    g = BuildingSync::Generator.new('2.2.0')
+    doc_string = g.create_bsync_root_to_building
+    expect(doc_string).to be_an_instance_of(String)
+  end
+  it 'create_bsync_root_to_section should be able to create an REXML::Document from the returned String' do
+    g = BuildingSync::Generator.new('2.2.0')
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    expect(doc).to be_an_instance_of(REXML::Document)
+  end
 end

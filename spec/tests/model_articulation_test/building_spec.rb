@@ -38,8 +38,12 @@ require_relative '../../../lib/buildingsync/model_articulation/building'
 
 RSpec.describe 'BuildingSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
+    # -- Setup
+    file_name = 'building_151_Blank.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     begin
-      generate_baseline('building_151_Blank', '', '', 'auc')
+      generate_baseline_buildings(xml_path, '', '', 'auc')
     rescue StandardError => e
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
     end
@@ -97,7 +101,7 @@ RSpec.describe 'BuildingSpec' do
 
   it 'Should return ownership' do
     building = get_building_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = 'The owner'
+    expected_value = 'Property management company'
     puts "expected ownership: #{expected_value} but got: #{building.ownership} " if building.ownership != expected_value
     expect(building.ownership == expected_value).to be true
   end
@@ -189,36 +193,6 @@ RSpec.describe 'BuildingSpec' do
         return BuildingSync::Building.new(building, 'Office', '20000', ns)
       end
     end
-  end
-
-  def generate_baseline(file_name, occupancy_type, total_floor_area, ns)
-    buildings = []
-    xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
-
-    doc = create_xml_file_object(xml_path)
-    site_xml = create_site_object(doc, ns)
-
-    site_xml.elements.each("#{ns}:Buildings/#{ns}:Building") do |building_element|
-      buildings.push(BuildingSync::Building.new(building_element, occupancy_type, total_floor_area, ns))
-    end
-    return buildings
-  end
-
-  def create_site_object(doc, ns)
-    sites = []
-    doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site") do |site_xml|
-      sites.push(site_xml)
-    end
-    return sites[0]
-  end
-
-  def create_xml_file_object(xml_file_path)
-    doc = nil
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-    return doc
   end
 
   def create_minimum_building(occupancy_classification, year_of_const, floor_area_type, floor_area_value)

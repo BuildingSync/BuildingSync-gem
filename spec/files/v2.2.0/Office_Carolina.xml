@@ -1,14 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019"
-  xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/1c73127d389b779c6b74029be72c6e9ff3187113/BuildingSync.xsd"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.2.0">
   <auc:Facilities>
-    <auc:Facility>
+    <auc:Facility ID="Facility1">
       <auc:Sites>
-        <auc:Site>
-          <auc:Ownership>Unknown</auc:Ownership>
+        <auc:Site ID="Site1">
           <auc:Address>
             <auc:City>Lansing</auc:City>
-            <auc:State>New York</auc:State>
+            <auc:State>NY</auc:State>
             <auc:PostalCode>14850</auc:PostalCode>
           </auc:Address>
           <auc:ClimateZoneType>
@@ -18,6 +18,7 @@
           </auc:ClimateZoneType>
           <auc:Longitude>-76.5</auc:Longitude>
           <auc:Latitude>42.5</auc:Latitude>
+          <auc:Ownership>Unknown</auc:Ownership>
           <auc:Buildings>
             <auc:Building ID="Office_Carolina">
               <auc:PremisesName>Building Carolina</auc:PremisesName>
@@ -306,7 +307,7 @@
         </auc:Measure>
       </auc:Measures>
       <auc:Reports>
-        <auc:Report>
+        <auc:Report ID="Report1">
           <auc:Scenarios>
             <auc:Scenario ID="Baseline">
               <auc:ScenarioName>Baseline</auc:ScenarioName>
@@ -318,10 +319,10 @@
                 </auc:CurrentBuilding>
               </auc:ScenarioType>
             </auc:Scenario>
-            <auc:Scenario>
+            <auc:Scenario ID="Scenario1">
               <auc:ScenarioName>LED Only</auc:ScenarioName>
               <auc:ScenarioType>
-                <auc:PackageOfMeasures>
+                <auc:PackageOfMeasures ID="PackageOfMeasures1">
                   <auc:ReferenceCase IDref="Baseline"/>
                   <auc:MeasureIDs>
                     <auc:MeasureID IDref="Measure1"/>
@@ -340,10 +341,10 @@
                 </auc:UserDefinedField>
               </auc:UserDefinedFields>
             </auc:Scenario>
-            <auc:Scenario>
+            <auc:Scenario ID="Scenario2">
               <auc:ScenarioName>Electric_Appliance_30%_Reduction Only</auc:ScenarioName>
               <auc:ScenarioType>
-                <auc:PackageOfMeasures>
+                <auc:PackageOfMeasures ID="PackageOfMeasures2">
                   <auc:ReferenceCase IDref="Baseline"/>
                   <auc:MeasureIDs>
                     <auc:MeasureID IDref="Measure2"/>
@@ -362,10 +363,10 @@
                 </auc:UserDefinedField>
               </auc:UserDefinedFields>
             </auc:Scenario>
-            <auc:Scenario>
+            <auc:Scenario ID="Scenario3">
               <auc:ScenarioName>Air_Seal_Infiltration_30%_More_Airtight Only</auc:ScenarioName>
               <auc:ScenarioType>
-                <auc:PackageOfMeasures>
+                <auc:PackageOfMeasures ID="PackageOfMeasures3">
                   <auc:ReferenceCase IDref="Baseline"/>
                   <auc:MeasureIDs>
                     <auc:MeasureID IDref="Measure3"/>
@@ -384,10 +385,10 @@
                 </auc:UserDefinedField>
               </auc:UserDefinedFields>
             </auc:Scenario>
-            <auc:Scenario>
+            <auc:Scenario ID="Scenario4">
               <auc:ScenarioName>Cooling_System_SEER 14 Only</auc:ScenarioName>
               <auc:ScenarioType>
-                <auc:PackageOfMeasures>
+                <auc:PackageOfMeasures ID="PackageOfMeasures4">
                   <auc:ReferenceCase IDref="Baseline"/>
                   <auc:MeasureIDs>
                     <auc:MeasureID IDref="Measure4"/>
@@ -406,10 +407,10 @@
                 </auc:UserDefinedField>
               </auc:UserDefinedFields>
             </auc:Scenario>
-            <auc:Scenario>
+            <auc:Scenario ID="Scenario5">
               <auc:ScenarioName>All Package</auc:ScenarioName>
               <auc:ScenarioType>
-                <auc:PackageOfMeasures>
+                <auc:PackageOfMeasures ID="PackageOfMeasures5">
                   <auc:ReferenceCase IDref="Baseline"/>
                   <auc:MeasureIDs>
                     <auc:MeasureID IDref="Measure1_Package0"/>

@@ -37,6 +37,49 @@
 module BuildingSync
   # Generator class that generates basic data that is used mostly for testing
   class Generator
+
+    # @param version [String] version of BuildingSync
+    def initialize(version = "2.2.0")
+      supported_versions = ["2.0", "2.2.0"]
+      if !supported_versions.include? version
+        @version = nil
+        OpenStudio.logFree(OpenStudio::Error, "BuildingSync.Generator.create_bsync_root_to_section", "The version: #{version} is not one of the supported versions: #{supported_versions}")
+      else
+        @version = version
+      end
+    end
+
+    # Starts from scratch and creates all necessary elements up to and including an
+    #  - Sites/Site/Buildings/Building/Sections/Section
+    #  - Reports/Report/Scenarios/Scenario
+    # @return [String] string formatted XML document
+    def create_bsync_root_to_building
+      xml = Builder::XmlMarkup.new(indent: 2)
+      auc_ns = "http://buildingsync.net/schemas/bedes-auc/2019"
+      location = "https://raw.githubusercontent.com/BuildingSync/schema/v#{@version}/BuildingSync.xsd"
+      xml.instruct! :xml
+      xml.tag!('auc:BuildingSync', {
+          :"xmlns:auc" => auc_ns,
+          :"xsi:schemaLocation" => "#{auc_ns} #{location}",
+          :"xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+          :version => "#{@version}"
+      }) do |buildsync|
+
+        buildsync.tag!('auc:Facilities') do |faclts|
+          faclts.tag!('auc:Facility', {:ID => "Facility1"}) do |faclt|
+            faclt.tag!('auc:Sites') do |sites|
+              sites.tag!('auc:Site', {:ID => "Site1"}) do |site|
+                site.tag!('auc:Buildings') do |builds|
+                  builds.tag!('auc:Building', {:ID => "Building1"}) do |build|
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
     # creates a minimum building sync snippet
     # @param occupancy_classification [String]
     # @param year_of_const [Integer]
@@ -45,9 +88,8 @@ module BuildingSync
     # @param ns [String]
     # @return REXML::Document
     def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade = 1, ns = 'auc')
-      xml_path = File.expand_path('./../../spec/files/building_151_Blank.xml', File.dirname(__FILE__))
-
-      doc = create_xml_file_object(xml_path)
+      doc_string = create_bsync_root_to_building
+      doc = REXML::Document.new(doc_string)
       site_element = doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
 
       occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
@@ -99,5 +141,7 @@ module BuildingSync
         expect(facility_element.nil?).to be false
       end
     end
+
+    attr_reader :version
   end
 end

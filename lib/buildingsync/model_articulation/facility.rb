@@ -66,9 +66,9 @@ module BuildingSync
       @contact_owner_name = nil
       @auditor_years_experience = nil
       @utility_name = nil
-      @utility_meter_number = nil
+      @utility_meter_numbers = []
       @metering_configuration = nil
-      @rate_schedules = nil
+      @rate_schedules_xml = []
       @interval_reading_monthly = []
       @interval_reading_yearly = []
       @audit_notes = nil
@@ -78,7 +78,7 @@ module BuildingSync
 
       # parameter to read and write.
       @energy_resource = nil
-      @benchmark_source = nil
+      @benchmark_tool = nil
       @building_eui = nil
       @building_eui_benchmark = nil
       @energy_cost = nil
@@ -232,29 +232,42 @@ module BuildingSync
 
       report = @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report"]
       if !report.nil?
-        @auditor_contact_id = BuildingSync::Helper.get_text_value(report.elements["#{@ns}:AuditorContactID"])
-        report.elements.each("#{@ns}:AuditDates/#{@ns}:AuditDate") do |audit_date|
-          if audit_date.elements["#{@ns}:CustomDateType"].text == 'Level 1: Walk-through'
-            @audit_date_level_1 = BuildingSync::Helper.get_date_value(audit_date.elements["#{@ns}:Date"])
-            @audit_date = @audit_date_level_1
-          elsif audit_date.elements["#{@ns}:CustomDateType"].text == 'Level 2: Energy Survey and Analysis'
-            @audit_date_level_2 = BuildingSync::Helper.get_date_value(audit_date.elements["#{@ns}:Date"])
-            @audit_date = @audit_date_level_2
-          elsif audit_date.elements["#{@ns}:CustomDateType"].text == 'Level 3: Detailed Survey and Analysis'
-            @audit_date_level_3 = BuildingSync::Helper.get_date_value(audit_date.elements["#{@ns}:Date"])
-            @audit_date = @audit_date_level_3
+        auditor_contact_id_element = report.elements["#{@ns}:AuditorContactID"]
+        audit_level = report.elements["#{@ns}:ASHRAEAuditLevel"]
+        if !audit_level.nil?
+          @audit_level = BuildingSync::Helper.get_text_value(audit_level)
+        end
+        if !auditor_contact_id_element.nil?
+          @auditor_contact_id = BuildingSync::Helper.get_attribute_value(auditor_contact_id_element, 'IDref')
+        end
+        audit_dates = report.get_elements("#{@ns}:AuditDates/#{@ns}:AuditDate")
+        if !audit_dates.nil? && !@audit_level.nil?
+          audit_dates.each do |audit_date|
+            if @audit_level == 'Level 1: Walk-through'
+              @audit_date_level_1 = BuildingSync::Helper.get_date_value(audit_date.elements["#{@ns}:Date"])
+              @audit_date = @audit_date_level_1
+            elsif @audit_level == 'Level 2: Energy Survey and Analysis'
+              @audit_date_level_2 = BuildingSync::Helper.get_date_value(audit_date.elements["#{@ns}:Date"])
+              @audit_date = @audit_date_level_2
+            elsif @audit_level == 'Level 3: Detailed Survey and Analysis'
+              @audit_date_level_3 = BuildingSync::Helper.get_date_value(audit_date.elements["#{@ns}:Date"])
+              @audit_date = @audit_date_level_3
+            end
           end
         end
 
         # here we iterate over the scenarios to find the one "currentBuilding" and "benchmark"
         report.elements.each("#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
-          if scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding"]
-            @building_eui = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:SiteEnergyUseIntensity"])
+          measured_scenario = scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Measured"]
+          benchmark_scenario = scenario.elements["#{@ns}:ScenarioType/#{@ns}:Benchmark"]
+          site_eui_xpath = "#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:SiteEnergyUseIntensity"
+          if measured_scenario
+            @building_eui = BuildingSync::Helper.get_text_value(scenario.elements[site_eui_xpath])
             @annual_fuel_use_native_units = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:ResourceUses/#{@ns}:ResourceUse/#{@ns}:AnnualFuelUseNativeUnits"])
             @energy_cost = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:EnergyCost"])
-          elsif scenario.elements["#{@ns}:ScenarioType/#{@ns}:Benchmark"]
-            @building_eui_benchmark = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:SiteEnergyUseIntensity"])
-            @benchmark_source = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:ScenarioType/#{@ns}:Benchmark/#{@ns}:BenchmarkType/#{@ns}:Other"])
+          elsif benchmark_scenario
+            @building_eui_benchmark = BuildingSync::Helper.get_text_value(scenario.elements[site_eui_xpath])
+            @benchmark_tool = BuildingSync::Helper.get_text_value(scenario.elements["#{@ns}:ScenarioType/#{@ns}:Benchmark/#{@ns}:BenchmarkTool"])
           end
         end
 
@@ -271,17 +284,28 @@ module BuildingSync
             @premises_notes_for_not_applicable = user_defined_field.elements["#{@ns}:FieldValue"].text
           end
         end
-      end
 
-      utilities = @facility_xml.elements["#{@ns}:Utilities"]
-      if utilities
-        @utility_meter_number = BuildingSync::Helper.get_text_value(utilities.elements["#{@ns}:UtilityMeterNumbers/#{@ns}:UtilityMeterNumber"])
-        utilities.elements.each("#{@ns}:Utility") do |utility|
-          @utility_name = BuildingSync::Helper.get_text_value(utility.elements["#{@ns}:UtilityName"])
-          @metering_configuration = BuildingSync::Helper.get_text_value(utility.elements["#{@ns}:MeteringConfiguration"])
-          @rate_schedules = BuildingSync::Helper.get_text_value(utility.elements["#{@ns}:RateSchedules"])
+        utilities = report.elements["#{@ns}:Utilities"]
+        if utilities
+          utilities.elements.each("#{@ns}:Utility") do |utility|
+            @utility_name = BuildingSync::Helper.get_text_value(utility.elements["#{@ns}:UtilityName"])
+            @metering_configuration = BuildingSync::Helper.get_text_value(utility.elements["#{@ns}:MeteringConfiguration"])
+            meter_numbers = utility.get_elements("#{@ns}:UtilityMeterNumbers/#{@ns}:UtilityMeterNumber")
+            rate_schedules = utility.get_elements("#{@ns}:RateSchedules/#{@ns}:RateSchedule")
+            if meter_numbers
+              meter_numbers.each do |mn|
+                @utility_meter_numbers << BuildingSync::Helper.get_text_value(mn)
+              end
+            end
+            if rate_schedules
+              rate_schedules.each do |rs|
+                @rate_schedules_xml << rs
+              end
+            end
+          end
         end
       end
+
     end
 
     # create building systems
@@ -444,7 +468,7 @@ module BuildingSync
       report = @facility_xml.elements["#{@ns}:Reports/#{@ns}:Report"]
       report.elements.each("#{@ns}:Scenarios/#{@ns}:Scenario") do |scenario|
         scenario.elements["#{@ns}:ResourceUses/#{@ns}:ResourceUse/#{@ns}:EnergyResource"].text = @energy_resource if !@energy_resource.nil?
-        scenario.elements["#{@ns}:ScenarioType/#{@ns}:Benchmark/#{@ns}:BenchmarkType/#{@ns}:Other"].text = @benchmark_source if !@benchmark_source.nil?
+        scenario.elements["#{@ns}:ScenarioType/#{@ns}:Benchmark/#{@ns}:BenchmarkType/#{@ns}:Other"].text = @benchmark_tool if !@benchmark_tool.nil?
         scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:SiteEnergyUseIntensity"].text = @building_eui if !@building_eui.nil?
         scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:SiteEnergyUseIntensity"].text = @building_eui_benchmark if !@building_eui_benchmark.nil?
         scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:EnergyCost"].text = @energy_cost if !@energy_cost.nil?
@@ -461,7 +485,7 @@ module BuildingSync
       return @sites[0].get_model
     end
 
-    attr_reader :building_eui_benchmark, :building_eui, :auditor_contact_id, :annual_fuel_use_native_units, :audit_date, :benchmark_source, :contact_auditor_name, :energy_cost, :energy_resource,
-                :rate_schedules, :utility_meter_number, :utility_name, :metering_configuration
+    attr_reader :building_eui_benchmark, :building_eui, :auditor_contact_id, :annual_fuel_use_native_units, :audit_date, :benchmark_tool, :contact_auditor_name, :energy_cost, :energy_resource,
+                :rate_schedules_xml, :utility_meter_numbers, :utility_name, :metering_configuration
   end
 end

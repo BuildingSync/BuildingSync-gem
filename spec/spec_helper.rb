@@ -34,7 +34,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative '../lib/buildingsync/generator'
+require 'buildingsync/generator'
 
 # try to load configuration, use defaults if doesn't exist
 begin
@@ -71,6 +71,33 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
+  SPEC_OUTPUT_DIR = File.join(__dir__, 'output')
+  SPEC_FILES_DIR = File.join(__dir__, 'files')
+
+  def create_xml_path_and_output_path(file_name, std, spec_file_name, version = nil)
+    if version.nil?
+      xml_path = File.join(SPEC_FILES_DIR, file_name)
+
+      # The output path will look something like:
+      # to/spec/output/translator_baseline_generation_spec/building_151/Caliornia
+      output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(spec_file_name , File.extname(spec_file_name ))}/#{File.basename(xml_path, File.extname(xml_path))}")
+      output_path = File.join(output_path, "#{std.split('.')[0]}")
+    else
+      xml_path = File.join(SPEC_FILES_DIR, version, file_name)
+
+      # The output path will look something like:
+      # to/spec/output/translator_baseline_generation_spec/building_151/Caliornia
+
+      output_path = File.join(SPEC_OUTPUT_DIR, version, "#{File.basename(spec_file_name , File.extname(spec_file_name ))}/#{File.basename(xml_path, File.extname(xml_path))}")
+      output_path = File.join(output_path, "#{std.split('.')[0]}")
+    end
+
+    puts xml_path
+    puts output_path
+    expect(File.exist?(xml_path)).to be true
+    return xml_path, output_path
+  end
+
   def numeric?(val)
     Float(val) != nil rescue false
   end
@@ -100,24 +127,6 @@ RSpec.configure do |config|
     runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
     runner.run_osw(osw_path, osm_baseline_dir)
     expect(File.exist?(osw_path.gsub('in.osw', 'eplusout.sql'))).to be true
-  end
-
-  # test baseline creation
-  # @param file_name [String]
-  # @param standard_to_be_used [String]
-  # @param epw_file_name [String]
-  def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
-    xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
-
-    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
-
-    epw_file_path = nil
-    if !epw_file_name.nil?
-      epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
-    end
-    translator = translator_write_osm_and_perform_checks(xml_path, out_path, epw_file_path, standard_to_be_used)
-    return translator
   end
 
   # generate baseline idf and compare
@@ -231,9 +240,9 @@ RSpec.configure do |config|
   # @param standard_to_be_used [String]
   # @param epw_file_name [String]
   # @param simulate [Boolean]
-  def test_baseline_and_scenario_creation_with_simulation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, simulate = true)
+  def test_baseline_and_scenario_creation_with_simulation(xml_path, output_path, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, simulate = true)
     current_year = Date.today.year
-    translator = test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used, epw_file_name)
+    translator = test_baseline_and_scenario_creation(xml_path, output_path, expected_number_of_measures, standard_to_be_used, epw_file_name)
 
     out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
     osw_files = []
@@ -259,28 +268,30 @@ RSpec.configure do |config|
   # @param file_name [String]
   # @param standard_to_be_used [String]
   # @param epw_file_name [String]
-  def test_baseline_creation_and_simulation(filename, standard_to_be_used, epw_file)
-    current_year = Date.today.year
-    translator = test_baseline_creation(filename, standard_to_be_used, epw_file)
-    expect(translator.run_baseline_osm(epw_file)).to be true
-    expect(File.exist?(translator.osm_baseline_file_path.gsub('in.osm', 'eplusout.sql'))).to be true
-    out_path = File.dirname(translator.osm_baseline_file_path)
-    success = translator.gather_results(out_path, current_year, true)
-
-    expect(success).to be true
-    translator.save_xml(File.join(out_path, 'results.xml'))
-    expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
-  end
+  # def test_baseline_creation_and_simulation(xml_path, output_path, standard_to_be_used, epw_file)
+  #   # -- Setup
+  #   current_year = Date.today.year
+  #   translator = translator_write_osm_and_perform_checks(xml_path, output_path, standard_to_be_used, epw_file)
+  #   expect(translator.run_baseline_osm(epw_file)).to be true
+  #
+  #   # -- Assert translator.run_baseline_osm checks
+  #   translator_run_baseline_osm_checks(output_path)
+  #
+  #   success = translator.gather_results(output_path, current_year, true)
+  #
+  #   expect(success).to be true
+  #   translator.save_xml(File.join(output_path, 'results.xml'))
+  #   expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
+  # end
 
   # test baseline and scenario creation
   # @param file_name [String]
   # @param expected_number_of_measures [Integer]
   # @param standard_to_be_used [String]
   # @param epw_file_name [String]
-  def test_baseline_and_scenario_creation(file_name, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
-    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
+  def test_baseline_and_scenario_creation(file_name, output_path, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
 
-    translator = test_baseline_creation(file_name, standard_to_be_used, epw_file_name)
+    translator = translator_write_osm_and_perform_checks(file_name, output_path, standard_to_be_used, epw_file_name)
     translator.write_osws
 
     osw_files = []
@@ -293,35 +304,35 @@ RSpec.configure do |config|
     return translator
   end
 
-  # test baseline creation
-  # @param file_name [String]
-  # @param standard_to_be_used [String]
-  # @param epw_file_name [String]
-  def test_baseline_creation(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
-    xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
-
-    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
-
-    if File.exist?(out_path)
-      FileUtils.rm_rf(out_path)
-    end
-
-    FileUtils.mkdir_p(out_path)
-    expect(File.exist?(out_path)).to be true
-
-    epw_file_path = nil
-    if !epw_file_name.nil?
-      epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
-    end
-
-    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
-    translator.write_osm
-
-    expect(File.exist?("#{out_path}/in.osm")).to be true
-
-    return translator
-  end
+  # # test baseline creation
+  # # @param file_name [String]
+  # # @param standard_to_be_used [String]
+  # # @param epw_file_name [String]
+  # def test_baseline_creation(file_name, output_path, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
+  #   xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
+  #   expect(File.exist?(xml_path)).to be true
+  #
+  #   out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
+  #
+  #   if File.exist?(out_path)
+  #     FileUtils.rm_rf(out_path)
+  #   end
+  #
+  #   FileUtils.mkdir_p(out_path)
+  #   expect(File.exist?(out_path)).to be true
+  #
+  #   epw_file_path = nil
+  #   if !epw_file_name.nil?
+  #     epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
+  #   end
+  #
+  #   translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
+  #   translator.write_osm
+  #
+  #   expect(File.exist?("#{out_path}/in.osm")).to be true
+  #
+  #   return translator
+  # end
 
   # create minimum site
   # @param occupancy_classification [String]
@@ -344,7 +355,7 @@ RSpec.configure do |config|
   # create xml file object
   # @param xml_file_path [String]
   # @return [REXML::Document]
-  def create_xml_file_object(xml_file_path)
+  def create_rexml_document_from_file_path(xml_file_path)
     doc = nil
     File.open(xml_file_path, 'r') do |file|
       doc = REXML::Document.new(file)
@@ -405,6 +416,10 @@ RSpec.configure do |config|
   def translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
     # -- Assert
     expect(File.exist?(xml_path)).to be true
+    if !epw_file_path.nil? && !epw_file_path == ''
+      expect(File.exist?(epw_file_path)).to be true
+      puts "Found epw: #{epw_file_path}"
+    end
 
     # -- Setup
     # Delete the directory and start over if it does exist so we are not checking old results
@@ -526,5 +541,64 @@ RSpec.configure do |config|
 
     # -- Assert
     expect(File.exist?(results_file_path)).to be true
+  end
+
+  def generate_baseline_buildings(xml_path, occupancy_type, total_floor_area, ns)
+    buildings = []
+
+    doc = create_rexml_document_from_file_path(xml_path)
+    site_xml = create_site_object(doc, ns)
+
+    site_xml.elements.each("#{ns}:Buildings/#{ns}:Building") do |building_element|
+      buildings.push(BuildingSync::Building.new(building_element, occupancy_type, total_floor_area, ns))
+    end
+    return buildings
+  end
+
+  def generate_baseline_sites(xml_path, ns)
+    sites = []
+    doc = create_rexml_document_from_file_path(xml_path)
+    facility_xml = create_facility_object(doc, ns)
+
+    facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
+      sites.push(BuildingSync::Site.new(site_element, ns))
+    end
+    return sites
+  end
+
+  def generate_baseline_facilities(xml_path, ns)
+    facilities = []
+    doc = create_rexml_document_from_file_path(xml_path)
+
+    doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_element|
+      facilities.push(BuildingSync::Facility.new(facility_element, ns))
+    end
+    return facilities
+  end
+
+  def create_facility_object(doc, ns)
+    facilities = []
+    doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_xml|
+      facilities.push(facility_xml)
+    end
+    return facilities[0]
+  end
+
+  def create_site_object(doc, ns)
+    sites = []
+    doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site") do |site_xml|
+      sites.push(site_xml)
+    end
+    return sites[0]
+  end
+
+  def get_facility_from_file(xml_path)
+    File.open(xml_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+      ns = 'auc'
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility|
+        return BuildingSync::Facility.new(facility, ns)
+      end
+    end
   end
 end
