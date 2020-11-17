@@ -37,73 +37,55 @@
 
 RSpec.describe 'BuildingSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
+    # -- Setup
+    file_name = 'building_151_Blank.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     begin
-      generate_baseline('building_151_Blank', nil, nil, 'auc')
+      generate_baseline_building_sections(xml_path, nil, nil, 'auc')
     rescue StandardError => e
       puts "expected error message:Building type '' is nil but got: #{e.message} " if !e.message.include?("Building type '' is nil")
       expect(e.message.include?("Building type '' is nil")).to be true
     end
   end
 
-  it 'Should return occupancy_type ' do
-    building_section = get_building_section_from_file('building_151_level1.xml', ASHRAE90_1)
+  it 'building_151_level1.xml: Should return occupancy_type for the Section' do
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building_section = get_building_section_from_file(xml_path)
     expected_value = 'Retail'
+
+    # -- Assert
     puts "expected bldgsync_occupancy_type : #{expected_value} but got: #{building_section.bldgsync_occupancy_type} " if building_section.bldgsync_occupancy_type != expected_value
     expect(building_section.bldgsync_occupancy_type == expected_value).to be true
   end
 
-  it 'Should return typical_occupant_usage_value_hours ' do
-    building_section = get_building_section_from_file('building_151_level1.xml', ASHRAE90_1)
+  it 'building_151_level1.xml: Should return typical_occupant_usage_value_hours for the Section' do
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building_section = get_building_section_from_file(xml_path)
     expected_value = '40.0'
+
+    # -- Assert
     puts "expected typical_occupant_usage_value_hours : #{expected_value} but got: #{building_section.typical_occupant_usage_value_hours} " if building_section.typical_occupant_usage_value_hours != expected_value
     expect(building_section.typical_occupant_usage_value_hours == expected_value).to be true
   end
 
-  it 'Should return typical_occupant_usage_value_weeks ' do
-    building_section = get_building_section_from_file('building_151_level1.xml', ASHRAE90_1)
+  it 'building_151_level1.xml: Should return typical_occupant_usage_value_weeks for the Section' do
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    building_section = get_building_section_from_file(xml_path)
     expected_value = '50.0'
+
+    # -- Assert
     puts "expected typical_occupant_usage_value_weeks : #{expected_value} but got: #{building_section.typical_occupant_usage_value_weeks} " if building_section.typical_occupant_usage_value_weeks != expected_value
     expect(building_section.typical_occupant_usage_value_weeks == expected_value).to be true
   end
 
-  def get_building_section_from_file(xml_file_name, standard_to_be_used)
-    xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-      ns = 'auc'
-      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building/#{ns}:Sections/#{ns}:Section") do |building_section|
-        return BuildingSync::BuildingSection.new(building_section, 'Office', '20000', 1, ns)
-      end
-    end
-  end
-
-  def generate_baseline(file_name, occupancy_type, total_floor_area, ns)
-    sub_sections = []
-    xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
-
-    doc = create_xml_file_object(xml_path)
-    building_xml = create_building_object(doc, ns)
-
-    building_xml.elements.each("#{ns}:Sections/#{ns}:Section") do |building_element|
-      sub_sections.push(BuildingSync::BuildingSection.new(building_element, occupancy_type, total_floor_area, ns))
-    end
-    return sub_sections
-  end
-
-  def create_building_object(doc, ns)
-    buildings = []
-    doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building_xml|
-      buildings.push(building_xml)
-    end
-    return buildings[0]
-  end
-
-  def create_xml_file_object(xml_file_path)
-    doc = nil
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-    return doc
-  end
 end

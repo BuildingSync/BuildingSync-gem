@@ -543,16 +543,15 @@ RSpec.configure do |config|
     expect(File.exist?(results_file_path)).to be true
   end
 
-  def generate_baseline_buildings(xml_path, occupancy_type, total_floor_area, ns)
-    buildings = []
-
+  # -- Generate Baseline functions
+  def generate_baseline_facilities(xml_path, ns)
+    facilities = []
     doc = create_rexml_document_from_file_path(xml_path)
-    site_xml = create_site_object(doc, ns)
 
-    site_xml.elements.each("#{ns}:Buildings/#{ns}:Building") do |building_element|
-      buildings.push(BuildingSync::Building.new(building_element, occupancy_type, total_floor_area, ns))
+    doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_element|
+      facilities.push(BuildingSync::Facility.new(facility_element, ns))
     end
-    return buildings
+    return facilities
   end
 
   def generate_baseline_sites(xml_path, ns)
@@ -566,14 +565,28 @@ RSpec.configure do |config|
     return sites
   end
 
-  def generate_baseline_facilities(xml_path, ns)
-    facilities = []
-    doc = create_rexml_document_from_file_path(xml_path)
+  def generate_baseline_buildings(xml_path, occupancy_type, total_floor_area, ns)
+    buildings = []
 
-    doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_element|
-      facilities.push(BuildingSync::Facility.new(facility_element, ns))
+    doc = create_rexml_document_from_file_path(xml_path)
+    site_xml = create_site_object(doc, ns)
+
+    site_xml.elements.each("#{ns}:Buildings/#{ns}:Building") do |building_element|
+      buildings.push(BuildingSync::Building.new(building_element, occupancy_type, total_floor_area, ns))
     end
-    return facilities
+    return buildings
+  end
+
+  def generate_baseline_building_sections(xml_path, occupancy_type, total_floor_area, ns)
+    building_sections = []
+
+    doc = create_rexml_document_from_file_path(xml_path)
+    building_xml = create_building_object(doc, ns)
+
+    building_xml.elements.each("#{ns}:Sections/#{ns}:Section") do |building_element|
+      building_sections.push(BuildingSync::BuildingSection.new(building_element, occupancy_type, total_floor_area, ns))
+    end
+    return building_sections
   end
 
   def create_facility_object(doc, ns)
@@ -592,12 +605,30 @@ RSpec.configure do |config|
     return sites[0]
   end
 
-  def get_facility_from_file(xml_path)
-    File.open(xml_path, 'r') do |file|
+  def create_building_object(doc, ns)
+    buildings = []
+    doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building") do |building_xml|
+      buildings.push(building_xml)
+    end
+    return buildings[0]
+  end
+
+  def get_facility_from_file(xml_file_path)
+    File.open(xml_file_path, 'r') do |file|
       doc = REXML::Document.new(file)
       ns = 'auc'
       doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility|
         return BuildingSync::Facility.new(facility, ns)
+      end
+    end
+  end
+
+  def get_building_section_from_file(xml_file_path)
+    File.open(xml_file_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+      ns = 'auc'
+      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site/#{ns}:Buildings/#{ns}:Building/#{ns}:Sections/#{ns}:Section") do |building_section|
+        return BuildingSync::BuildingSection.new(building_section, 'Office', '20000', 1, ns)
       end
     end
   end
