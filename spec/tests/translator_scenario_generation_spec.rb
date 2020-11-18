@@ -55,9 +55,9 @@ RSpec.describe 'BuildingSync' do
 
   it 'should parse the DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
     # -- Setup
-    file_name = 'building_151.xml'
+    file_name = 'DC GSA Headquarters.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     expected_measures = 2
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     simulate = false
@@ -68,9 +68,9 @@ RSpec.describe 'BuildingSync' do
 
   it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with CA Title 24 and generate baseline and scenarios' do
     # -- Setup
-    file_name = 'building_151.xml'
+    file_name = 'BuildingSync Website Valid Schema.xml'
     std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     expected_measures = 30
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     simulate = false

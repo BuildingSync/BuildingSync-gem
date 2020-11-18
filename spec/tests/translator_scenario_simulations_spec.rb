@@ -57,7 +57,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'DC GSA Headquarters.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     expected_measures = 2
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     simulate = true
