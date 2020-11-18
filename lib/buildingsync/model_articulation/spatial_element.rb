@@ -176,7 +176,6 @@ module BuildingSync
           raise "Building total floor area '#{total_floor_area}' is nil"
         end
       end
-      puts "to get @bldg_type #{@bldg_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}"
     end
 
     # gets the standards occupancy type from the building type or the potential overwrite occupancy type
@@ -191,6 +190,7 @@ module BuildingSync
       @bldg_type = occ_type[:bldg_type]
       @bar_division_method = occ_type[:bar_division_method]
       @system_type = occ_type[:system_type]
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.sets_occupancy_bldg_system_types', "Element ID: #{@id} @bldg_type #{@bldg_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}")
       return true
     end
 
@@ -201,7 +201,8 @@ module BuildingSync
     # @param total_number_floors [Integer]
     # @return [Boolean]
     def process_bldg_and_system_type(json, occupancy_type, total_floor_area, total_number_floors)
-      puts "using occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}"
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.sets_occupancy_bldg_system_types', "Element ID: #{@id} started with occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}")
+      puts "Element ID: #{@id} started with occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}"
       min_floor_area_correct = false
       max_floor_area_correct = false
       if !json[:"#{occupancy_type}"].nil?

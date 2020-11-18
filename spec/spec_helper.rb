@@ -116,7 +116,6 @@ RSpec.configure do |config|
     end
     osm_baseline_path = File.join(osm_baseline_dir, file_name)
     FileUtils.cp(osm_name, osm_baseline_dir)
-    puts "osm_baseline_path: #{osm_baseline_path}"
     workflow = OpenStudio::WorkflowJSON.new
     workflow.setSeedFile(osm_baseline_path)
     workflow.setWeatherFile(epw_file_path)
@@ -127,7 +126,6 @@ RSpec.configure do |config|
     runner_options = { run_simulations: true }
     runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
     runner.run_osw(osw_path, osm_baseline_dir)
-    expect(File.exist?(osw_path.gsub('in.osw', 'eplusout.sql'))).to be true
   end
 
   # generate baseline idf and compare
@@ -293,15 +291,32 @@ RSpec.configure do |config|
   # @param standard_to_be_used [String]
   # @param spec_name [String]
   def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used, spec_name, floors_above_grade = 1)
+    # -- Setup
     generator = BuildingSync::Generator.new
     facility = generator.create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade)
     facility.determine_open_studio_standard(standard_to_be_used)
-    epw_file_path = File.expand_path('./weather/CZ01RV2.epw', File.dirname(__FILE__))
-    output_path = File.expand_path("./output/#{spec_name}/#{occupancy_classification}", File.dirname(__FILE__))
+
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    output_path = File.join(SPEC_OUTPUT_DIR, "#{spec_name}/#{occupancy_classification}/Year#{year_of_const}")
+
+    # Remove if previously exists
+    if Dir.exist?(output_path)
+      FileUtils.rm_rf(output_path)
+    end
+    expect(Dir.exist?(output_path)).to be false
+
+    # Recreate fresh directory
+    FileUtils.mkdir_p(output_path)
+    expect(Dir.exist?(output_path)).to be true
+
     expect(facility.generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)).to be true
     facility.write_osm(output_path)
 
+    write_osm_checks(output_path)
+
     run_baseline_simulation(output_path + '/in.osm', epw_file_path)
+
+    translator_run_baseline_osm_checks(output_path)
   end
 
   def translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
@@ -359,6 +374,12 @@ RSpec.configure do |config|
     translator.write_osm
 
     # -- Assert
+    write_osm_checks(output_path)
+    return translator
+  end
+
+  def write_osm_checks(output_path)
+    # -- Assert
     # Check SR path exists
     # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/SR
     sr_path = File.join(output_path, 'SR')
@@ -380,8 +401,6 @@ RSpec.configure do |config|
     # Check in.osm written to the main output_path
     # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/in.osm
     expect(File.exist?(File.join(output_path, 'in.osm'))).to be true
-
-    return translator
   end
 
   def translator_run_baseline_osm_checks(output_path)

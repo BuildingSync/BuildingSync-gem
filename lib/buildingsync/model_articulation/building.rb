@@ -171,7 +171,13 @@ module BuildingSync
 
       if @building_xml.elements["#{@ns}:YearOfLastMajorRemodel"]
         @year_major_remodel = @building_xml.elements["#{@ns}:YearOfLastMajorRemodel"].text.to_i
-        @built_year = @year_major_remodel if @year_major_remodel > @built_year
+        if @year_major_remodel > @built_year
+          pr_year = @built_year
+          @built_year = @year_major_remodel
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.read_built_remodel_year', "YearOfConstruction (#{pr_year}) overriden by YearOfLastMajorRemodel (#{@year_major_remodel}).  Use year: #{@built_year}")
+        end
+      else
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.read_built_remodel_year', "YearOfConstruction set at: #{@built_year}")
       end
 
       if @building_xml.elements["#{@ns}:YearOfLastEnergyAudit"]
