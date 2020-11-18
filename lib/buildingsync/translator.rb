@@ -76,18 +76,14 @@ module BuildingSync
       end
 
       @doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_file_path)
-      if @doc.root.has_attribute?('version')
-        @schema_version = @doc.root.attribute('version').value
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "Using BuildingSync version: #{@schema_version}")
-      end
 
-      # test for the namespace
-      @ns = 'auc'
       @schema_version = BuildingSync::Helper.get_attribute_value(@doc.root, 'version')
       if @schema_version.nil?
         @schema_version = '2.0.0'
       end
 
+      # test for the namespace
+      @ns = 'auc'
       @doc.root.namespaces.each_pair do |k, v|
         @ns = k if /bedes-auc/.match(v)
       end
