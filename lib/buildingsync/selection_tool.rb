@@ -45,11 +45,12 @@ module BuildingSync
     # @note See documentation here: https://github.com/buildingsync/selection-tool#validator
     # @note Use core Net::HTTPS
     # @param xml_path [String]
-    def initialize(xml_path)
+    def initialize(xml_path, version = '2.0.0')
       @hash_response = nil
+      version = '2.0.0' if version.nil?
       url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
 
-      params = { 'schema_version' => '2.0.0' }
+      params = { 'schema_version' => version }
       params[:file] = UploadIO.new(xml_path, 'text/xml', File.basename(xml_path))
 
       request = Net::HTTP::Post::Multipart.new(url.path, params)

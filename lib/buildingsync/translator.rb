@@ -55,6 +55,7 @@ module BuildingSync
     # @param validate_xml_file_against_schema [Boolean]
     def initialize(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1, validate_xml_file_against_schema = true)
       @doc = nil
+      @schema_version = nil
       @model_maker = nil
       @workflow_maker = nil
       @output_dir = output_dir
@@ -74,10 +75,27 @@ module BuildingSync
         raise "File '#{xml_file_path}' does not exist" unless File.exist?(xml_file_path)
       end
 
+      @doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_file_path)
+      if @doc.root.has_attribute?('version')
+        @schema_version = @doc.root.attribute('version').value
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "Using BuildingSync version: #{@schema_version}")
+      end
+
+      # test for the namespace
+      @ns = 'auc'
+      @schema_version = BuildingSync::Helper.get_attribute_value(@doc.root, 'version')
+      if @schema_version.nil?
+        @schema_version = '2.0.0'
+      end
+
+      @doc.root.namespaces.each_pair do |k, v|
+        @ns = k if /bedes-auc/.match(v)
+      end
+
       if validate_xml_file_against_schema
         # we wil try to validate the file, but if it fails, we will not cancel the process, but log an error
         begin
-          selection_tool = BuildingSync::SelectionTool.new(xml_file_path)
+          selection_tool = BuildingSync::SelectionTool.new(xml_file_path, @schema_version)
           if !selection_tool.validate_schema
             raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
           else
@@ -90,14 +108,6 @@ module BuildingSync
       else
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' was not validated against the BuildingSync schema")
         puts "File '#{xml_file_path}' was not validated against the BuildingSync schema"
-      end
-
-      @doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_file_path)
-
-      # test for the namespace
-      @ns = 'auc'
-      @doc.root.namespaces.each_pair do |k, v|
-        @ns = k if /bedes-auc/.match(v)
       end
 
       # we use only one model maker and one workflow maker that we set init here
