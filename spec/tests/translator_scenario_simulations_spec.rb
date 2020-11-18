@@ -59,7 +59,7 @@ RSpec.describe 'BuildingSync' do
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     expected_measures = 2
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     simulate = true
 
     # -- Assert

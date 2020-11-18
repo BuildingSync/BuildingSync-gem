@@ -296,7 +296,7 @@ RSpec.configure do |config|
     facility = generator.create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade)
     facility.determine_open_studio_standard(standard_to_be_used)
 
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     output_path = File.join(SPEC_OUTPUT_DIR, "#{spec_name}/#{occupancy_classification}/Year#{year_of_const}")
 
     # Remove if previously exists

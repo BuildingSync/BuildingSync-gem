@@ -45,7 +45,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'building_151.xml'
     std = CA_TITLE24
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
     translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
@@ -58,7 +58,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'building_151.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
     translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
@@ -71,7 +71,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
     translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
@@ -84,7 +84,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'DC GSA Headquarters.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
     translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
@@ -97,7 +97,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'BuildingSync Website Valid Schema.xml'
     std = CA_TITLE24
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
     translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
@@ -110,7 +110,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'BuildingSync Website Valid Schema.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
     translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
@@ -123,7 +123,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'report_478.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     begin
       translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
     rescue StandardError => e

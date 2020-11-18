@@ -59,12 +59,12 @@ RSpec.describe 'BuildingSync' do
   #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
   # end
 
-  it 'L100_Audit.xml ASHRAE90_1 CZ01RV2.epw - perform a sizing run, and create an in.osm' do
+  it 'L100_Audit.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - perform a sizing run, and create an in.osm' do
     # -- Setup
     file_name = 'L100_Audit.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -81,12 +81,12 @@ RSpec.describe 'BuildingSync' do
   #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
   # end
   #
-  # it 'DC GSA Headquarters.xml CA_TITLE24 CZ01RV2.epw - should error - Cant find class CBES Pre-1978_LargeOffice' do
+  # it 'DC GSA Headquarters.xml CA_TITLE24 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - should error - Cant find class CBES Pre-1978_LargeOffice' do
   #   # -- Setup
   #   file_name = 'DC GSA Headquarters.xml'
   #   std = CA_TITLE24
   #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-  #   epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+  #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   begin
   #     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -96,56 +96,56 @@ RSpec.describe 'BuildingSync' do
   #   end
   # end
   #
-  # it 'DC GSA Headquarters.xml ASHRAE90_1 CZ01RV2.epw - perform a sizing run, and create an in.osm' do
+  # it 'DC GSA Headquarters.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - perform a sizing run, and create an in.osm' do
   #   # -- Setup
   #   file_name = 'DC GSA Headquarters.xml'
   #   std = ASHRAE90_1
   #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-  #   epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+  #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
   #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
   # end
   #
-  # it 'DC GSA HeadquartersWithClimateZone.xml ASHRAE90_1 CZ01RV2.epw - perform a sizing run, and create an in.osm' do
+  # it 'DC GSA HeadquartersWithClimateZone.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - perform a sizing run, and create an in.osm' do
   #   # -- Setup
   #   file_name = 'DC GSA HeadquartersWithClimateZone.xml'
   #   std = ASHRAE90_1
   #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-  #   epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+  #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
   #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
   # end
   #
-  # it 'BuildingSync Website Valid Schema.xml CA_TITLE24 CZ01RV2.epw - perform a sizing run, and create an in.osm' do
+  # it 'BuildingSync Website Valid Schema.xml CA_TITLE24 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - perform a sizing run, and create an in.osm' do
   #   # -- Setup
   #   file_name = 'BuildingSync Website Valid Schema.xml'
   #   std = CA_TITLE24
   #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-  #   epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+  #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
   #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
   # end
   #
-  # it 'BuildingSync Website Valid Schema.xml ASHRAE90_1 CZ01RV2.epw - perform a sizing run, and create an in.osm' do
+  # it 'BuildingSync Website Valid Schema.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - perform a sizing run, and create an in.osm' do
   #   # -- Setup
   #   file_name = 'BuildingSync Website Valid Schema.xml'
   #   std = ASHRAE90_1
   #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-  #   epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+  #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
   #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
   # end
   #
-  # it 'Golden Test File.xml ASHRAE90_1 CZ01RV2.epw - should error since there are 2 buildings defined' do
+  # it 'Golden Test File.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - should error since there are 2 buildings defined' do
   #   # -- Setup
   #   file_name = 'Golden Test File.xml'
   #   std = ASHRAE90_1
   #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-  #   epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+  #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   begin
   #     # -- Assert
@@ -156,12 +156,12 @@ RSpec.describe 'BuildingSync' do
   #   end
   # end
   #
-  # it 'AT_example_property_report_25.xml ASHRAE90_1 CZ01RV2.epw - should error since there are 3 buildings defined' do
+  # it 'AT_example_property_report_25.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - should error since there are 3 buildings defined' do
   #   # -- Setup
   #   file_name = 'AT_example_property_report_25.xml'
   #   std = ASHRAE90_1
   #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-  #   epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+  #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #   begin
   #     # -- Assert
   #     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -170,12 +170,12 @@ RSpec.describe 'BuildingSync' do
   #   end
   # end
 
-  it 'AT_example_report_332.xml ASHRAE90_1 CZ01RV2.epw - should error since Occupancy type: "Food Service" is not defined in bldg_and_system_types.json' do
+  it 'AT_example_report_332.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - should error since Occupancy type: "Food Service" is not defined in bldg_and_system_types.json' do
     # -- Setup
     file_name = 'AT_example_report_332.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     begin
       # -- Assert
       translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -189,7 +189,7 @@ RSpec.describe 'BuildingSync' do
   #   file_name = 'L000_OpenStudio_Pre-Simulation_01.xml'
   #   std = ASHRAE90_1
   #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-  #   epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+  #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
   #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -200,7 +200,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'L000_OpenStudio_Pre-Simulation_02.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -211,7 +211,7 @@ RSpec.describe 'BuildingSync' do
   #   file_name = 'L000_OpenStudio_Pre-Simulation_03.xml'
   #   std = ASHRAE90_1
   #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-  #   epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+  #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
   #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
@@ -222,7 +222,7 @@ RSpec.describe 'BuildingSync' do
     file_name = 'L000_OpenStudio_Pre-Simulation_04.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)

@@ -49,7 +49,7 @@ RSpec.describe 'LoadSystemSpec' do
     g = BuildingSync::Generator.new
     site = g.create_minimum_site('Retail', '1980', 'Gross', '20000')
     site.determine_open_studio_standard(ASHRAE90_1)
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     site.generate_baseline_osm(epw_file_path, ASHRAE90_1)
     # we need to create a site and call the generate_baseline_osm method in order to set the space types in the model, why are those really needed?
     load_system = BuildingSync::LoadsSystem.new

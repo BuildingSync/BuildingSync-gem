@@ -62,7 +62,7 @@ RSpec.describe 'FacilitySpec' do
     file_name = 'building_151.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     expect(File.exist?(epw_path)).to be true
 
     generator = BuildingSync::Generator.new

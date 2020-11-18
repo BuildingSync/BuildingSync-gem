@@ -43,7 +43,7 @@ RSpec.describe 'BuildingSync' do
     climate_zone_standard_string = 'ASHRAE 169-2006-4'
     open_studio_standards = Standard.build("#{standard_template}_#{bldg_type}")
     model = OpenStudio::Model::Model.new
-    epw_file_name = 'CZ01RV2.epw'
+    epw_file_name = 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'
     epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
 
     begin
