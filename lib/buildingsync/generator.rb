@@ -376,7 +376,7 @@ module BuildingSync
         doc = REXML::Document.new(file)
       end
       facility = get_first_facility_element(doc)
-        return BuildingSync::Facility.new(facility, @ns)
+      return BuildingSync::Facility.new(facility, @ns)
     end
 
     def get_building_from_file(xml_file_path)
@@ -386,7 +386,6 @@ module BuildingSync
       end
       building = get_first_building_element(doc)
       return BuildingSync::Building.new(building, 'Office', '20000', @ns)
-      end
     end
 
     def get_building_section_from_file(xml_file_path)
@@ -396,7 +395,6 @@ module BuildingSync
       end
       section = get_first_building_section_element(doc)
       return BuildingSync::BuildingSection.new(section, 'Office', '20000', 1, @ns)
-      end
     end
 
     # create and return the set of elements:
