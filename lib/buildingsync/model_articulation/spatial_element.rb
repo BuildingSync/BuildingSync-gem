@@ -40,14 +40,14 @@ require 'json'
 require 'openstudio/extension/core/os_lib_model_generation'
 
 require 'buildingsync/helpers/helper'
-require 'buildingsync/helpers/x_get_set'
+require 'buildingsync/helpers/xml_get_set'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpatialElement
     include OsLib_ModelGeneration
     include BuildingSync::Helper
-    include BuildingSync::XGetSet
+    include BuildingSync::XmlGetSet
     # initialize SpatialElement class
     # @param base_xml [REXML::Element] an element corresponding to a spatial element,
     #   either an auc:Site, auc:Building, auc:Section

@@ -35,27 +35,68 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'buildingsync/helpers/helper'
-require 'buildingsync/helpers/xml_get_set'
 
 module BuildingSync
-  # Measure class
-  class Measure
-    include BuildingSync::Helper
-    include BuildingSync::XmlGetSet
-    # initialize
-    # @param @base_xml [REXML::Element]
-    # @param ns [String]
-    def initialize(base_xml, ns)
-      @base_xml = base_xml
-      @ns = ns
+  # helper class for helper methods in BuildingSync
+  module XmlGetSet
 
-      help_element_class_type_check(base_xml, 'Measure')
-
-      read_xml
+    # Get the id attribute of the @base_xml
+    # @see help_get_attribute_value
+    def xget_id
+      return help_get_attribute_value(@base_xml, 'ID')
     end
 
-    def read_xml
+    # Get the name of the element
+    # @example scenario.get_name , returns text for ScenarioName element
+    # @example site.get_name , returns text for SiteName
+    def xget_name
+      premises = ['Site', 'Building', 'Section', 'ThermalZone', 'Space']
+      if premises.include? @base_xml.name
+        return xget_text("PremisesName")
+      elsif @base_xml.name == 'Measure'
+        m = @base_xml.elements[".//#{@ns}:MeasureName"]
+        return help_get_text_value(m)
+      else
+        return xget_text("#{@base_xml.name}Name")
+      end
+    end
 
+    # returns the first element with the specified element name
+    # @param element_name [String] non-namespaced element name, 'EnergyResource'
+    # @return [REXML::Element] if element exists
+    # @return [nil] if element doesn't
+    def xget_element(element_name)
+      return @base_xml.elements["./#{@ns}:#{element_name}"]
+    end
+
+    # @see help_get_text_value
+    def xget_text(element_name)
+      return help_get_text_value(@base_xml.elements["./#{@ns}:#{element_name}"])
+    end
+
+    # @see help_get_text_value_as_float
+    def xget_text_as_float(element_name)
+      return help_get_text_value_as_float(@base_xml.elements["./#{@ns}:#{element_name}"])
+    end
+
+    # @see help_get_text_value_as_date
+    def xget_text_as_date(element_name)
+      return help_get_text_value_as_date(@base_xml.elements["./#{@ns}:#{element_name}"])
+    end
+
+    # @see help_get_text_value_as_datetime
+    def xget_text_as_dt(element_name)
+      return help_get_text_value_as_datetime(@base_xml.elements["./#{@ns}:#{element_name}"])
+    end
+
+    # @return [Array<String>]
+    def xget_idrefs(element_name)
+      id_elements = @base_xml.get_elements(".//#{@ns}:#{element_name}s/#{@ns}:#{element_name}")
+      to_return = []
+      id_elements.each do |id|
+        to_return << help_get_attribute_value(id, 'IDref')
+      end
+      return to_return
     end
   end
 end

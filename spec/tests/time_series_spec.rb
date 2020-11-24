@@ -34,28 +34,29 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require 'buildingsync/helpers/helper'
-require 'buildingsync/helpers/xml_get_set'
 
-module BuildingSync
-  # Measure class
-  class Measure
-    include BuildingSync::Helper
-    include BuildingSync::XmlGetSet
-    # initialize
-    # @param @base_xml [REXML::Element]
-    # @param ns [String]
-    def initialize(base_xml, ns)
-      @base_xml = base_xml
-      @ns = ns
+require 'buildingsync/generator'
+require 'buildingsync/time_series'
 
-      help_element_class_type_check(base_xml, 'Measure')
+RSpec.describe 'TimeSeries' do
+  it 'should raise an error given a non-TimeSeries REXML Element' do
+    # -- Setup
+    ns = 'auc'
+    v = '2.2.0'
+    g = BuildingSync::Generator.new(v, ns)
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    facility_element = doc.elements["//#{ns}:Facility"]
 
-      read_xml
-    end
+    # -- Create TimeSeries object from Facility
+    begin
+      ts = BuildingSync::TimeSeries.new(facility_element, ns)
 
-    def read_xml
-
+      # Should not reach this
+      expect(false).to be true
+    rescue StandardError => e
+      puts (e.message)
+      expect(e.message).to eql "Attempted to initialize TimeSeries object with Element name of: Facility"
     end
   end
 end

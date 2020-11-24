@@ -44,7 +44,7 @@ module BuildingSync
   class BuildingSection < SpatialElement
     include OpenstudioStandards
     include BuildingSync::Helper
-    include BuildingSync::XGetSet
+    include BuildingSync::XmlGetSet
     # initialize
     # @param base_xml [REXML:Element] an element corresponding to a single auc:Section
     # @param bldgsync_occ_type [String] Office, Retail, etc.

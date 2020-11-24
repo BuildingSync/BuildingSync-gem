@@ -37,7 +37,7 @@
 require 'openstudio/extension/core/os_lib_geometry'
 
 require 'buildingsync/helpers/helper'
-require 'buildingsync/helpers/x_get_set'
+require 'buildingsync/helpers/xml_get_set'
 require 'buildingsync/helpers/Model.hvac'
 require 'buildingsync/helpers/metered_energy'
 
@@ -53,7 +53,7 @@ module BuildingSync
   class Facility
     include OsLib_Geometry
     include BuildingSync::Helper
-    include BuildingSync::XGetSet
+    include BuildingSync::XmlGetSet
     # initialize
     # @param base_xml [REXML:Element]
     # @param ns [String]
