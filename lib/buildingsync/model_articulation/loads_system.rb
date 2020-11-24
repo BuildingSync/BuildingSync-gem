@@ -34,12 +34,15 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative 'building_system'
 require 'openstudio/extension/core/os_lib_schedules.rb'
+
+require 'buildingsync/helpers/helper'
+require_relative 'building_system'
 
 module BuildingSync
   # LoadsSystem class that manages internal and external loads
   class LoadsSystem < BuildingSystem
+    include BuildingSync::Helper
     # initialize
     # @param system_element [REXML::Element]
     # @param ns [String]
@@ -176,22 +179,22 @@ module BuildingSync
       return unless !building_occupant_hours_per_week.nil?
       hours_per_week = building_occupant_hours_per_week
 
-      default_schedule_set = BuildingSync::Helper.get_default_schedule_set(model)
-      existing_number_of_people_sched = BuildingSync::Helper.get_schedule_rule_set_from_schedule(default_schedule_set.numberofPeopleSchedule)
+      default_schedule_set = help_get_default_schedule_set(model)
+      existing_number_of_people_sched = help_get_schedule_rule_set_from_schedule(default_schedule_set.numberofPeopleSchedule)
       return false if existing_number_of_people_sched.nil?
-      calc_hours_per_week = BuildingSync::Helper.calculate_hours(existing_number_of_people_sched)
+      calc_hours_per_week = help_calculate_hours(existing_number_of_people_sched)
       ratio_hours_per_week = hours_per_week / calc_hours_per_week
 
-      wkdy_start_time = BuildingSync::Helper.get_start_time_weekday(existing_number_of_people_sched)
-      wkdy_end_time = BuildingSync::Helper.get_end_time_weekday(existing_number_of_people_sched)
+      wkdy_start_time = help_get_start_time_weekday(existing_number_of_people_sched)
+      wkdy_end_time = help_get_end_time_weekday(existing_number_of_people_sched)
       wkdy_hours = wkdy_end_time - wkdy_start_time
 
-      sat_start_time = BuildingSync::Helper.get_start_time_sat(existing_number_of_people_sched)
-      sat_end_time = BuildingSync::Helper.get_end_time_sat(existing_number_of_people_sched)
+      sat_start_time = help_get_start_time_sat(existing_number_of_people_sched)
+      sat_end_time = help_get_end_time_sat(existing_number_of_people_sched)
       sat_hours = sat_end_time - sat_start_time
 
-      sun_start_time = BuildingSync::Helper.get_start_time_sun(existing_number_of_people_sched)
-      sun_end_time = BuildingSync::Helper.get_end_time_sun(existing_number_of_people_sched)
+      sun_start_time = help_get_start_time_sun(existing_number_of_people_sched)
+      sun_end_time = help_get_end_time_sun(existing_number_of_people_sched)
       sun_hours = sun_end_time - sun_start_time
 
       # determine new end times via ratios
@@ -203,7 +206,7 @@ module BuildingSync
       op_sch = standard.model_infer_hours_of_operation_building(model)
       default_schedule_set.setHoursofOperationSchedule(op_sch)
 
-      # BuildingSync::Helper.print_all_schedules("org_schedules-#{space_type.name}.csv", default_schedule_set)
+      # help_print_all_schedules("org_schedules-#{space_type.name}.csv", default_schedule_set)
 
       # Convert existing schedules in the model to parametric schedules based on current hours of operation
       standard.model_setup_parametric_schedules(model)

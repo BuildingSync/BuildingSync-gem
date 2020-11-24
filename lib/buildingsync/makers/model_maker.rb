@@ -41,12 +41,13 @@ require 'buildingsync/makers/workflow_maker'
 
 module BuildingSync
   # ModelMaker class
-  class ModelMaker < ModelMakerBase
+  class ModelMaker
     # initialize the ModelMaker class
     # @param doc [REXML::Document]
     # @param ns [String]
     def initialize(doc, ns)
-      super
+      @doc = doc
+      @ns = ns
 
       @facilities = []
       @facility = nil
@@ -55,65 +56,6 @@ module BuildingSync
       read_xml
     end
 
-    # main read xml function that drives all of the reading
-    def read_xml
-      facility_path = "/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility"
-      facility_elements = REXML::XPath.match(@doc, facility_path)
-      if facility_elements.size == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMaker.read_xml', 'There are no facilities in your BuildingSync file.')
-        raise 'Error: There are no facilities in your BuildingSync file.'
-      elsif @facilities.count > 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMaker.read_xml', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
-        raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
-      else
-        @facility_xml = facility_elements.first()
-        @facility = Facility.new(@facility_xml, @ns)
-      end
-    end
 
-    # get the facility object
-    # @return [BldgSync::Facility] facility
-    def get_facility
-      return @facility
-    end
-
-    # generate the baseline model as osm model
-    # @param dir [String]
-    # @param epw_file_path [String]
-    # @param standard_to_be_used [String] 'ASHRAE90.1' or 'CaliforniaTitle24' are supported options for now
-    # @param ddy_file [String] path to the ddy file
-    # @return [Boolean] true if successful
-    def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
-      @facility.set_all
-      open_studio_standard = @facility.determine_open_studio_standard(standard_to_be_used)
-
-      @facility.generate_baseline_osm(epw_file_path, dir, standard_to_be_used, ddy_file)
-      return write_osm(dir)
-    end
-
-    # get the space types of the facility
-    # @return [Vector<OpenStudio::Model::SpaceType>] vector of space types
-    def get_space_types
-      return @facility.get_space_types
-    end
-
-    # get model
-    # @return [OpenStudio::Model] model
-    def get_model
-      return @facility.get_model
-    end
-
-    # writes the parameters determine during processing back to the BldgSync XML file
-    def write_parameters_to_xml
-      @facility.write_parameters_to_xml
-    end
-
-    private
-
-    # write osm
-    # @param dir [String]
-    def write_osm(dir)
-      @scenario_types = @facility.write_osm(dir)
-    end
   end
 end

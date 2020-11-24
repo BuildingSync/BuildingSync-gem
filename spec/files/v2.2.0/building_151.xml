@@ -952,7 +952,7 @@
                 </auc:UserDefinedField>
               </auc:UserDefinedFields>
             </auc:Scenario>
-            <auc:Scenario  ID="Scenario6">
+            <auc:Scenario ID="Scenario6">
               <auc:ScenarioName>Add daylight controls Only</auc:ScenarioName>
               <auc:ScenarioType>
                 <auc:PackageOfMeasures ID="PackageOfMeasures6">
@@ -974,7 +974,7 @@
                 </auc:UserDefinedField>
               </auc:UserDefinedFields>
             </auc:Scenario>
-            <auc:Scenario  ID="Scenario7">
+            <auc:Scenario ID="Scenario7">
               <auc:ScenarioName>Add occupancy sensors Only</auc:ScenarioName>
               <auc:ScenarioType>
                 <auc:PackageOfMeasures ID="PackageOfMeasures7">
@@ -996,7 +996,7 @@
                 </auc:UserDefinedField>
               </auc:UserDefinedFields>
             </auc:Scenario>
-            <auc:Scenario  ID="Scenario8">
+            <auc:Scenario ID="Scenario8">
               <auc:ScenarioName>Install plug load controls Only</auc:ScenarioName>
               <auc:ScenarioType>
                 <auc:PackageOfMeasures ID="PackageOfMeasures8">
@@ -1194,7 +1194,7 @@
                 </auc:UserDefinedField>
               </auc:UserDefinedFields>
             </auc:Scenario>
-            <auc:Scenario  ID="Scenario17">
+            <auc:Scenario ID="Scenario17">
               <auc:ScenarioName>Replace windows Only</auc:ScenarioName>
               <auc:ScenarioType>
                 <auc:PackageOfMeasures ID="PackageOfMeasures17">
@@ -1260,7 +1260,7 @@
                 </auc:UserDefinedField>
               </auc:UserDefinedFields>
             </auc:Scenario>
-            <auc:Scenario  ID="Scenario20">
+            <auc:Scenario ID="Scenario20">
               <auc:ScenarioName>VRF with DOAS Only</auc:ScenarioName>
               <auc:ScenarioType>
                 <auc:PackageOfMeasures ID="PackageOfMeasures20">

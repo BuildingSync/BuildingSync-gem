@@ -36,12 +36,48 @@
 # *******************************************************************************
 require_relative './../spec_helper'
 
-RSpec.describe 'WorkFlow Maker' do
-  it 'should print out all available measure paths' do
-    workflow_maker = BuildingSync::WorkflowMaker.new(nil, nil)
-    list_of_measures = workflow_maker.get_available_measures_hash
+RSpec.describe 'WorkflowMaker' do
+  it 'should raise a StandardError if !doc.is_a REXML::Document' do
+    # -- Setup
+    doc = ''
+    ns = ''
+
+    # -- Assert
+    begin
+      workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+    rescue StandardError => e
+      expect(e.message).to eql "doc must be an REXML::Document.  Passed object of class: String"
+    end
+  end
+
+  it 'should raise a StandardError if !ns.is_a String' do
+    # -- Setup
+    doc = REXML::Document.new
+    ns = 1
+
+    # -- Assert
+    begin
+      workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+    rescue StandardError => e
+      expect(e.message).to eql "ns must be String.  Passed object of class: Int"
+    end
+  end
+
+  it 'get_available_measures_hash should return a Hash of measures' do
+    # -- Setup
+    g = BuildingSync::Generator.new
+    doc = g.create_minimum_snippet('Retail')
+    ns = 'auc'
+
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+    measures_hash = workflow_maker.get_available_measures_hash
+
+    # -- Assert
+    expect(measures_hash).to be_an_instance_of(Hash)
+
+    # TODO: why this?
     count = 0
-    list_of_measures.each do |path, list|
+    measures_hash.each do |path, list|
       puts "measure path: #{path} with #{list.length} measures"
       count += list.length
       list.each do |measure_path_name|
@@ -51,17 +87,26 @@ RSpec.describe 'WorkFlow Maker' do
     puts "found #{count} measures"
   end
 
-  it 'should check if all measures are available' do
-    workflow_maker = BuildingSync::WorkflowMaker.new(nil, nil)
-    expect(workflow_maker.check_if_measures_exist).to be true
+  it 'measures_exist? should return true if all measures are available' do
+    # -- Setup
+    ns = 'auc'
+    g = BuildingSync::Generator.new
+    doc = g.create_minimum_snippet('Retail')
+
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+
+    # -- Assert
+    expect(workflow_maker.measures_exist?).to be true
   end
 
   it 'should get_measure_directories_array for CommonMeasures, ModelArticulation, EeMeasures, and BSyncMeasures' do
     # -- Setup
-    # For initialization, needs no substantial info.
-    doc = REXML::Document.new
     ns = 'auc'
-    wm = BuildingSync::WorkflowMaker.new(doc, ns)
+    g = BuildingSync::Generator.new
+    doc = g.create_minimum_snippet('Retail')
+
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+
     # Currently support measures from 4 Extensions
     cm = OpenStudio::CommonMeasures::Extension.new
     ma = OpenStudio::ModelArticulation::Extension.new
@@ -69,23 +114,33 @@ RSpec.describe 'WorkFlow Maker' do
     bsync = BuildingSync::Extension.new
 
     expected_measure_paths = Set[cm.measures_dir, ma.measures_dir, ee.measures_dir, bsync.measures_dir]
-    actual = wm.get_measure_directories_array
+    actual = workflow_maker.get_measure_directories_array
 
     # -- Assert
     expect(actual).to be_an_instance_of(Array)
     expect(actual.to_set == expected_measure_paths).to be true
   end
 
-  it 'should initialize a workflow as a hash, have expected @workflow["measure_paths"]' do
+  it 'should initialize a workflow as a hash' do
     # -- Setup
-    # For initialization, needs no substantial info.
-    doc = REXML::Document.new
     ns = 'auc'
-    wm = BuildingSync::WorkflowMaker.new(doc, ns)
+    g = BuildingSync::Generator.new
+    doc = g.create_minimum_snippet('Retail')
+
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
 
     # -- Assert
-    expect(wm.check_if_measures_exist).to be true
-    expect(wm.get_workflow).to be_an_instance_of(Hash)
+    expect(workflow_maker.measures_exist?).to be true
+    expect(workflow_maker.get_workflow).to be_an_instance_of(Hash)
+  end
+
+  it '@workflow set on initialization should have correct measure_paths' do
+    # -- Setup
+    ns = 'auc'
+    g = BuildingSync::Generator.new
+    doc = g.create_minimum_snippet('Retail')
+
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
 
     # -- Setup
     # Currently support measures from 4 Extensions
@@ -98,17 +153,42 @@ RSpec.describe 'WorkFlow Maker' do
 
     # -- Assert
     # Check the measure_paths defined in the workflow
-    actual_measure_paths = wm.get_workflow['measure_paths'].to_set
+    actual_measure_paths = workflow_maker.get_workflow['measure_paths'].to_set
     expect(expected_measure_paths == actual_measure_paths).to be true
+  end
+
+  it 'deep_copy_workflow creates a deep copy of the @workflow' do
+    # -- Setup
+    ns = 'auc'
+    g = BuildingSync::Generator.new
+    doc = g.create_minimum_snippet('Retail')
+
+    # -- Assert - this object is the same
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+    workflow = workflow_maker.get_workflow
+    expect(workflow).to be workflow_maker.get_workflow
+
+    # -- Assert these objects are different
+    workflow_new = workflow_maker.deep_copy_workflow
+    expect(workflow_new).to_not be workflow_maker.get_workflow
+
+    # -- Assert the hashes are still equivalent
+    expect(workflow_new).to eql workflow_maker.get_workflow
+
+    # Assert the hashes are no longer equivalent
+    workflow_new[:new_key] = 'stuff'
+    expect(workflow_new).to_not eql workflow_maker.get_workflow
   end
 
   it 'should get_available_measures_hash with correct structure, expected keys format' do
     # -- Setup
-    # For initialization, needs no substantial info.
-    doc = REXML::Document.new
     ns = 'auc'
-    wm = BuildingSync::WorkflowMaker.new(doc, ns)
-    available_measures = wm.get_available_measures_hash
+    g = BuildingSync::Generator.new
+    doc = g.create_minimum_snippet('Retail')
+
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+
+    available_measures = workflow_maker.get_available_measures_hash
 
     # -- Assert
     expect(available_measures).to be_an_instance_of(Hash)
@@ -124,38 +204,109 @@ RSpec.describe 'WorkFlow Maker' do
     expect(available_measures[cm.measures_dir].find { |item | item == "SetEnergyPlusMinimumOutdoorAirFlowRate"}).to_not be nil
   end
 
-  it 'get_scenarios should return "nil" if no scenario elements are found' do
+  it 'get_scenarios should return an empty array if no scenario elements are found' do
     # -- Setup
-    # For initialization, needs no substantial info.
-    doc = REXML::Document.new
     ns = 'auc'
-    wm = BuildingSync::WorkflowMaker.new(doc, ns)
+    g = BuildingSync::Generator.new
+    doc = g.create_minimum_snippet('Retail')
+    scenarios = doc.elements["//#{ns}:Scenarios"]
 
-    scenarios = wm.get_scenarios
-    expect(scenarios).to be nil
-  end
+    # -- Act - remove scenario
+    scenarios.delete_element("#{ns}:Scenario")
 
-  it 'get_scenario_elements should return an empty array if no scenario elements are found' do
-    # -- Setup
-    # For initialization, needs no substantial info.
-    doc = REXML::Document.new
-    ns = 'auc'
-    wm = BuildingSync::WorkflowMaker.new(doc, ns)
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+    scenarios = workflow_maker.get_scenarios
 
-    scenarios = wm.get_scenario_elements
+    # -- Assert
     expect(scenarios).to be_an_instance_of(Array)
     expect(scenarios.empty?).to be true
   end
 
-  # TODO: Come back to and verify - what is difference between this and next test?
-  it 'should save annual results to xml file and verify them' do
+  it 'building_151.xml get_scenarios should return an Array of length 30 with elements of type BuildingSync::Scenario' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
     ns = 'auc'
-    doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path)
+    doc = help_load_doc(xml_path)
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+
+    # -- Assert
+    scenarios = workflow_maker.get_scenarios
+    expect(scenarios.size).to eq 30
+    scenarios.each do |scenario|
+      expect(scenario).to be_an_instance_of(BuildingSync::Scenario)
+    end
+  end
+
+  # TODO: additional test to show failing scenario
+  it 'building_151_one_scenario.xml configure_workflow_for_scenario should return success = true for both Scenarios' do
+    # -- Setup
+    file_name = 'building_151_one_scenario.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    ns = 'auc'
+    doc = help_load_doc(xml_path)
+
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+
+    # -- Setup - Create deep copies of the workflows for modification
+    baseline_base_workflow = workflow_maker.deep_copy_workflow
+    pom_base_workflow = workflow_maker.deep_copy_workflow
+
+    baseline_scenario_xml = doc.get_elements("//#{ns}:Scenario")[0]
+    pom_scenario_xml = doc.get_elements("//#{ns}:Scenario")[1]
+
+    # -- Setup - create new scenario elements
+    baseline_scenario = BuildingSync::Scenario.new(baseline_scenario_xml, ns)
+    pom_scenario = BuildingSync::Scenario.new(pom_scenario_xml, ns)
+
+    baseline_success = workflow_maker.configure_workflow_for_scenario(baseline_base_workflow, baseline_scenario)
+    pom_success = workflow_maker.configure_workflow_for_scenario(pom_base_workflow, pom_scenario)
+
+    # -- Assert
+    expect(baseline_success).to be true
+    expect(pom_success).to be true
+  end
+
+  it 'building_151_one_scenario.xml write_osw should return success = true for both Scenarios and write the in.osw' do
+    # -- Setup
+    file_name = 'building_151_one_scenario.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    ns = 'auc'
+    doc = help_load_doc(xml_path)
+    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+
+    baseline_scenario_xml = doc.get_elements("//#{ns}:Scenario")[0]
+    pom_scenario_xml = doc.get_elements("//#{ns}:Scenario")[1]
+
+    # -- Setup - create new scenario elements
+    baseline_scenario = BuildingSync::Scenario.new(baseline_scenario_xml, ns)
+    pom_scenario = BuildingSync::Scenario.new(pom_scenario_xml, ns)
+
+    baseline_success = workflow_maker.write_osw(output_path, baseline_scenario)
+    pom_success = workflow_maker.write_osw(output_path, pom_scenario)
+
+    # -- Assert
+    expect(baseline_success).to be true
+    expect(pom_success).to be true
+
+    # -- Assert files exist
+    expect(File.exist?(File.join(output_path, 'Baseline', 'in.osw'))).to be true
+    expect(File.exist?(File.join(output_path, 'LED Only', 'in.osw'))).to be true
+  end
+
+  # TODO: Come back to and verify - what is difference between this and next test?
+  xit 'should save annual results to xml file and verify them' do
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    ns = 'auc'
+    doc = help_load_doc(xml_path)
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
     result = {}
     result[:completed_status] = 'Success'
@@ -170,13 +321,12 @@ RSpec.describe 'WorkFlow Maker' do
     annual_results['fuel_natural_gas_kbtu'] = 700
     annual_results['annual_peak_electric_demand_kw'] = 800
 
-    scenarios = workflow_maker.get_scenario_elements
+    scenarios = workflow_maker.get_scenarios
     scenarios.each do |scenario|
-      scenario_name = scenario.elements["#{ns}:ScenarioName"].text
-      puts "scenario_name: #{scenario_name}"
-      package_of_measures_or_current_building = workflow_maker.prepare_package_of_measures_or_current_building(scenario)
-      puts "package_of_measures_or_current_building: #{package_of_measures_or_current_building}"
-      if package_of_measures_or_current_building
+      # package_of_measures_or_current_building = workflow_maker.prepare_package_of_measures_or_current_building(scenario)
+      # puts "package_of_measures_or_current_building: #{package_of_measures_or_current_building}"
+      if scenario.pom? || scenario.cb_modeled?
+        scenario.add_openstudio_results(results)
         expect(workflow_maker.add_results_to_scenario(package_of_measures_or_current_building, scenario, scenario_name, {}, result, nil, nil)).to be false
         expect(workflow_maker.add_results_to_scenario(package_of_measures_or_current_building, scenario, scenario_name, annual_results, result, nil, nil)).to be true
       end
@@ -187,7 +337,7 @@ RSpec.describe 'WorkFlow Maker' do
     FileUtils.mkdir_p(File.dirname(xml_path_output))
     workflow_maker.save_xml(xml_path_output)
 
-    doc_output = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path_output)
+    doc_output = help_load_doc(xml_path_output)
     workflow_maker_output = BuildingSync::WorkflowMaker.new(doc_output, ns)
 
     scenarios = workflow_maker_output.get_scenario_elements
@@ -205,14 +355,14 @@ RSpec.describe 'WorkFlow Maker' do
   end
 
   # TODO: What does this accomplish that previous test doesn't
-  it 'should save baseline annual results to xml file and verify them' do
+  xit 'should save baseline annual results to xml file and verify them' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
     ns = 'auc'
-    doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path)
+    doc = help_load_doc(xml_path)
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
     result = {}
     result[:completed_status] = 'Success'
@@ -242,7 +392,7 @@ RSpec.describe 'WorkFlow Maker' do
     xml_path_output = xml_path.sub! '/files/', '/output/'
     workflow_maker.save_xml(xml_path_output)
 
-    doc_output = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path_output)
+    doc_output = help_load_doc(xml_path_output)
     workflow_maker_output = BuildingSync::WorkflowMaker.new(doc_output, ns)
 
     scenarios = workflow_maker_output.get_scenario_elements
@@ -258,42 +408,15 @@ RSpec.describe 'WorkFlow Maker' do
     end
   end
 
-  it 'create_calculation_method_element(result) should correctly create and return an auc:CalculationMethod element' do
-    doc = REXML::Document.new
-    ns = 'auc'
-
-    workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
-
-    # -- Setup
-    # Create a dummy result
-    result_success = {}
-    result_failed = {}
-    result_xxx = {}
-
-    result_success[:completed_status] = 'Success'
-    result_failed[:completed_status] = 'Failed'
-    result_xxx[:completed_status] = 'XXX'
-
-    calc_method_success = workflow_maker.create_calculation_method_element(result_success)
-    calc_method_failed = workflow_maker.create_calculation_method_element(result_failed)
-    calc_method_xxx = workflow_maker.create_calculation_method_element(result_xxx)
-
-    puts calc_method_success
-    # -- Assert
-    expect(calc_method_success.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to be == 'Finished'
-    expect(calc_method_failed.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to eq 'Failed'
-    expect(calc_method_xxx.elements["#{ns}:Modeled/#{ns}:SimulationCompletionStatus"].text).to eq 'Failed'
-  end
-
   # TODO: Come back to
-  it 'should process monthly data correctly' do
+  xit 'should process monthly data correctly' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
     ns = 'auc'
-    doc = BuildingSync::Helper.create_rexml_document_from_file_path(xml_path)
+    doc = help_load_doc(xml_path)
     workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
 
     month_lookup = { 1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec' }

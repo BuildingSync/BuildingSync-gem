@@ -34,13 +34,17 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'rexml/document'
+
 require 'openstudio/common_measures'
 require 'openstudio/model_articulation'
 require 'openstudio/ee_measures'
 
 require 'buildingsync/extension'
 require 'buildingsync/constants'
+require 'buildingsync/scenario'
 require 'buildingsync/makers/workflow_maker_base'
+require 'buildingsync/model_articulation/facility'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
@@ -51,26 +55,101 @@ module BuildingSync
     def initialize(doc, ns)
       super(doc, ns)
 
-      # load the workflow
+      if !doc.is_a?(REXML::Document)
+        raise StandardError, "doc must be an REXML::Document.  Passed object of class: #{doc.class}"
+      end
+
+      if !ns.is_a?(String)
+        raise StandardError, "ns must be String.  Passed object of class: Int"
+      end
+
+      @facility_xml = nil
       @facility = nil
 
-      # log failed scenarios
       @failed_scenarios = []
-      @scenarios = []
 
+      # TODO: Be consistent in symbolizing names in hashes or not
       File.open(PHASE_0_BASE_OSW_FILE_PATH, 'r') do |file|
         @workflow = JSON.parse(file.read)
+      end
+
+
+      File.open(WORKFLOW_MAKER_JSON_FILE_PATH, 'r') do |file|
+        @workflow_maker_json = JSON.parse(file.read, {:symbolize_names => true})
       end
 
       # Add all of the measure directories from the extension gems
       # into the @workflow, then check they exist
       set_measure_paths(get_measure_directories_array)
-      check_if_measures_exist
+      measures_exist?
+      read_xml
+    end
+
+    def read_xml
+      facility_xml_temp = @doc.get_elements("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility")
+
+      # Raise errors for zero or multiple Facilities.  Not supported at this time.
+      if facility_xml_temp.nil? || facility_xml_temp.empty?
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.populate_facility_report_and_scenarios', 'There are no Facility elements in your BuildingSync file.')
+        raise StandardError, 'There are no Facility elements in your BuildingSync file.'
+      elsif facility_xml_temp.size > 1
+        @facility_xml = facility_xml_temp.first()
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.populate_facility_report_and_scenarios', "There are more than one (#{facility_xml_temp.size}) Facility elements in your BuildingSync file. Only the first Facility will be considered (ID: #{@facility_xml.attributes['ID']}")
+      else
+        @facility_xml = facility_xml_temp.first()
+      end
+
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.read_xml', "Setting up workflow for Facility ID: #{@facility_xml.attributes['ID']}")
+
+      # Initialize Facility object
+      @facility = BuildingSync::Facility.new(@facility_xml, @ns)
+    end
+
+    # get the facility object from this workflow
+    # @return [BuildingSync::Facility] facility
+    def get_facility
+      return @facility
+    end
+
+    # get the space types of the facility
+    # @return [Vector<OpenStudio::Model::SpaceType>] vector of space types
+    def get_space_types
+      return @facility.get_space_types
+    end
+
+    # get model
+    # @return [OpenStudio::Model] model
+    def get_model
+      return @facility.get_model
+    end
+
+    # generate the baseline model as osm model
+    # @param dir [String]
+    # @param epw_file_path [String]
+    # @param standard_to_be_used [String] 'ASHRAE90.1' or 'CaliforniaTitle24' are supported options for now
+    # @param ddy_file [String] path to the ddy file
+    # @return [Boolean] true if successful
+    def determine_standard_perform_sizing_write_osm(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
+      @facility.set_all
+      standard = @facility.determine_open_studio_standard(standard_to_be_used)
+      @facility.generate_baseline_osm(epw_file_path, dir, standard, ddy_file)
+      @facility.write_osm(dir)
+    end
+
+    # writes the parameters determine during processing back to the BldgSync XML file
+    def prepare_final_xml
+      @facility.prepare_final_xml
+    end
+
+    # write osm
+    # @param dir [String]
+    def write_osm(dir)
+      @scenario_types = @facility.write_osm(dir)
     end
 
     # iterate over the current measure list in the workflow and check if they are available at the referenced measure directories
     # @return [Boolean]
-    def check_if_measures_exist
+    def measures_exist?
       all_measures_found = true
       number_measures_found = 0
       @workflow['steps'].each do |step|
@@ -80,18 +159,18 @@ module BuildingSync
           measure_dir_full_path = "#{potential_measure_path}/#{measure_dir_name}"
           if Dir.exist?(measure_dir_full_path)
             measure_is_valid = true
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.check_if_measures_exist', "Measure: #{measure_dir_name} found at: #{measure_dir_full_path}")
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.measures_exist?', "Measure: #{measure_dir_name} found at: #{measure_dir_full_path}")
             number_measures_found += 1
             break
           end
         end
         if !measure_is_valid
           all_measures_found = false
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.check_if_measures_exist', "CANNOT find measure with name (#{measure_dir_name}) in any of the measure paths  ")
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.measures_exist?', "CANNOT find measure with name (#{measure_dir_name}) in any of the measure paths  ")
         end
       end
       if all_measures_found
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.check_if_measures_exist', "Total measures found: #{number_measures_found}. All measures defined by @workflow found.")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.measures_exist?', "Total measures found: #{number_measures_found}. All measures defined by @workflow found.")
         puts "Total measures found: #{number_measures_found}. All measures defined by @workflow found."
       end
       return all_measures_found
@@ -225,54 +304,49 @@ module BuildingSync
       return @workflow
     end
 
-    # get the name of a measure within the xml structure
-    # @param measure_category [String]
-    # @param measure [REXML:Element]
-    # @return [String]
-    def get_measure_name(measure_category, measure)
-      measure_name = ''
-      if measure_category == 'Lighting'
-        measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:LightingImprovements/#{@ns}:MeasureName"].text
-      elsif measure_category == 'Plug Load'
-        measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:PlugLoadReductions/#{@ns}:MeasureName"].text
-      elsif measure_category == 'Refrigeration'
-        measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:Refrigeration/#{@ns}:MeasureName"].text
-      elsif measure_category == 'Wall' || measure_category == 'Roof' || measure_category == 'Ceiling' || measure_category == 'Fenestration'
-        measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BuildingEnvelopeModifications/#{@ns}:MeasureName"].text
-      elsif measure_category == 'Cooling System' || measure_category == 'General Controls and Operations' || measure_category == 'Heat Recovery'
-        measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
-      elsif measure_category == 'Heating System'
-        if defined? measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
-          measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherHVAC/#{@ns}:MeasureName"].text
-        end
-        if defined? measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BoilerPlantImprovements/#{@ns}:MeasureName"].text
-          measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:BoilerPlantImprovements/#{@ns}:MeasureName"].text
-        end
-      elsif measure_category == 'Other HVAC'
-        measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:*/#{@ns}:MeasureName"].text
+    # configure for scenario
+    # @param base_workflow [Hash] a Hash map of the @workflow.  DO NOT  use @workflow directly, should be a deep clone
+    # @param scenario [BuildingSync::Scenario] a Scenario object
+    def configure_workflow_for_scenario(base_workflow, scenario)
+      successful = true
 
-        # DLM: somme measures don't have a direct BuildingSync equivalent, use UserDefinedField 'OpenStudioMeasureName' for now
-        if measure_name == 'Other'
-          measure.elements.each("#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField") do |user_defined_field|
-            field_name = user_defined_field.elements["#{@ns}:FieldName"].text
-            if field_name == 'OpenStudioMeasureName'
-              measure_name = user_defined_field.elements["#{@ns}:FieldValue"].text
+      num_measures = 0
+      scenario.get_measure_ids.each do |measure_id|
+        puts measure_id
+        measure = @facility.measures.find { |m| m.xget_id == measure_id}
+        current_num_measure = num_measures
+
+        sym_to_find = "#{measure.xget_text('SystemCategoryAffected')}".to_sym
+        categories_found = @workflow_maker_json.key?(sym_to_find)
+        if categories_found
+          @workflow_maker_json[sym_to_find].each do |category|
+            m_name = measure.xget_name.to_sym
+            if !category[m_name].nil?
+              measure_dir_name = category[m_name][:measure_dir_name]
+              num_measures += 1
+              category[m_name][:arguments].each do |argument|
+                if !argument[:condition].nil? && !argument[:condition].empty?
+                  set_argument_detail(base_workflow, argument, measure_dir_name, measure.xget_name)
+                else
+                  set_measure_argument(base_workflow, measure_dir_name, argument[:name], argument[:value])
+                end
+              end
             end
           end
+        else
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Category: #{measure.xget_text("SystemCategoryAffected")} not found in workflow_maker.json.")
         end
-      elsif measure_category == 'Fan'
-        measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:OtherElectricMotorsAndDrives/#{@ns}:MeasureName"].text
-      elsif measure_category == 'Air Distribution'
-        measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:*/#{@ns}:MeasureName"].text
-      elsif measure_category == 'Domestic Hot Water'
-        measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:ChilledWaterHotWaterAndSteamDistributionSystems/#{@ns}:MeasureName"].text
-      elsif measure_category == 'Water Use'
-        measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:WaterAndSewerConservationSystems/#{@ns}:MeasureName"].text
 
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.set_argument_detail', "measure dir name not found #{measure_dir_name}.")
+
+        if current_num_measure == num_measures
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Measure ID: #{measure.xget_id} could not be processed!")
+          successful = false
+        end
       end
-      return measure_name
+
+      # ensure that we didn't miss any measures by accident
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "#{scenario.get_measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{scenario.get_measure_ids}") if num_measures != scenario.get_measure_ids.size
+      return successful
     end
 
     # set argument details
@@ -285,28 +359,28 @@ module BuildingSync
       argument_value = ''
 
       if measure_name == 'Add daylight controls' || measure_name == 'Replace HVAC system type to PZHP'
-        if argument[:condition] == @facility['bldg_type']
+        if argument[:condition] == @facility_xml['bldg_type']
           argument_name = argument[:name]
-          argument_value = "#{argument[:value]} #{@facility['template']}"
+          argument_value = "#{argument[:value]} #{@facility_xml['template']}"
         end
       elsif measure_name == 'Replace burner'
-        if argument[:condition] == @facility['system_type']
+        if argument[:condition] == @facility_xml['system_type']
           argument_name = argument[:name]
           argument_value = argument[:value]
         end
       elsif measure_name == 'Replace boiler'
-        if argument[:condition] == @facility['system_type']
+        if argument[:condition] == @facility_xml['system_type']
           argument_name = argument[:name]
           argument_value = argument[:value]
         end
       elsif measure_name == 'Replace package units'
-        if argument[:condition] == @facility['system_type']
+        if argument[:condition] == @facility_xml['system_type']
           argument_name = argument[:name]
           argument_value = argument[:value]
         end
       elsif measure_name == 'Replace HVAC system type to VRF' || measure_name == 'Replace HVAC with GSHP and DOAS' || measure_name == 'Replace AC and heating units with ground coupled heat pump systems'
-        if argument[:condition] == @facility['bldg_type']
-          argument_name = "#{argument[:name]} #{@facility['template']}"
+        if argument[:condition] == @facility_xml['bldg_type']
+          argument_name = "#{argument[:name]} #{@facility_xml['template']}"
           argument_value = argument[:value]
         end
       else
@@ -317,185 +391,131 @@ module BuildingSync
       set_measure_argument(osw, measure_dir_name, argument_name, argument_value) if !argument_name.nil? && !argument_name.empty?
     end
 
-    # configure for scenario
-    # @param osw [String]
-    # @param scenario [REXML:Element]
-    def configure_for_scenario(osw, scenario)
-      successful = true
-      measure_ids = []
-      scenario.elements.each("#{@ns}:ScenarioType/#{@ns}:PackageOfMeasures/#{@ns}:MeasureIDs/#{@ns}:MeasureID") do |measure_id|
-        measure_ids << measure_id.attributes['IDref']
-      end
-
-      num_measures = 0
-      measure_ids.each do |measure_id|
-        @doc.elements.each("//#{@ns}:Measure[@ID='#{measure_id}']") do |measure|
-          measure_category = measure.elements["#{@ns}:SystemCategoryAffected"].text
-
-          current_num_measure = num_measures
-
-          measure_name = get_measure_name(measure_category, measure)
-
-          json_file_path = File.expand_path('workflow_maker.json', File.dirname(__FILE__))
-          json = eval(File.read(json_file_path))
-
-          json[:"#{measure_category}"].each do |meas_name|
-            if !meas_name[:"#{measure_name}"].nil?
-              measure_dir_name = meas_name[:"#{measure_name}"][:measure_dir_name]
-              num_measures += 1
-              meas_name[:"#{measure_name}"][:arguments].each do |argument|
-                if !argument[:condition].nil? && !argument[:condition].empty?
-                  set_argument_detail(osw, argument, measure_dir_name, measure_name)
-                else
-                  set_measure_argument(osw, measure_dir_name, argument[:name], argument[:value])
-                end
-              end
-            end
-          end
-
-          if current_num_measure == num_measures
-            measure_name = measure.elements["#{@ns}:TechnologyCategories/#{@ns}:TechnologyCategory/#{@ns}:*/#{@ns}:MeasureName"].text
-            measure_long_description = measure.elements["#{@ns}:LongDescription"].text
-            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_for_scenario', "Measure with name: #{measure_name} and Description: #{measure_long_description} could not be processed!")
-            successful = false
-          end
-        end
-      end
-
-      # ensure that we didn't miss any measures by accident
-      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_for_scenario', "#{measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{measure_ids}") if num_measures != measure_ids.size
-      return successful
-    end
+    # # configure for scenario
+    # # @param osw [String]
+    # # @param scenario [REXML:Element]
+    # def configure_for_scenario(osw, scenario)
+    #   successful = true
+    #
+    #   num_measures = 0
+    #   scenario.get_measure_ids.each do |measure_id|
+    #     measure = @facility.measures.select { |m| m.xget_id == measure_id}
+    #     current_num_measure = num_measures
+    #
+    #     # measure_name = get_measure_name(measure.system_category_affected, measure)
+    #
+    #     json = eval(File.read(WORKFLOW_MAKER_JSON_FILE_PATH))
+    #
+    #     json[:"#{measure.system_category_affected}"].each do |category|
+    #       if !category[:"#{measure.xget_name}"].nil?
+    #         measure_dir_name = category[:"#{measure.xget_name}"][:measure_dir_name]
+    #         num_measures += 1
+    #         category[:"#{measure.xget_name}"][:arguments].each do |argument|
+    #           if !argument[:condition].nil? && !argument[:condition].empty?
+    #             set_argument_detail(osw, argument, measure_dir_name, measure.xget_name)
+    #           else
+    #             set_measure_argument(osw, measure_dir_name, argument[:name], argument[:value])
+    #           end
+    #         end
+    #       end
+    #     end
+    #
+    #     if current_num_measure == num_measures
+    #       OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_for_scenario', "Measure with name: #{measure.xget_name} and Description: #{measure.long_description} could not be processed!")
+    #       successful = false
+    #     end
+    #   end
+    #
+    #   # ensure that we didn't miss any measures by accident
+    #   OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_for_scenario', "#{scenario.get_measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{scenario.get_measure_ids}") if num_measures != scenario.get_measure_ids.size
+    #   return successful
+    # end
 
     # get scenario elements
-    # @return [REXML:Element]
-    def get_scenario_elements
-      if @scenarios.empty?
-        scenarios = get_scenarios
-        if !scenarios.nil?
-          scenarios.elements.each("#{@ns}:Scenario") do |scenario|
-            if scenario.is_a? REXML::Element
-              @scenarios.push(scenario)
-            end
-          end
-        end
-        if @scenarios.empty?
-          puts 'No scenarios found in your BuildingSync XML file!'
-        end
-      end
-      return @scenarios
-    end
-
-    # get scenarios
-    # @return [REXML:Element]
+    # @return [Array<BuildingSync::Scenario>]
     def get_scenarios
-      scenarios = @doc.elements["#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios"]
-      return scenarios
+      return @facility.scenarios
     end
 
-    # check if the scenario is a baseline scenario
-    # @param scenario [REXML:Element]
-    # @return [Boolean]
-    def scenario_is_baseline_scenario(scenario)
-      # first we check if we find the new scenario type definition
-      return true if scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Modeled"]
-      return false
+    # add a current building modeled scenario and set the @cb_modeled attribute
+    # @param id [String] id to use for the scenario
+    # @return [NilClass]
+    def add_cb_modeled(id = "Scenario-#{BuildingSync::BASELINE}")
+      if @cb_modeled.nil? || @cb_modeled.empty?
+        g = BuildingSync::Generator.new
+        scenario_xml = g.add_scenario_to_report(@report_xml, 'CBModeled', id)
+        scenario = BuildingSync::Scenario.new(scenario_xml, @ns)
+        @scenarios.push(scenario)
+        @cb_modeled = scenario
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.add_cb_modeled', "A Current Building Modeled scenario was added (Scenario ID: #{@cb_modeled.xget_id}).")
+      else
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.add_cb_modeled', "A Current Building Modeled scenario already exists (Scenario ID: #{@cb_modeled.xget_id}). A new one was not added.")
+      end
     end
 
-    # check if the scenario is a measured scenario
-    # @param scenario [REXML:Element]
-    # @return [Boolean]
-    def scenario_is_measured_scenario(scenario)
-      # first we check if we find the new scenario type definition
-      return true if scenario.elements["#{@ns}:ScenarioType/#{@ns}:CurrentBuilding/#{@ns}:CalculationMethod/#{@ns}:Measured"]
-      return false
-    end
 
-    # write workflows for all scenarios into osw files
-    # @param facility [REXML:Element]
-    # @param dir [String]
-    # @return [Boolean]
-    def write_osws(facility, dir)
+    # write workflows for scenarios into osw files.  This includes:
+    #   - Package of Measure Scenarios
+    #   - Current Building Modeled (Baseline) Scenario
+    # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
+    # @return [Boolean] whether writing of all the new workflows was successful
+    def write_osws(main_output_dir)
       super
 
+      if @cb_modeled.nil?
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', "OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method")
+        raise StandardError, "OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method"
+      end
+
+      # Write a workflow for the current building modeled scenario
+      cb_modeled_success = write_osw(main_output_dir, @cb_modeled)
+      number_successful =  cb_modeled_success ? 1 : 0
+
+      # write an osw for each Package Of Measures scenario
+      @facility.poms.each do |scenario|
+        successful = write_osw(main_output_dir, scenario)
+        if successful
+          number_successful += 1
+        end
+      end
+
+      # Compare the total number of potential successes to the number of actual successes
+      really_successful = number_successful == @facility.poms.size + 1 ? true : false
+      return really_successful
+    end
+
+    # Write an OSW for the provided scenario
+    # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
+    # @param [BuildingSync::Scenario]
+    # @return [Boolean] whether the writing was successful
+    def write_osw(main_output_dir, scenario)
       successful = true
-      @facility = facility
-      scenarios = get_scenario_elements
-      # ensure there is a 'Baseline' scenario
-      puts 'Looking for the baseline scenario ...'
-      found_baseline = false
-      scenarios.each do |scenario|
-        scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        puts "scenario with name #{scenario_name} found"
-        if scenario_is_baseline_scenario(scenario)
-          found_baseline = true
-          break
-        end
-      end
-
-      if !found_baseline
-        if !scenarios.nil?
-          scenario_element = REXML::Element.new("#{@ns}:Scenario")
-          scenario_element.attributes['ID'] = BASELINE
-
-          scenario_name_element = REXML::Element.new("#{@ns}:ScenarioName")
-          scenario_name_element.text = BASELINE
-          scenario_element.add_element(scenario_name_element)
-
-          # adding XML elements for the new way to define a baseline scenario
-          current_building = REXML::Element.new("#{@ns}:CurrentBuilding")
-          calculation_method = REXML::Element.new("#{@ns}:CalculationMethod")
-          modeled = REXML::Element.new("#{@ns}:Modeled")
-          calculation_method.add_element(modeled)
-          current_building.add_element(calculation_method)
-          scenario_element.add_element(current_building)
-          get_scenarios.add_element(scenario_element)
-          puts '.....adding a new baseline scenario'
-        end
-      end
-
-      found_baseline = false
-      scenarios.each do |scenario|
-        if scenario_is_baseline_scenario(scenario)
-          found_baseline = true
-          break
-        end
-      end
-
-      if !found_baseline
-        puts 'Cannot find or create Baseline scenario'
-        exit
-      end
-
-      # write an osw for each scenario
-      scenarios.each do |scenario|
-        # get information about the scenario
-        scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        next if scenario_is_measured_scenario(scenario)
-
         # deep clone
-        osw = JSON.load(JSON.generate(@workflow))
+        base_workflow = deep_copy_workflow
 
         # configure the workflow based on measures in this scenario
         begin
-          successful = false if !configure_for_scenario(osw, scenario)
-
-          # dir for the osw
-          osw_dir = get_osw_dir(dir, scenario)
-          FileUtils.mkdir_p(osw_dir)
-
-          # write the osw
-          path = File.join(osw_dir, 'in.osw')
-          File.open(path, 'w') do |file|
-            file << JSON.generate(osw)
+          if !configure_workflow_for_scenario(base_workflow, scenario)
+            successful = false
+            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osw', "Could not configure workflow for scenario #{scenario.xget_name}")
+          else
+            # The workflow is updated by configure_workflow, so passing in here is ok
+            scenario.set_workflow(base_workflow)
+            scenario.write_osw(main_output_dir)
           end
+
         rescue StandardError => e
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', "Could not configure for scenario #{scenario_name}")
-          puts "Could not configure for scenario #{scenario_name}"
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osw', "Could not configure for scenario #{scenario.xget_name}")
+          puts "Could not configure for scenario #{scenario.xget_name}"
           puts e.backtrace.join("\n\t")
+          successful = false
         end
-      end
       return successful
+    end
+
+    # Creates a deep copy of the @workflow be serializing and reloading with JSON
+    def deep_copy_workflow
+      return JSON.load(JSON.generate(@workflow))
     end
 
     # get measure result
@@ -560,7 +580,7 @@ module BuildingSync
     def get_result_for_scenarios(dir, baseline_only)
       results = {}
       monthly_results = {}
-      get_scenario_elements.each do |scenario|
+      @scenarios.each do |scenario|
         # get information about the scenario
         if scenario.elements["#{@ns}:ScenarioName"]
           scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
@@ -593,97 +613,6 @@ module BuildingSync
         end
       end
       return results, monthly_results
-    end
-
-    # delete resource element
-    # @param scenario [REXML::Element]
-    # @param package_of_measures [REXML::Element]
-    def delete_resource_element(scenario, package_of_measures)
-      if package_of_measures
-        package_of_measures.elements.delete("#{@ns}:AnnualSavingsSiteEnergy")
-        package_of_measures.elements.delete("#{@ns}:AnnualSavingsCost")
-        package_of_measures.elements.delete("#{@ns}:CalculationMethod")
-        package_of_measures.elements.delete("#{@ns}AnnualSavingsByFuels")
-      end
-      scenario.elements.delete("#{@ns}AllResourceTotals")
-      scenario.elements.delete("#{@ns}ResourceUses")
-      scenario.elements.delete("#{@ns}AnnualSavingsByFuels")
-    end
-
-    # get package of measures
-    # @param scenario [REXML::Element]
-    # @return [REXML::Element]
-    def get_package_of_measures(scenario)
-      return scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:PackageOfMeasures"]
-    end
-
-    # get current building
-    # @param scenario [REXML::Element]
-    # @return [REXML::Element]
-    def get_current_building(scenario)
-      return scenario.elements["#{@ns}:ScenarioType"].elements["#{@ns}:CurrentBuilding"]
-    end
-
-    # prepare package of measures or current building
-    # @param scenario [REXML::Element]
-    # @return [REXML::Element]
-    def prepare_package_of_measures_or_current_building(scenario)
-      package_of_measures_or_current_building = get_package_of_measures(scenario)
-      if package_of_measures_or_current_building.nil?
-        package_of_measures_or_current_building = get_current_building(scenario)
-      end
-      # delete previous results
-      delete_resource_element(scenario, package_of_measures_or_current_building)
-
-      # preserve existing user defined fields if they exist
-      # KAF: there should no longer be any UDFs
-      user_defined_fields = scenario.elements["#{@ns}:UserDefinedFields"]
-      if !user_defined_fields.nil?
-        # delete previous results (if using an old schema)
-        to_remove = []
-        user_defined_fields.elements.each("#{@ns}:UserDefinedField") do |user_defined_field|
-          name_element = user_defined_field.elements["#{@ns}:FieldName"]
-          if name_element.nil?
-            to_remove << user_defined_field
-          elsif /OpenStudio/.match(name_element.text)
-            to_remove << user_defined_field
-          end
-        end
-
-        to_remove.each do |element|
-          user_defined_fields.elements.delete(element)
-        end
-      end
-      return package_of_measures_or_current_building
-    end
-
-    # create and return the set of elements:
-    #   auc:CalculationMethod/auc:Modeled/
-    #     auc:SoftwareProgramUsed = OpenStudio
-    #     auc:SoftwareProgramVersion = ...
-    #     auc:WeatherDataType = TMY
-    #     auc:SimulationCompletionStatus = Success or Failed, depending on result[:completion_status]
-    # @param result [hash] must have key: result[:completion_status]
-    # @return [REXML::Element]
-    def create_calculation_method_element(result)
-      # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
-      # options are: Not Started, Started, Finished, Failed, Unknown
-      calc_method = REXML::Element.new("#{@ns}:CalculationMethod")
-      modeled = REXML::Element.new("#{@ns}:Modeled")
-      software_program_used = REXML::Element.new("#{@ns}:SoftwareProgramUsed")
-      software_program_used.text = 'OpenStudio'
-      modeled.add_element(software_program_used)
-      software_program_version = REXML::Element.new("#{@ns}:SoftwareProgramVersion")
-      software_program_version.text = OpenStudio.openStudioLongVersion.to_s
-      modeled.add_element(software_program_version)
-      weather_data_type = REXML::Element.new("#{@ns}:WeatherDataType")
-      weather_data_type.text = 'TMY3'
-      modeled.add_element(weather_data_type)
-      sim_completion_status = REXML::Element.new("#{@ns}:SimulationCompletionStatus")
-      sim_completion_status.text = result[:completed_status] == 'Success' ? 'Finished' : 'Failed'
-      modeled.add_element(sim_completion_status)
-      calc_method.add_element(modeled)
-      return calc_method
     end
 
     # add results to xml file and calculate annual savings
@@ -1002,7 +931,7 @@ module BuildingSync
     # @param result [hash]
     # @param monthly_results [hash]
     # @param year_val [Integer]
-    def add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, monthly_results, year_val)
+    def  add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, monthly_results, year_val)
       # first we need to check if we have any result variables
       if !annual_results || annual_results.empty?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.add_results_to_scenario', "result variables are null, cannot add results from scenario: #{scenario_name}to BldgSync file.")
@@ -1034,15 +963,6 @@ module BuildingSync
       return true
     end
 
-    # get osw dir
-    # @param dir [String]
-    # @param scenario [REXML:Element]
-    # @return [String]
-    def get_osw_dir(dir, scenario)
-      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-      return File.join(dir, scenario_name)
-    end
-
     # gather results
     # @param dir [String] output_path where all scenarios are being run: i.e output_path/Baseline output_path/SR
     # @param year_val [Integer]
@@ -1051,14 +971,14 @@ module BuildingSync
     def gather_results(dir, year_val = Date.today.year, baseline_only = false)
       results_counter = 0
       successful = true
-      super
       begin
         scenarios_found = false
 
         # write an osw for each scenario
         results, monthly_results = get_result_for_scenarios(dir, baseline_only)
 
-        get_scenario_elements.each do |scenario|
+        # gather results for all Package Of Measure Scenarios
+        @facility.poms.each do |scenario|
           begin
             scenarios_found = true
             # get information about the scenario

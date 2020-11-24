@@ -40,19 +40,21 @@ require 'json'
 require 'openstudio/extension/core/os_lib_model_generation'
 
 require 'buildingsync/helpers/helper'
+require 'buildingsync/helpers/x_get_set'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpatialElement
     include OsLib_ModelGeneration
+    include BuildingSync::Helper
+    include BuildingSync::XGetSet
     # initialize SpatialElement class
-    # @param spatial_element_xml [REXML::Element] an element corresponding to a spatial element,
+    # @param base_xml [REXML::Element] an element corresponding to a spatial element,
     #   either an auc:Site, auc:Building, auc:Section
     # @param ns [String] namespace, likely 'auc'
-    def initialize(spatial_element_xml, ns)
-      @spatial_element_xml = spatial_element_xml
+    def initialize(base_xml, ns)
+      @base_xml = base_xml
       @ns = ns
-      @id = BuildingSync::Helper.get_attribute_value(spatial_element_xml, 'ID')
 
       @total_floor_area = nil
       @bldg_type = nil
@@ -73,7 +75,7 @@ module BuildingSync
     # read floor areas
     # @param parent_total_floor_area [Float]
     def read_floor_areas(parent_total_floor_area)
-      @spatial_element_xml.elements.each("#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
+      @base_xml.elements.each("#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
         next if !floor_area_element.elements["#{@ns}:FloorAreaValue"]
         floor_area = floor_area_element.elements["#{@ns}:FloorAreaValue"].text.to_f
         next if floor_area.nil?
@@ -142,7 +144,7 @@ module BuildingSync
     # @param occupancy_type [String]
     # @return [String]
     def read_bldgsync_occupancy_type(occupancy_type)
-      occ_element = @spatial_element_xml.elements["#{@ns}:OccupancyClassification"]
+      occ_element = @base_xml.elements["#{@ns}:OccupancyClassification"]
       if !occ_element.nil?
         return occ_element.text
       else
@@ -190,7 +192,7 @@ module BuildingSync
       @bldg_type = occ_type[:bldg_type]
       @bar_division_method = occ_type[:bar_division_method]
       @system_type = occ_type[:system_type]
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.sets_occupancy_bldg_system_types', "Element ID: #{@id} @bldg_type #{@bldg_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.sets_occupancy_bldg_system_types', "Element ID: #{xget_id} @bldg_type #{@bldg_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}")
       return true
     end
 
@@ -201,8 +203,8 @@ module BuildingSync
     # @param total_number_floors [Integer]
     # @return [Boolean]
     def process_bldg_and_system_type(json, occupancy_type, total_floor_area, total_number_floors)
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.sets_occupancy_bldg_system_types', "Element ID: #{@id} started with occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}")
-      puts "Element ID: #{@id} started with occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}"
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.sets_occupancy_bldg_system_types', "Element ID: #{xget_id} started with occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}")
+      puts "Element ID: #{xget_id} started with occupancy_type #{occupancy_type} and total floor area: #{total_floor_area}"
       min_floor_area_correct = false
       max_floor_area_correct = false
       if !json[:"#{occupancy_type}"].nil?
@@ -344,7 +346,7 @@ module BuildingSync
     end
 
     # write parameters to xml for spatial element
-    def write_parameters_to_xml_for_spatial_element
+    def prepare_final_xml_for_spatial_element
 
       add_user_defined_field_to_xml_file('BuildingType', @bldg_type)
       add_user_defined_field_to_xml_file('SystemType', @system_type)
@@ -352,13 +354,13 @@ module BuildingSync
       add_user_defined_field_to_xml_file('FractionArea', @fraction_area)
       add_user_defined_field_to_xml_file('SpaceTypesFloorArea', @space_types_floor_area)
 
-      @spatial_element_xml.add_element(@user_defined_fields)
+      @base_xml.add_element(@user_defined_fields)
       add_floor_area_field_to_xml_file
     end
 
     # add floor area field to xml file
     def add_floor_area_field_to_xml_file
-      @spatial_element_xml.elements.each("#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
+      @base_xml.elements.each("#{@ns}:FloorAreas/#{@ns}:FloorArea") do |floor_area_element|
         next if !floor_area_element.elements["#{@ns}:FloorAreaValue"]
         floor_area = floor_area_element.elements["#{@ns}:FloorAreaValue"].text.to_f
         next if floor_area.nil?

@@ -40,11 +40,15 @@ require 'buildingsync/generator'
 RSpec.describe 'FacilitySpec' do
   it 'Should generate meaningful error when passing empty XML data' do
     # -- Setup
-    file_name = 'building_151_Blank.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    g = BuildingSync::Generator.new
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    facility_xml = g.get_first_facility_element(doc)
     begin
-      BuildingSync::Generator.new.generate_baseline_facilities(xml_path, 'auc')
+      f = BuildingSync::Facility.new(facility_xml, 'auc')
+
+      # Should not reach this line
+      expect(false).to be true
     rescue StandardError => e
       puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true

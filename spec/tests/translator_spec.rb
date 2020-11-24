@@ -62,7 +62,7 @@ RSpec.describe 'BuildingSync' do
 
     translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
     translator.insert_energyplus_measure('scale_geometry', 1)
-    translator.write_osm
+    translator.sizing_run_and_write_osm
     translator.write_osws
     translator.run_osws
     osw_files = []
@@ -96,7 +96,7 @@ RSpec.describe 'BuildingSync' do
     translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
     translator.clear_all_measures
     translator.insert_energyplus_measure('scale_geometry', 1)
-    translator.write_osm
+    translator.sizing_run_and_write_osm
     translator.write_osws
     translator.run_osws
     osw_files = []
@@ -129,7 +129,7 @@ RSpec.describe 'BuildingSync' do
 
     translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
     translator.insert_reporting_measure('openstudio_results', 0)
-    translator.write_osm
+    translator.sizing_run_and_write_osm
     translator.write_osws
     translator.run_osws
     osw_files = []
@@ -161,11 +161,11 @@ RSpec.describe 'BuildingSync' do
     expect(File.exist?(output_path)).to be true
 
     translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
-    translator.write_osm
+    translator.sizing_run_and_write_osm
     translator.write_osws
 
     results_xml = File.join(output_path, 'results.xml')
-    translator.write_parameters_to_xml(results_xml)
+    translator.prepare_final_xml(results_xml)
     expect(File.exist?(results_xml)).to be true
   end
 

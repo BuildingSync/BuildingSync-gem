@@ -82,6 +82,6 @@ RSpec.describe 'WeatherFileDownload' do
     @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
     expect(File.exist?(@xml_path)).to be true
 
-    return BuildingSync::Helper.create_rexml_document_from_file_path(@xml_path)
+    return help_load_doc(@xml_path)
   end
 end

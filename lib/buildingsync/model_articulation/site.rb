@@ -182,8 +182,8 @@ module BuildingSync
     end
 
     # get building objects
-    # @return [array<Building>]
-    def get_building_objects
+    # @return [Array<BuildingSync::Building>]
+    def get_buildings
       return @buildings
     end
 
@@ -244,7 +244,7 @@ module BuildingSync
     # write parameters to xml file
     # @param site [Site]
     # @param ns [String]
-    def write_parameters_to_xml
+    def prepare_final_xml
       @site_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE/#{@ns}:ClimateZone"].text = @climate_zone_ashrae if !@climate_zone_ashrae.nil?
       @site_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24/#{@ns}:ClimateZone"].text = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil?
       @site_xml.elements["#{@ns}:WeatherStationName"].text = @weather_file_name if !@weather_file_name.nil?
@@ -256,10 +256,10 @@ module BuildingSync
       @site_xml.elements["#{@ns}:Latitude"].text = @latitude if !@latitude.nil?
       @site_xml.elements["#{@ns}:Longitude"].text = @longitude if !@longitude.nil?
 
-      write_parameters_to_xml_for_spatial_element
+      prepare_final_xml_for_spatial_element
 
       @site_xml.elements.each("#{@ns}:Buildings/#{@ns}:Building") do |buildings_element|
-        @buildings[0].write_parameters_to_xml
+        @buildings[0].prepare_final_xml
       end
     end
   end

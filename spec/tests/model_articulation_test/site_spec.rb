@@ -41,12 +41,15 @@ require 'buildingsync/generator'
 
 RSpec.describe 'SiteSpec' do
   it 'Should generate meaningful error when passing empty XML data' do
-    # -- Setup
-    file_name = 'building_151_Blank.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    g = BuildingSync::Generator.new
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    site_xml = g.get_first_site_element(doc)
     begin
-      BuildingSync::Generator.new.generate_baseline_sites(xml_path, 'auc')
+      s = BuildingSync::Site.new(site_xml, 'auc')
+
+      # Should not reach this line
+      expect(false).to be true
     rescue StandardError => e
       puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
@@ -55,7 +58,8 @@ RSpec.describe 'SiteSpec' do
 
   it 'Should create an instance of the site class with minimal XML snippet' do
     g = BuildingSync::Generator.new
-    g.create_minimum_site('Retail', '1954', 'Gross', '69452')
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
+    expect(site).to be_an_instance_of(BuildingSync::Site)
   end
 
   it 'Should return the correct building template' do

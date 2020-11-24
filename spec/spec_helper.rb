@@ -35,6 +35,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'buildingsync/generator'
+require 'rspec-parameterized'
 
 # try to load configuration, use defaults if doesn't exist
 begin
@@ -70,6 +71,7 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+  config.include BuildingSync::Helper
 
   SPEC_OUTPUT_DIR = File.expand_path('output', __dir__)
   SPEC_FILES_DIR = File.expand_path('files', __dir__)
@@ -152,7 +154,7 @@ RSpec.configure do |config|
     end
 
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
-    translator.write_osm
+    translator.sizing_run_and_write_osm
 
     base_file_name = File.basename(file_name, '.xml')
     new_osm_file = "#{out_path}/#{base_file_name}.osm"
@@ -371,7 +373,7 @@ RSpec.configure do |config|
     # -- Setup
     # Create a new Translator and write the OSM
     translator = BuildingSync::Translator.new(xml_path, output_path, epw_file_path, standard_to_be_used)
-    translator.write_osm
+    translator.sizing_run_and_write_osm
 
     # -- Assert
     write_osm_checks(output_path)

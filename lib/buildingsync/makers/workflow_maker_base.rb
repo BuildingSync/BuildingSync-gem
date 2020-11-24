@@ -37,7 +37,6 @@
 
 require 'fileutils'
 require 'json'
-require_relative 'model_maker_base'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
@@ -54,21 +53,8 @@ module BuildingSync
     # write OpenStudio workflows in osw files (base method)
     # @param facility [REXML::Element]
     # @param dir [String]
-    def write_osws(facility, dir)
+    def write_osws(dir)
       FileUtils.mkdir_p(dir)
-    end
-
-    # gather results (base method)
-    # @param dir [String]
-    # @param year_val [Integer]
-    # @param baseline_only [Boolean]
-    # @return [Boolean]
-    def gather_results(dir, year_val, baseline_only = false); end
-
-    # returns failed scenarios (base method)
-    # @return [Array]
-    def failed_scenarios
-      return []
     end
 
     # save xml file

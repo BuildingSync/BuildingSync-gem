@@ -34,9 +34,12 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'buildingsync/helpers/helper'
+
 module BuildingSync
   # HVACSystem class
   class HVACSystem < BuildingSystem
+    include BuildingSync::Helper
     # initialize
     # @param system_element [REXML::Element]
     # @param ns [String]
@@ -286,7 +289,7 @@ module BuildingSync
         # Single-zone systems will get one per zone.
         story_groups.each do |zones|
           new_system_type = get_system_type_from_zone(zone_hash, zones, system_type)
-          puts "setting system: #{new_system_type} for zone names: #{BuildingSync::Helper.get_zone_name_list(zones)}"
+          puts "setting system: #{new_system_type} for zone names: #{help_get_zone_name_list(zones)}"
           model.add_cbecs_hvac_system(standard, new_system_type, zones)
         end
       end
@@ -301,7 +304,7 @@ module BuildingSync
     def get_system_type_from_zone(zone_hash, zones, system_type)
       if zone_hash
         zone_hash.each do |id, zone_list|
-          zone_name_list = BuildingSync::Helper.get_zone_name_list(zone_list)
+          zone_name_list = help_get_zone_name_list(zone_list)
           zones.each do |zone|
             if zone_name_list.include? zone.name.get
               return map_principal_hvac_system_type_to_cbecs_system_type(@principal_hvac_system_type[id], system_type)

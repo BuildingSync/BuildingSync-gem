@@ -36,33 +36,32 @@
 # *******************************************************************************
 require 'builder/xmlmarkup'
 require 'rexml/element'
-require 'buildingsync/helpers/helper'
 
 RSpec.describe 'BuildingSync::Helper' do
-  # get_text_value
-  it 'get_text_value returns the text value of an an REXML::Element if text exists' do
+  # help_get_text_value
+  it 'help_get_text_value returns the text value of an an REXML::Element if text exists' do
     # --Setup
     el = REXML::Element.new('a')
     to_add = 'This is text'
     el.add_text(to_add)
-    received = BuildingSync::Helper.get_text_value(el)
+    received = help_get_text_value(el)
 
     # -- Assert
     expect(to_add == received).to be true
   end
 
-  it 'get_text_value returns nil for an REXML::Element if text doesnt exists' do
+  it 'help_get_text_value returns nil for an REXML::Element if text doesnt exists' do
     # --Setup
     el = REXML::Element.new('a')
-    received = BuildingSync::Helper.get_text_value(el)
+    received = help_get_text_value(el)
     expect(received.nil?).to be true
   end
 
-  it 'get_text_value returns nil for an REXML::Element if it has child elements' do
+  it 'help_get_text_value returns nil for an REXML::Element if it has child elements' do
     # --Setup
     el = REXML::Element.new('a')
     el.add_element(REXML::Element.new('b'))
-    received = BuildingSync::Helper.get_text_value(el)
+    received = help_get_text_value(el)
 
     # -- Assert
     expect(received.nil?).to be true
@@ -75,7 +74,7 @@ RSpec.describe 'BuildingSync::Helper' do
     attr = 'ID'
     attr_value = 'ID1'
     el.add_attribute(attr, attr_value)
-    received = BuildingSync::Helper.get_attribute_value(el, attr)
+    received = help_get_attribute_value(el, attr)
 
     # -- Assert
     expect(attr_value == received).to be true
@@ -85,43 +84,62 @@ RSpec.describe 'BuildingSync::Helper' do
     # --Setup
     el = REXML::Element.new('a')
     attr = 'ID'
-    received = BuildingSync::Helper.get_attribute_value(el, attr)
+    received = help_get_attribute_value(el, attr)
 
     # -- Assert
     expect(received.nil?).to be true
   end
 
-  # get_date_value
-  it 'get_date_value returns a Date object if the text can be parsed' do
+  # help_get_date_value
+  it 'help_get_date_value returns a Date object if the text can be parsed' do
     # --Setup
     el = REXML::Element.new('a')
     date_text = '2020-01-01'
     el.add_text(date_text)
-    received = BuildingSync::Helper.get_date_value(el)
+    received = help_get_text_value_as_date(el)
 
     # -- Assert
     expect(received).to be_an_instance_of(Date)
     expect(received.to_s == date_text).to be true
     end
 
-  it 'get_date_value returns nil if the text cant be parsed' do
+  it 'help_get_date_value returns nil if the text cant be parsed' do
     # --Setup
     el = REXML::Element.new('a')
     date_text = 'stuff'
     el.add_text(date_text)
-    received = BuildingSync::Helper.get_date_value(el)
+    received = help_get_text_value_as_date(el)
 
     # -- Assert
     expect(received.nil?).to be true
   end
 
-  it 'get_date_value returns nil if the REXML::Element has children' do
+  it 'help_get_date_value returns nil if the REXML::Element has children' do
     # --Setup
     el = REXML::Element.new('a')
     el.add_element(REXML::Element.new('b'))
-    received = BuildingSync::Helper.get_date_value(el)
+    received = help_get_text_value_as_date(el)
 
     # -- Assert
     expect(received.nil?).to be true
+  end
+end
+
+RSpec.describe "BuildingSync::Helper convert" do
+  where(:val, :from, :to, :result) do
+    [
+      [1000, "Btu", "kBtu", 1],
+      [1000000, "Btu", "MMBtu", 1],
+      [0.001, "kBtu", "Btu", 1],
+      [1000, "kBtu", "MMBtu", 1],
+      [0.000001, "MMBtu", "Btu", 1],
+      [0.001, "MMBtu", "kBtu", 1],
+    ]
+  end
+  with_them do
+    it "#{params[:val]} #{params[:from]} should equal #{params[:result]} #{params[:to]}" do
+      output = help_convert(val, from, to)
+      expect(result).to be_within(0.01).of(output)
+    end
   end
 end

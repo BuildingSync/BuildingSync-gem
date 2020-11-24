@@ -35,57 +35,47 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-RSpec.describe 'BuildingSpec' do
+RSpec.describe 'BuildingSection' do
   it 'Should generate meaningful error when passing empty XML data' do
-    # -- Setup
-    file_name = 'building_151_Blank.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    g = BuildingSync::Generator.new
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    g.add_section_to_first_building(doc)
+    section_xml = g.get_first_building_section_element(doc)
     begin
-      BuildingSync::Generator.new.generate_baseline_building_sections(xml_path, nil, nil, 'auc')
+      section = BuildingSync::BuildingSection.new(section_xml, 'Retail', 1000, 1, 'auc')
+
+      # Should not reach this line
+      expect(false).to be true
     rescue StandardError => e
+      puts e.message.to_s
       puts "expected error message:Building type '' is nil but got: #{e.message} " if !e.message.include?("Building type '' is nil")
       expect(e.message.include?("Building type '' is nil")).to be true
     end
   end
+end
 
-  it 'building_151_level1.xml: Should return occupancy_type for the Section' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building_section = BuildingSync::Generator.new.get_building_section_from_file(xml_path)
-    expected_value = 'Retail'
-
-    # -- Assert
-    puts "expected bldgsync_occupancy_type : #{expected_value} but got: #{building_section.bldgsync_occupancy_type} " if building_section.bldgsync_occupancy_type != expected_value
-    expect(building_section.bldgsync_occupancy_type == expected_value).to be true
+RSpec.describe "BuildingSection methods" do
+  where(:expected, :method_call) do
+    [
+        ['Retail', "bldgsync_occupancy_type"],
+        ['40.0', 'typical_occupant_usage_value_hours'],
+        ['50.0', 'typical_occupant_usage_value_weeks']
+    ]
   end
+  with_them do
+    it 'building_151_level1.xml: Should return values as expected' do
+      # -- Setup
+      file_name = 'building_151_level1.xml'
+      std = ASHRAE90_1
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+      building_section = BuildingSync::Generator.new.get_building_section_from_file(xml_path)
 
-  it 'building_151_level1.xml: Should return typical_occupant_usage_value_hours for the Section' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building_section = BuildingSync::Generator.new.get_building_section_from_file(xml_path)
-    expected_value = '40.0'
-
-    # -- Assert
-    puts "expected typical_occupant_usage_value_hours : #{expected_value} but got: #{building_section.typical_occupant_usage_value_hours} " if building_section.typical_occupant_usage_value_hours != expected_value
-    expect(building_section.typical_occupant_usage_value_hours == expected_value).to be true
+      # -- Assert
+      if building_section.send(method_call) != expected
+        puts "expected #{method_call} : #{expected} but got: #{building_section.send(method_call)}"
+        expect(building_section.send(method_call) == expected).to be true
+      end
+    end
   end
-
-  it 'building_151_level1.xml: Should return typical_occupant_usage_value_weeks for the Section' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building_section = BuildingSync::Generator.new.get_building_section_from_file(xml_path)
-    expected_value = '50.0'
-
-    # -- Assert
-    puts "expected typical_occupant_usage_value_weeks : #{expected_value} but got: #{building_section.typical_occupant_usage_value_weeks} " if building_section.typical_occupant_usage_value_weeks != expected_value
-    expect(building_section.typical_occupant_usage_value_weeks == expected_value).to be true
-  end
-
 end
