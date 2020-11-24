@@ -92,7 +92,7 @@ RSpec.describe 'FacilitySpec' do
     # -- Act
     facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
     facility.determine_open_studio_standard(ASHRAE90_1)
-    facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
+    facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
     facility.create_building_systems(output_path, nil, 'Forced Air', 'Electricity', 'Electricity',
                                      true, true, true, true,
                                      true, true, true, true, true)
@@ -113,7 +113,7 @@ RSpec.describe 'FacilitySpec' do
     ns = 'auc'
     facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
     facility.determine_open_studio_standard(ASHRAE90_1)
-    facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
+    facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
     facility.create_building_systems(output_path, 'Forced Air', 'Electricity', 'Electricity',
                                      false, false, false, false,
                                      false, false, false, false, false)

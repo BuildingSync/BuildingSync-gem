@@ -371,29 +371,31 @@ module BuildingSync
     end
 
     def get_facility_from_file(xml_file_path)
+      doc = nil
       File.open(xml_file_path, 'r') do |file|
         doc = REXML::Document.new(file)
-        doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility|
-          return BuildingSync::Facility.new(facility, ns)
-        end
       end
+      facility = get_first_facility_element(doc)
+        return BuildingSync::Facility.new(facility, @ns)
     end
 
     def get_building_from_file(xml_file_path)
+      doc = nil
       File.open(xml_file_path, 'r') do |file|
         doc = REXML::Document.new(file)
-        doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building") do |building|
-          return BuildingSync::Building.new(building, 'Office', '20000', @ns)
-        end
+      end
+      building = get_first_building_element(doc)
+      return BuildingSync::Building.new(building, 'Office', '20000', @ns)
       end
     end
 
     def get_building_section_from_file(xml_file_path)
+      doc = nil
       File.open(xml_file_path, 'r') do |file|
         doc = REXML::Document.new(file)
-        doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building/#{@ns}:Sections/#{@ns}:Section") do |building_section|
-          return BuildingSync::BuildingSection.new(building_section, 'Office', '20000', 1, @ns)
-        end
+      end
+      section = get_first_building_section_element(doc)
+      return BuildingSync::BuildingSection.new(section, 'Office', '20000', 1, @ns)
       end
     end
 

@@ -399,7 +399,7 @@ module BuildingSync
         @space_types.each do |space_name, space_type|
           zone_list.concat(get_zones_per_space_type(space_type[:space_type]))
         end
-        zone_hash[get_id] = zone_list
+        zone_hash[xget_id] = zone_list
       end
       @building_sections.each do |bldg_subsec|
         zone_list = []
@@ -420,14 +420,14 @@ module BuildingSync
         @space_types.each do |space_name, space_type|
           space_type_list << space_type[:space_type]
         end
-        space_type_hash[get_id] = space_type_list
+        space_type_hash[xget_id] = space_type_list
       end
       @building_sections.each do |bldg_subsec|
         space_type_list = []
         bldg_subsec.space_types_floor_area.each do |space_type, hash|
           space_type_list << space_type
         end
-        space_type_hash[bldg_subsec.id] = space_type_list
+        space_type_hash[bldg_subsec.xget_id] = space_type_list
       end
       return space_type_hash
     end
@@ -1161,11 +1161,11 @@ module BuildingSync
     def get_peak_occupancy
       peak_occupancy = {}
       if @occupant_quantity
-        peak_occupancy[get_id] = @occupant_quantity.to_f
+        peak_occupancy[xget_id] = @occupant_quantity.to_f
         return peak_occupancy
       end
       @building_sections.each do |section|
-        peak_occupancy[section.id] = section.get_peak_occupancy.to_f if section.get_peak_occupancy
+        peak_occupancy[section.xget_id] = section.get_peak_occupancy.to_f if section.get_peak_occupancy
       end
       return peak_occupancy
     end
@@ -1175,11 +1175,11 @@ module BuildingSync
     def get_floor_area
       floor_area = {}
       if @total_floor_area
-        floor_area[get_id] = @total_floor_area.to_f
+        floor_area[xget_id] = @total_floor_area.to_f
       end
       @building_sections.each do |section|
         if section.get_floor_area
-          floor_area[section.id] = section.get_floor_area
+          floor_area[section.xget_id] = section.get_floor_area
         end
       end
       return floor_area

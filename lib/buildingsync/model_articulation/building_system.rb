@@ -34,9 +34,14 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'buildingsync/helpers/helper'
+require 'buildingsync/helpers/xml_get_set'
+
 module BuildingSync
   # BuildingSystem class to share functionality between system classes
   class BuildingSystem
     # no features here yet
+    include BuildingSync::Helper
+    include BuildingSync::XmlGetSet
   end
 end
