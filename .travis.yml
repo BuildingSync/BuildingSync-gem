@@ -60,6 +60,15 @@ jobs:
       - $SH "bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb"
       name: "Translator Scenario Simulation Spec"
     - script:
+      - $SH "bundle exec rspec spec/tests/scenario_spec.rb"
+      name: "Scenario Spec"
+    - script:
+      - $SH "bundle exec rspec spec/tests/time_series_spec.rb"
+      name: "TimeSeries Spec"
+    - script:
+      - $SH "bundle exec rspec spec/tests/resource_use_spec.rb"
+      name: "ResourceUse Spec"
+    - script:
       - $SH "bundle exec rspec spec/tests/building_sync_spec.rb"
       - $SH "bundle exec rspec spec/tests/epw_test_spec.rb"
       - $SH "bundle exec rspec spec/tests/constants_spec.rb"
