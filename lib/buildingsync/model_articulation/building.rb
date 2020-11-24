@@ -65,7 +65,6 @@ module BuildingSync
       @building_sections_whole_building = []
       @model = nil
       @primary_contact_id = nil
-      @id = nil
       @all_set = false
 
       # parameter to read and write.
@@ -400,7 +399,7 @@ module BuildingSync
         @space_types.each do |space_name, space_type|
           zone_list.concat(get_zones_per_space_type(space_type[:space_type]))
         end
-        zone_hash[@id] = zone_list
+        zone_hash[get_id] = zone_list
       end
       @building_sections.each do |bldg_subsec|
         zone_list = []
@@ -421,7 +420,7 @@ module BuildingSync
         @space_types.each do |space_name, space_type|
           space_type_list << space_type[:space_type]
         end
-        space_type_hash[@id] = space_type_list
+        space_type_hash[get_id] = space_type_list
       end
       @building_sections.each do |bldg_subsec|
         space_type_list = []
@@ -1162,7 +1161,7 @@ module BuildingSync
     def get_peak_occupancy
       peak_occupancy = {}
       if @occupant_quantity
-        peak_occupancy[@id] = @occupant_quantity.to_f
+        peak_occupancy[get_id] = @occupant_quantity.to_f
         return peak_occupancy
       end
       @building_sections.each do |section|
@@ -1176,7 +1175,7 @@ module BuildingSync
     def get_floor_area
       floor_area = {}
       if @total_floor_area
-        floor_area[@id] = @total_floor_area.to_f
+        floor_area[get_id] = @total_floor_area.to_f
       end
       @building_sections.each do |section|
         if section.get_floor_area
