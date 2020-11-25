@@ -140,18 +140,6 @@ module BuildingSync
       end
     end
 
-    # read occupancy type
-    # @param occupancy_type [String]
-    # @return [String]
-    def read_bldgsync_occupancy_type(occupancy_type)
-      occ_element = @base_xml.elements["#{@ns}:OccupancyClassification"]
-      if !occ_element.nil?
-        return occ_element.text
-      else
-        return occupancy_type
-      end
-    end
-
     # set building and system type
     # @param occupancy_type [String]
     # @param total_floor_area [Float]

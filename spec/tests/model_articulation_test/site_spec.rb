@@ -51,8 +51,7 @@ RSpec.describe 'SiteSpec' do
       # Should not reach this line
       expect(false).to be true
     rescue StandardError => e
-      puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
-      expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
+      expect(e.message.to_s).to eq('Building ID: Building1. Year of Construction is blank in your BuildingSync file.')
     end
   end
 

@@ -72,6 +72,7 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
   config.include BuildingSync::Helper
+  config.include BuildingSync::XmlGetSet
 
   SPEC_OUTPUT_DIR = File.expand_path('output', __dir__)
   SPEC_FILES_DIR = File.expand_path('files', __dir__)

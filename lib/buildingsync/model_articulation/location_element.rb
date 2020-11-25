@@ -39,12 +39,12 @@ module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class LocationElement < SpatialElement
     # initialize LocationElement class
-    # @param location_element_xml [REXML::Element] an element corresponding to a locational element
+    # @param base_xml [REXML::Element] an element corresponding to a locational element
     #   either an auc:Site or auc:Building
     # @param ns [String] namespace, likely 'auc'
-    def initialize(location_element_xml, ns)
-      super(location_element_xml, ns)
-      @location_element_xml = location_element_xml
+    def initialize(base_xml, ns)
+      super(base_xml, ns)
+      @base_xml = base_xml
       @ns = ns
 
       @climate_zone = nil
@@ -76,14 +76,14 @@ module BuildingSync
 
     # read climate zone
     def read_climate_zone
-      if @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE"]
-        @climate_zone_ashrae = @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE/#{@ns}:ClimateZone"].text
+      if @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE"]
+        @climate_zone_ashrae = @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE/#{@ns}:ClimateZone"].text
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LocationElement.read_climate_zone', "Element ID: #{xget_id} - ASHRAE Climate Zone: #{@climate_zone_ashrae}")
       else
         @climate_zone_ashrae = nil
       end
-      if @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24"]
-        @climate_zone_ca_t24 = @location_element_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24/#{@ns}:ClimateZone"].text
+      if @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24"]
+        @climate_zone_ca_t24 = @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24/#{@ns}:ClimateZone"].text
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LocationElement.read_climate_zone', "Element ID: #{xget_id} - Title24 Climate Zone: #{@climate_zone_ca_t24}")
       else
         @climate_zone_ca_t24 = nil
@@ -97,13 +97,13 @@ module BuildingSync
 
     # read weather file name
     def read_weather_file_name
-      if @location_element_xml.elements["#{@ns}:WeatherStationName"]
-        @weather_file_name = @location_element_xml.elements["#{@ns}:WeatherStationName"].text
+      if @base_xml.elements["#{@ns}:WeatherStationName"]
+        @weather_file_name = @base_xml.elements["#{@ns}:WeatherStationName"].text
       else
         @weather_file_name = nil
       end
-      if @location_element_xml.elements["#{@ns}:WeatherDataStationID"]
-        @weather_station_id = @location_element_xml.elements["#{@ns}:WeatherDataStationID"].text
+      if @base_xml.elements["#{@ns}:WeatherDataStationID"]
+        @weather_station_id = @base_xml.elements["#{@ns}:WeatherDataStationID"].text
       else
         @weather_station_id = nil
       end
@@ -111,13 +111,13 @@ module BuildingSync
 
     # read city and state name
     def read_city_and_state_name
-      if @location_element_xml.elements["#{@ns}:Address/#{@ns}:City"]
-        @city_name = @location_element_xml.elements["#{@ns}:Address/#{@ns}:City"].text
+      if @base_xml.elements["#{@ns}:Address/#{@ns}:City"]
+        @city_name = @base_xml.elements["#{@ns}:Address/#{@ns}:City"].text
       else
         @city_name = nil
       end
-      if @location_element_xml.elements["#{@ns}:Address/#{@ns}:State"]
-        @state_name = @location_element_xml.elements["#{@ns}:Address/#{@ns}:State"].text
+      if @base_xml.elements["#{@ns}:Address/#{@ns}:State"]
+        @state_name = @base_xml.elements["#{@ns}:Address/#{@ns}:State"].text
       else
         @state_name = nil
       end
@@ -125,20 +125,20 @@ module BuildingSync
 
     # read address, postal code and premises notes
     def read_address_postal_code_notes
-      if @location_element_xml.elements["#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"]
-        @street_address = @location_element_xml.elements["#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"].text
+      if @base_xml.elements["#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"]
+        @street_address = @base_xml.elements["#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"].text
       else
         @street_address = nil
       end
 
-      if @location_element_xml.elements["#{@ns}:Address/#{@ns}:PostalCode"]
-        @postal_code = @location_element_xml.elements["#{@ns}:Address/#{@ns}:PostalCode"].text.to_i
+      if @base_xml.elements["#{@ns}:Address/#{@ns}:PostalCode"]
+        @postal_code = @base_xml.elements["#{@ns}:Address/#{@ns}:PostalCode"].text.to_i
       else
         @postal_code = nil
       end
 
-      if @location_element_xml.elements["#{@ns}:PremisesNotes"]
-        @premises_notes = @location_element_xml.elements["#{@ns}:PremisesNotes"].text
+      if @base_xml.elements["#{@ns}:PremisesNotes"]
+        @premises_notes = @base_xml.elements["#{@ns}:PremisesNotes"].text
       else
         @premises_notes = nil
       end
@@ -146,13 +146,13 @@ module BuildingSync
 
     # read latitude and longitude
     def read_latitude_and_longitude
-      if @location_element_xml.elements["#{@ns}:Latitude"]
-        @latitude = @location_element_xml.elements["#{@ns}:Latitude"].text
+      if @base_xml.elements["#{@ns}:Latitude"]
+        @latitude = @base_xml.elements["#{@ns}:Latitude"].text
       else
         @latitude = nil
       end
-      if @location_element_xml.elements["#{@ns}:Longitude"]
-        @longitude = @location_element_xml.elements["#{@ns}:Longitude"].text
+      if @base_xml.elements["#{@ns}:Longitude"]
+        @longitude = @base_xml.elements["#{@ns}:Longitude"].text
       else
         @longitude = nil
       end

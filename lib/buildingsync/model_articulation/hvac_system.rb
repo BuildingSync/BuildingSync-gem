@@ -35,88 +35,43 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'buildingsync/helpers/helper'
+require 'buildingsync/helpers/xml_get_set'
 
 module BuildingSync
   # HVACSystem class
   class HVACSystem < BuildingSystem
     include BuildingSync::Helper
+    include BuildingSync::XmlGetSet
     # initialize
     # @param system_element [REXML::Element]
     # @param ns [String]
-    def initialize(system_element = nil, ns = '')
+    def initialize(base_xml, ns = 'auc')
+      @base_xml = base_xml
+      @ns = ns
+
+      help_element_class_type_check(base_xml, 'HVACSystem')
+
       # code to initialize
-      @principal_hvac_system_type = {}
-      @systems = system_element
-      read_xml(system_element, ns) if system_element
+      @linked
+      read_xml
     end
 
     # read xml
-    # @param system_element [REXML::Element]
-    # @param ns [String]
-    def read_xml(system_element, ns)
-      system_element.elements.each("#{ns}:HVACSystem") do |hvac_system|
-        system_type = nil
-        if hvac_system.elements["#{ns}:PrincipalHVACSystemType"]
-          system_type = hvac_system.elements["#{ns}:PrincipalHVACSystemType"].text
-        end
-        if hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"]
-          linked_building = hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref']
-          puts "found principal system type: #{system_type} for linked building: #{linked_building}"
-          @principal_hvac_system_type[linked_building] = system_type
-        elsif hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"]
-          linked_section = hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"].attributes['IDref']
-          puts "found principal system type: #{system_type} for linked section: #{linked_section}"
-          @principal_hvac_system_type[linked_section] = system_type
-        elsif system_type
-          puts "principal_hvac_system_type: #{system_type} is not linked to a building or section "
-        end
-      end
+    def read_xml
+
     end
 
     # get principal hvac system type
     # @return [String]
     def get_principal_hvac_system_type
-      if @principal_hvac_system_type
-        return @principal_hvac_system_type.values[0]
-      end
-      return nil
+      return xget_text('PrincipalHVACSystemType')
     end
 
     # adding the principal hvac system type to the hvac systems, overwrite existing values or create new elements if none are present
     # @param id [String]
     # @param principal_hvac_type [String]
-    def add_principal_hvac_system_type(id, principal_hvac_type)
-      if @systems.nil?
-        @systems = REXML::Element.new("#{ns}:HVACSystems")
-      end
-      hvac_system = nil
-      if @systems.elements["#{ns}:HVACSystem"].nil?
-        hvac_system = REXML::Element.new("#{ns}:HVACSystem")
-      else
-        @systems.elements["#{ns}:HVACSystem"].each do |system|
-          if system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"]
-            if system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref'] = id
-              hvac_system = system
-              break
-            end
-          elsif system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"]
-            if system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"].attributes['IDref'] = id
-              hvac_system = system
-              break
-            end
-          end
-        end
-        if hvac_system.nil? && (@systems.elements["#{ns}:HVACSystem"].size = 1)
-          hvac_system = @systems.elements["#{ns}:HVACSystem"][0]
-        end
-      end
-
-      if hvac_system.elements["#{ns}:PrincipalHVACSystemType"].nil?
-        principal_hvac_system_type = REXML::Element.new("#{ns}:PrincipalHVACSystemType")
-      else
-        principal_hvac_system_type = hvac_system.elements["#{ns}:PrincipalHVACSystemType"]
-      end
-      principal_hvac_system_type.text = principal_hvac_type
+    def set_principal_hvac_system_type(id, principal_hvac_type)
+      xset_or_create('PrincipalHVACSystemType', principal_hvac_type)
     end
 
     # add exhaust
@@ -178,11 +133,11 @@ module BuildingSync
     end
 
     # map principal hvac system type to cbecs system type
-    # @param building_sync_principal_hvac_system_type [String]
-    # @param system_type [String]
+    # @param principal_hvac_system_type [String]
+    # @param fallback_system_type [String] the default system_type to use if the other is not found
     # @return [String]
-    def map_principal_hvac_system_type_to_cbecs_system_type(building_sync_principal_hvac_system_type, system_type)
-      case building_sync_principal_hvac_system_type
+    def map_to_cbecs(principal_hvac_system_type, fallback_system_type)
+      case principal_hvac_system_type
       when 'Packaged Terminal Air Conditioner'
         return 'PTAC with hot water heat'
       when 'Packaged Terminal Heat Pump'
@@ -200,8 +155,8 @@ module BuildingSync
       when 'VAV with Electric Reheat'
         return 'VAV with PFP boxes'
       else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.HVACSystem.map_principal_hvac_system_type_to_cbecs_system_type', "building_sync_principal_hvac_system_type: #{building_sync_principal_hvac_system_type} does not have a mapping to the CBECS system type, using the system type from standards: #{system_type}")
-        return system_type
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.HVACSystem.map_to_cbecs', "building_sync_principal_hvac_system_type: #{building_sync_principal_hvac_system_type} does not have a mapping to the CBECS system type, using the system type from standards: #{system_type}")
+        return fallback_system_type
       end
     end
 
@@ -221,9 +176,12 @@ module BuildingSync
         standard.model_remove_prm_hvac(model)
       end
 
-      puts "system_type derived from standards: #{system_type} and principal hvac system type override is: #{get_principal_hvac_system_type}"
-      if !@principal_hvac_system_type.empty?
-        system_type = map_principal_hvac_system_type_to_cbecs_system_type(get_principal_hvac_system_type, system_type)
+      puts "HVAC System ID: #{xget_id}. System_type derived from standards: #{system_type} and principal hvac system type override is: #{get_principal_hvac_system_type}"
+      temp = get_principal_hvac_system_type
+      if !temp.nil? && !temp.empty?
+        previous_system_type = system_type
+        system_type = map_to_cbecs(get_principal_hvac_system_type, previous_system_type)
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_hvac', "HVAC System ID: #{xget_id}. System type derived from standards: #{previous_system_type}, overriden to #{system_type}")
       end
 
       case system_type
@@ -307,7 +265,7 @@ module BuildingSync
           zone_name_list = help_get_zone_name_list(zone_list)
           zones.each do |zone|
             if zone_name_list.include? zone.name.get
-              return map_principal_hvac_system_type_to_cbecs_system_type(@principal_hvac_system_type[id], system_type)
+              return map_to_cbecs(get_principal_hvac_system_type, system_type)
             end
           end
         end

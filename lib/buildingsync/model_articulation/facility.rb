@@ -72,6 +72,10 @@ module BuildingSync
       @cb_modeled = nil
       @cb_measured = []
       @poms = []
+      @hvac_systems = []
+      @loads_systems = []
+      @lighting_systems = []
+      @contacts = []
       
       @auditor_contact_id = nil
       @audit_date_level_1 = nil
@@ -79,15 +83,12 @@ module BuildingSync
       @audit_date_level_3 = nil
       @contact_auditor_name = nil
       @contact_owner_name = nil
-      @auditor_years_experience = nil
       @utility_name = nil
       @utility_meter_numbers = []
       @metering_configuration = nil
       @rate_schedules_xml = []
       @interval_reading_monthly = []
       @interval_reading_yearly = []
-      @audit_notes = nil
-      @audit_team_notes = nil
       @spaces_excluded_from_gross_floor_area = nil
       @premises_notes_for_not_applicable = nil
 
@@ -112,11 +113,11 @@ module BuildingSync
       # Site - checks
       site_xml_temp = @base_xml.get_elements("#{@ns}:Sites/#{@ns}:Site")
       if site_xml_temp.nil? || site_xml_temp.empty?
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.read_xml', "Facility with ID: #{xget_id} has no Site elements.  Cannot initialize Facility.")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.read_xml', "Facility ID: #{xget_id} has no Site elements.  Cannot initialize Facility.")
         raise StandardError, "Facility with ID: #{xget_id} has no Site elements.  Cannot initialize Facility."
       elsif site_xml_temp.size > 1
         @site_xml = site_xml_temp.first()
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', "There are more than one (#{site_xml_temp.size}) Site elements in your BuildingSync file. Only the first Site will be considered (ID: #{@site_xml.attributes['ID']}")
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', "Facility ID: #{xget_id}. There is more than one (#{site_xml_temp.size}) Site elements. Only the first Site will be considered (ID: #{@site_xml.attributes['ID']}")
       else
         @site_xml = site_xml_temp.first()
       end
@@ -470,24 +471,15 @@ module BuildingSync
 
       @load_system.add_daylighting_controls(model, open_studio_system_standard, template)
 
+      # TODO: - add internal mass
+      # TODO: - add slab modeling and slab insulation
+      # TODO: - fuel customization for cooking and laundry
       # TODO: - add refrigeration
       # remove refrigeration equipment
       if remove_objects
         model.getRefrigerationSystems.each(&:remove)
       end
 
-      # TODO: - add internal mass
-      # remove internal mass
-      # if remove_objects
-      #  model.getSpaceLoads.each do |instance|
-      #    next if not instance.to_InternalMass.is_initialized
-      #    instance.remove
-      #  end
-      # end
-
-      # TODO: - add slab modeling and slab insulation
-
-      # TODO: - fuel customization for cooking and laundry
       # works by switching some fraction of electric loads to gas if requested (assuming base load is electric)
       # add thermostats
       if add_thermostat
@@ -521,10 +513,7 @@ module BuildingSync
     # @param dir [String]
     # @return [Array]
     def write_osm(dir)
-      scenario_types = {}
-      @sites.each do |site|
-        scenario_types = site.determine_standard_perform_sizing_write_osm(dir)
-      end
+      scenario_types = @site.determine_standard_perform_sizing_write_osm(dir)
       return scenario_types
     end
 
@@ -539,9 +528,7 @@ module BuildingSync
         scenario.elements["#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:EnergyCost"].text = @energy_cost if !@energy_cost.nil?
         scenario.elements["#{@ns}:ResourceUses/#{@ns}:ResourceUse/#{@ns}:AnnualFuelUseNativeUnits"].text = @annual_fuel_use_native_units if !@annual_fuel_use_native_units.nil?
       end
-      @base_xml.elements.each("#{@ns}:Sites/#{@ns}:Site") do |site|
-        @site.prepare_final_xml
-      end
+      @site.prepare_final_xml
     end
 
     # get OpenStudio model

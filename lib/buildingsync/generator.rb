@@ -86,15 +86,30 @@ module BuildingSync
       end
     end
 
+    def add_hvac_system_to_first_facility(doc, id = "HVACSystem-1")
+      facility_xml = get_first_facility_element(doc)
+      systems_xml = facility_xml.get_elements("#{@ns}:Systems").first()
+      if systems_xml.nil?
+        systems_xml = REXML::Element.new("#{@ns}:Systems", facility_xml)
+      end
+      hvac_systems_xml = systems_xml.get_elements("#{@ns}:HVACSystems").first()
+      if hvac_systems_xml.nil?
+        hvac_systems_xml = REXML::Element.new("#{@ns}:HVACSystems", systems_xml)
+      end
+      hvac_system_xml = REXML::Element.new("#{@ns}:HVACSystem", hvac_systems_xml)
+      hvac_system_xml.add_attribute("ID", id)
+      return hvac_system_xml
+    end
+
     def add_section_to_first_building(doc, id = "Section-1")
       building_xml = get_first_building_element(doc)
       sections = building_xml.get_elements("#{@ns}:Sections").first()
       if sections.nil?
         sections = REXML::Element.new("#{@ns}:Sections", building_xml)
       end
-      scenario = REXML::Element.new("#{@ns}:Section", sections)
-      scenario.add_attribute("ID", id)
-      return doc
+      section = REXML::Element.new("#{@ns}:Section", sections)
+      section.add_attribute("ID", id)
+      return section
     end
 
     def add_energy_resource_use_to_scenario(scenario_xml, energy_resource_type = 'Electricity', end_use = 'All end uses', id = 'ResourceUse-1')
@@ -346,7 +361,7 @@ module BuildingSync
     end
 
     def get_first_facility_element(doc)
-      facility = doc.get_elements("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility")
+      facility = doc.get_elements("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility").first()
       return facility
     end
 
@@ -367,6 +382,11 @@ module BuildingSync
 
     def get_first_scenario_element(doc)
       scenario = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario").first()
+      return scenario
+    end
+
+    def get_first_hvac_system_element(doc)
+      scenario = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Systems/#{@ns}:HVACSystems/#{@ns}:HVACSystem").first()
       return scenario
     end
 
@@ -395,6 +415,19 @@ module BuildingSync
       end
       section = get_first_building_section_element(doc)
       return BuildingSync::BuildingSection.new(section, 'Office', '20000', 1, @ns)
+    end
+
+    # get hvac system from xml file
+    # @param xml_file_name [String]
+    # @param standard_to_be_used [String]
+    # @return [BuildingSync::HVACSystem]
+    def get_hvac_system_from_file(xml_file_path)
+      doc = nil
+      File.open(xml_file_path, 'r') do |file|
+        doc = REXML::Document.new(file)
+      end
+      hvac_system = get_first_hvac_system_element(doc)
+      return BuildingSync::HVACSystem.new(hvac_system, @ns)
     end
 
     # create and return the set of elements:

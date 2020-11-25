@@ -37,13 +37,15 @@
 
 RSpec.describe 'BuildingSection' do
   it 'Should generate meaningful error when passing empty XML data' do
+    # -- Setup
     g = BuildingSync::Generator.new
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_section_to_first_building(doc)
     section_xml = g.get_first_building_section_element(doc)
+
     begin
-      section = BuildingSync::BuildingSection.new(section_xml, 'Retail', 1000, 1, 'auc')
+      section = BuildingSync::BuildingSection.new(section_xml, '', 1000, 1, 'auc')
 
       # Should not reach this line
       expect(false).to be true
@@ -56,11 +58,11 @@ RSpec.describe 'BuildingSection' do
 end
 
 RSpec.describe "BuildingSection methods" do
-  where(:expected, :method_call) do
+  where(:expected, :method_call, :method_args) do
     [
-        ['Retail', "bldgsync_occupancy_type"],
-        ['40.0', 'typical_occupant_usage_value_hours'],
-        ['50.0', 'typical_occupant_usage_value_weeks']
+        ['Retail', "xget_text", ["OccupancyClassification"]],
+        ['40.0', 'typical_occupant_usage_value_hours', []],
+        ['50.0', 'typical_occupant_usage_value_weeks', []]
     ]
   end
   with_them do
@@ -72,9 +74,9 @@ RSpec.describe "BuildingSection methods" do
       building_section = BuildingSync::Generator.new.get_building_section_from_file(xml_path)
 
       # -- Assert
-      if building_section.send(method_call) != expected
+      expect(building_section.send(method_call, *method_args) == expected).to be true
+      if building_section.send(method_call, *method_args) != expected
         puts "expected #{method_call} : #{expected} but got: #{building_section.send(method_call)}"
-        expect(building_section.send(method_call) == expected).to be true
       end
     end
   end

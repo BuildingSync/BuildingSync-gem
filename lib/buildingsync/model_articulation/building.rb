@@ -52,10 +52,10 @@ module BuildingSync
 
     # initialize
     # @param building_element [REXML::Element] an element corresponding to a single auc:Building
-    # @param site_bldgsync_occupancy_type [String]
+    # @param site_occupancy_classification [String]
     # @param site_total_floor_area [String]
     # @param ns [String] namespace, likely 'auc'
-    def initialize(base_xml, site_bldgsync_occupancy_type, site_total_floor_area, ns)
+    def initialize(base_xml, site_occupancy_classification, site_total_floor_area, ns)
       super(base_xml, ns)
       @base_xml = base_xml
       @ns = ns
@@ -96,7 +96,7 @@ module BuildingSync
       @number_of_units = nil
       @fraction_area = 1.0
       # code to initialize
-      read_xml(site_bldgsync_occupancy_type, site_total_floor_area)
+      read_xml(site_occupancy_classification, site_total_floor_area)
     end
 
     # returns number of stories
@@ -106,9 +106,9 @@ module BuildingSync
     end
 
     # read xml
-    # @param site_bldgsync_occupancy_type [String]
+    # @param site_occupancy_classification [String]
     # @param site_total_floor_area [String]
-    def read_xml(site_bldgsync_occupancy_type, site_total_floor_area)
+    def read_xml(site_occupancy_classification, site_total_floor_area)
 
       # read location specific values
       read_location_values
@@ -118,11 +118,12 @@ module BuildingSync
       read_stories_above_and_below_grade
       # aspect ratio
       read_aspect_ratio
+
+      xset_or_create('OccupancyClassification', site_occupancy_classification, false)
       # read occupancy
-      @bldgsync_occupancy_type = read_bldgsync_occupancy_type(site_bldgsync_occupancy_type)
 
       @base_xml.elements.each("#{@ns}:Sections/#{@ns}:Section") do |section_element|
-        section = BuildingSection.new(section_element, @bldgsync_occupancy_type, @total_floor_area, num_stories, @ns)
+        section = BuildingSection.new(section_element, xget_text('OccupancyClassification'), @total_floor_area, num_stories, @ns)
         if section.section_type == 'Whole building'
           @building_sections_whole_building.push(section)
         elsif section.section_type == 'Space function' || section.section_type.nil?
@@ -162,7 +163,7 @@ module BuildingSync
     def read_built_remodel_year
       if !@base_xml.elements["#{@ns}:YearOfConstruction"]
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_standard_template_based_on_year', 'Year of Construction is blank in your BuildingSync file.')
-        raise 'Error : Year of Construction is blank in your BuildingSync file.'
+        raise StandardError, "Building ID: #{xget_id}. Year of Construction is blank in your BuildingSync file."
       end
 
       @built_year = @base_xml.elements["#{@ns}:YearOfConstruction"].text.to_i
@@ -464,7 +465,7 @@ module BuildingSync
     def set_bldg_and_system_type_for_building_and_section
       @building_sections.each(&:set_bldg_and_system_type)
 
-      set_bldg_and_system_type(@bldgsync_occupancy_type, @total_floor_area, num_stories, false)
+      set_bldg_and_system_type(xget_text('OccupancyClassification'), @total_floor_area, num_stories, false)
     end
 
     # determine the open studio standard and call the set_all function

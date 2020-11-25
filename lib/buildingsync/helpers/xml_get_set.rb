@@ -34,6 +34,8 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'rexml/document'
+
 require 'buildingsync/helpers/helper'
 
 module BuildingSync
@@ -97,6 +99,31 @@ module BuildingSync
         to_return << help_get_attribute_value(id, 'IDref')
       end
       return to_return
+    end
+
+    def xset_text(element_name, new_value)
+      element = @base_xml.elements["./#{@ns}:#{element_name}"]
+      if !element.nil?
+        element.text = new_value
+      end
+      return element
+    end
+
+    def xset_or_create(element_name, new_value, override = true)
+      element = @base_xml.elements["./#{@ns}:#{element_name}"]
+      if !element.nil?
+        # if there is no value, we set it
+        if element.text.nil? || element.text.empty?
+          element.text = new_value
+        # if there is a value but we are overriding, we set it
+        elsif override
+          element.text = new_value
+        end
+      else
+        new_element = REXML::Element.new("#{@ns}:#{element_name}", @base_xml)
+        new_element.text = new_value
+      end
+      return element
     end
   end
 end

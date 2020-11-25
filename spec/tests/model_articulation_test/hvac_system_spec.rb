@@ -34,35 +34,64 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-
+require 'buildingsync/generator'
 RSpec.describe 'HVACSystemSpec' do
   it 'Should add a Exhaust in HVAC system successfully' do
+    # -- Setup
+    g = BuildingSync::Generator.new
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    hvac_system_xml = g.add_hvac_system_to_first_facility(doc)
+    ns = 'auc'
+
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref 1980-2004')
-    hvac_system = BuildingSync::HVACSystem.new
-    puts 'expected : true but got: false} ' if hvac_system.add_exhaust(model, standard, 'Adjacent', false) != true
+
+    hvac_system = BuildingSync::HVACSystem.new(hvac_system_xml, ns)
     expect(hvac_system.add_exhaust(model, standard, 'Adjacent', false)).to be true
   end
 
   it 'Should add a Thermostats in HVAC System successfully' do
+    # -- Setup
+    g = BuildingSync::Generator.new
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    hvac_system_xml = g.add_hvac_system_to_first_facility(doc)
+    ns = 'auc'
+
     model = OpenStudio::Model::Model.new
-    hvac_system = BuildingSync::HVACSystem.new
-    puts 'expected : true but got: false} ' if hvac_system.add_thermostats(model, ASHRAE90_1, false) != true
+
+    hvac_system = BuildingSync::HVACSystem.new(hvac_system_xml, ns)
     expect(hvac_system.add_thermostats(model, ASHRAE90_1, false)).to be true
   end
 
   it 'Should add HVAC System successfully' do
+    # -- Setup
+    g = BuildingSync::Generator.new
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    hvac_system_xml = g.add_hvac_system_to_first_facility(doc)
+    ns = 'auc'
+
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref 1980-2004')
-    hvac_system = BuildingSync::HVACSystem.new
-    puts 'expected : true but got: false} ' if hvac_system.add_hvac(model, nil, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true) != true
+
+    hvac_system = BuildingSync::HVACSystem.new(hvac_system_xml, ns)
     expect(hvac_system.add_hvac(model, nil, standard, 'PSZ-AC with gas coil heat', 'Forced Air', 'NaturalGas', 'Electricity', true)).to be true
   end
 
   it 'Should apply sizing and assumptions in HVAC System' do
+    # -- Setup
+    g = BuildingSync::Generator.new
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    hvac_system_xml = g.add_hvac_system_to_first_facility(doc)
+    ns = 'auc'
+
     model = OpenStudio::Model::Model.new
     standard = Standard.build('DOE Ref 1980-2004')
-    hvac_system = BuildingSync::HVACSystem.new
+
+    hvac_system = BuildingSync::HVACSystem.new(hvac_system_xml, ns)
 
     output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
     puts 'expected : false but got: true} ' if hvac_system.apply_sizing_and_assumptions(model, output_path, standard, 'Retail', 'PSZ-AC with gas coil heat', '') != false
@@ -70,27 +99,16 @@ RSpec.describe 'HVACSystemSpec' do
   end
 
   it 'Should return expected system type ' do
+    # -- Setup
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    hvac_system = get_hvac_system_from_file(xml_path, std)
+    g = BuildingSync::Generator.new
+
+    hvac_system = g.get_hvac_system_from_file(xml_path)
     expected_value = 'VAV with Hot Water Reheat'
-    puts "hvac_system #{hvac_system}"
     puts "expected primary_hvac_system_type : #{expected_value} but got: #{hvac_system.get_principal_hvac_system_type} " if hvac_system.get_principal_hvac_system_type != expected_value
     expect(hvac_system.get_principal_hvac_system_type == expected_value).to be true
   end
 
-  # get hvac system from xml file
-  # @param xml_file_name [String]
-  # @param standard_to_be_used [String]
-  # @return [BuildingSync::HVACSystem]
-  def get_hvac_system_from_file(xml_file_path, standard_to_be_used)
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-      ns = 'auc'
-      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Systems/#{ns}:HVACSystems") do |hvac_system|
-        return BuildingSync::HVACSystem.new(hvac_system, ns)
-      end
-    end
-  end
 end
