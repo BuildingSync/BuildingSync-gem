@@ -91,6 +91,11 @@ module BuildingSync
       return help_get_text_value_as_datetime(@base_xml.elements["./#{@ns}:#{element_name}"])
     end
 
+    # Gets all of the IDref attributes of the element_name provided
+    # assumes there is a parent child containment downstream of the base_xml,
+    # where the parent is a plural version of the element_name provided
+    # @example xget_idrefs('Measure') #=> Searches for Measures/Measure
+    # @param element_name [String] name of the non-pluralized element, i.e. Measure
     # @return [Array<String>]
     def xget_idrefs(element_name)
       id_elements = @base_xml.get_elements(".//#{@ns}:#{element_name}s/#{@ns}:#{element_name}")
@@ -99,6 +104,12 @@ module BuildingSync
         to_return << help_get_attribute_value(id, 'IDref')
       end
       return to_return
+    end
+
+    def xget_linked_premises
+      map = {}
+      id_elements = @base_xml.get_elements(".//#{@ns}:LinkedPremises/*")
+
     end
 
     def xset_text(element_name, new_value)

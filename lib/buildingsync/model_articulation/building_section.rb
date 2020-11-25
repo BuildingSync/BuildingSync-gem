@@ -190,9 +190,7 @@ module BuildingSync
         hvac_systems = facility.elements["#{@ns}:HVACSystems"]
       end
 
-      if hvac_systems.elements["#{@ns}:HVACSystem"].nil?
-        hvac_system = BuildingSync::HVACSystem.new
-      else
+      if !hvac_systems.elements["#{@ns}:HVACSystem"].nil?
         hvac_system = facility.elements["#{@ns}:HVACSystem"]
       end
 

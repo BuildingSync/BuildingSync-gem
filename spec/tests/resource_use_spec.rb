@@ -43,7 +43,7 @@ RSpec.describe 'ResourceUse' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     facility_element = doc.elements["//#{ns}:Facility"]

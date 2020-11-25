@@ -55,7 +55,7 @@ module BuildingSync
 
       # Helpful
       @site_eui_xpath = "#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal/#{@ns}:SiteEnergyUseIntensity"
-      @g = BuildingSync::Generator.new(version = '2.2.0', ns = @ns)
+      @g = BuildingSync::Generator.new(@ns)
 
       # linked fields
       @resource_uses = [] # Array[<BuildingSync::ResourceUse>]

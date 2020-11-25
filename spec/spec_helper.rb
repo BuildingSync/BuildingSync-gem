@@ -487,4 +487,12 @@ RSpec.configure do |config|
     expect(File.exist?(results_file_path)).to be true
   end
 
+  class DummyClass
+    include BuildingSync::Helper
+    include BuildingSync::XmlGetSet
+    def initialize(base_xml, ns)
+      @base_xml = base_xml
+      @ns = ns
+    end
+  end
 end

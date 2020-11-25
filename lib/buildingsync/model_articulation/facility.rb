@@ -60,6 +60,7 @@ module BuildingSync
     def initialize(base_xml, ns)
       @base_xml = base_xml
       @ns = ns
+      @g = BuildingSync::Generator.new(ns)
 
       help_element_class_type_check(base_xml, 'Facility')
 
@@ -72,9 +73,10 @@ module BuildingSync
       @cb_modeled = nil
       @cb_measured = []
       @poms = []
-      @hvac_systems = []
-      @loads_systems = []
-      @lighting_systems = []
+      @systems = {}
+      # @hvac_systems = []
+      # @loads_systems = []
+      # @lighting_systems = []
       @contacts = []
       
       @auditor_contact_id = nil
@@ -282,12 +284,19 @@ module BuildingSync
     # read systems
     def read_systems
       systems_xml = @base_xml.elements["#{@ns}:Systems"]
-      if systems_xml
-        @load_system = LoadsSystem.new(systems_xml.elements["#{@ns}:PlugLoads"], @ns)
-        @hvac_system = HVACSystem.new(systems_xml.elements["#{@ns}:HVACSystems"], @ns)
+      if !systems_xml.nil? && !systems_xml.empty?
+        systems_xml.elements.each do |system_type|
+          @systems[system_type.name] = []
+          system_type.elements.each do |system|
+            @systems[system_type.name] << system
+          end
+        end
+        # @load_system = LoadsSystem.new(systems_xml.elements["#{@ns}:PlugLoads"], @ns)
+        # @hvac_system = HVACSystem.new(systems_xml.elements["#{@ns}:HVACSystems"], @ns)
       else
         @load_system = LoadsSystem.new
-        @hvac_system = HVACSystem.new
+        hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
+        @hvac_system = HVACSystem.new(hvac_xml, @ns)
       end
     end
 

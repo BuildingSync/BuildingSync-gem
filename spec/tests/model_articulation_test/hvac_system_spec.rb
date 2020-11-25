@@ -93,8 +93,7 @@ RSpec.describe 'HVACSystemSpec' do
 
     hvac_system = BuildingSync::HVACSystem.new(hvac_system_xml, ns)
 
-    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
-    puts 'expected : false but got: true} ' if hvac_system.apply_sizing_and_assumptions(model, output_path, standard, 'Retail', 'PSZ-AC with gas coil heat', '') != false
+    output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__, File.extname(__FILE__))}")
     expect(hvac_system.apply_sizing_and_assumptions(model, output_path, standard, 'Retail', 'PSZ-AC with gas coil heat', '')).to be false
   end
 

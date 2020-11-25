@@ -44,7 +44,7 @@ module BuildingSync
   class Generator
     include BuildingSync::Helper
     # @param version [String] version of BuildingSync
-    def initialize(version = "2.2.0", ns = 'auc')
+    def initialize(ns = 'auc', version = "2.2.0")
       supported_versions = ["2.0", "2.2.0"]
       if !supported_versions.include? version
         @version = nil
@@ -86,8 +86,7 @@ module BuildingSync
       end
     end
 
-    def add_hvac_system_to_first_facility(doc, id = "HVACSystem-1")
-      facility_xml = get_first_facility_element(doc)
+    def add_hvac_system_to_facility(facility_xml, id = "HVACSystem-1", principal_hvac_system_type = nil)
       systems_xml = facility_xml.get_elements("#{@ns}:Systems").first()
       if systems_xml.nil?
         systems_xml = REXML::Element.new("#{@ns}:Systems", facility_xml)
@@ -98,7 +97,16 @@ module BuildingSync
       end
       hvac_system_xml = REXML::Element.new("#{@ns}:HVACSystem", hvac_systems_xml)
       hvac_system_xml.add_attribute("ID", id)
+      if !principal_hvac_system_type.nil?
+        principal_xml = REXML::Element.new("#{@ns}:PrincipalHVACSystemType", hvac_system_xml)
+        principal_xml.text = principal_hvac_system_type
+      end
       return hvac_system_xml
+    end
+
+    def add_hvac_system_to_first_facility(doc, id = "HVACSystem-1")
+      facility_xml = get_first_facility_element(doc)
+      return add_hvac_system_to_facility(facility_xml, id)
     end
 
     def add_section_to_first_building(doc, id = "Section-1")

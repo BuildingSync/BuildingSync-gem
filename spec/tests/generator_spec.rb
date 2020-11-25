@@ -38,18 +38,18 @@ require 'buildingsync/generator'
 
 RSpec.describe 'BuildingSync::Generator' do
   it 'should set the version to nil if it is not a supported type' do
-    g = BuildingSync::Generator.new("asdflkj")
+    g = BuildingSync::Generator.new('auc',"asdflkj")
     expect(g.version.nil?).to be true
   end
 
   it 'create_bsync_root_to_section should return a String' do
-    g = BuildingSync::Generator.new('2.2.0')
+    g = BuildingSync::Generator.new
     doc_string = g.create_bsync_root_to_building
     expect(doc_string).to be_an_instance_of(String)
   end
 
   it 'create_bsync_root_to_section should be able to create an REXML::Document from the returned String' do
-    g = BuildingSync::Generator.new('2.2.0')
+    g = BuildingSync::Generator.new
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     expect(doc).to be_an_instance_of(REXML::Document)

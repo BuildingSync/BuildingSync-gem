@@ -47,7 +47,7 @@ RSpec.describe 'Scenario' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -65,7 +65,7 @@ RSpec.describe 'Scenario' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -125,7 +125,7 @@ RSpec.describe "Scenario Type Discovery Methods" do
       # -- Setup
       ns = 'auc'
       v = '2.2.0'
-      g = BuildingSync::Generator.new(v, ns)
+      g = BuildingSync::Generator.new(ns, v)
       doc_string = g.create_bsync_root_to_building
       doc = REXML::Document.new(doc_string)
       g.add_report_to_first_facility(doc)
@@ -152,7 +152,7 @@ RSpec.describe 'Scenario data creation' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -186,7 +186,7 @@ RSpec.describe 'Scenario data creation' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -215,7 +215,7 @@ RSpec.describe 'Scenario workflow configuration' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -237,7 +237,7 @@ RSpec.describe 'Scenario workflow configuration' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -263,7 +263,7 @@ RSpec.describe 'Scenario workflow configuration' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -282,7 +282,7 @@ RSpec.describe 'Scenario workflow configuration' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -302,7 +302,7 @@ RSpec.describe 'Scenario workflow configuration' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -326,7 +326,7 @@ RSpec.describe 'Scenario workflow configuration' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -360,7 +360,7 @@ RSpec.describe 'Scenario workflow configuration' do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
@@ -402,7 +402,7 @@ RSpec.describe "Scenario Results Parsing" do
     # -- Setup
     ns = 'auc'
     v = '2.2.0'
-    g = BuildingSync::Generator.new(v, ns)
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
