@@ -34,29 +34,26 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require 'buildingsync/helpers/helper'
-require 'buildingsync/helpers/xml_get_set'
+require_relative './../../spec_helper'
 
-module BuildingSync
-  # LightingSystemType class
-  class LightingSystemType
-    include BuildingSync::Helper
-    include BuildingSync::XmlGetSet
-    # initialize
-    # @param doc [REXML::Document]
-    # @param ns [String]
-    def initialize(base_xml, ns)
-      @base_xml = base_xml
-      @ns = ns
+require 'buildingsync/model_articulation/lighting_system'
 
-      help_element_class_type_check(@base_xml, 'LightingSystem')
+RSpec.describe 'LightingSystemType' do
+  it 'should raise an error given a non-LightingSystem REXML Element' do
+    # -- Setup
+    ns = 'auc'
+    v = '2.2.0'
+    g = BuildingSync::Generator.new(ns, v)
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
 
-      read_xml
-    end
+    facility_xml = g.get_first_facility_element(doc)
 
-    # read
-    def read_xml
-
+    # -- Create scenario object from report
+    begin
+      BuildingSync::LightingSystemType.new(facility_xml, ns)
+    rescue StandardError => e
+      expect(e.message).to eql "Attempted to initialize LightingSystem object with Element name of: Facility"
     end
   end
 end

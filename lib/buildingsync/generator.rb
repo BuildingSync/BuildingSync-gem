@@ -86,16 +86,47 @@ module BuildingSync
       end
     end
 
+    def check_linked_premises(element_xml)
+      linked_premises_xml = element_xml.get_elements("./#{@ns}:LinkedPremises").first()
+      if linked_premises_xml.nil?
+        linked_premises_xml = REXML::Element.new("#{@ns}:LinkedPremises", element_xml)
+      end
+      return linked_premises_xml
+    end
+
+    def add_linked_premise_of_type(premise_type_xml, premise_type, id)
+      linked_xml = REXML::Element.new("#{@ns}:Linked#{premise_type}ID", premise_type_xml)
+      linked_xml.add_attribute("IDref", id)
+      return linked_xml
+    end
+
+    def check_premise_of_type(premise_xml, premise_type)
+      premise_type_xml = premise_xml.get_elements("./#{@ns}:#{premise_type}").first()
+      if premise_type_xml.nil?
+        premise_type_xml = REXML::Element.new("#{@ns}:#{premise_type}", premise_xml)
+      end
+      return premise_type_xml
+    end
+
+    def add_linked_premise(premise_type, element, id)
+      linked_premises_xml = check_linked_premises(element)
+      premise_type_xml = check_premise_of_type(linked_premises_xml, premise_type)
+      add_linked_premise_of_type(premise_type_xml, premise_type, id)
+      return linked_premises_xml
+    end
+
+    def add_linked_building(element, id)
+      add_linked_premise('Building', element, id)
+    end
+
+    def add_linked_section(element, id)
+      add_linked_premise('Section', element, id)
+    end
+
     def add_hvac_system_to_facility(facility_xml, id = "HVACSystem-1", principal_hvac_system_type = nil)
-      systems_xml = facility_xml.get_elements("#{@ns}:Systems").first()
-      if systems_xml.nil?
-        systems_xml = REXML::Element.new("#{@ns}:Systems", facility_xml)
-      end
-      hvac_systems_xml = systems_xml.get_elements("#{@ns}:HVACSystems").first()
-      if hvac_systems_xml.nil?
-        hvac_systems_xml = REXML::Element.new("#{@ns}:HVACSystems", systems_xml)
-      end
-      hvac_system_xml = REXML::Element.new("#{@ns}:HVACSystem", hvac_systems_xml)
+      systems_xml = check_systems(facility_xml)
+      hvac_system_xml = check_system_of_type(systems_xml, 'HVACSystem')
+
       hvac_system_xml.add_attribute("ID", id)
       if !principal_hvac_system_type.nil?
         principal_xml = REXML::Element.new("#{@ns}:PrincipalHVACSystemType", hvac_system_xml)
@@ -104,9 +135,42 @@ module BuildingSync
       return hvac_system_xml
     end
 
-    def add_hvac_system_to_first_facility(doc, id = "HVACSystem-1")
+    def add_hvac_system_to_first_facility(doc, id = "HVACSystem-1", principal_hvac_system_type = nil)
       facility_xml = get_first_facility_element(doc)
-      return add_hvac_system_to_facility(facility_xml, id)
+      return add_hvac_system_to_facility(facility_xml, id, principal_hvac_system_type)
+    end
+
+    def add_lighting_system_to_first_facility(doc, id = "LightingSystem-1")
+      facility_xml = get_first_facility_element(doc)
+      systems_xml = check_systems(facility_xml)
+      lighting_system_xml = check_system_of_type(systems_xml, 'LightingSystem')
+      lighting_system_xml.add_attribute("ID", id)
+      return lighting_system_xml
+    end
+
+    def add_plug_load_to_first_facility(doc, id = "PlugLoad-1")
+      facility_xml = get_first_facility_element(doc)
+      systems_xml = check_systems(facility_xml)
+      new_system_xml = check_system_of_type(systems_xml, 'PlugLoad')
+      new_system_xml.add_attribute("ID", id)
+      return new_system_xml
+    end
+
+    def check_system_of_type(systems_xml, system_type)
+      new_systems_xml = systems_xml.get_elements("#{@ns}:#{system_type}s").first()
+      if new_systems_xml.nil?
+        new_systems_xml = REXML::Element.new("#{@ns}:#{system_type}s", systems_xml)
+      end
+      new_system_xml = REXML::Element.new("#{@ns}:#{system_type}", new_systems_xml)
+      return new_system_xml
+    end
+
+    def check_systems(facility_xml)
+      systems_xml = facility_xml.get_elements("#{@ns}:Systems").first()
+      if systems_xml.nil?
+        systems_xml = REXML::Element.new("#{@ns}:Systems", facility_xml)
+      end
+      return systems_xml
     end
 
     def add_section_to_first_building(doc, id = "Section-1")

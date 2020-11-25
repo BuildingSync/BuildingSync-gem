@@ -36,6 +36,23 @@
 # *******************************************************************************
 require 'buildingsync/generator'
 RSpec.describe 'HVACSystemSpec' do
+  it 'should raise an error given a non-HVACSystem REXML Element' do
+    # -- Setup
+    ns = 'auc'
+    v = '2.2.0'
+    g = BuildingSync::Generator.new(ns, v)
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+
+    facility_xml = g.get_first_facility_element(doc)
+
+    # -- Create scenario object from report
+    begin
+      BuildingSync::HVACSystem.new(facility_xml, ns)
+    rescue StandardError => e
+      expect(e.message).to eql "Attempted to initialize HVACSystem object with Element name of: Facility"
+    end
+  end
   it 'Should add a Exhaust in HVAC system successfully' do
     # -- Setup
     g = BuildingSync::Generator.new
@@ -53,11 +70,11 @@ RSpec.describe 'HVACSystemSpec' do
 
   it 'Should add a Thermostats in HVAC System successfully' do
     # -- Setup
+    ns = 'auc'
     g = BuildingSync::Generator.new
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     hvac_system_xml = g.add_hvac_system_to_first_facility(doc)
-    ns = 'auc'
 
     model = OpenStudio::Model::Model.new
 

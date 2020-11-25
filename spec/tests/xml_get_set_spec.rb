@@ -34,29 +34,49 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require 'buildingsync/helpers/helper'
-require 'buildingsync/helpers/xml_get_set'
+require_relative './../spec_helper'
 
-module BuildingSync
-  # LightingSystemType class
-  class LightingSystemType
-    include BuildingSync::Helper
-    include BuildingSync::XmlGetSet
-    # initialize
-    # @param doc [REXML::Document]
-    # @param ns [String]
-    def initialize(base_xml, ns)
-      @base_xml = base_xml
-      @ns = ns
+RSpec.describe 'XmlGetSet' do
+  describe 'xget_linked_premises' do
+    before(:all) do
+      # -- Setup
+      ns = 'auc'
+      g = BuildingSync::Generator.new
+      doc_string = g.create_bsync_root_to_building
+      doc = REXML::Document.new(doc_string)
+      hvac_system_xml = g.add_hvac_system_to_first_facility(doc)
+      g.add_linked_building(hvac_system_xml, 'Building-1')
+      g.add_linked_section(hvac_system_xml, 'Section-1')
+      g.add_linked_section(hvac_system_xml, 'Section-2')
 
-      help_element_class_type_check(@base_xml, 'LightingSystem')
+      d = DummyClass.new(hvac_system_xml, ns)
+      @links = d.xget_linked_premises
+      puts "Linked Premises: #{@links}"
+    end
+    it 'is a Hash' do
+      expect(@links).to be_an_instance_of(Hash)
+    end
+    it 'has expected keys' do
+      expected_keys = ['Building', 'Section']
 
-      read_xml
+      # -- Assert
+      expected_keys.each do |k|
+        expect(@links.has_key?(k)).to be true
+      end
     end
 
-    # read
-    def read_xml
+    it 'has values of type Array and the correct length' do
+      expect(@links['Building']).to be_an_instance_of(Array)
+      expect(@links['Section']).to be_an_instance_of(Array)
 
+      expect(@links['Building'].size).to eq(1)
+      expect(@links['Section'].size).to eq(2)
+    end
+
+    it 'has correct values' do
+      expect(@links['Building'][0]).to eq('Building-1')
+      expect(@links['Section'][0]).to eq('Section-1')
+      expect(@links['Section'][1]).to eq('Section-2')
     end
   end
 end

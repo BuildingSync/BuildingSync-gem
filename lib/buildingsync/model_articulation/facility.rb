@@ -45,6 +45,7 @@ require_relative 'site'
 require_relative 'loads_system'
 require_relative 'envelope_system'
 require_relative 'hvac_system'
+require_relative 'lighting_system'
 require_relative 'service_hot_water_system'
 require_relative 'measure'
 
@@ -73,7 +74,7 @@ module BuildingSync
       @cb_modeled = nil
       @cb_measured = []
       @poms = []
-      @systems = {}
+      @systems_map = {}
       # @hvac_systems = []
       # @loads_systems = []
       # @lighting_systems = []
@@ -283,16 +284,20 @@ module BuildingSync
 
     # read systems
     def read_systems
-      systems_xml = @base_xml.elements["#{@ns}:Systems"]
-      if !systems_xml.nil? && !systems_xml.empty?
+      systems_xml = xget_element("Systems")
+      if !systems_xml.nil?
         systems_xml.elements.each do |system_type|
-          @systems[system_type.name] = []
-          system_type.elements.each do |system|
-            @systems[system_type.name] << system
+          @systems_map[system_type.name] = []
+          system_type.elements.each do |system_xml|
+            if system_xml.name == 'HVACSystem'
+              @systems_map[system_type.name] << BuildingSync::HVACSystem.new(system_xml, @ns)
+            elsif system_xml.name == 'LightingSystem'
+              @systems_map[system_type.name] << BuildingSync::LightingSystemType.new(system_xml, @ns)
+            else
+              @systems_map[system_type.name] << system_xml
+            end
           end
         end
-        # @load_system = LoadsSystem.new(systems_xml.elements["#{@ns}:PlugLoads"], @ns)
-        # @hvac_system = HVACSystem.new(systems_xml.elements["#{@ns}:HVACSystems"], @ns)
       else
         @load_system = LoadsSystem.new
         hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
@@ -546,7 +551,7 @@ module BuildingSync
       return @site.get_model
     end
 
-    attr_reader :building_eui_benchmark, :building_eui, :auditor_contact_id, :annual_fuel_use_native_units, :audit_date, :benchmark_tool, :contact_auditor_name, :energy_cost, :energy_resource,
+    attr_reader :systems_map, :building_eui_benchmark, :building_eui, :auditor_contact_id, :annual_fuel_use_native_units, :audit_date, :benchmark_tool, :contact_auditor_name, :energy_cost, :energy_resource,
                 :rate_schedules_xml, :utility_meter_numbers, :utility_name, :metering_configuration, :scenarios, :poms, :cb_modeled, :cb_measured, :measures
   end
 end

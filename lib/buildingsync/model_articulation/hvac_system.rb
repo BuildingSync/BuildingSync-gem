@@ -52,12 +52,15 @@ module BuildingSync
       help_element_class_type_check(base_xml, 'HVACSystem')
 
       # code to initialize
-      @linked
       read_xml
     end
 
     # read xml
     def read_xml
+
+    end
+
+    def get_linked_ids
 
     end
 
@@ -70,7 +73,7 @@ module BuildingSync
     # adding the principal hvac system type to the hvac systems, overwrite existing values or create new elements if none are present
     # @param id [String]
     # @param principal_hvac_type [String]
-    def set_principal_hvac_system_type(id, principal_hvac_type)
+    def set_principal_hvac_system_type(principal_hvac_type)
       xset_or_create('PrincipalHVACSystemType', principal_hvac_type)
     end
 
@@ -155,7 +158,7 @@ module BuildingSync
       when 'VAV with Electric Reheat'
         return 'VAV with PFP boxes'
       else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.HVACSystem.map_to_cbecs', "building_sync_principal_hvac_system_type: #{building_sync_principal_hvac_system_type} does not have a mapping to the CBECS system type, using the system type from standards: #{system_type}")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.HVACSystem.map_to_cbecs', "HVACSystem ID: #{xget_id}: No mapping for #{principal_hvac_system_type} to CBECS. Using the system type from standards: #{fallback_system_type}")
         return fallback_system_type
       end
     end

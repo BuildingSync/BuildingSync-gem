@@ -194,7 +194,7 @@ module BuildingSync
         hvac_system = facility.elements["#{@ns}:HVACSystem"]
       end
 
-      hvac_system.set_principal_hvac_system_type(xget_id, @principal_hvac_type)
+      hvac_system.set_principal_hvac_system_type(@principal_hvac_type)
     end
 
     # add principal hvac type

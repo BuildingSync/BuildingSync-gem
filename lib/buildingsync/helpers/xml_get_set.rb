@@ -106,10 +106,24 @@ module BuildingSync
       return to_return
     end
 
+    # Get the linked premises ids of the @base_xml element
+    # @return [Hash] where keys are premise types and values are an array of ids
+    # @example {'Building' => ['Building-1', 'Building-1', 'Section' => ['Section-4']]}
     def xget_linked_premises
       map = {}
-      id_elements = @base_xml.get_elements(".//#{@ns}:LinkedPremises/*")
-
+      premises = @base_xml.get_elements(".//#{@ns}:LinkedPremises").first()
+      if !premises.nil?
+        premises.elements.each do |premise_type|
+          map[premise_type.name] = []
+          idref_elements = premise_type.get_elements(".//*[@IDref]")
+          if !idref_elements.nil?
+            idref_elements.each do |element|
+              map[premise_type.name] << element.attributes["IDref"]
+            end
+          end
+        end
+      end
+      return map
     end
 
     def xset_text(element_name, new_value)
