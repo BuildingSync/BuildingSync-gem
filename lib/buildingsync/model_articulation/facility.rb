@@ -184,7 +184,7 @@ module BuildingSync
 
       read_other_details
       read_interval_reading
-      read_systems
+      read_and_create_initial_systems
     end
 
     # set_all wrapper for Site
@@ -283,9 +283,9 @@ module BuildingSync
     end
 
     # read systems
-    def read_systems
-      systems_xml = xget_element("Systems")
-      if !systems_xml.nil?
+    def read_and_create_initial_systems
+      systems_xml = xget_or_create("Systems")
+      if systems_xml.elements.size > 0
         systems_xml.elements.each do |system_type|
           @systems_map[system_type.name] = []
           system_type.elements.each do |system_xml|
@@ -299,10 +299,31 @@ module BuildingSync
           end
         end
       else
-        @load_system = LoadsSystem.new
         hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
         @hvac_system = HVACSystem.new(hvac_xml, @ns)
+        @load_system = LoadsSystem.new
       end
+    end
+
+    # Add a minimal lighting system in the doc and as an object
+    # @param premise_id [String] id of the premise which the system will be linked to
+    # @param premise_type [String] type of premise, i.e. Building, Section, etc.
+    # @param lighting_system_id [String] id for new lighting system
+    # @return [BuildingSync::LightingSystemType] new lighting system object
+    def add_blank_lighting_system(premise_id, premise_type, lighting_system_id="LightingSystem-1")
+      # Create new lighting system and link it
+      lighting_system_xml = @g.add_lighting_system_to_facility(@base_xml, lighting_system_id)
+      @g.add_linked_premise(lighting_system_xml, premise_id, premise_type)
+
+      # Create a new array if doesn't yet exist
+      if !@systems_map.has_key?("LightingSystems")
+        @systems_map["LightingSystems"] = []
+      end
+
+      # Create new lighting system and add to array
+      new_system = BuildingSync::LightingSystemType.new(lighting_system_xml, @ns)
+      @systems_map["LightingSystems"] << new_system
+      return new_system
     end
 
     # read other details from the xml

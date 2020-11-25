@@ -226,29 +226,6 @@ module BuildingSync
       return true
     end
 
-    # add exterior lights
-    # @param model [OpenStudio::Model]
-    # @param standard [Standard]
-    # @param onsite_parking_fraction [Float]
-    # @param exterior_lighting_zone [String]
-    # @param remove_objects [Boolean]
-    # @return boolean
-    def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
-      if remove_objects
-        model.getExteriorLightss.each do |ext_light|
-          next if ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name
-
-          ext_light.remove
-        end
-      end
-
-      exterior_lights = standard.model_add_typical_exterior_lights(model, exterior_lighting_zone.chars[0].to_i, onsite_parking_fraction)
-      exterior_lights.each do |k, v|
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LoadsSystem.add_exterior_lights', "Adding Exterior Lights named #{v.exteriorLightsDefinition.name} with design level of #{v.exteriorLightsDefinition.designLevel} * #{OpenStudio.toNeatString(v.multiplier, 0, true)}.")
-      end
-      return true
-    end
-
     # add elevator
     # @param model [OpenStudio::Model]
     # @param standard [Standard]

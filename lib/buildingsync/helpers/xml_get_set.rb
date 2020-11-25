@@ -71,6 +71,11 @@ module BuildingSync
       return @base_xml.elements["./#{@ns}:#{element_name}"]
     end
 
+    # only creates new if doesn't exist
+    def xget_or_create(element_name)
+      return help_get_or_create(@base_xml, "#{@ns}:#{element_name}")
+    end
+
     # @see help_get_text_value
     def xget_text(element_name)
       return help_get_text_value(@base_xml.elements["./#{@ns}:#{element_name}"])
@@ -150,5 +155,6 @@ module BuildingSync
       end
       return element
     end
+
   end
 end

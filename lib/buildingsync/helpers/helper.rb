@@ -45,6 +45,14 @@ module BuildingSync
       end
     end
 
+    def help_get_or_create(parent, new_element_type)
+      new_element = parent.elements[new_element_type]
+      if new_element.nil?
+        new_element = REXML::Element.new(new_element_type, parent)
+      end
+      return new_element
+    end
+
     # get text value from xml element
     # @param xml_element [REXML::Element]
     # @return [String] if text value exists

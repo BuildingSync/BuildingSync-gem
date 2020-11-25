@@ -137,7 +137,6 @@ RSpec.describe "Facility Systems Mapping" do
 
     facility_xml = g.get_first_facility_element(doc)
     @facility = BuildingSync::Facility.new(facility_xml, @ns)
-    puts @facility.systems_map
   end
   describe 'with systems defined' do
     it 'should be of the correct data structure' do

@@ -36,23 +36,37 @@
 # *******************************************************************************
 
 RSpec.describe 'BuildingSection' do
-  it 'Should generate meaningful error when passing empty XML data' do
-    # -- Setup
-    g = BuildingSync::Generator.new
-    doc_string = g.create_bsync_root_to_building
-    doc = REXML::Document.new(doc_string)
-    g.add_section_to_first_building(doc)
-    section_xml = g.get_first_building_section_element(doc)
+  describe 'initialization' do
+    before(:all) do
+      # -- Setup
+      @ns = 'auc'
+      g = BuildingSync::Generator.new
+      doc_string = g.create_bsync_root_to_building
+      doc = REXML::Document.new(doc_string)
+      g.add_section_to_first_building(doc)
+      @facility_xml = g.get_first_facility_element(doc)
+      @section_xml = g.get_first_building_section_element(doc)
+      puts @section_xml
+    end
+    it 'should raise an error given a non-Section REXML Element' do
+      begin
+        BuildingSync::BuildingSection.new(@facility_xml, nil, nil, nil, @ns)
+      rescue StandardError => e
+        expect(e.message).to eql "Attempted to initialize Section object with Element name of: Facility"
+      end
+    end
 
-    begin
-      section = BuildingSync::BuildingSection.new(section_xml, '', 1000, 1, 'auc')
+    it 'Should generate meaningful error when passing empty XML data' do
+      begin
+        section = BuildingSync::BuildingSection.new(@section_xml, nil, nil, nil, @ns)
 
-      # Should not reach this line
-      expect(false).to be true
-    rescue StandardError => e
-      puts e.message.to_s
-      puts "expected error message:Building type '' is nil but got: #{e.message} " if !e.message.include?("Building type '' is nil")
-      expect(e.message.include?("Building type '' is nil")).to be true
+        # Should not reach this line
+        expect(false).to be true
+      rescue StandardError => e
+        puts e.message.to_s
+        puts "expected error message:Building type '' is nil but got: #{e.message} " if !e.message.include?("Building type '' is nil")
+        expect(e.message.include?("Building type '' is nil")).to be true
+      end
     end
   end
 end

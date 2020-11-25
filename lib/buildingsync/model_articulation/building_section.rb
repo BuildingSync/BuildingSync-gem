@@ -57,6 +57,7 @@ module BuildingSync
       @ns = ns
 
       help_element_class_type_check(base_xml, 'Section')
+
       @door_ids = []
       @wall_ids = []
       @window_ids = []
@@ -73,7 +74,6 @@ module BuildingSync
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
       @occupant_quantity = nil
-      @footprint_shape = nil
       @principal_hvac_type = nil
       @principal_lighting_system_type = nil
       @miscellaneous_electric_load = nil
@@ -96,22 +96,12 @@ module BuildingSync
       # based on the occupancy type set building type, system type and bar division method
       xset_or_create('OccupancyClassification', building_occupancy_classification, false)
       read_building_section_other_detail
-      read_footprint_shape
       read_construction_types
 
       if @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"]
         @occupant_quantity = @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"].text
       else
         @occupant_quantity = nil
-      end
-    end
-
-    # read footprint shape
-    def read_footprint_shape
-      if @base_xml.elements["#{@ns}:FootprintShape"]
-        @footprint_shape = @base_xml.elements["#{@ns}:FootprintShape"].text
-      else
-        @footprint_shape = nil
       end
     end
 
@@ -170,34 +160,6 @@ module BuildingSync
     end
 
     # add principal hvac type
-    def add_principal_hvac_type
-      building_sections = @base_xml.parent
-      building = building_sections.parent
-      buildings = building.parent
-      site = buildings.parent
-      sites = site.parent
-      facility = sites.parent
-
-      if facility.elements["#{@ns}:Systems"].nil?
-        systems = REXML::Element.new("#{@ns}:Systems", facility)
-      else
-        systems = facility.elements["#{@ns}:Systems"]
-      end
-
-      if systems.elements["#{@ns}:HVACSystems"].nil?
-        hvac_systems = REXML::Element.new("#{@ns}:HVACSystems", systems)
-      else
-        hvac_systems = facility.elements["#{@ns}:HVACSystems"]
-      end
-
-      if !hvac_systems.elements["#{@ns}:HVACSystem"].nil?
-        hvac_system = facility.elements["#{@ns}:HVACSystem"]
-      end
-
-      hvac_system.set_principal_hvac_system_type(@principal_hvac_type)
-    end
-
-    # add principal hvac type
     def prepare_final_xml
       @base_xml.elements["#{@ns}:fraction_area"].text = @fraction_area
       @base_xml.elements["#{@ns}:OriginalOccupancyClassification"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
@@ -210,7 +172,6 @@ module BuildingSync
       @base_xml.elements["#{@ns}:TypicalOccupantUsages/#{@ns}:TypicalOccupantUsage/#{@ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_hours if !@typical_occupant_usage_value_hours.nil?
       @base_xml.elements["#{@ns}:TypicalOccupantUsages/#{@ns}:TypicalOccupantUsage/#{@ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_weeks if !@typical_occupant_usage_value_weeks.nil?
       @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
-      @base_xml.elements["#{@ns}:FootprintShape"].text = @footprint_shape if !@footprint_shape.nil?
 
       # Add new element in the XML file
       add_user_defined_field_to_xml_file('BuildingType', @bldg_type)
