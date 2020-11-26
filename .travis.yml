@@ -70,10 +70,12 @@ jobs:
       - $SH "bundle exec rspec spec/tests/resource_use_spec.rb"
       name: "ResourceUse Spec"
     - script:
+      - $SH "bundle exec rspec spec/tests/workflow_maker_spec.rb"
+      name: "WorkflowMaker Spec"
+    - script:
       - $SH "bundle exec rspec spec/tests/building_sync_spec.rb"
       - $SH "bundle exec rspec spec/tests/epw_test_spec.rb"
       - $SH "bundle exec rspec spec/tests/constants_spec.rb"
-      - $SH "bundle exec rspec spec/tests/workflow_maker_spec.rb"
       - $SH "bundle exec rspec spec/tests/generator_spec.rb"
       - $SH "bundle exec rspec spec/tests/helper_spec.rb"
       - $SH "bundle exec rspec spec/tests/xml_get_set_spec.rb"

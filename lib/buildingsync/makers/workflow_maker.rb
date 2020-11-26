@@ -219,10 +219,10 @@ module BuildingSync
       count = 0  # count for all of the measures, regardless of the type
       measure_type_count = 0  # count of measures specific to the measure_goal_type
       measure_type_found = false
+      new_step = {}
+      new_step['measure_dir_name'] = measure_dir
+      new_step['arguments'] = args_hash
       if @workflow['steps'].empty?
-        new_step = {}
-        new_step['measure_dir_name'] = measure_dir
-        new_step['arguments'] = args_hash
         @workflow['steps'].insert(count, new_step)
         successfully_added = true
       else
@@ -236,9 +236,6 @@ module BuildingSync
               # insert measure here
               OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
               puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
-              new_step = {}
-              new_step['measure_dir_name'] = measure_dir
-              new_step['arguments'] = args_hash
               @workflow['steps'].insert(count, new_step)
               successfully_added = true
               break
@@ -247,8 +244,6 @@ module BuildingSync
           elsif measure_type_found
             OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
             puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
-            new_step = {}
-            new_step['measure_dir_name'] = measure_dir
             @workflow['steps'].insert(count - 1, new_step)
             successfully_added = true
             break

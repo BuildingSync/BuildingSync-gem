@@ -181,16 +181,24 @@ RSpec.describe 'WorkflowMaker' do
     end
 
 
-    it "insert_measure_into_workflow: EnergyPlusMeasure (modify_energyplus_coil_cooling_dx_single_speed_objects) at the expected position and still simulates" do
+    it "insert_measure_into_workflow: EnergyPlusMeasure (set_energyplus_minimum_outdoor_air_flow_rate) at the expected position and still simulates" do
       # -- Setup
       # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
       measure_type = 'EnergyPlusMeasure'
-      measure_dir_name = 'modify_energyplus_coil_cooling_dx_single_speed_objects'
+      measure_dir_name = 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects'
       item = 1
       final_expected_position = 27
+      args = {
+          "ratedTotalCoolingCapacity" => 999.9,
+          "ratedCOP" => 0.99,
+          "ratedAirFlowRate" => 0.999,
+          "condensateRemovalStart" => 9.999,
+          "evapLatentRatio" => 0.0999,
+          "latentCapTimeConstant" => 4.0
+      }
 
       expect(@workflow_maker.get_workflow['steps'].size).to eq(29)
-      @workflow_maker.insert_measure_into_workflow(measure_type, measure_dir_name, item)
+      @workflow_maker.insert_measure_into_workflow(measure_type, measure_dir_name, item, args)
 
       # -- Assert
       expect(@workflow_maker.get_workflow['steps'].size).to eq(30)
