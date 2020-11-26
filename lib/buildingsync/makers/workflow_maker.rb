@@ -123,6 +123,13 @@ module BuildingSync
       return @facility.get_model
     end
 
+    # get the current workflow
+    # @return [hash]
+    def get_workflow
+      return @workflow
+    end
+
+
     # generate the baseline model as osm model
     # @param dir [String]
     # @param epw_file_path [String]
@@ -131,8 +138,8 @@ module BuildingSync
     # @return [Boolean] true if successful
     def determine_standard_perform_sizing_write_osm(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
       @facility.set_all
-      standard = @facility.determine_open_studio_standard(standard_to_be_used)
-      @facility.generate_baseline_osm(epw_file_path, dir, standard, ddy_file)
+      @facility.determine_open_studio_standard(standard_to_be_used)
+      @facility.generate_baseline_osm(epw_file_path, dir, standard_to_be_used, ddy_file)
       @facility.write_osm(dir)
     end
 
@@ -198,39 +205,19 @@ module BuildingSync
       return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir]
     end
 
-    # insert an EnergyPlus measure to the list of existing measures - by default (item = 0) it gets added as first EnergyPlus measure
-    # @param measure_dir [String]
-    # @param item [Integer]
-    # @param args_hash [hash]
-    def insert_energyplus_measure(measure_dir, item = 0, args_hash = {})
-      insert_measure('EnergyPlusMeasure', measure_dir, item, args_hash)
-    end
-
-    # insert a Reporting measure to the list of existing measures - by default (item = 0) it gets added as first Reporting measure
-    # @param measure_dir [String]
-    # @param item [Integer]
-    # @param args_hash [hash]
-    def insert_reporting_measure(measure_dir, item = 0, args_hash = {})
-      insert_measure('ReportingMeasure', measure_dir, item, args_hash)
-    end
-
-    # insert a Model measure to the list of existing measures - by default (item = 0) it gets added as first Model measure
-    # @param measure_dir [String]
-    # @param item [Integer]
-    # @param args_hash [hash]
-    def insert_model_measure(measure_dir, item = 0, args_hash = {})
-      insert_measure('ModelMeasure', measure_dir, item, args_hash)
-    end
-
-    # inserts any measure
+    # inserts any measure.  traverses through the measures available in the included extensions
+    # (common measures, model articulation, etc.) to find the lib/measures/[measure_dir] specified.
+    # It is inserted at the relative position according to its type
     # @param measure_goal_type [String] one of: 'EnergyPlusMeasure', 'ReportingMeasure', or 'ModelMeasure'
-    # @param measure_dir [String]
-    # @param item [Integer]
+    # @param measure_dir [String] name of the measure directory, also what one would find in the <name/> field of the
+    #   measure.xml file.
+    #   @example 'openstudio_results', 'scale_geometry', etc.
+    # @param relative_position [Integer] the position where the measure should be inserted with respect to the measure_goal_type
     # @param args_hash [hash]
-    def insert_measure(measure_goal_type, measure_dir, item = 0, args_hash = {})
+    def insert_measure_into_workflow(measure_goal_type, measure_dir, relative_position = 0, args_hash = {})
       successfully_added = false
-      count = 0
-      measure_type_count = 0
+      count = 0  # count for all of the measures, regardless of the type
+      measure_type_count = 0  # count of measures specific to the measure_goal_type
       measure_type_found = false
       if @workflow['steps'].empty?
         new_step = {}
@@ -242,12 +229,12 @@ module BuildingSync
         @workflow['steps'].each do |step|
           measure_dir_name = step['measure_dir_name']
           measure_type = get_measure_type(measure_dir_name)
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "measure: #{measure_dir_name} with type: #{measure_type} found")
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "measure: #{measure_dir_name} with type: #{measure_type} found")
           if measure_type == measure_goal_type
             measure_type_found = true
-            if measure_type_count == item
+            if measure_type_count == relative_position
               # insert measure here
-              OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+              OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
               puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
               new_step = {}
               new_step['measure_dir_name'] = measure_dir
@@ -258,8 +245,8 @@ module BuildingSync
             end
             measure_type_count += 1
           elsif measure_type_found
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
-            puts "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+            puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
             new_step = {}
             new_step['measure_dir_name'] = measure_dir
             @workflow['steps'].insert(count - 1, new_step)
@@ -270,7 +257,7 @@ module BuildingSync
         end
       end
       if !successfully_added
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure', "CANNOT insert measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure_into_workflow', "CANNOT insert measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
       end
       return successfully_added
     end
@@ -296,12 +283,6 @@ module BuildingSync
         end
       end
       return measure_type
-    end
-
-    # get the current workflow
-    # @return [hash]
-    def get_workflow
-      return @workflow
     end
 
     # configure for scenario
@@ -391,68 +372,11 @@ module BuildingSync
       set_measure_argument(osw, measure_dir_name, argument_name, argument_value) if !argument_name.nil? && !argument_name.empty?
     end
 
-    # # configure for scenario
-    # # @param osw [String]
-    # # @param scenario [REXML:Element]
-    # def configure_for_scenario(osw, scenario)
-    #   successful = true
-    #
-    #   num_measures = 0
-    #   scenario.get_measure_ids.each do |measure_id|
-    #     measure = @facility.measures.select { |m| m.xget_id == measure_id}
-    #     current_num_measure = num_measures
-    #
-    #     # measure_name = get_measure_name(measure.system_category_affected, measure)
-    #
-    #     json = eval(File.read(WORKFLOW_MAKER_JSON_FILE_PATH))
-    #
-    #     json[:"#{measure.system_category_affected}"].each do |category|
-    #       if !category[:"#{measure.xget_name}"].nil?
-    #         measure_dir_name = category[:"#{measure.xget_name}"][:measure_dir_name]
-    #         num_measures += 1
-    #         category[:"#{measure.xget_name}"][:arguments].each do |argument|
-    #           if !argument[:condition].nil? && !argument[:condition].empty?
-    #             set_argument_detail(osw, argument, measure_dir_name, measure.xget_name)
-    #           else
-    #             set_measure_argument(osw, measure_dir_name, argument[:name], argument[:value])
-    #           end
-    #         end
-    #       end
-    #     end
-    #
-    #     if current_num_measure == num_measures
-    #       OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_for_scenario', "Measure with name: #{measure.xget_name} and Description: #{measure.long_description} could not be processed!")
-    #       successful = false
-    #     end
-    #   end
-    #
-    #   # ensure that we didn't miss any measures by accident
-    #   OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_for_scenario', "#{scenario.get_measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{scenario.get_measure_ids}") if num_measures != scenario.get_measure_ids.size
-    #   return successful
-    # end
-
     # get scenario elements
     # @return [Array<BuildingSync::Scenario>]
     def get_scenarios
       return @facility.scenarios
     end
-
-    # add a current building modeled scenario and set the @cb_modeled attribute
-    # @param id [String] id to use for the scenario
-    # @return [NilClass]
-    def add_cb_modeled(id = "Scenario-#{BuildingSync::BASELINE}")
-      if @cb_modeled.nil? || @cb_modeled.empty?
-        g = BuildingSync::Generator.new
-        scenario_xml = g.add_scenario_to_report(@report_xml, 'CBModeled', id)
-        scenario = BuildingSync::Scenario.new(scenario_xml, @ns)
-        @scenarios.push(scenario)
-        @cb_modeled = scenario
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.add_cb_modeled', "A Current Building Modeled scenario was added (Scenario ID: #{@cb_modeled.xget_id}).")
-      else
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.add_cb_modeled', "A Current Building Modeled scenario already exists (Scenario ID: #{@cb_modeled.xget_id}). A new one was not added.")
-      end
-    end
-
 
     # write workflows for scenarios into osw files.  This includes:
     #   - Package of Measure Scenarios
@@ -462,13 +386,13 @@ module BuildingSync
     def write_osws(main_output_dir)
       super
 
-      if @cb_modeled.nil?
+      if @facility.cb_modeled.nil?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', "OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method")
         raise StandardError, "OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method"
       end
 
       # Write a workflow for the current building modeled scenario
-      cb_modeled_success = write_osw(main_output_dir, @cb_modeled)
+      cb_modeled_success = write_osw(main_output_dir, @facility.cb_modeled)
       number_successful =  cb_modeled_success ? 1 : 0
 
       # write an osw for each Package Of Measures scenario
@@ -511,6 +435,18 @@ module BuildingSync
           successful = false
         end
       return successful
+    end
+
+    # run osws - running all scenario simulations
+    # @param runner_options [hash]
+    def run_osws(output_dir, runner_options = {run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY})
+      osw_files = []
+      osw_sr_files = []
+      Dir.glob("#{output_dir}/**/in.osw") { |osw| osw_files << osw }
+      Dir.glob("#{output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
+
+      runner = OpenStudio::Extension::Runner.new(dirname = Dir.pwd, bundle_without = [], options = runner_options)
+      return runner.run_osws(osw_files - osw_sr_files)
     end
 
     # Creates a deep copy of the @workflow be serializing and reloading with JSON

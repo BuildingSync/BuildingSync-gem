@@ -72,14 +72,12 @@ RSpec.describe 'BuildingSection' do
 end
 
 RSpec.describe "BuildingSection methods" do
-  where(:expected, :method_call, :method_args) do
-    [
-        ['Retail', "xget_text", ["OccupancyClassification"]],
-        ['40.0', 'typical_occupant_usage_value_hours', []],
-        ['50.0', 'typical_occupant_usage_value_weeks', []]
-    ]
-  end
-  with_them do
+  to_test = [
+      ['Retail', "xget_text", ["OccupancyClassification"]],
+      ['40.0', 'typical_occupant_usage_value_hours', []],
+      ['50.0', 'typical_occupant_usage_value_weeks', []]
+  ]
+  to_test.each do |test|
     it 'building_151_level1.xml: Should return values as expected' do
       # -- Setup
       file_name = 'building_151_level1.xml'
@@ -88,10 +86,8 @@ RSpec.describe "BuildingSection methods" do
       building_section = BuildingSync::Generator.new.get_building_section_from_file(xml_path)
 
       # -- Assert
-      expect(building_section.send(method_call, *method_args) == expected).to be true
-      if building_section.send(method_call, *method_args) != expected
-        puts "expected #{method_call} : #{expected} but got: #{building_section.send(method_call)}"
-      end
+      expect(building_section.send(test[1], *test[2]) == test[0]).to be true
     end
   end
+
 end

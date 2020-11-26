@@ -110,17 +110,15 @@ RSpec.describe "Scenario Measures" do
 end
 
 RSpec.describe "Scenario Type Discovery Methods" do
-  where(:scenario_type, :is_cb_meas, :is_pom, :is_cb_mod, :is_benchmark, :is_target) do
-    [
-        ['CBMeasured', true, false, false, false, false],
-        [nil, false, false, false, false, false],
-        ['CBModeled', false, false, true, false, false],
-        ['POM', false, true, false, false, false],
-        ['Benchmark', false, false, false, true, false],
-        ['Target', false, false, false, false, true]
-    ]
-  end
-  with_them do
+  to_test = [
+      ['CBMeasured', true, false, false, false, false],
+      [nil, false, false, false, false, false],
+      ['CBModeled', false, false, true, false, false],
+      ['POM', false, true, false, false, false],
+      ['Benchmark', false, false, false, true, false],
+      ['Target', false, false, false, false, true]
+  ]
+  to_test.each do |test|
     it 'cb_measured?, cb_modeled?, pom?, benchmark?, target? methods should evaluate as expected' do
       # -- Setup
       ns = 'auc'
@@ -131,18 +129,18 @@ RSpec.describe "Scenario Type Discovery Methods" do
       g.add_report_to_first_facility(doc)
 
       # -- Setup
-      g.add_scenario_to_first_report(doc, scenario_type)
+      g.add_scenario_to_first_report(doc, test[0])
       scenario_element = doc.get_elements("//#{ns}:Scenarios/#{ns}:Scenario")[0]
 
       # -- Create new Scenario object
       scenario = BuildingSync::Scenario.new(scenario_element, ns)
 
       # -- Assert
-      expect(scenario.cb_measured?).to be is_cb_meas
-      expect(scenario.pom?).to be is_pom
-      expect(scenario.cb_modeled?).to be is_cb_mod
-      expect(scenario.benchmark?).to be is_benchmark
-      expect(scenario.target?).to be is_target
+      expect(scenario.cb_measured?).to be test[1]
+      expect(scenario.pom?).to be test[2]
+      expect(scenario.cb_modeled?).to be test[3]
+      expect(scenario.benchmark?).to be test[4]
+      expect(scenario.target?).to be test[5]
     end
   end
 end
@@ -333,7 +331,7 @@ RSpec.describe 'Scenario workflow configuration' do
 
     # -- Setup output path
     file_name = 'blank.file'
-    main_output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__ , File.extname(__FILE__ ))}/#{File.basename(file_name, File.extname(file_name))}")
+    main_output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__, File.extname(__FILE__))}/#{File.basename(file_name, File.extname(file_name))}")
     FileUtils.rm_rf(main_output_path) if Dir.exist?(main_output_path)
 
     # -- Setup
@@ -367,7 +365,7 @@ RSpec.describe 'Scenario workflow configuration' do
 
     # -- Setup output path
     file_name = 'blank.file'
-    main_output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__ , File.extname(__FILE__ ))}/#{File.basename(file_name, File.extname(file_name))}")
+    main_output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__, File.extname(__FILE__))}/#{File.basename(file_name, File.extname(file_name))}")
     FileUtils.rm_rf(main_output_path) if Dir.exist?(main_output_path)
 
     # -- Setup
@@ -409,7 +407,7 @@ RSpec.describe "Scenario Results Parsing" do
 
     # -- Setup output path
     file_name = 'blank.file'
-    main_output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__ , File.extname(__FILE__ ))}/#{File.basename(file_name, File.extname(file_name))}")
+    main_output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__, File.extname(__FILE__))}/#{File.basename(file_name, File.extname(file_name))}")
     FileUtils.rm_rf(main_output_path) if Dir.exist?(main_output_path)
 
     # -- Setup

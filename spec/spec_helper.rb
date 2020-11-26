@@ -35,7 +35,6 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'buildingsync/generator'
-require 'rspec-parameterized'
 
 # try to load configuration, use defaults if doesn't exist
 begin
@@ -96,9 +95,18 @@ RSpec.configure do |config|
       output_path = File.join(output_path, "#{std.split('.')[0]}")
     end
 
+    # -- Setup
+    # Delete the directory and start over if it does exist so we are not checking old results
+    if File.exist?(output_path)
+      puts "Removing dir: #{output_path}"
+      FileUtils.rm_rf(output_path)
+      expect(Dir.exist?(output_path)).to be false
+    end
+    FileUtils.mkdir_p(output_path) if !File.exist?(output_path)
+    expect(Dir.exist?(output_path)).to be true
+    expect(File.exist?(xml_path)).to be true
     puts xml_path
     puts output_path
-    expect(File.exist?(xml_path)).to be true
     return xml_path, output_path
   end
 
@@ -360,16 +368,6 @@ RSpec.configure do |config|
       expect(File.exist?(epw_file_path)).to be true
       puts "Found epw: #{epw_file_path}"
     end
-
-    # -- Setup
-    # Delete the directory and start over if it does exist so we are not checking old results
-    if File.exist?(output_path)
-      puts "Removing dir: #{output_path}"
-      FileUtils.rm_rf(output_path)
-      expect(Dir.exist?(output_path)).to be false
-    end
-    FileUtils.mkdir_p(output_path) if !File.exist?(output_path)
-    expect(Dir.exist?(output_path)).to be true
 
     # -- Setup
     # Create a new Translator and write the OSM

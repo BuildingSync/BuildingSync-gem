@@ -120,6 +120,10 @@ module BuildingSync
       return @doc
     end
 
+    def get_workflow_maker
+      return @workflow_maker
+    end
+
     # get workflow from workflow maker
     def get_workflow
       @workflow_maker.get_workflow
@@ -181,28 +185,9 @@ module BuildingSync
       @workflow_maker.add_measure_path(measure_path)
     end
 
-    # insert EnergyPlus measure
-    # @param measure_dir [String]
-    # @param position [Integer]
-    # @param args_hash [hash]
-    def insert_energyplus_measure(measure_dir, position = 0, args_hash = {})
-      @workflow_maker.insert_energyplus_measure(measure_dir, position, args_hash)
-    end
-
-    # insert model measure
-    # @param measure_dir [String]
-    # @param position [Integer]
-    # @param args_hash [hash]
-    def insert_model_measure(measure_dir, position = 0, args_hash = {})
-      @workflow_maker.insert_model_measure(measure_dir, position, args_hash)
-    end
-
-    # insert reporting measure
-    # @param measure_dir [String]
-    # @param position [Integer]
-    # @param args_hash [hash]
-    def insert_reporting_measure(measure_dir, position = 0, args_hash = {})
-      @workflow_maker.insert_reporting_measure(measure_dir, position, args_hash)
+    # @see WorkflowMaker.insert_measure_into_workflow
+    def insert_measure_into_workflow(measure_goal_type, measure_dir, item = 0, args_hash = {})
+      @workflow_maker.insert_measure_into_workflow(measure_goal_type, measure_dir, item, args_hash)
     end
 
     # create an osw file for the baseline scenario and save it to disk
@@ -269,13 +254,7 @@ module BuildingSync
     # run osws - running all scenario simulations
     # @param runner_options [hash]
     def run_osws(runner_options = {run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY})
-      osw_files = []
-      osw_sr_files = []
-      Dir.glob("#{@output_dir}/**/in.osw") { |osw| osw_files << osw }
-      Dir.glob("#{@output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
-
-      runner = OpenStudio::Extension::Runner.new(dirname = Dir.pwd, bundle_without = [], options = runner_options)
-      return runner.run_osws(osw_files - osw_sr_files)
+      @workflow_maker.run_osws(@output_dir, runner_options)
     end
 
     # write parameters to xml file

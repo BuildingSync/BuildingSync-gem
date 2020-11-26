@@ -101,7 +101,7 @@ RSpec.describe 'BuildingSync::Helper' do
     # -- Assert
     expect(received).to be_an_instance_of(Date)
     expect(received.to_s == date_text).to be true
-    end
+  end
 
   it 'help_get_date_value returns nil if the text cant be parsed' do
     # --Setup
@@ -126,20 +126,19 @@ RSpec.describe 'BuildingSync::Helper' do
 end
 
 RSpec.describe "BuildingSync::Helper convert" do
-  where(:val, :from, :to, :result) do
-    [
+  to_test = [
       [1000, "Btu", "kBtu", 1],
       [1000000, "Btu", "MMBtu", 1],
       [0.001, "kBtu", "Btu", 1],
       [1000, "kBtu", "MMBtu", 1],
       [0.000001, "MMBtu", "Btu", 1],
       [0.001, "MMBtu", "kBtu", 1],
-    ]
-  end
-  with_them do
-    it "#{params[:val]} #{params[:from]} should equal #{params[:result]} #{params[:to]}" do
-      output = help_convert(val, from, to)
-      expect(result).to be_within(0.01).of(output)
+  ]
+  to_test.each do |test|
+    # 1000 Btu should equal 1 kBtu, etc.
+    it "#{test[0]} #{test[1]} should equal #{test[3]} #{test[2]}" do
+      output = help_convert(test[0], test[1], test[2])
+      expect(test[3]).to be_within(0.01).of(output)
     end
   end
 end

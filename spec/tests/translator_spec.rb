@@ -41,39 +41,6 @@ require 'parallel'
 
 RSpec.describe 'BuildingSync' do
 
-  it 'should add a new EnergyPlus measure' do
-    # -- Setup
-    file_name = 'building_151_one_scenario.xml'
-    std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = nil
-
-    if File.exist?(output_path)
-      FileUtils.rm_rf(output_path)
-    end
-
-    # -- Assert
-    expect(File.exist?(xml_path)).to be true
-    expect(File.exist?(output_path)).to be false
-
-    # -- Setup
-    FileUtils.mkdir_p(output_path)
-    expect(File.exist?(output_path)).to be true
-
-    translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
-    translator.insert_energyplus_measure('scale_geometry', 1)
-    translator.sizing_run_and_write_osm
-    translator.write_osws
-    translator.run_osws
-    osw_files = []
-    Dir.glob("#{output_path}/Baseline/in.osw") { |osw| osw_files << osw }
-    osw_files.each do |osw|
-      sql_file = osw.gsub('in.osw', 'eplusout.sql')
-      puts "Simulation not completed successfully for file: #{osw}" if !File.exist?(sql_file)
-      expect(File.exist?(sql_file)).to be true
-    end
-  end
-
   it 'remove all measures and then add a new EnergyPlus measure' do
     # -- Setup
     file_name = 'building_151_no_measures.xml'
@@ -81,22 +48,17 @@ RSpec.describe 'BuildingSync' do
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__,'v2.2.0')
     epw_path = nil
 
-    if File.exist?(output_path)
-      FileUtils.rm_rf(output_path)
-    end
-
-    # -- Assert
-    expect(File.exist?(xml_path)).to be true
-    expect(File.exist?(output_path)).to be false
-
-    # -- Setup
-    FileUtils.mkdir_p(output_path)
-    expect(File.exist?(output_path)).to be true
-
     translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
     translator.clear_all_measures
+
+    # -- Assert steps get deleted from workflow
+    expect(translator.get_workflow['steps'].empty?).to be true
+
     translator.insert_energyplus_measure('scale_geometry', 1)
     translator.sizing_run_and_write_osm
+
+    # -- Assert
+    write_osm_checks(output_path)
     translator.write_osws
     translator.run_osws
     osw_files = []
@@ -108,65 +70,21 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
-  it 'should add a new Reporting measure' do
-    # -- Setup
-    file_name = 'building_151_one_scenario.xml'
-    std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std,__FILE__, 'v2.2.0')
-    epw_path = nil
-
-    if File.exist?(output_path)
-      FileUtils.rm_rf(output_path)
-    end
-
-    # -- Assert
-    expect(File.exist?(xml_path)).to be true
-    expect(File.exist?(output_path)).to be false
-
-    # -- Setup
-    FileUtils.mkdir_p(output_path)
-    expect(File.exist?(output_path)).to be true
-
-    translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
-    translator.insert_reporting_measure('openstudio_results', 0)
-    translator.sizing_run_and_write_osm
-    translator.write_osws
-    translator.run_osws
-    osw_files = []
-    Dir.glob("#{output_path}/Baseline/in.osw") { |osw| osw_files << osw }
-    osw_files.each do |osw|
-      sql_file = osw.gsub('in.osw', 'eplusout.sql')
-      puts "Simulation not completed successfully for file: #{osw}" if !File.exist?(sql_file)
-      expect(File.exist?(sql_file)).to be true
-    end
-  end
-
-  it 'should write parameter value into XML' do
-    # -- Setup
-    file_name = 'building_151_one_scenario.xml'
-    std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = nil
-
-    if File.exist?(output_path)
-      FileUtils.rm_rf(output_path)
-    end
-
-    # -- Assert
-    expect(File.exist?(xml_path)).to be true
-    expect(File.exist?(output_path)).to be false
-
-    # -- Setup
-    FileUtils.mkdir_p(output_path)
-    expect(File.exist?(output_path)).to be true
-
-    translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
-    translator.sizing_run_and_write_osm
-    translator.write_osws
-
-    results_xml = File.join(output_path, 'results.xml')
-    translator.prepare_final_xml(results_xml)
-    expect(File.exist?(results_xml)).to be true
-  end
+  #
+  # it 'should write parameter value into XML' do
+  #   # -- Setup
+  #   file_name = 'building_151_one_scenario.xml'
+  #   std = CA_TITLE24
+  #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+  #   epw_path = nil
+  #
+  #   translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
+  #   translator.sizing_run_and_write_osm
+  #   translator.write_osws
+  #
+  #   results_xml = File.join(output_path, 'results.xml')
+  #   translator.prepare_final_xml(results_xml)
+  #   expect(File.exist?(results_xml)).to be true
+  # end
 
 end

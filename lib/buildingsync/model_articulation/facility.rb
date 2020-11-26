@@ -305,6 +305,22 @@ module BuildingSync
       end
     end
 
+    # add a current building modeled scenario and set the @cb_modeled attribute
+    # @param id [String] id to use for the scenario
+    # @return [NilClass]
+    def add_cb_modeled(id = "Scenario-#{BuildingSync::BASELINE}")
+      if @cb_modeled.nil? || @cb_modeled.empty?
+        g = BuildingSync::Generator.new
+        scenario_xml = g.add_scenario_to_report(@report_xml, 'CBModeled', id)
+        scenario = BuildingSync::Scenario.new(scenario_xml, @ns)
+        @scenarios.push(scenario)
+        @cb_modeled = scenario
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.add_cb_modeled', "A Current Building Modeled scenario was added (Scenario ID: #{@cb_modeled.xget_id}).")
+      else
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.add_cb_modeled', "A Current Building Modeled scenario already exists (Scenario ID: #{@cb_modeled.xget_id}). A new one was not added.")
+      end
+    end
+
     # Add a minimal lighting system in the doc and as an object
     # @param premise_id [String] id of the premise which the system will be linked to
     # @param premise_type [String] type of premise, i.e. Building, Section, etc.
@@ -548,7 +564,7 @@ module BuildingSync
     # @param dir [String]
     # @return [Array]
     def write_osm(dir)
-      scenario_types = @site.determine_standard_perform_sizing_write_osm(dir)
+      scenario_types = @site.write_osm(dir)
       return scenario_types
     end
 
