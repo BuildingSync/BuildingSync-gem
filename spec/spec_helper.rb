@@ -472,6 +472,17 @@ RSpec.configure do |config|
     end
   end
 
+  def check_osws_simulated(osw_files)
+    osw_files.each do |osw|
+      sql_file = osw.gsub('in.osw', 'eplusout.sql')
+      finished_job = osw.gsub('in.osw', 'finished.job')
+      failed_job = osw.gsub('in.osw', 'failed.job')
+      expect(File.exist?(sql_file)).to be true
+      expect(File.exist?(finished_job)).to be true
+      expect(File.exist?(failed_job)).to be false
+    end
+  end
+
   # @param translator [BuildingSync::Translator]
   # @param results_file_path [String]
   def translator_save_xml_checks(translator, results_file_path)

@@ -54,7 +54,7 @@ RSpec.describe 'BuildingSync' do
     # -- Assert steps get deleted from workflow
     expect(translator.get_workflow['steps'].empty?).to be true
 
-    translator.insert_energyplus_measure('scale_geometry', 1)
+    translator.insert_measure_into_workflow('', 'scale_geometry', 1)
     translator.sizing_run_and_write_osm
 
     # -- Assert
@@ -70,21 +70,21 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
-  #
-  # it 'should write parameter value into XML' do
-  #   # -- Setup
-  #   file_name = 'building_151_one_scenario.xml'
-  #   std = CA_TITLE24
-  #   xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-  #   epw_path = nil
-  #
-  #   translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
-  #   translator.sizing_run_and_write_osm
-  #   translator.write_osws
-  #
-  #   results_xml = File.join(output_path, 'results.xml')
-  #   translator.prepare_final_xml(results_xml)
-  #   expect(File.exist?(results_xml)).to be true
-  # end
+
+  it 'should write parameter value into XML' do
+    # -- Setup
+    file_name = 'building_151_one_scenario.xml'
+    std = CA_TITLE24
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_path = nil
+
+    translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
+    translator.sizing_run_and_write_osm
+    translator.write_osws
+
+    results_xml = File.join(output_path, 'results.xml')
+    translator.prepare_final_xml(results_xml)
+    expect(File.exist?(results_xml)).to be true
+  end
 
 end

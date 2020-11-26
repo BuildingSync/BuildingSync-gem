@@ -181,7 +181,7 @@ RSpec.describe 'WorkflowMaker' do
     end
 
 
-    it "insert_measure_into_workflow: EnergyPlusMeasure (modify_energyplus_coil_cooling_dx_single_speed_objects) at the expected position" do
+    it "insert_measure_into_workflow: EnergyPlusMeasure (modify_energyplus_coil_cooling_dx_single_speed_objects) at the expected position and still simulates" do
       # -- Setup
       # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
       measure_type = 'EnergyPlusMeasure'
@@ -203,14 +203,12 @@ RSpec.describe 'WorkflowMaker' do
       @workflow_maker.run_osws(@output_path)
       osw_files = []
       Dir.glob("#{@output_path}/Baseline/in.osw") { |osw| osw_files << osw }
-      osw_files.each do |osw|
-        sql_file = osw.gsub('in.osw', 'eplusout.sql')
-        puts "Simulation not completed successfully for file: #{osw}" if !File.exist?(sql_file)
-        expect(File.exist?(sql_file)).to be true
-      end
+
+      # -- Assert
+      check_osws_simulated(osw_files)
     end
 
-    it "insert_measure_into_workflow: ReportingMeasure (openstudio_results) at the expected position" do
+    it "insert_measure_into_workflow: ReportingMeasure (openstudio_results) at the expected position and still simulates" do
       # -- Setup
       # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
       measure_type = 'ReportingMeasure'
@@ -232,14 +230,12 @@ RSpec.describe 'WorkflowMaker' do
       @workflow_maker.run_osws(@output_path)
       osw_files = []
       Dir.glob("#{@output_path}/Baseline/in.osw") { |osw| osw_files << osw }
-      osw_files.each do |osw|
-        sql_file = osw.gsub('in.osw', 'eplusout.sql')
-        puts "Simulation not completed successfully for file: #{osw}" if !File.exist?(sql_file)
-        expect(File.exist?(sql_file)).to be true
-      end
+
+      # -- Assert
+      check_osws_simulated(osw_files)
     end
 
-    it "insert_measure_into_workflow: ModelMeasure (scale_geometry) at the expected position" do
+    it "insert_measure_into_workflow: ModelMeasure (scale_geometry) at the expected position and still simulates" do
       # -- Setup
       # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
       measure_type = 'ModelMeasure'
@@ -261,11 +257,9 @@ RSpec.describe 'WorkflowMaker' do
       @workflow_maker.run_osws(@output_path)
       osw_files = []
       Dir.glob("#{@output_path}/Baseline/in.osw") { |osw| osw_files << osw }
-      osw_files.each do |osw|
-        sql_file = osw.gsub('in.osw', 'eplusout.sql')
-        puts "Simulation not completed successfully for file: #{osw}" if !File.exist?(sql_file)
-        expect(File.exist?(sql_file)).to be true
-      end
+
+      # -- Assert
+      check_osws_simulated(osw_files)
     end
 
   end
