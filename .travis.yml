@@ -62,13 +62,10 @@ jobs:
       name: "Translator Scenario Simulation Spec"
     - script:
       - $SH "bundle exec rspec spec/tests/scenario_spec.rb"
-      name: "Scenario Spec"
-    - script:
       - $SH "bundle exec rspec spec/tests/time_series_spec.rb"
-      name: "TimeSeries Spec"
-    - script:
       - $SH "bundle exec rspec spec/tests/resource_use_spec.rb"
-      name: "ResourceUse Spec"
+      - $SH "bundle exec rspec spec/tests/all_resource_total_spec.rb"
+      name: "Scenario Related Specs"
     - script:
       - $SH "bundle exec rspec spec/tests/workflow_maker_spec.rb"
       name: "WorkflowMaker Spec"

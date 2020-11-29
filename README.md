@@ -43,7 +43,7 @@ translator = BuildingSync::Translator.new(building_sync_xml_file_path, out_path)
 
 # generating the OpenStudio Model and writing the osm file.
 # path/to/output_dir/SR and path/to/output_dir/in.osm created
-translator.determine_standard_perform_sizing_write_osm
+translator.setup_and_sizing_run
 
 # generating the OpenStudio workflows and writing the osw files
 # auc:Scenario elements with measures are turned into new simulation dirs

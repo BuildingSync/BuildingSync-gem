@@ -203,7 +203,7 @@ RSpec.describe 'Scenario data creation' do
     expect(s.get_time_series_data).to be_an_instance_of(Array)
 
     expect(s.get_resource_uses[0]).to be_an_instance_of(BuildingSync::ResourceUse)
-    expect(s.get_all_resource_totals[0]).to be_an_instance_of(REXML::Element)
+    expect(s.get_all_resource_totals[0]).to be_an_instance_of(BuildingSync::AllResourceTotal)
     expect(s.get_time_series_data[0]).to be_an_instance_of(BuildingSync::TimeSeries)
   end
 end
@@ -396,17 +396,16 @@ RSpec.describe 'Scenario workflow configuration' do
 end
 
 RSpec.describe "Scenario Results Parsing" do
-  it 'parse_annual_results should create two ResourceUses (Electricity, Natural gas) and add annual results' do
+  it 'os_add_resource_uses should create two ResourceUses (Electricity, Natural gas) and add ResourceUse annual results' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
-    g = BuildingSync::Generator.new(ns, v)
+    g = BuildingSync::Generator.new(ns)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
 
     # -- Setup output path
-    file_name = 'blank.file'
+    file_name = 'resource_use.file'
     main_output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__, File.extname(__FILE__))}/#{File.basename(file_name, File.extname(file_name))}")
     FileUtils.rm_rf(main_output_path) if Dir.exist?(main_output_path)
 
@@ -414,12 +413,12 @@ RSpec.describe "Scenario Results Parsing" do
     scenario_xml = g.add_scenario_to_first_report(doc, 'CBModeled')
     s = BuildingSync::Scenario.new(scenario_xml, ns)
 
+    # -- Setup - read in IP results json file
     results = {}
-    # -- Setup
     File.open(File.join(SPEC_FILES_DIR, 'ip_results.json'), 'r') do |file|
       results = JSON.parse(file.read)
     end
-    s.parse_annual_results(results)
+    s.os_add_resource_uses(results)
 
     # -- Assert
     expect(s.get_resource_uses.size).to eq(2)
@@ -429,11 +428,46 @@ RSpec.describe "Scenario Results Parsing" do
     expect(elec.xget_text('EnergyResource')).to eq('Electricity')
     expect(elec.xget_text('EndUse')).to eq('All end uses')
     expect(elec.xget_text_as_float('AnnualFuelUseConsistentUnits')).to be_within(0.01).of(180.644)
+    expect(elec.xget_text_as_float('AnnualPeakConsistentUnits')).to be_within(0.01).of(19.06)
 
     # -- Assert - Natural Gas checks
     ng = s.get_resource_uses[1]
     expect(ng.xget_text('EnergyResource')).to eq('Natural gas')
     expect(ng.xget_text('EndUse')).to eq('All end uses')
     expect(ng.xget_text_as_float('AnnualFuelUseConsistentUnits')).to be_within(0.01).of(0.218)
+  end
+
+  it 'os_add_all_resource_totals should create one AllResourceTotal and ' do
+    # -- Setup
+    ns = 'auc'
+    g = BuildingSync::Generator.new(ns)
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    g.add_report_to_first_facility(doc)
+
+    # -- Setup output path
+    file_name = 'all_resource_total.file'
+    main_output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__, File.extname(__FILE__))}/#{File.basename(file_name, File.extname(file_name))}")
+    FileUtils.rm_rf(main_output_path) if Dir.exist?(main_output_path)
+
+    # -- Setup
+    scenario_xml = g.add_scenario_to_first_report(doc, 'CBModeled')
+    s = BuildingSync::Scenario.new(scenario_xml, ns)
+
+    # -- Setup - read in IP results json file
+    results = {}
+    File.open(File.join(SPEC_FILES_DIR, 'ip_results.json'), 'r') do |file|
+      results = JSON.parse(file.read)
+    end
+    s.os_add_all_resource_totals(results)
+
+    # -- Assert
+    expect(s.get_all_resource_totals.size).to eq(1)
+
+    # -- Assert - Electricity checks
+    art = s.get_all_resource_totals[0]
+    expect(art.xget_text('EndUse')).to eq('All end uses')
+    expect(art.xget_text_as_float('SiteEnergyUse')).to be_within(0.01).of(180_862.46)
+    expect(art.xget_text_as_float('SiteEnergyUseIntensity')).to be_within(0.01).of(32.87)
   end
 end

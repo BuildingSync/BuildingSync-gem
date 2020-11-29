@@ -34,57 +34,18 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative './../spec_helper'
 
-require 'fileutils'
-require 'parallel'
+module BuildingSync
+  # ResourceUse class
+  class AllResourceTotal
+    include BuildingSync::Helper
+    include BuildingSync::XmlGetSet
+    def initialize(base_xml, ns)
+      @base_xml = base_xml
+      @ns = ns
 
-RSpec.describe 'BuildingSync' do
+      help_element_class_type_check(base_xml, 'AllResourceTotal')
 
-  it 'remove all measures and then add a new EnergyPlus measure' do
-    # -- Setup
-    file_name = 'building_151_no_measures.xml'
-    std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__,'v2.2.0')
-    epw_path = nil
-
-    translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
-    translator.clear_all_measures
-
-    # -- Assert steps get deleted from workflow
-    expect(translator.get_workflow['steps'].empty?).to be true
-
-    translator.insert_measure_into_workflow('', 'scale_geometry', 1)
-    translator.setup_and_sizing_run
-
-    # -- Assert
-    write_osm_checks(output_path)
-    translator.write_osws
-    translator.run_osws
-    osw_files = []
-    Dir.glob("#{output_path}/Baseline/in.osw") { |osw| osw_files << osw }
-    osw_files.each do |osw|
-      sql_file = osw.gsub('in.osw', 'eplusout.sql')
-      puts "Simulation not completed successfully for file: #{osw}" if !File.exist?(sql_file)
-      expect(File.exist?(sql_file)).to be true
     end
   end
-
-
-  it 'should write parameter value into XML' do
-    # -- Setup
-    file_name = 'building_151_one_scenario.xml'
-    std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_path = nil
-
-    translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
-    translator.setup_and_sizing_run
-    translator.write_osws
-
-    results_xml = File.join(output_path, 'results.xml')
-    translator.prepare_final_xml(results_xml)
-    expect(File.exist?(results_xml)).to be true
-  end
-
 end

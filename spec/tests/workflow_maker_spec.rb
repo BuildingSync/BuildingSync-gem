@@ -181,7 +181,7 @@ RSpec.describe 'WorkflowMaker' do
     end
 
 
-    it "insert_measure_into_workflow: EnergyPlusMeasure (set_energyplus_minimum_outdoor_air_flow_rate) at the expected position and still simulates" do
+    it "insert_measure_into_workflow: EnergyPlusMeasure (ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects) at the expected position and still simulates" do
       # -- Setup
       # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
       measure_type = 'EnergyPlusMeasure'
@@ -204,7 +204,7 @@ RSpec.describe 'WorkflowMaker' do
       expect(@workflow_maker.get_workflow['steps'].size).to eq(30)
       expect(@workflow_maker.get_workflow['steps'][final_expected_position]['measure_dir_name']).to eq(measure_dir_name)
 
-      @workflow_maker.determine_standard_perform_sizing_write_osm(@output_path, nil, @std)
+      @workflow_maker.setup_and_sizing_run(@output_path, nil, @std)
       write_osm_checks(@output_path)
 
       @workflow_maker.write_osws(@output_path)
@@ -231,7 +231,7 @@ RSpec.describe 'WorkflowMaker' do
       expect(@workflow_maker.get_workflow['steps'].size).to eq(30)
       expect(@workflow_maker.get_workflow['steps'][final_expected_position]['measure_dir_name']).to eq(measure_dir_name)
 
-      @workflow_maker.determine_standard_perform_sizing_write_osm(@output_path, nil, @std)
+      @workflow_maker.setup_and_sizing_run(@output_path, nil, @std)
       write_osm_checks(@output_path)
 
       @workflow_maker.write_osws(@output_path)
@@ -258,7 +258,7 @@ RSpec.describe 'WorkflowMaker' do
       expect(@workflow_maker.get_workflow['steps'].size).to eq(30)
       expect(@workflow_maker.get_workflow['steps'][final_expected_position]['measure_dir_name']).to eq(measure_dir_name)
 
-      @workflow_maker.determine_standard_perform_sizing_write_osm(@output_path, nil, @std)
+      @workflow_maker.setup_and_sizing_run(@output_path, nil, @std)
       write_osm_checks(@output_path)
 
       @workflow_maker.write_osws(@output_path)
@@ -272,7 +272,7 @@ RSpec.describe 'WorkflowMaker' do
 
   end
 
-  # TODO: additional test to show failing scenario
+  # TODO: add test to show what a failing scenario looks like
   it 'building_151_one_scenario.xml configure_workflow_for_scenario should return success = true for both Scenarios' do
     # -- Setup
     file_name = 'building_151_one_scenario.xml'

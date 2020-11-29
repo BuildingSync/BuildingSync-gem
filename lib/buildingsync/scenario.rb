@@ -40,6 +40,7 @@ require 'securerandom'
 require 'buildingsync/helpers/helper'
 require 'buildingsync/helpers/xml_get_set'
 require 'buildingsync/resource_use'
+require 'buildingsync/all_resource_total'
 require 'buildingsync/time_series'
 
 module BuildingSync
@@ -47,6 +48,7 @@ module BuildingSync
   class Scenario
     include BuildingSync::Helper
     include BuildingSync::XmlGetSet
+
     def initialize(base_xml, ns)
       @base_xml = base_xml
       @ns = ns
@@ -87,6 +89,12 @@ module BuildingSync
                               "bsync_element_units" => "MMBtu",
                               "os_results_key" => "fuel_electricity",
                               "os_results_unit" => "kBtu"
+                          },
+                          {
+                              "bsync_element_name" => "AnnualPeakConsistentUnits",
+                              "bsync_element_units" => "kW",
+                              "os_results_key" => "annual_peak_electric_demand",
+                              "os_results_unit" => "kW"
                           }
                       ]
                   },
@@ -305,14 +313,22 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.gather_openstudio_results', "Scenario ID: #{xget_id}. Only able to process IP results.")
           raise StandardError, "BuildingSync.Scenario.gather_openstudio_results. Scenario ID: #{xget_id}. Only able to process IP results."
         else
-          parse_annual_results
+          os_parse_annual_results
           parse_monthly_results
         end
       end
 
     end
 
-    def parse_annual_results(results = @results_json)
+    def os_parse_annual_results(results = @results_json)
+      os_add_resource_uses(results)
+      os_add_all_resource_totals(results)
+    end
+
+    # Use the bsync to openstudio resources map to add results from the openstudio
+    # simulations as new ResourceUse elements and objects
+    # @param results [Hash] a hash of the results as directly read in from a results.json file
+    def os_add_resource_uses(results)
       ip_map = @bsync_openstudio_resources_map['IP']
       os_results = results["OpenStudio Results"]
 
@@ -331,30 +347,62 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Scenario.parse_annual_results', "Scenario ID: #{xget_id}.  Resource Use of type: #{ru_type} and end use: #{end_use} already exists")
           resource_use_xml = resource_use_element.first()
         end
-        resource_use_map['fields'].each do |field|
-          os_results_val = os_results[field['os_results_key']]
-          if os_results_val.nil?
-            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.parse_annual_results', "Scenario ID: #{xget_id}.  Unable to find result for #{field['os_results_key']}")
-          else
-            if field['os_results_unit'] == field['bsync_element_units']
-              new_element = REXML::Element.new("#{@ns}:#{field['bsync_element_name']}", resource_use_xml)
-              new_element.text = os_results_val
-            else
-              converted = help_convert(os_results_val, field['os_results_unit'], field['bsync_element_units'])
-              if !converted.nil?
-                new_element = REXML::Element.new("#{@ns}:#{field['bsync_element_name']}", resource_use_xml)
-                new_element.text = converted
-              end
-            end
 
-            # Add ResourceUse
-            @resource_uses << BuildingSync::ResourceUse.new(resource_use_xml, @ns)
+        # Map in the fields for each ResourceUse element into the xml
+        add_fields_from_map(resource_use_map['fields'], os_results, resource_use_xml)
+        # Add ResourceUse
+        @resource_uses << BuildingSync::ResourceUse.new(resource_use_xml, @ns)
+      end
+    end
+
+    def os_add_all_resource_totals(results)
+      ip_map = @bsync_openstudio_resources_map['IP']
+      os_results = results["OpenStudio Results"]
+
+      # Loop through ResourceUses in the resource_use_map
+      ip_map['AllResourceTotal'].each do |map|
+        end_use = map['EndUse']
+
+        # Check if an AllResourceTotal of the desired type already exists
+        element = @base_xml.get_elements("./#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal[#{@ns}:EndUse/text() = '#{end_use}']")
+
+        # Add a new ResourceUse xml to the Scenario
+        if element.nil? || element.empty?
+          all_resource_total_xml = @g.add_all_resource_total_to_scenario(@base_xml, end_use, "AllResourceTotal-#{end_use.split.map(&:capitalize).join('')}")
+        else
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Scenario.parse_annual_results', "Scenario ID: #{xget_id}.  Resource Use of type: #{ru_type} and end use: #{end_use} already exists")
+          all_resource_total_xml = element.first()
+        end
+
+        add_fields_from_map(map['fields'], os_results, all_resource_total_xml)
+
+        @all_resource_totals << BuildingSync::AllResourceTotal.new(all_resource_total_xml, @ns)
+      end
+    end
+
+    def add_fields_from_map(fields, os_results, parent_xml)
+      fields.each do |field|
+        os_results_val = os_results[field['os_results_key']]
+        if os_results_val.nil?
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.parse_annual_results', "Scenario ID: #{xget_id}.  Unable to find result for #{field['os_results_key']}")
+        else
+          if field['os_results_unit'] == field['bsync_element_units']
+            # Parent element
+            new_element = REXML::Element.new("#{@ns}:#{field['bsync_element_name']}", parent_xml)
+            new_element.text = os_results_val
+          else
+            converted = help_convert(os_results_val, field['os_results_unit'], field['bsync_element_units'])
+            if !converted.nil?
+              new_element = REXML::Element.new("#{@ns}:#{field['bsync_element_name']}", parent_xml)
+              new_element.text = converted
+            end
           end
         end
       end
     end
 
-    def parse_monthly_results(results = @results_json)
+
+    def os_parse_monthly_results(results = @results_json)
 
     end
 
@@ -370,8 +418,8 @@ module BuildingSync
     def read_all_resource_totals
       all_resource_total = @base_xml.get_elements("./#{@ns}:AllResourceTotals/#{@ns}:AllResourceTotal")
       if !all_resource_total.nil? && !all_resource_total.empty?
-        all_resource_total.each do |a|
-          @all_resource_totals << a
+        all_resource_total.each do |art|
+          @all_resource_totals << BuildingSync::AllResourceTotal.new(art, @ns)
         end
       end
     end

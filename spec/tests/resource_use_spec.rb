@@ -48,9 +48,9 @@ RSpec.describe 'ResourceUse' do
     doc = REXML::Document.new(doc_string)
     facility_element = doc.elements["//#{ns}:Facility"]
 
-    # -- Create TimeSeries object from Facility
+    # -- Create ResourceUse object from Facility
     begin
-      ts = BuildingSync::ResourceUse.new(facility_element, ns)
+      ru = BuildingSync::ResourceUse.new(facility_element, ns)
 
       # Should not reach this
       expect(false).to be true

@@ -216,11 +216,14 @@ module BuildingSync
       return resource_use
     end
 
-    def add_all_resource_total_to_scenario(scenario_xml, id = 'AllResourceTotal-1')
+    def add_all_resource_total_to_scenario(scenario_xml, end_use = 'All end uses', id = 'AllResourceTotal-1')
       all_resource_totals = help_get_or_create(scenario_xml, "#{@ns}:AllResourceTotals")
 
       all_resource_total = REXML::Element.new("#{@ns}:AllResourceTotal", all_resource_totals)
       all_resource_total.add_attribute('ID', id)
+      eu = REXML::Element.new("#{@ns}:EndUse", all_resource_total)
+      eu.text = end_use
+
       return all_resource_total
     end
 

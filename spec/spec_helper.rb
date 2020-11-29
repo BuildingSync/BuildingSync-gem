@@ -163,7 +163,7 @@ RSpec.configure do |config|
     end
 
     translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
-    translator.sizing_run_and_write_osm
+    translator.setup_and_sizing_run
 
     base_file_name = File.basename(file_name, '.xml')
     new_osm_file = "#{out_path}/#{base_file_name}.osm"
@@ -372,7 +372,7 @@ RSpec.configure do |config|
     # -- Setup
     # Create a new Translator and write the OSM
     translator = BuildingSync::Translator.new(xml_path, output_path, epw_file_path, standard_to_be_used)
-    translator.sizing_run_and_write_osm
+    translator.setup_and_sizing_run
 
     # -- Assert
     write_osm_checks(output_path)
