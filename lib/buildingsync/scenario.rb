@@ -69,10 +69,16 @@ module BuildingSync
       @osw_dir = nil
       @workflow = {} # Hash to hold the workflow, see set_workflow
       @results_file_name = 'results.json' # holds annual and monthly results
+      @eplustbl_file_name = 'eplustbl.htm' # holds source energy results
       @out_osw_file_name = 'out.osw' # holds the completion status of the simulation
       @out_osw_json = nil # Hash to hold the read in of out.osw
       @results_json = nil # Hash to hold the read in of results.json
-      @simulation_success = false # Set by check_simulation_success
+
+      # Define mappings for native units by Resource Use
+      @native_units_map = {
+          'Electricity' => 'kWh',
+          'Natural gas' => 'kBtu'
+      }
 
       # Define a mapping between BuildingSync concepts to openstudio concepts
       # available in the results.json file
@@ -96,7 +102,12 @@ module BuildingSync
                               "os_results_key" => "annual_peak_electric_demand",
                               "os_results_unit" => "kW"
                           }
-                      ]
+                      ],
+                      "monthly" => {
+                          # [bracket text] is replaced when processed
+                          'text' => 'electricity_ip_[month]',
+                          'os_results_unit' => 'kWh'
+                      }
                   },
                   {
                       "EnergyResource" => "Natural gas",
@@ -109,7 +120,12 @@ module BuildingSync
                               "os_results_key" => "fuel_natural_gas",
                               "os_results_unit" => "kBtu"
                           }
-                      ]
+                      ],
+                      "monthly" => {
+                          # [bracket text] is replaced when processed
+                          'text' => 'natural_gas_ip_[month]',
+                          'os_results_unit' => 'MMBtu'
+                      }
                   }
               ],
               "AllResourceTotal" => [
@@ -133,14 +149,6 @@ module BuildingSync
               ]
           }
       }
-      # ' Electricity ': {
-      #     ' annual ': ' electricity_ip ',
-      #     ' monthly ': %w(electricity_ip_jan electricity_ip_feb electricity_ip_mar electricity_ip_apr electricity_ip_may electricity_ip_jun electricity_ip_jul electricity_ip_aug electricity_ip_sep electricity_ip_oct electricity_ip_nov electricity_ip_dec)
-      # },
-      # ' Natural Gas ': {
-      #     ' AnnualFuelUseConsistentUnits ': ' natural_gas_ip ',
-      #     ' monthly ': %w(natural_gas_ip_jan natural_gas_ip_feb natural_gas_ip_mar natural_gas_ip_apr natural_gas_ip_may natural_gas_ip_jun natural_gas_ip_jul natural_gas_ip_aug natural_gas_ip_sep natural_gas_ip_oct natural_gas_ip_nov natural_gas_ip_dec)
-      # }
 
       read_xml
 
@@ -175,6 +183,10 @@ module BuildingSync
     # @return [Array<BuildingSync::ResourceUse>]
     def get_resource_uses
       return @resource_uses
+    end
+
+    def get_all_end_use_resource_uses
+      return @resource_uses.each.select { |ru| ru.xget_text('EndUse') == 'All end uses' }
     end
 
     # @return [Array<REXML::Element>]
@@ -271,51 +283,101 @@ module BuildingSync
       end
     end
 
-    # Check that the simulation was completed successfully.  Three things are checked:
-    # - Existence of finished.job file
-    # - Non-existence of failed.job file
-    # - out.osw completed_status == ' Success '
-    def check_simulation_success
-      out_osw_file = File.join(@osw_dir, @out_osw_file_name)
-      finished_job = File.join(@osw_dir, 'finished.job')
-      failed_job = File.join(@osw_dir, 'failed.job')
+    # Check that the simulation was completed successfully.  We check:
+    # - out.osw completed_status == 'Success'
+    # - finished.job file exists
+    # - failed.job file doesn't exist
+    # - eplusout.end and eplusout.err files
+    def simulation_success?
+      success = true
+
+      # Check out.osw
+      out_osw_file = File.join(get_osw_dir, @out_osw_file_name)
       if !File.exist?(out_osw_file)
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.check_simulation_status', "Scenario ID: #{xget_id}.  #{out_osw_file} does not exist.")
-      end
-
-      File.open(out_osw_file, ' r ') do |file|
-        @out_osw_json << JSON.parse(file)
-      end
-
-      if File.exist?(finished_job) && !File.exist?(failed_job) && @out_osw_json['completed_status'] == 'Success'
-        @simulation_success = true
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Scenario.check_simulation_success', "Scenario ID: #{xget_id} successfully completed.")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.simulation_success?', "Scenario ID: #{xget_id}.  #{out_osw_file} does not exist.")
       else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.check_simulation_success', "Scenario ID: #{xget_id} unsuccessful.")
+        File.open(out_osw_file, 'r') do |file|
+          @out_osw_json = JSON.parse(file.read)
+        end
+        if @out_osw_json['completed_status'] == 'Success'
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Scenario.simulation_success?', "Scenario ID: #{xget_id} successfully completed.")
+        else
+          success = false
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.simulation_success?', "Scenario ID: #{xget_id} unsuccessful.")
+        end
+
       end
 
+      # Check for finished.job
+      finished_job = File.join(get_osw_dir, 'finished.job')
+      if !File.exist?(finished_job)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.simulation_success?', "Scenario ID: #{xget_id}: finished.job does not exist, simulation unsuccessful.")
+        success = false
+      end
+
+      # Check for failed.job
+      failed_job = File.join(get_osw_dir, 'failed.job')
+      if File.exist?(failed_job)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.simulation_success?', "Scenario ID: #{xget_id}: failed.job exists, simulation unsuccessful.")
+        success = false
+      end
+
+      # Check eplusout.end and eplusout.err files
+      end_file = File.join(get_osw_dir, 'eplusout.end')
+      if File.exist?(end_file)
+        # we open the .end file to determine if EnergyPlus was successful or not
+        energy_plus_string = File.open(end_file, &:readline)
+        if energy_plus_string.include? 'Fatal Error Detected'
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.simulation_success?', "Scenario ID: #{xget_id}: eplusout.end detected error, simulation unsuccessful: #{energy_plus_string}")
+          success = false
+          # if we found out that there was a fatal error we search the err file for the first error.
+          File.open(File.join(scenario.get_osw_dir, 'eplusout.err')).each do |line|
+            if line.include? '** Severe  **'
+              OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.simulation_success?', "Scenario ID: #{xget_id}: Severe error occurred! #{line}")
+            elsif line.include? '**  Fatal  **'
+              OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.simulation_success?', "Scenario ID: #{xget_id}: Fatal error occurred! #{line}")
+            end
+          end
+        end
+      end
+
+      return success
     end
 
-    def gather_openstudio_results
-      check_simulation_success
-      if !@simulation_success
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.gather_openstudio_results', "Scenario ID: #{xget_id}. Unable to gather results as simulation was unsuccessful.")
-      else
-        results_file = File.join(@osw_dir, @results_file_name)
-        if !File.exist?(results_file)
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.gather_openstudio_results', "Scenario ID: #{xget_id}.  Unable to gather results: #{results_file} does not exist.")
-        end
+    def results_available_and_correct_units?(results=@results_json)
+      results_available = true
 
+      if !results.nil?
+        if @results_json['units'] == 'SI'
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.results_available_and_correct_units?', "Scenario ID: #{xget_id}. Only able to process IP results.")
+          results_available = false
+        end
+      elsif !File.exist?(File.join(get_osw_dir, @results_file_name))
+        results_available = false
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.results_available_and_correct_units?', "Scenario ID: #{xget_id}.  Unable to gather results: #{results_file} does not exist.")
+      else
+        results_file = File.join(get_osw_dir, @results_file_name)
         File.open(results_file, 'r') do |file|
-          @results_json << JSON.parse(file)
+          @results_json = JSON.parse(file.read)
         end
         if @results_json['units'] == 'SI'
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.gather_openstudio_results', "Scenario ID: #{xget_id}. Only able to process IP results.")
-          raise StandardError, "BuildingSync.Scenario.gather_openstudio_results. Scenario ID: #{xget_id}. Only able to process IP results."
-        else
-          os_parse_annual_results
-          parse_monthly_results
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.results_available_and_correct_units?', "Scenario ID: #{xget_id}. Only able to process IP results.")
+          results_available = false
         end
+      end
+      return results_available
+    end
+
+    def os_gather_results(year_val)
+      success = simulation_success?
+      results_available = results_available_and_correct_units?
+      if success && results_available
+        os_parse_annual_results
+        os_parse_monthly_all_end_uses_results(year_val)
+      elsif !success
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.os_gather_results', "Scenario ID: #{xget_id}. Unable to gather results as simulation was unsuccessful.")
+      elsif !results_available
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.os_gather_results', "Scenario ID: #{xget_id}. Unable to gather results as results are not available.")
       end
 
     end
@@ -325,24 +387,80 @@ module BuildingSync
       os_add_all_resource_totals(results)
     end
 
+    def os_parse_monthly_all_end_uses_results(year_val = Date.today.year, results = @results_json)
+      if results_available_and_correct_units?(results)
+        time_series_data_xml = xget_or_create('TimeSeriesData')
+        resource_use_map = @bsync_openstudio_resources_map["IP"]["ResourceUse"]
+        os_results = results['OpenStudioResults']
+        get_all_end_use_resource_uses.each do |resource_use|
+          resource_use_hash = resource_use_map.each.find { |h| h["EnergyResource"] == resource_use.xget_text("EnergyResource") && h["EndUse"] == 'All end uses' }
+          if resource_use_hash.nil?
+            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.os_parse_monthly_all_end_uses_results', "Scenario ID: #{xget_id}: Unable to find mapping for ResourceUse: #{resource_use.xget_id} and 'All end uses'. Cannot parse monthly results")
+          else
+            monthly_text = resource_use_hash['monthly']['text']
+            monthly_units = resource_use_hash['monthly']['os_results_unit']
+            native_units = @native_units_map[resource_use.xget_text("EnergyResource")]
+            (1..12).each do |month|
+              start_date_time = DateTime.new(year_val, month, 1)
+
+              # substitues [month] with oct, for example, so we get electricity_ip_oct
+              key_to_find = monthly_text.gsub("[month]", start_date_time.strftime('%b').downcase)
+              if os_results.has_key?(key_to_find)
+                # We always use the first day of the month as the start day
+                time_series_xml = REXML::Element.new("#{@ns}:TimeSeries", time_series_data_xml)
+                time_series_xml.add_attribute('ID', "TS-#{start_date_time.strftime('%b').upcase}-#{resource_use.xget_id}")
+
+                # Create new TimeSeries element
+                ts = BuildingSync::TimeSeries.new(time_series_xml, @ns)
+
+                # continue defining values using xset methods
+                ts.xset_or_create('ReadingType', 'Total')
+                ts.xset_or_create('TimeSeriesReadingQuantity', 'Energy')
+                ts.set_start_and_end_timestamps_monthly(start_date_time.dup)
+                ts.xset_or_create('IntervalFrequency', 'Month')
+
+                # Makes sure the value is in the correct units
+                interval_reading_val = help_convert(os_results[key_to_find], monthly_units, native_units)
+                ts.xset_or_create('IntervalReading', interval_reading_val)
+
+
+                ru_id = ts.xget_or_create('ResourceUseID')
+                ru_id.add_attribute('IDref', resource_use.xget_id)
+              else
+                OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.os_parse_monthly_all_end_uses_results', "Scenario ID: #{xget_id}: Key #{key_to_find} not found in results['OpenStudioResults'].  Make sure monthly data is being output by os_results measure")
+              end
+
+
+            end
+          end
+        end
+      else
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.get_timeseries_element', 'Cannot add monthly report values to the BldgSync file since it is missing.')
+      end
+
+    end
+
     # Use the bsync to openstudio resources map to add results from the openstudio
     # simulations as new ResourceUse elements and objects
     # @param results [Hash] a hash of the results as directly read in from a results.json file
     def os_add_resource_uses(results)
+      @results_json = results
       ip_map = @bsync_openstudio_resources_map['IP']
-      os_results = results["OpenStudio Results"]
+      os_results = @results_json["OpenStudioResults"]
 
       # Loop through ResourceUses in the resource_use_map
       ip_map['ResourceUse'].each do |resource_use_map|
         ru_type = resource_use_map['EnergyResource']
         end_use = resource_use_map['EndUse']
+        native_units = @native_units_map[ru_type]
 
         # Check if a ResourceUse of the desired type already exists
         resource_use_element = @base_xml.get_elements("./#{@ns}:ResourceUses/#{@ns}:ResourceUse[#{@ns}:EnergyResource/text() = '#{ru_type}' and #{@ns}:EndUse/text() = '#{end_use}']")
 
-        # Add a new ResourceUse xml to the Scenario
+        # Add a new ResourceUse xml to the Scenario.  This also adds ResourceUses if not defined
         if resource_use_element.nil? || resource_use_element.empty?
-          resource_use_xml = @g.add_energy_resource_use_to_scenario(@base_xml, ru_type, end_use, "ResourceUse-#{ru_type.split.map(&:capitalize).join('')}-#{end_use.split.map(&:capitalize).join('')}")
+          ru_id = "#{xget_id}-ResourceUse-#{ru_type.split.map(&:capitalize).join('')}-#{end_use.split.map(&:capitalize).join('')}"
+          resource_use_xml = @g.add_energy_resource_use_to_scenario(@base_xml, ru_type, end_use, ru_id, native_units)
         else
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Scenario.parse_annual_results', "Scenario ID: #{xget_id}.  Resource Use of type: #{ru_type} and end use: #{end_use} already exists")
           resource_use_xml = resource_use_element.first()
@@ -350,14 +468,15 @@ module BuildingSync
 
         # Map in the fields for each ResourceUse element into the xml
         add_fields_from_map(resource_use_map['fields'], os_results, resource_use_xml)
-        # Add ResourceUse
+
+        # Add ResourceUse to array
         @resource_uses << BuildingSync::ResourceUse.new(resource_use_xml, @ns)
       end
     end
 
     def os_add_all_resource_totals(results)
       ip_map = @bsync_openstudio_resources_map['IP']
-      os_results = results["OpenStudio Results"]
+      os_results = results["OpenStudioResults"]
 
       # Loop through ResourceUses in the resource_use_map
       ip_map['AllResourceTotal'].each do |map|
@@ -368,16 +487,54 @@ module BuildingSync
 
         # Add a new ResourceUse xml to the Scenario
         if element.nil? || element.empty?
-          all_resource_total_xml = @g.add_all_resource_total_to_scenario(@base_xml, end_use, "AllResourceTotal-#{end_use.split.map(&:capitalize).join('')}")
+          art_id = "#{xget_id}-AllResourceTotal-#{end_use.split.map(&:capitalize).join('')}"
+          all_resource_total_xml = @g.add_all_resource_total_to_scenario(@base_xml, end_use, art_id)
         else
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Scenario.parse_annual_results', "Scenario ID: #{xget_id}.  Resource Use of type: #{ru_type} and end use: #{end_use} already exists")
           all_resource_total_xml = element.first()
         end
 
         add_fields_from_map(map['fields'], os_results, all_resource_total_xml)
+        # add_source_energy(all_resource_total_xml)
 
         @all_resource_totals << BuildingSync::AllResourceTotal.new(all_resource_total_xml, @ns)
       end
+    end
+
+    def add_source_energy(all_resource_total_xml)
+      eplustbl_file = File.join(get_osw_dir, @eplustbl_file_name)
+      if !File.exist?(eplustbl_file)
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Scenario.add_source_energy', "Scenario ID: #{xget_id}.  #{@eplustbl_file_name} does not exist, cannot add source energy results")
+      else
+        source_energy, source_eui = get_source_energy_array(eplustbl_file)
+        source_energy_xml = REXML::Element.new("#{@ns}:SourceEnergyUse", all_resource_total_xml)
+        source_energy_xml.text = source_energy
+        source_eui_xml = REXML::Element.new("#{@ns}:SourceEnergyUseIntensity", all_resource_total_xml)
+        source_eui_xml.text = source_eui
+      end
+    end
+
+    # Get source energy and source EUI from
+    # @param eplustbl_path [String]
+    # @return [Array] [total_source_energy_kbtu, total_source_eui_kbtu_ft2]
+    def get_source_energy_array(eplustbl_path)
+      # DLM: total hack because these are not reported in the out.osw
+      # output is array of [source_energy, source_eui] in kBtu and kBtu/ft2
+      result = []
+      File.open(eplustbl_path, 'r') do |f|
+        while line = f.gets
+          if /\<td align=\"right\"\>Total Source Energy\<\/td\>/.match(line)
+            result << /\<td align=\"right\"\>(.*?)<\/td\>/.match(f.gets)[1].to_f
+            result << /\<td align=\"right\"\>(.*?)<\/td\>/.match(f.gets)[1].to_f
+            break
+          end
+        end
+      end
+
+      result[0] = result[0] * 947.8171203133 # GJ to kBtu
+      result[1] = result[1] * 0.947817120313 * 0.092903 # MJ/m2 to kBtu/ft2
+
+      return result[0], result[1]
     end
 
     def add_fields_from_map(fields, os_results, parent_xml)
@@ -401,10 +558,6 @@ module BuildingSync
       end
     end
 
-
-    def os_parse_monthly_results(results = @results_json)
-
-    end
 
     def read_resource_uses
       resource_use = @base_xml.get_elements("./#{@ns}:ResourceUses/#{@ns}:ResourceUse")

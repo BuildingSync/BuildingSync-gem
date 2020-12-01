@@ -280,7 +280,7 @@ RSpec.configure do |config|
   # @param epw_file_name [String]
   def test_baseline_and_scenario_creation(file_name, output_path, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
 
-    translator = translator_write_osm_and_perform_checks(file_name, output_path, standard_to_be_used, epw_file_name)
+    translator = translator_sizing_run_and_check(file_name, output_path, standard_to_be_used, epw_file_name)
     translator.write_osws
 
     osw_files = []
@@ -323,16 +323,12 @@ RSpec.configure do |config|
     expect(facility.generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)).to be true
     facility.write_osm(output_path)
 
-    write_osm_checks(output_path)
-
-    run_baseline_simulation(output_path + '/in.osm', epw_file_path)
-
-    translator_run_baseline_osm_checks(output_path)
+    sizing_run_checks(output_path)
   end
 
   def translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
     # -- Assert translator.write_osm checks
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, standard_to_be_used)
+    translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, standard_to_be_used)
 
     # -- Setup
     epw_file_path = '' if epw_file_path.nil? || !File.exist?(epw_file_path)
@@ -353,7 +349,7 @@ RSpec.configure do |config|
     translator_save_xml_checks(translator, results_file_path)
   end
 
-  # Creates a new Translator for the file specified and runs the write_osm method and checks:
+  # Creates a new Translator for the file specified and runs the setup_and_sizing_run method and checks:
   #  - output_path/SR directory created (for sizing run)
   #  - output_path/SR/run/finished.job exists
   #  - output_path/SR/run/failed.job doesn't exist
@@ -361,7 +357,7 @@ RSpec.configure do |config|
   # @param xml_path [String] full path to BuildingSync XML file
   # @param output_path [String] full path to output directory where new files should be saved
   # @param epw_file_path [String] optional, full path to epw file
-  def translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
+  def translator_sizing_run_and_check(xml_path, output_path, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
     # -- Assert
     expect(File.exist?(xml_path)).to be true
     if !epw_file_path.nil? && !epw_file_path == ''
@@ -375,15 +371,16 @@ RSpec.configure do |config|
     translator.setup_and_sizing_run
 
     # -- Assert
-    write_osm_checks(output_path)
+    sizing_run_checks(output_path)
     return translator
   end
 
-  def write_osm_checks(output_path)
+  # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
+  def sizing_run_checks(main_output_dir)
     # -- Assert
     # Check SR path exists
     # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/SR
-    sr_path = File.join(output_path, 'SR')
+    sr_path = File.join(main_output_dir, 'SR')
     expect(Dir.exist?(sr_path)).to be true
 
     # -- Assert
@@ -401,13 +398,14 @@ RSpec.configure do |config|
     # -- Assert
     # Check in.osm written to the main output_path
     # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/in.osm
-    expect(File.exist?(File.join(output_path, 'in.osm'))).to be true
+    expect(File.exist?(File.join(main_output_dir, 'in.osm'))).to be true
   end
 
-  def translator_run_baseline_osm_checks(output_path)
+  # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
+  def translator_run_baseline_osm_checks(main_output_dir)
     # Check Baseline directory gets created
     # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/Baseline
-    baseline_path = File.join(output_path, 'Baseline')
+    baseline_path = File.join(main_output_dir, 'Baseline')
     expect(Dir.exist?(baseline_path)).to be true
 
     # Expect job not to have failed
@@ -472,8 +470,18 @@ RSpec.configure do |config|
     end
   end
 
-  def check_osws_simulated(osw_files)
-    osw_files.each do |osw|
+  def check_osws_simulated(main_output_dir, expected_number_scenarios_excluding_sr)
+    osw_files = []
+    osw_sr_files = []
+    Dir.glob("#{main_output_dir}/**/in.osw") { |osw| osw_files << osw }
+    Dir.glob("#{main_output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
+
+    # -- Assert - simulations are as we expect them
+    expect(osw_files.size).to eq(expected_number_scenarios_excluding_sr + 1)  # includes SR
+    expect(osw_sr_files.size).to eq(1)
+
+    osw_exclude_sr = osw_files - osw_sr_files
+    osw_exclude_sr.each do |osw|
       sql_file = osw.gsub('in.osw', 'eplusout.sql')
       finished_job = osw.gsub('in.osw', 'finished.job')
       failed_job = osw.gsub('in.osw', 'failed.job')

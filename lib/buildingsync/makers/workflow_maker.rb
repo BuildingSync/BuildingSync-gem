@@ -124,18 +124,23 @@ module BuildingSync
     end
 
     # get the current workflow
-    # @return [hash]
+    # @return [Hash]
     def get_workflow
       return @workflow
     end
 
+    # get scenario elements
+    # @return [Array<BuildingSync::Scenario>]
+    def get_scenarios
+      return @facility.scenarios
+    end
 
     # generate the baseline model as osm model
     # @param dir [String]
     # @param epw_file_path [String]
     # @param standard_to_be_used [String] 'ASHRAE90.1' or 'CaliforniaTitle24' are supported options
     # @param ddy_file [String] path to the ddy file
-    # @return [Boolean] true if successful
+    # @return @see BuildingSync::Facility.write_osm
     def setup_and_sizing_run(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
       @facility.set_all
       @facility.determine_open_studio_standard(standard_to_be_used)
@@ -148,11 +153,11 @@ module BuildingSync
       @facility.prepare_final_xml
     end
 
-    # write osm
-    # @param dir [String]
-    def write_osm(dir)
-      @scenario_types = @facility.write_osm(dir)
-    end
+    # # write osm
+    # # @param dir [String]
+    # def write_osm(dir)
+    #   @scenario_types = @facility.write_osm(dir)
+    # end
 
     # iterate over the current measure list in the workflow and check if they are available at the referenced measure directories
     # @return [Boolean]
@@ -216,8 +221,8 @@ module BuildingSync
     # @param args_hash [hash]
     def insert_measure_into_workflow(measure_goal_type, measure_dir, relative_position = 0, args_hash = {})
       successfully_added = false
-      count = 0  # count for all of the measures, regardless of the type
-      measure_type_count = 0  # count of measures specific to the measure_goal_type
+      count = 0 # count for all of the measures, regardless of the type
+      measure_type_count = 0 # count of measures specific to the measure_goal_type
       measure_type_found = false
       new_step = {}
       new_step['measure_dir_name'] = measure_dir
@@ -289,7 +294,7 @@ module BuildingSync
       num_measures = 0
       scenario.get_measure_ids.each do |measure_id|
         puts measure_id
-        measure = @facility.measures.find { |m| m.xget_id == measure_id}
+        measure = @facility.measures.find { |m| m.xget_id == measure_id }
         current_num_measure = num_measures
 
         sym_to_find = "#{measure.xget_text('SystemCategoryAffected')}".to_sym
@@ -367,12 +372,6 @@ module BuildingSync
       set_measure_argument(osw, measure_dir_name, argument_name, argument_value) if !argument_name.nil? && !argument_name.empty?
     end
 
-    # get scenario elements
-    # @return [Array<BuildingSync::Scenario>]
-    def get_scenarios
-      return @facility.scenarios
-    end
-
     # write workflows for scenarios into osw files.  This includes:
     #   - Package of Measure Scenarios
     #   - Current Building Modeled (Baseline) Scenario
@@ -388,7 +387,7 @@ module BuildingSync
 
       # Write a workflow for the current building modeled scenario
       cb_modeled_success = write_osw(main_output_dir, @facility.cb_modeled)
-      number_successful =  cb_modeled_success ? 1 : 0
+      number_successful = cb_modeled_success ? 1 : 0
 
       # write an osw for each Package Of Measures scenario
       @facility.poms.each do |scenario|
@@ -409,26 +408,26 @@ module BuildingSync
     # @return [Boolean] whether the writing was successful
     def write_osw(main_output_dir, scenario)
       successful = true
-        # deep clone
-        base_workflow = deep_copy_workflow
+      # deep clone
+      base_workflow = deep_copy_workflow
 
-        # configure the workflow based on measures in this scenario
-        begin
-          if !configure_workflow_for_scenario(base_workflow, scenario)
-            successful = false
-            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osw', "Could not configure workflow for scenario #{scenario.xget_name}")
-          else
-            # The workflow is updated by configure_workflow, so passing in here is ok
-            scenario.set_workflow(base_workflow)
-            scenario.write_osw(main_output_dir)
-          end
-
-        rescue StandardError => e
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osw', "Could not configure for scenario #{scenario.xget_name}")
-          puts "Could not configure for scenario #{scenario.xget_name}"
-          puts e.backtrace.join("\n\t")
+      # configure the workflow based on measures in this scenario
+      begin
+        if !configure_workflow_for_scenario(base_workflow, scenario)
           successful = false
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osw', "Could not configure workflow for scenario #{scenario.xget_name}")
+        else
+          # The workflow is updated by configure_workflow, so passing in here is ok
+          scenario.set_workflow(base_workflow)
+          scenario.write_osw(main_output_dir)
         end
+
+      rescue StandardError => e
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osw', "Could not configure for scenario #{scenario.xget_name}")
+        puts "Could not configure for scenario #{scenario.xget_name}"
+        puts e.backtrace.join("\n\t")
+        successful = false
+      end
       return successful
     end
 
@@ -449,26 +448,6 @@ module BuildingSync
       return JSON.load(JSON.generate(@workflow))
     end
 
-    # get measure result
-    # @param result [hash]
-    # @param measure_dir_name [String]
-    # @param result_name [String]
-    # @return [Float]
-    def get_measure_result(result, measure_dir_name, result_name)
-      result[:steps].each do |step|
-        if step[:measure_dir_name] == measure_dir_name
-          if step[:result] && step[:result][:step_values]
-            step[:result][:step_values].each do |step_value|
-              if step_value[:name] == result_name
-                return step_value[:value]
-              end
-            end
-          end
-        end
-      end
-      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.get_measure_result', "Did not find any steps for measure #{measure_dir_name} for result #{result_name}")
-      return nil
-    end
 
     # get failed scenarios
     # @return [array]
@@ -482,8 +461,10 @@ module BuildingSync
       # first we make sure all directories exist
       FileUtils.mkdir_p(File.dirname(filename))
       # then we can save the file
+      formatter = REXML::Formatters::Pretty.new
+      formatter.compact = true
       File.open(filename, 'w') do |file|
-        @doc.write(file)
+        formatter.write(@doc, file)
       end
     end
 
@@ -504,546 +485,25 @@ module BuildingSync
       end
     end
 
-    # get results for all scenarios
-    # @param dir [String]
-    # @param baseline_only [Boolean]
-    # @return [array] of results and monthly results in hashes
-    def get_result_for_scenarios(dir, baseline_only)
-      results = {}
-      monthly_results = {}
-      @scenarios.each do |scenario|
-        # get information about the scenario
-        if scenario.elements["#{@ns}:ScenarioName"]
-          scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-        else
-          scenario_name = scenario.attributes['ID']
-        end
-        next if scenario_is_measured_scenario(scenario)
-        next if !scenario_is_baseline_scenario(scenario) && baseline_only
-
-        # dir for the osw
-        osw_dir = get_osw_dir(dir, scenario)
-        # cleanup large files
-        cleanup_larger_files(osw_dir)
-
-        # find the osw
-        path = File.join(osw_dir, 'out.osw')
-        if !File.exist?(path)
-          puts "Cannot load results for scenario #{scenario_name}, because the osw files does not exist #{path}"
-          next
-        end
-        File.open(path, 'r') do |file|
-          results[scenario_name] = JSON.parse(file.read, symbolize_names: true)
-        end
-        # open results.json to get monthly timeseries
-        # just grabbed openstudio_results
-        path2 = File.join(osw_dir, 'results.json')
-        File.open(path2, 'r') do |file|
-          temp_res = JSON.parse(file.read, symbolize_names: true)
-          monthly_results[scenario_name] = temp_res[:OpenStudioResults]
-        end
-      end
-      return results, monthly_results
-    end
-
-    # add results to xml file and calculate annual savings
-    # @param package_of_measures [REXML::Element]
-    # @param variables [hash]
-    # @return [REXML::Element]
-    def calculate_annual_savings_value(package_of_measures, variables)
-      if variables.key?('total_site_energy_savings_mmbtu')
-        annual_savings_site_energy = REXML::Element.new("#{@ns}:AnnualSavingsSiteEnergy")
-        annual_savings_site_energy.text = variables['total_site_energy_savings_mmbtu']
-        package_of_measures.add_element(annual_savings_site_energy)
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'total site energy savings' variable to the BldgSync file since it is missing.")
-      end
-
-      if variables.key?('total_source_energy_savings_mmbtu')
-        annual_savings_source_energy = REXML::Element.new("#{@ns}:AnnualSavingsSourceEnergy")
-        annual_savings_source_energy.text = variables['total_source_energy_savings_mmbtu']
-        package_of_measures.add_element(annual_savings_source_energy)
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'total source energy savings' variable to the BldgSync file since it is missing.")
-      end
-
-      if variables.key?('total_energy_cost_savings')
-        annual_savings_energy_cost = REXML::Element.new("#{@ns}:AnnualSavingsCost")
-        annual_savings_energy_cost.text = variables['total_energy_cost_savings'].to_i # BuildingSync wants an integer, might be a BuildingSync bug
-        package_of_measures.add_element(annual_savings_energy_cost)
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'total energy cost savings' variable to the BldgSync file since it is missing.")
-      end
-
-      # KAF: adding annual savings by fuel
-      annual_savings = REXML::Element.new("#{@ns}:AnnualSavingsByFuels")
-      if variables.key?('baseline_fuel_electricity_kbtu') && variables.key?('fuel_electricity_kbtu')
-        electricity_savings = variables['baseline_fuel_electricity_kbtu'] - variables['fuel_electricity_kbtu']
-        annual_saving = REXML::Element.new("#{@ns}:AnnualSavingsByFuel")
-        energy_res = REXML::Element.new("#{@ns}:EnergyResource")
-        energy_res.text = 'Electricity'
-        annual_saving.add_element(energy_res)
-        resource_units = REXML::Element.new("#{@ns}:ResourceUnits")
-        resource_units.text = 'kBtu'
-        annual_saving.add_element(resource_units)
-        savings_native = REXML::Element.new("#{@ns}:AnnualSavingsNativeUnits") # this is in kBtu
-        savings_native.text = electricity_savings.to_s
-        annual_saving.add_element(savings_native)
-        annual_savings.add_element(annual_saving)
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'baseline fuel electricity' and 'fuel electricity kbtu' variable to the BldgSync file since it is missing.")
-      end
-      if variables.key?('baseline_fuel_natural_gas_kbtu') && variables.key?('fuel_natural_gas_kbtu')
-        natural_gas_savings = variables['baseline_fuel_natural_gas_kbtu'] - variables['fuel_natural_gas_kbtu']
-        annual_saving = REXML::Element.new("#{@ns}:AnnualSavingsByFuel")
-        energy_res = REXML::Element.new("#{@ns}:EnergyResource")
-        energy_res.text = 'Natural gas'
-        annual_saving.add_element(energy_res)
-        resource_units = REXML::Element.new("#{@ns}:ResourceUnits")
-        resource_units.text = 'kBtu'
-        annual_saving.add_element(resource_units)
-        savings_native = REXML::Element.new("#{@ns}:AnnualSavingsNativeUnits") # this is in kBtu
-        savings_native.text = natural_gas_savings.to_s
-        annual_saving.add_element(savings_native)
-        annual_savings.add_element(annual_saving)
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.calculate_annual_savings_value', "Cannot add 'baseline fuel natural gas' and 'fuel natural gas' variable to the BldgSync file since it is missing.")
-      end
-      return annual_savings
-    end
-
-    # get resource uses element
-    # @param scenario_name [String]
-    # @param variables [hash]
-    # @return [REXML::Element]
-    def get_resource_uses_element(scenario_name, variables)
-      res_uses = REXML::Element.new("#{@ns}:ResourceUses")
-      scenario_name_ns = scenario_name.tr(' ', '_').gsub(/[^0-9a-z_]/i, '')
-      # ELECTRICITY
-      res_use = REXML::Element.new("#{@ns}:ResourceUse")
-      res_use.add_attribute('ID', scenario_name_ns + '_Electricity')
-      if variables.key?('fuel_electricity_kbtu') && variables['fuel_electricity_kbtu']
-        energy_res = REXML::Element.new("#{@ns}:EnergyResource")
-        energy_res.text = 'Electricity'
-        res_units = REXML::Element.new("#{@ns}:ResourceUnits")
-        res_units.text = 'kBtu'
-        native_units = REXML::Element.new("#{@ns}:AnnualFuelUseNativeUnits")
-        native_units.text = variables['fuel_electricity_kbtu'].to_s
-        consistent_units = REXML::Element.new("#{@ns}:AnnualFuelUseConsistentUnits")
-        if variables['fuel_electricity_kbtu']
-          consistent_units.text = (variables['fuel_electricity_kbtu'] / 1000.0).to_s # convert to MMBtu
-          res_use.add_element(consistent_units)
-        end
-        res_use.add_element(energy_res)
-        res_use.add_element(res_units)
-        res_use.add_element(native_units)
-
-        if variables.key?('annual_peak_electric_demand_kw') && variables['annual_peak_electric_demand_kw']
-          peak_units = REXML::Element.new("#{@ns}:PeakResourceUnits")
-          peak_units.text = 'kW'
-          peak_native_units = REXML::Element.new("#{@ns}:AnnualPeakNativeUnits")
-          peak_native_units.text = variables['annual_peak_electric_demand_kw'].to_s
-          peak_consistent_units = REXML::Element.new("#{@ns}:AnnualPeakConsistentUnits")
-          peak_consistent_units.text = variables['annual_peak_electric_demand_kw'].to_s
-          res_use.add_element(peak_units)
-          res_use.add_element(peak_native_units)
-          res_use.add_element(peak_consistent_units)
-        end
-        res_uses.add_element(res_use)
-      end
-      # NATURAL GAS
-      if variables.key?('fuel_natural_gas_kbtu') && variables['fuel_natural_gas_kbtu']
-        res_use = REXML::Element.new("#{@ns}:ResourceUse")
-        res_use.add_attribute('ID', scenario_name_ns + '_NaturalGas')
-        energy_res = REXML::Element.new("#{@ns}:EnergyResource")
-        energy_res.text = 'Natural gas'
-        res_units = REXML::Element.new("#{@ns}:ResourceUnits")
-        res_units.text = 'kBtu'
-        native_units = REXML::Element.new("#{@ns}:AnnualFuelUseNativeUnits")
-        native_units.text = variables['fuel_natural_gas_kbtu'].to_s
-        consistent_units = REXML::Element.new("#{@ns}:AnnualFuelUseConsistentUnits")
-        consistent_units.text = (variables['fuel_natural_gas_kbtu'] / 1000.0).to_s # in MMBtu
-        res_use.add_element(energy_res)
-        res_use.add_element(res_units)
-        res_use.add_element(native_units)
-        res_use.add_element(consistent_units)
-        res_uses.add_element(res_use)
-      end
-      return res_uses
-    end
-
-    # get timeseries element
-    # @param monthly_results [hash]
-    # @param year_val [Integer]
-    # @param scenario_name [String]
-    # @param timeseriesdata [REXML:Element]
-    # @param key_value [String]
-    def get_timeseries_element(monthly_results, year_val, scenario_name, timeseriesdata, key_value)
-      if !monthly_results.nil?
-        month_lookup = {1 => 'jan', 2 => 'feb', 3 => 'mar', 4 => 'apr', 5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'aug', 9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dec'}
-        scenario_name_ns = scenario_name.tr(' ', '_').gsub(/[^0-9a-z_]/i, '')
-
-        (1..12).each do |month|
-          timeseries = REXML::Element.new("#{@ns}:TimeSeries")
-          reading_type = REXML::Element.new("#{@ns}:ReadingType")
-          reading_type.text = 'Total'
-          timeseries.add_element(reading_type)
-          ts_quantity = REXML::Element.new("#{@ns}:TimeSeriesReadingQuantity")
-          ts_quantity.text = 'Energy'
-          timeseries.add_element(ts_quantity)
-          start_time = REXML::Element.new("#{@ns}:StartTimeStamp")
-          if month < 10
-            start_time.text = year_val.to_s + '-0' + month.to_s + '-01T00:00:00'
-          else
-            start_time.text = year_val.to_s + '-' + month.to_s + '-01T00:00:00'
-          end
-          timeseries.add_element(start_time)
-          end_time = REXML::Element.new("#{@ns}:EndTimeStamp")
-          if month < 9
-            end_time.text = year_val.to_s + '-0' + (month + 1).to_s + '-01T00:00:00'
-          elsif month < 12
-            end_time.text = year_val.to_s + '-' + (month + 1).to_s + '-01T00:00:00'
-          else
-            end_time.text = year_val.to_s + '-01-01T00:00:00'
-          end
-          timeseries.add_element(end_time)
-          interval_frequency = REXML::Element.new("#{@ns}:IntervalFrequency")
-          interval_frequency.text = 'Month'
-          timeseries.add_element(interval_frequency)
-          interval_reading = REXML::Element.new("#{@ns}:IntervalReading")
-          the_key = key_value.downcase + "_ip_#{month_lookup[month]}"
-          # puts "saving value 123: #{monthly_results[scenario_name][the_key]}"
-          if !monthly_results[scenario_name][the_key.to_sym].nil?
-            interval_reading.text = monthly_results[scenario_name][the_key.to_sym].to_i * 3.4121416331 # kWh to kBtu
-          end
-          timeseries.add_element(interval_reading)
-          resource_id = REXML::Element.new("#{@ns}:ResourceUseID")
-          resource_id.add_attribute('IDref', scenario_name_ns + '_' + key_value)
-          timeseries.add_element(resource_id)
-          timeseriesdata.add_element(timeseries)
-        end
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.get_timeseries_element', 'Cannot add monthly report values to the BldgSync file since it is missing.')
-      end
-    end
-
-    # get timeseries data element
-    # @param monthly_results [hash]
-    # @param year_val [Integer]
-    # @param scenario_name [String]
-    # @return [REXML:Element]
-    def get_timeseries_data_element(monthly_results, year_val, scenario_name)
-      timeseriesdata = REXML::Element.new("#{@ns}:TimeSeriesData")
-
-      # Electricity
-      # looking for: "electricity_ip_jan" through "electricity_ip_dec"
-      # convert from kWh to kBtu
-      get_timeseries_element(monthly_results, year_val, scenario_name, timeseriesdata, 'Electricity')
-      # Natural Gas
-      # looking for: "natural_gas_ip_jan" through "natural_gas_ip_dec"
-      # convert from MMBtu to kBtu
-      get_timeseries_element(monthly_results, year_val, scenario_name, timeseriesdata, 'NaturalGas')
-
-      return timeseriesdata
-    end
-
-    # get all resource totals element
-    # @param variables [hash]
-    # @return [REXML::Element]
-    def get_all_resource_totals_element(variables)
-      all_res_totals = REXML::Element.new("#{@ns}:AllResourceTotals")
-      all_res_total = REXML::Element.new("#{@ns}:AllResourceTotal")
-      end_use = REXML::Element.new("#{@ns}:EndUse")
-      end_use.text = 'All end uses'
-      site_energy_use = REXML::Element.new("#{@ns}:SiteEnergyUse")
-      site_energy_use.text = variables['total_site_energy_kbtu'].to_s
-      site_energy_use_intensity = REXML::Element.new("#{@ns}:SiteEnergyUseIntensity")
-      site_energy_use_intensity.text = variables['total_site_eui_kbtu_ft2'].to_s
-      source_energy_use = REXML::Element.new("#{@ns}:SourceEnergyUse")
-      source_energy_use.text = variables['total_source_energy_kbtu'].to_s
-      source_energy_use_intensity = REXML::Element.new("#{@ns}:SourceEnergyUseIntensity")
-      source_energy_use_intensity.text = variables['total_source_eui_kbtu_ft2'].to_s
-      all_res_total.add_element(end_use)
-      all_res_total.add_element(site_energy_use)
-      all_res_total.add_element(site_energy_use_intensity)
-      all_res_total.add_element(source_energy_use)
-      all_res_total.add_element(source_energy_use_intensity)
-      all_res_totals.add_element(all_res_total)
-      return all_res_totals
-    end
-
-    # gather annual results
-    # @param dir [String]
-    # @param result [hash]
-    # @param scenario_name [String]
-    # @param baseline [hash]
-    # @param is_baseline [Boolean]
-    # @return [REXML:Element]
-    def gather_annual_results(dir, result, scenario_name, baseline, is_baseline)
-      variables = {}
-      # Check out.osw "openstudio_results" for output variables
-      variables['total_site_energy_kbtu'] = get_measure_result(result, 'openstudio_results', 'total_site_energy') # in kBtu
-      variables['total_site_eui_kbtu_ft2'] = get_measure_result(result, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-      # temporary hack to get source energy
-      eplustbl_path = File.join(dir, scenario_name, 'eplustbl.htm')
-      variables['total_source_energy_kbtu'], variables['total_source_eui_kbtu_ft2'] = get_source_energy_array(eplustbl_path)
-
-      variables['fuel_electricity_kbtu'] = get_measure_result(result, 'openstudio_results', 'fuel_electricity') # in kBtu
-      variables['fuel_natural_gas_kbtu'] = get_measure_result(result, 'openstudio_results', 'fuel_natural_gas') # in kBtu
-      variables['annual_peak_electric_demand_kw'] = get_measure_result(result, 'openstudio_results', 'annual_peak_electric_demand') # in kW
-      variables['annual_utility_cost'] = get_measure_result(result, 'openstudio_results', 'annual_utility_cost') # in $
-
-      if !is_baseline
-        variables['baseline_total_site_energy_kbtu'] = get_measure_result(baseline, 'openstudio_results', 'total_site_energy') # in kBtu
-        variables['baseline_total_site_eui_kbtu_ft2'] = get_measure_result(baseline, 'openstudio_results', 'total_site_eui') # in kBtu/ft2
-        # temporary hack
-        baseline_eplustbl_path = File.join(dir, 'Baseline', 'eplustbl.htm')
-        variables['baseline_total_source_energy_kbtu'], variables['baseline_total_source_eui_kbtu_ft2'] = get_source_energy_array(baseline_eplustbl_path)
-
-        variables['baseline_fuel_electricity_kbtu'] = get_measure_result(baseline, 'openstudio_results', 'fuel_electricity') # in kBtu
-        variables['baseline_fuel_natural_gas_kbtu'] = get_measure_result(baseline, 'openstudio_results', 'fuel_natural_gas') # in kBtu
-        variables['baseline_annual_peak_electric_demand_kw'] = get_measure_result(baseline, 'openstudio_results', 'annual_peak_electric_demand') # in kW
-        variables['baseline_annual_utility_cost'] = get_measure_result(baseline, 'openstudio_results', 'annual_utility_cost') # in $
-      end
-
-      variables['total_site_energy_savings_mmbtu'] = 0
-      if variables['baseline_total_site_energy_kbtu'] && variables['total_site_energy_kbtu']
-        variables['total_site_energy_savings_mmbtu'] = (variables['baseline_total_site_energy_kbtu'] - variables['total_site_energy_kbtu']) / 1000.0 # in MMBtu
-      end
-
-      variables['total_source_energy_savings_mmbtu'] = 0
-      if variables['baseline_total_source_energy_kbtu'] && variables['total_source_energy_kbtu']
-        variables['total_source_energy_savings_mmbtu'] = (variables['baseline_total_source_energy_kbtu'] - variables['total_source_energy_kbtu']) / 1000.0 # in MMBtu
-      end
-
-      variables['total_energy_cost_savings'] = 0
-      if variables['baseline_annual_utility_cost'] && variables['annual_utility_cost']
-        variables['total_energy_cost_savings'] = variables['baseline_annual_utility_cost'] - variables['annual_utility_cost']
-      end
-
-      return variables
-    end
-
-    # get result for scenario
-    # @param results [hash]
-    # @param scenario [REXML:Element]
-    # @return [array]
-    def get_result_for_scenario(results, scenario)
-      # code here
-      scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-
-      result = results[scenario_name]
-      baseline = results[BASELINE]
-
-      if result.nil?
-        puts "Cannot load results for scenario #{scenario_name}, because the result is nil"
-        @failed_scenarios << scenario_name
-        return
-      elsif baseline.nil?
-        puts "Cannot load baseline results for scenario #{scenario_name}"
-        @failed_scenarios << scenario_name
-        return
-      end
-
-      if result['completed_status'] == 'Success' || result[:completed_status] == 'Success'
-        # success
-      else
-        @failed_scenarios << scenario_name
-      end
-
-      return result, baseline
-    end
-
-    # adding results to a specific scenario
-    # @param package_of_measures [REXML:Element]
-    # @param scenario [REXML:Element]
-    # @param scenario_name [String]
-    # @param annual_results [hash]
-    # @param result [hash]
-    # @param monthly_results [hash]
-    # @param year_val [Integer]
-    def  add_results_to_scenario(package_of_measures, scenario, scenario_name, annual_results, result, monthly_results, year_val)
-      # first we need to check if we have any result variables
-      if !annual_results || annual_results.empty?
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.add_results_to_scenario', "result variables are null, cannot add results from scenario: #{scenario_name}to BldgSync file.")
-        return false
-      end
-      # this is now in PackageOfMeasures.CalculationMethod.Modeled.SimulationCompletionStatus
-      # options are: Not Started, Started, Finished, Failed, Unknown
-      if package_of_measures
-        package_of_measures.add_element(create_calculation_method_element(result))
-        package_of_measures.add_element(calculate_annual_savings_value(package_of_measures, annual_results))
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.add_results_to_scenario', "Scenario: #{scenario_name} does not have a package of measures xml element defined.")
-      end
-
-      res_uses = get_resource_uses_element(scenario_name, annual_results)
-      scenario_type = scenario.elements["#{@ns}:ScenarioType"]
-      scenario.insert_after(scenario_type, res_uses)
-
-      # already added ResourceUses above. Needed as ResourceUseID reference
-      timeseries_data = get_timeseries_data_element(monthly_results, year_val, scenario_name)
-      scenario.insert_after(res_uses, timeseries_data)
-
-      # all the totals
-      all_res_totals = get_all_resource_totals_element(annual_results)
-      scenario.insert_after(timeseries_data, all_res_totals)
-
-      # no longer using user defined fields
-      scenario.elements.delete("#{@ns}:UserDefinedFields")
-      return true
-    end
-
-    # gather results
-    # @param dir [String] output_path where all scenarios are being run: i.e output_path/Baseline output_path/SR
+    # gather results for all CB Modeled and POM Scenarios, including both annual and monthly results
+    # - ResourceUse and AllResourceTotal elements are added to the Scenario as part of this process
+    # - ResourceUse - holds consumption information about a specific resource / fuel (Electricity, Natural gas, etc.)
+    # - AllResourceTotal - holds total site and source energy consumption information
     # @param year_val [Integer]
     # @param baseline_only [Boolean]
     # @return [Boolean]
-    def gather_results(dir, year_val = Date.today.year, baseline_only = false)
-      results_counter = 0
-      successful = true
-      begin
-        scenarios_found = false
+    def gather_results(year_val = Date.today.year, baseline_only = false)
 
-        # write an osw for each scenario
-        results, monthly_results = get_result_for_scenarios(dir, baseline_only)
+      # Gather results for the Current Building Modeled (Baseline) Scenario
+      @facility.cb_modeled.os_gather_results(year_val)
 
-        # gather results for all Package Of Measure Scenarios
+      if !baseline_only
+        # Gather results for the Package of Measures scenarios
         @facility.poms.each do |scenario|
-          begin
-            scenarios_found = true
-            # get information about the scenario
-            scenario_name = scenario.elements["#{@ns}:ScenarioName"].text
-            next if scenario_is_measured_scenario(scenario)
-            next if !scenario_is_baseline_scenario(scenario) && baseline_only
-            results_counter += 1
-            package_of_measures_or_current_building = prepare_package_of_measures_or_current_building(scenario)
-            result, baseline = get_result_for_scenario(results, scenario)
-            annual_results = gather_annual_results(dir, result, scenario_name, baseline, scenario_name == 'Baseline')
-            add_results_to_scenario(package_of_measures_or_current_building, scenario, scenario_name, annual_results, result, monthly_results, year_val)
-          rescue StandardError => e
-            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "The following error occurred #{e.message} while processing results in #{dir}")
-            end_file = File.join(get_osw_dir(dir, scenario), 'eplusout.end')
-            if File.file?(end_file)
-              # we open the .end file to determine if EnergyPlus was successful or not
-              energy_plus_string = File.open(end_file, &:readline)
-              if energy_plus_string.include? 'Fatal Error Detected'
-                OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "EnergyPlus simulation did not succeed! #{energy_plus_string}")
-                # if we found out that there was a fatal error we search the err file for the first error.
-                File.open(File.join(osw_dir, 'eplusout.err')).each do |line|
-                  if line.include? '** Severe  **'
-                    OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Severe error occured! #{line}")
-                  elsif line.include? '**  Fatal  **'
-                    OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Fatal error occured! #{line}")
-                  end
-                end
-              end
-            else
-              run_log = File.open(File.join(osw_dir, 'run.log'), &:readline)
-              OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "Workflow did not succeed! #{run_log}")
-            end
-          end
+          scenario.os_gather_results(year_val)
         end
-
-        puts 'No scenarios found in BuildingSync XML File, please check the object hierarchy for errors.' if !scenarios_found
-      rescue StandardError => e
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.gather_results', "The following error occurred #{e.message} while processing results in #{dir}")
-        successful = false
       end
-
-      if results_counter > 0
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.gather_results', "#{results_counter} successfully simulated and results processed")
-        puts "#{results_counter} scenarios successfully simulated and results processed"
-      end
-      return successful
     end
 
-    # get source energy array
-    # @param eplustbl_path [String]
-    # @return [array]
-    def get_source_energy_array(eplustbl_path)
-      # DLM: total hack because these are not reported in the out.osw
-      # output is array of [source_energy, source_eui] in kBtu and kBtu/ft2
-      result = []
-      File.open(eplustbl_path, 'r') do |f|
-        while line = f.gets
-          if /\<td align=\"right\"\>Total Source Energy\<\/td\>/.match(line)
-            result << /\<td align=\"right\"\>(.*?)<\/td\>/.match(f.gets)[1].to_f
-            result << /\<td align=\"right\"\>(.*?)<\/td\>/.match(f.gets)[1].to_f
-            break
-          end
-        end
-      end
-
-      result[0] = result[0] * 947.8171203133 # GJ to kBtu
-      result[1] = result[1] * 0.947817120313 * 0.092903 # MJ/m2 to kBtu/ft2
-
-      return result[0], result[1]
-    end
-
-    # extract annual results
-    # @param scenario [REXML:Element]
-    # @param scenario_name [String]
-    # @param package_of_measures [REXML:Element]
-    # @return [hash]
-    def extract_annual_results(scenario, scenario_name, package_of_measures)
-      variables = {}
-
-      if package_of_measures
-        if package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"]
-          variables['total_site_energy_savings_mmbtu'] = package_of_measures.elements["#{@ns}:AnnualSavingsSiteEnergy"].text
-        end
-        if package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"]
-          variables['total_source_energy_savings_mmbtu'] = package_of_measures.elements["#{@ns}:AnnualSavingsSourceEnergy"].text
-        end
-        if package_of_measures.elements["#{@ns}:AnnualSavingsCost"]
-          variables['total_energy_cost_savings'] = package_of_measures.elements["#{@ns}:AnnualSavingsCost"].text
-        end
-      end
-
-      # if scenario.elements["#{@ns}:ResourceUses"]
-      #   scenario.elements["#{@ns}:ResourceUses"].each do |resource_use|
-      #     if resource_use.elements["#{@ns}:EnergyResource"].text == 'Electricity'
-      #       variables['fuel_electricity_kbtu'] = resource_use.elements["#{@ns}:AnnualFuelUseNativeUnits"].text
-      #       if resource_use.elements["#{@ns}:PeakResourceUnits"].text == 'kW'
-      #         variables['annual_peak_electric_demand_kw'] = resource_use.elements["#{@ns}:AnnualPeakNativeUnits"].text
-      #       end
-      #     elsif resource_use.elements["#{@ns}:EnergyResource"].text == 'Natural gas'
-      #       variables['fuel_natural_gas_kbtu'] = resource_use.elements["#{@ns}:AnnualFuelUseNativeUnits"].text
-      #     end
-      #   end
-      # else
-      #   OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.extract_annual_results', "Scenario: #{scenario_name} does not have any ResourceUses xml elements defined.")
-      # end
-
-      if package_of_measures && package_of_measures.elements["#{@ns}:AnnualSavingsByFuels"]
-        package_of_measures.elements["#{@ns}:AnnualSavingsByFuels"].each do |annual_savings|
-          if annual_savings.elements["#{@ns}:EnergyResource"].text == 'Electricity'
-            variables['baseline_fuel_electricity_kbtu'] = annual_savings.elements["#{@ns}:AnnualSavingsNativeUnits"].text.to_i + variables['fuel_electricity_kbtu'].to_i
-          elsif annual_savings.elements["#{@ns}:EnergyResource"].text == 'Natural gas'
-            variables['baseline_fuel_natural_gas_kbtu'] = annual_savings.elements["#{@ns}:AnnualSavingsNativeUnits"].text.to_i + variables['fuel_natural_gas_kbtu'].to_i
-          end
-        end
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.extract_annual_results', "Scenario: #{scenario_name} does not have any AnnualSavingsByFuels xml elements defined.")
-      end
-
-      # if scenario.elements["#{@ns}:AllResourceTotals"]
-      #   scenario.elements["#{@ns}:AllResourceTotals"].each do |all_resource_total|
-      #     if all_resource_total.elements["#{@ns}:SiteEnergyUse"]
-      #       variables['total_site_energy_kbtu'] = all_resource_total.elements["#{@ns}:SiteEnergyUse"].text
-      #     elsif all_resource_total.elements["#{@ns}:SiteEnergyUseIntensity"]
-      #       variables['total_site_eui_kbtu_ft2'] = all_resource_total.elements["#{@ns}:SiteEnergyUseIntensity"].text
-      #     elsif all_resource_total.elements["#{@ns}:SourceEnergyUse"]
-      #       variables['total_source_energy_kbtu'] = all_resource_total.elements["#{@ns}:SourceEnergyUse"].text
-      #     elsif all_resource_total.elements["#{@ns}:SourceEnergyUseIntensity"]
-      #       variables['total_source_eui_kbtu_ft2'] = all_resource_total.elements["#{@ns}:SourceEnergyUseIntensity"].text
-      #     end
-      #   end
-      # else
-      #   OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.extract_annual_results', "Scenario: #{scenario_name} does not have any AllResourceTotals xml elements defined.")
-      # end
-      return variables
-    end
   end
 end

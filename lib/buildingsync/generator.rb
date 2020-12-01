@@ -204,15 +204,26 @@ module BuildingSync
       return section
     end
 
-    def add_energy_resource_use_to_scenario(scenario_xml, energy_resource_type = 'Electricity', end_use = 'All end uses', id = 'ResourceUse-1')
+    def add_energy_resource_use_to_scenario(scenario_xml, energy_resource_type = 'Electricity', end_use = 'All end uses', id = 'ResourceUse-1', native_units = nil)
       resource_uses = help_get_or_create(scenario_xml,"#{@ns}:ResourceUses")
+
+      # Define ResourceUse and add ID
       resource_use = REXML::Element.new("#{@ns}:ResourceUse", resource_uses)
       resource_use.add_attribute('ID', id)
+
+      # Add ResourceUnits
+      if !native_units.nil?
+        nu = REXML::Element.new("#{@ns}:ResourceUnits", resource_use)
+        nu.text = native_units
+      end
+
+      # Add EnergyResource
       energy_resource = REXML::Element.new("#{@ns}:EnergyResource", resource_use)
       energy_resource.text = energy_resource_type
-      eu = REXML::Element.new("#{@ns}:EndUse")
+
+      # Add EndUse
+      eu = REXML::Element.new("#{@ns}:EndUse", resource_use)
       eu.text = end_use
-      resource_use.insert_after(energy_resource, eu)
       return resource_use
     end
 

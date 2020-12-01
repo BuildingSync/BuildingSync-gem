@@ -48,7 +48,7 @@ RSpec.describe 'BuildingSync' do
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
+    translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, std)
     translator.run_baseline_osm(epw_file_path)
     translator_run_baseline_osm_checks(output_path)
   end
@@ -61,7 +61,7 @@ RSpec.describe 'BuildingSync' do
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
+    translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, std)
     translator.run_baseline_osm(epw_file_path)
     translator_run_baseline_osm_checks(output_path)
   end
@@ -74,7 +74,7 @@ RSpec.describe 'BuildingSync' do
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
+    translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, std)
     translator.run_baseline_osm(epw_file_path)
     translator_run_baseline_osm_checks(output_path)
   end
@@ -87,7 +87,7 @@ RSpec.describe 'BuildingSync' do
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
+    translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, std)
     translator.run_baseline_osm(epw_file_path)
     translator_run_baseline_osm_checks(output_path)
   end
@@ -100,7 +100,7 @@ RSpec.describe 'BuildingSync' do
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
+    translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, std)
     translator.run_baseline_osm(epw_file_path)
     translator_run_baseline_osm_checks(output_path)
   end
@@ -113,7 +113,7 @@ RSpec.describe 'BuildingSync' do
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
+    translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, std)
     translator.run_baseline_osm(epw_file_path)
     translator_run_baseline_osm_checks(output_path)
   end
@@ -125,7 +125,7 @@ RSpec.describe 'BuildingSync' do
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     begin
-      translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_file_path, std)
+      translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, std)
     rescue StandardError => e
       puts "e.message #{e.message}"
       expect(e.message.include?('Number of stories below grade is larger than 1: 2.0, currently only one basement story is supported.')).to be true

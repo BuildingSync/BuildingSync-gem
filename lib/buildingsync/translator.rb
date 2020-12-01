@@ -156,22 +156,22 @@ module BuildingSync
     end
 
     # gather results from simulated scenarios, for all or just the baseline scenario
-    # @param dir [String] output_path where all scenarios are being run: i.e output_path/Baseline output_path/SR
-    # @param year_val [Integer]
-    # @param baseline_only [Boolean]
-    def gather_results(dir, year_val = Date.today.year, baseline_only = false)
-      children_dirs = Dir.glob("#{dir}/*").select {|f| File.directory? f }
-      baseline_dir_found = false
-      children_dirs.each do |child|
-        if child.end_with?(BASELINE)
-          baseline_dir_found = true
-        end
-      end
-      OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.gather_results", "Children dirs: #{children_dirs}")
-      if !baseline_dir_found
-        OpenStudio.logFree(OpenStudio::Error, "BuildingSync.Translator.gather_results", "A Baseline directory was not found.  Will not gather_results.")
-      end
-      return @workflow_maker.gather_results(dir, year_val, baseline_only)
+    # @param year_val [Integer] year to use when processing monthly results as TimeSeries elements
+    # @param baseline_only [Boolean] whether to only process the Baseline (or current building modeled) Scenario
+    def gather_results(year_val = Date.today.year, baseline_only = false)
+      @results_gathered = true
+      # children_dirs = Dir.glob("#{dir}/*").select {|f| File.directory? f }
+      # baseline_dir_found = false
+      # children_dirs.each do |child|
+      #   if child.end_with?(BASELINE)
+      #     baseline_dir_found = true
+      #   end
+      # end
+      # OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.gather_results", "Children dirs: #{children_dirs}")
+      # if !baseline_dir_found
+      #   OpenStudio.logFree(OpenStudio::Error, "BuildingSync.Translator.gather_results", "A Baseline directory was not found.  Will not gather_results.")
+      # end
+      return @workflow_maker.gather_results(year_val, baseline_only)
     end
 
     # clear all measures

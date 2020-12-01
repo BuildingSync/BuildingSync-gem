@@ -67,7 +67,7 @@ RSpec.describe 'LoadSystemSpec' do
     std = CA_TITLE24
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = nil
-    translator = translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+    translator = translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
     model = translator.get_model
 
     cut_off_value = 0.5

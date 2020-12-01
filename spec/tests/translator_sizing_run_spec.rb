@@ -45,7 +45,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = nil
   #
   #   # -- Assert
-  #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #   translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   # end
   #
   # it 'building_151.xml ASHRAE90_1 - perform a sizing run, and create an in.osm' do
@@ -56,7 +56,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = nil
   #
   #   # -- Assert
-  #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #   translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   # end
 
   it 'L100_Audit.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - perform a sizing run, and create an in.osm' do
@@ -67,7 +67,7 @@ RSpec.describe 'BuildingSync' do
     epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
-    translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+    translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   end
 
   # it 'building_151_n1.xml CA_TITLE24 ns: n1 - perform a sizing run, and create an in.osm' do
@@ -78,7 +78,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = nil
   #
   #   # -- Assert
-  #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #   translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   # end
   #
   # it 'DC GSA Headquarters.xml CA_TITLE24 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - should error - Cant find class CBES Pre-1978_LargeOffice' do
@@ -89,7 +89,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   begin
-  #     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #     translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   #   rescue StandardError => e
   #     puts "rescued StandardError: #{e.message}"
   #     expect(e.message.include?("Did not find a class called 'CBES Pre-1978_LargeOffice' to create in")).to be true
@@ -104,7 +104,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
-  #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #   translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   # end
   #
   # it 'DC GSA HeadquartersWithClimateZone.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - perform a sizing run, and create an in.osm' do
@@ -115,7 +115,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
-  #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #   translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   # end
   #
   # it 'BuildingSync Website Valid Schema.xml CA_TITLE24 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - perform a sizing run, and create an in.osm' do
@@ -126,7 +126,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
-  #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #   translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   # end
   #
   # it 'BuildingSync Website Valid Schema.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - perform a sizing run, and create an in.osm' do
@@ -137,7 +137,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
-  #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #   translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   # end
   #
   # it 'Golden Test File.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - should error since there are 2 buildings defined' do
@@ -149,7 +149,7 @@ RSpec.describe 'BuildingSync' do
   #
   #   begin
   #     # -- Assert
-  #     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #     translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   #   rescue StandardError => e
   #     puts "StandardError occured #{e.message}"
   #     expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
@@ -164,7 +164,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #   begin
   #     # -- Assert
-  #     translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #     translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   #   rescue StandardError => e
   #     expect(e.message.include?('Error: There is more than one (3) building attached to this site in your BuildingSync file.')).to be true
   #   end
@@ -178,7 +178,7 @@ RSpec.describe 'BuildingSync' do
     epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     begin
       # -- Assert
-      translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+      translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
     rescue StandardError => e
       expect(e.message.include?('Occupancy type Food service is not available in the bldg_and_system_types.json dictionary')).to be true
     end
@@ -192,7 +192,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
-  #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #   translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   # end
 
   it 'L000_OpenStudio_Pre-Simulation_02.xml ASHRAE90_1 - perform a sizing run, and create an in.osm' do
@@ -203,7 +203,7 @@ RSpec.describe 'BuildingSync' do
     epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
-    translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+    translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   end
 
   # it 'L000_OpenStudio_Pre-Simulation_03.xml ASHRAE90_1 - perform a sizing run, and create an in.osm' do
@@ -214,7 +214,7 @@ RSpec.describe 'BuildingSync' do
   #   epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
   #
   #   # -- Assert
-  #   translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+  #   translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   # end
 
   it 'L000_OpenStudio_Pre-Simulation_04.xml ASHRAE90_1 - perform a sizing run, and create an in.osm' do
@@ -225,7 +225,7 @@ RSpec.describe 'BuildingSync' do
     epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     # -- Assert
-    translator_write_osm_and_perform_checks(xml_path, output_path, epw_path, std)
+    translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   end
 
 end

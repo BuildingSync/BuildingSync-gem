@@ -44,6 +44,18 @@ module BuildingSync
       @ns = ns
       help_element_class_type_check(base_xml, 'TimeSeries')
 
+      @timestamp_format = '%FT%T'
+    end
+
+    def set_start_and_end_timestamps_monthly(start_date)
+      start_date_value = start_date.strftime(@timestamp_format)
+      xset_or_create('StartTimestamp', start_date_value)
+
+      # >>= shifts a datetime by 1 month
+      end_date = start_date >>= 1
+      # += shifts a datetime by 1 day.  the following shifts it by negative 1 minute
+      end_date += - Rational(1, 24.0*60)
+      xset_or_create('EndTimestamp', end_date.strftime(@timestamp_format))
     end
   end
 end

@@ -70,6 +70,9 @@ module BuildingSync
     end
 
     def help_convert(val, from_unit, to_unit)
+      if from_unit == to_unit
+        return val
+      end
 
       btu_multiples = [
           {

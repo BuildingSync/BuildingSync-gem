@@ -46,8 +46,8 @@ jobs:
       - travis_wait 50 $SH "bundle exec rspec spec/tests/translator_spec.rb"
       name: "Translator Spec"
     - script:
-        - $SH "bundle exec rspec spec/tests/translator_write_osm_sizing_run_spec.rb"
-      name: "Translator Perform SR, Create in.osm Spec"
+        - $SH "bundle exec rspec spec/tests/translator_sizing_run_spec.rb"
+      name: "Translator Sizing Run Spec"
     - script:
         - $SH "bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb"
       name: "Translator Perform SR and Baseline Simulation Spec"

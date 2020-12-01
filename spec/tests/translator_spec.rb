@@ -41,35 +41,6 @@ require 'parallel'
 
 RSpec.describe 'BuildingSync' do
 
-  it 'remove all measures and then add a new EnergyPlus measure' do
-    # -- Setup
-    file_name = 'building_151_no_measures.xml'
-    std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__,'v2.2.0')
-    epw_path = nil
-
-    translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
-    translator.clear_all_measures
-
-    # -- Assert steps get deleted from workflow
-    expect(translator.get_workflow['steps'].empty?).to be true
-
-    translator.insert_measure_into_workflow('', 'scale_geometry', 1)
-    translator.setup_and_sizing_run
-
-    # -- Assert
-    write_osm_checks(output_path)
-    translator.write_osws
-    translator.run_osws
-    osw_files = []
-    Dir.glob("#{output_path}/Baseline/in.osw") { |osw| osw_files << osw }
-    osw_files.each do |osw|
-      sql_file = osw.gsub('in.osw', 'eplusout.sql')
-      puts "Simulation not completed successfully for file: #{osw}" if !File.exist?(sql_file)
-      expect(File.exist?(sql_file)).to be true
-    end
-  end
-
 
   it 'should write parameter value into XML' do
     # -- Setup
