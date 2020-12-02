@@ -68,33 +68,28 @@ module BuildingSync
 
       # parameter to read and write.
       @fraction_area = nil
-      @bldg_type = {}
       @standards_building_type = nil
       @occupancy_classification_original = nil
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
       @occupant_quantity = nil
       @principal_hvac_type = nil
-      @principal_lighting_system_type = nil
-      @miscellaneous_electric_load = nil
-      @spaces_conditioned_percent = nil
-      @dwelling_quantity = nil
-      @dwellings_occupied_percent = nil
       @num_stories = num_stories
 
+      @total_floor_area = read_floor_areas(building_total_floor_area)
+      xset_or_create('OccupancyClassification', building_occupancy_classification, false)
+
       # code to initialize
-      read_xml(building_occupancy_classification, building_total_floor_area)
+      read_xml
     end
 
     # read xml
     # @param building_occupancy_classification [String]
     # @param building_total_floor_area [Float]
-    def read_xml(building_occupancy_classification, building_total_floor_area)
+    def read_xml
 
       # floor areas
-      @total_floor_area = read_floor_areas(building_total_floor_area)
       # based on the occupancy type set building type, system type and bar division method
-      xset_or_create('OccupancyClassification', building_occupancy_classification, false)
       read_building_section_other_detail
       read_construction_types
 
@@ -164,18 +159,9 @@ module BuildingSync
       @base_xml.elements["#{@ns}:fraction_area"].text = @fraction_area
       @base_xml.elements["#{@ns}:OriginalOccupancyClassification"].text = @occupancy_classification_original if !@occupancy_classification_original.nil?
 
-      @base_xml.elements["#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField/#{@ns}:FieldValue"].text = @principal_lighting_system_type if !@principal_lighting_system_type.nil?
-      @base_xml.elements["#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField/#{@ns}:FieldValue"].text = @miscellaneous_electric_load if !@miscellaneous_electric_load.nil?
-      @base_xml.elements["#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField/#{@ns}:FieldValue"].text = @spaces_conditioned_percent if !@spaces_conditioned_percent.nil?
-      @base_xml.elements["#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField/#{@ns}:FieldValue"].text = @dwelling_quantity if !@dwelling_quantity.nil?
-      @base_xml.elements["#{@ns}:UserDefinedFields/#{@ns}:UserDefinedField/#{@ns}:FieldValue"].text = @dwellings_occupied_percent if !@dwellings_occupied_percent.nil?
       @base_xml.elements["#{@ns}:TypicalOccupantUsages/#{@ns}:TypicalOccupantUsage/#{@ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_hours if !@typical_occupant_usage_value_hours.nil?
       @base_xml.elements["#{@ns}:TypicalOccupantUsages/#{@ns}:TypicalOccupantUsage/#{@ns}:TypicalOccupantUsageValue"].text = @typical_occupant_usage_value_weeks if !@typical_occupant_usage_value_weeks.nil?
       @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
-
-      # Add new element in the XML file
-      add_user_defined_field_to_xml_file('BuildingType', @bldg_type)
-      add_user_defined_field_to_xml_file('FractionArea', @fraction_area)
 
       prepare_final_xml_for_spatial_element
     end
@@ -197,7 +183,7 @@ module BuildingSync
       return @total_floor_area
     end
 
-    attr_reader :bldg_type, :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :standards_building_type, :bldgsync_occupancy_type, :section_type, :id
+    attr_reader :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :standards_building_type, :section_type, :id
     attr_accessor :fraction_area
   end
 end

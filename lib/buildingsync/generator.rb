@@ -431,26 +431,26 @@ module BuildingSync
       return sites
     end
 
-    def generate_baseline_buildings(xml_path, occupancy_type, total_floor_area)
+    def generate_baseline_buildings(xml_path, occupancy_classification, total_floor_area)
       buildings = []
 
       doc = help_load_doc(xml_path)
       site_xml = get_first_site_element(doc)
 
       site_xml.elements.each("#{@ns}:Buildings/#{@ns}:Building") do |building_element|
-        buildings.push(BuildingSync::Building.new(building_element, occupancy_type, total_floor_area, @ns))
+        buildings.push(BuildingSync::Building.new(building_element, occupancy_classification, total_floor_area, @ns))
       end
       return buildings
     end
 
-    def generate_baseline_building_sections(xml_path, occupancy_type, total_floor_area)
+    def generate_baseline_building_sections(xml_path, occupancy_classification, total_floor_area)
       building_sections = []
 
       doc = help_load_doc(xml_path)
       building_xml = get_first_building_element(doc)
 
       building_xml.elements.each("#{@ns}:Sections/#{@ns}:Section") do |building_element|
-        building_sections.push(BuildingSync::BuildingSection.new(building_element, occupancy_type, total_floor_area, 1, @ns))
+        building_sections.push(BuildingSync::BuildingSection.new(building_element, occupancy_classification, total_floor_area, 1, @ns))
       end
       return building_sections
     end

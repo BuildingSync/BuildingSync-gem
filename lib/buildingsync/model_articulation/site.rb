@@ -47,9 +47,7 @@ module BuildingSync
       @ns = ns
 
       @building = nil
-      @premises_notes = nil
       @all_set = false
-
 
       # using the XML snippet to search for the buildings on the site
       read_xml
@@ -134,13 +132,13 @@ module BuildingSync
     # @return [Standard]
     def determine_open_studio_system_standard
       set_all
-      return Standard.build(get_building_template)
+      return Standard.build(get_standard_template)
     end
 
-    # get building template
+    # get @standard_template
     # @return [String]
-    def get_building_template
-      return @building.get_building_template
+    def get_standard_template
+      return @building.get_standard_template
     end
 
     # get space types from hash
@@ -159,10 +157,10 @@ module BuildingSync
     # get building type
     # @return [String]
     def get_building_type
-      if @bldg_type.nil?
+      if @standards_building_type.nil?
         return @building.get_building_type
       else
-        return @bldg_type
+        return @standards_building_type
       end
     end
 
@@ -199,8 +197,12 @@ module BuildingSync
       @climate_zone = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
       @climate_zone = @building.get_climate_zone(standard_to_be_used) if @climate_zone.nil?
       OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Site.generate_baseline_osm', 'Could not find a climate zone in the BuildingSync file.') if @climate_zone.nil?
-      @building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude, ddy_file, @weather_file_name, @weather_station_id, @state_name, @city_name)
-      @building.generate_baseline_osm(standard_to_be_used)
+      lat = @building.xget_text('Latitude').nil? ? xget_text('Latitude') : @building.xget_text('Latitude')
+      long = @building.xget_text('Longitude').nil? ? xget_text('Longitude') : @building.xget_text('Longitude')
+      weather_station_name = @building.xget_text('WeatherStationName').nil? ? xget_text('WeatherStationName') : @building.xget_text('WeatherStationName')
+      weather_station_id = @building.xget_text('WeatherDataStationID').nil? ? xget_text('WeatherDataStationID') : @building.xget_text('WeatherDataStationID')
+      @building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, lat, long, ddy_file, weather_station_name, weather_station_id, @state_name, @city_name)
+      @building.generate_baseline_osm
     end
 
     # write model to osm file
@@ -211,7 +213,7 @@ module BuildingSync
       scenario_types = {}
       scenario_types['system_type'] = get_system_type
       scenario_types['bldg_type'] = get_building_type
-      scenario_types['template'] = get_building_template
+      scenario_types['template'] = get_standard_template
       return scenario_types
     end
 
@@ -221,14 +223,13 @@ module BuildingSync
     def prepare_final_xml
       @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE/#{@ns}:ClimateZone"].text = @climate_zone_ashrae if !@climate_zone_ashrae.nil?
       @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24/#{@ns}:ClimateZone"].text = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil?
-      @base_xml.elements["#{@ns}:WeatherStationName"].text = @weather_file_name if !@weather_file_name.nil?
-      @base_xml.elements["#{@ns}:WeatherDataStationID"].text = @weather_station_id if !@weather_station_id.nil?
+
       @base_xml.elements["#{@ns}:Address/#{@ns}:City"].text = @city_name if !@city_name.nil?
       @base_xml.elements["#{@ns}:Address/#{@ns}:State"].text = @state_name if !@state_name.nil?
-      @base_xml.elements["#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"].text = @street_address if !@street_address.nil?
-      @base_xml.elements["#{@ns}:Address/#{@ns}:PostalCode"].text = @postal_code if !@postal_code.nil?
-      @base_xml.elements["#{@ns}:Latitude"].text = @latitude if !@latitude.nil?
-      @base_xml.elements["#{@ns}:Longitude"].text = @longitude if !@longitude.nil?
+
+      # TODO: probably set these as UDFs from actual openstudio model
+      @base_xml.elements["#{@ns}:WeatherStationName"].text = @weather_file_name if !@weather_file_name.nil?
+      @base_xml.elements["#{@ns}:WeatherDataStationID"].text = @weather_station_id if !@weather_station_id.nil?
 
       prepare_final_xml_for_spatial_element
 

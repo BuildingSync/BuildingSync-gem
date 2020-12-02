@@ -51,7 +51,7 @@ RSpec.describe 'SiteSpec' do
       # Should not reach this line
       expect(false).to be true
     rescue StandardError => e
-      expect(e.message.to_s).to eq('Building ID: Building1. Year of Construction is blank in your BuildingSync file.')
+      expect(e.message.to_s).to eq('Building ID: Building1. Year of Construction is blank in your BuildingSync file, but is required.')
     end
   end
 
@@ -67,8 +67,8 @@ RSpec.describe 'SiteSpec' do
     site.determine_open_studio_standard(ASHRAE90_1)
 
     # -- Assert
-    puts "expected building template: DOE Ref Pre-1980 but got: #{site.get_building_template} " if site.get_building_template != 'DOE Ref Pre-1980'
-    expect(site.get_building_template == 'DOE Ref Pre-1980').to be true
+    puts "expected building template: DOE Ref Pre-1980 but got: #{site.get_standard_template} " if site.get_standard_template != 'DOE Ref Pre-1980'
+    expect(site.get_standard_template == 'DOE Ref Pre-1980').to be true
   end
 
   it 'Should return the correct system type' do

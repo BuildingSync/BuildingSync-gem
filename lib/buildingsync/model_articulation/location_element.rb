@@ -50,28 +50,18 @@ module BuildingSync
       @climate_zone = nil
       @climate_zone_ashrae = nil
       @climate_zone_ca_t24 = nil
-      @weather_file_name = nil
-      @weather_station_id = nil
       @city_name = nil
       @state_name = nil
-      @latitude = nil
-      @longitude = nil
-      @street_address = nil
-      @postal_code = nil
     end
 
     # read location values
     def read_location_values
       # read in the ASHRAE climate zone
       read_climate_zone
-      # read in the weather station name
-      read_weather_file_name
+
       # read city and state name
       read_city_and_state_name
-      # read latitude and longitude
-      read_latitude_and_longitude
-      # read site address
-      read_address_postal_code_notes
+
     end
 
     # read climate zone
@@ -95,20 +85,6 @@ module BuildingSync
 
     end
 
-    # read weather file name
-    def read_weather_file_name
-      if @base_xml.elements["#{@ns}:WeatherStationName"]
-        @weather_file_name = @base_xml.elements["#{@ns}:WeatherStationName"].text
-      else
-        @weather_file_name = nil
-      end
-      if @base_xml.elements["#{@ns}:WeatherDataStationID"]
-        @weather_station_id = @base_xml.elements["#{@ns}:WeatherDataStationID"].text
-      else
-        @weather_station_id = nil
-      end
-    end
-
     # read city and state name
     def read_city_and_state_name
       if @base_xml.elements["#{@ns}:Address/#{@ns}:City"]
@@ -123,39 +99,5 @@ module BuildingSync
       end
     end
 
-    # read address, postal code and premises notes
-    def read_address_postal_code_notes
-      if @base_xml.elements["#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"]
-        @street_address = @base_xml.elements["#{@ns}:Address/#{@ns}:StreetAddressDetail/#{@ns}:Simplified/#{@ns}:StreetAddress"].text
-      else
-        @street_address = nil
-      end
-
-      if @base_xml.elements["#{@ns}:Address/#{@ns}:PostalCode"]
-        @postal_code = @base_xml.elements["#{@ns}:Address/#{@ns}:PostalCode"].text.to_i
-      else
-        @postal_code = nil
-      end
-
-      if @base_xml.elements["#{@ns}:PremisesNotes"]
-        @premises_notes = @base_xml.elements["#{@ns}:PremisesNotes"].text
-      else
-        @premises_notes = nil
-      end
-    end
-
-    # read latitude and longitude
-    def read_latitude_and_longitude
-      if @base_xml.elements["#{@ns}:Latitude"]
-        @latitude = @base_xml.elements["#{@ns}:Latitude"].text
-      else
-        @latitude = nil
-      end
-      if @base_xml.elements["#{@ns}:Longitude"]
-        @longitude = @base_xml.elements["#{@ns}:Longitude"].text
-      else
-        @longitude = nil
-      end
-    end
   end
 end

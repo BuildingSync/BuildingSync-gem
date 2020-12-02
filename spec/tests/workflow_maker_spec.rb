@@ -227,7 +227,7 @@ RSpec.describe 'WorkflowMaker' do
     before(:each) do
       # -- Setup
       file_name = 'building_151_no_measures.xml'
-      @std = CA_TITLE24
+      @std = ASHRAE90_1
       xml_path, @output_path = create_xml_path_and_output_path(file_name, @std, __FILE__, 'v2.2.0')
       @doc = help_load_doc(xml_path)
       @ns = 'auc'
@@ -340,10 +340,10 @@ RSpec.describe 'WorkflowMaker' do
   end
 
   describe 'Results Processing' do
-    it 'building_151_one_scenario: ' do
+    it 'building_151_one_scenario: should simula' do
       # -- Setup
       file_name = 'building_151_one_scenario.xml'
-      std = CA_TITLE24
+      std = ASHRAE90_1
       xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
       doc = help_load_doc(xml_path)
       ns = 'auc'
@@ -368,7 +368,12 @@ RSpec.describe 'WorkflowMaker' do
       output_xml_path = File.join(output_path, 'results.xml')
       workflow_maker.save_xml(output_xml_path)
 
+      output_xml_path2 = File.join(output_path, 'results_prepared.xml')
+      workflow_maker.prepare_final_xml
+      workflow_maker.save_xml(output_xml_path2)
+
       expect(File.exist?(output_xml_path)).to be true
+      expect(File.exist?(output_xml_path2)).to be true
     end
   end
 

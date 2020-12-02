@@ -215,7 +215,7 @@ module BuildingSync
       return @osw_dir
     end
 
-    # @param workflow [Hash] a hash of the workflow
+    # @param workflow [Hash] a hash of the openstudio workflow
     def set_workflow(workflow)
       if !workflow.is_a?(Hash)
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.set_workflow', "Scenario ID: #{xget_id}.  Cannot set_workflow, argument must be a Hash.")
@@ -369,14 +369,12 @@ module BuildingSync
     end
 
     def os_gather_results(year_val)
-      success = simulation_success?
-      results_available = results_available_and_correct_units?
-      if success && results_available
+      if simulation_success? && results_available_and_correct_units?
         os_parse_annual_results
         os_parse_monthly_all_end_uses_results(year_val)
-      elsif !success
+      elsif !simulation_success?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.os_gather_results', "Scenario ID: #{xget_id}. Unable to gather results as simulation was unsuccessful.")
-      elsif !results_available
+      elsif !results_available_and_correct_units?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.os_gather_results', "Scenario ID: #{xget_id}. Unable to gather results as results are not available.")
       end
 
@@ -410,22 +408,13 @@ module BuildingSync
                 time_series_xml = REXML::Element.new("#{@ns}:TimeSeries", time_series_data_xml)
                 time_series_xml.add_attribute('ID', "TS-#{start_date_time.strftime('%b').upcase}-#{resource_use.xget_id}")
 
+                # Convert value to correct units
+                interval_reading_value = help_convert(os_results[key_to_find], monthly_units, native_units)
+
                 # Create new TimeSeries element
                 ts = BuildingSync::TimeSeries.new(time_series_xml, @ns)
+                ts.set_monthly_energy_reading(start_date_time.dup, interval_reading_value, resource_use.xget_id)
 
-                # continue defining values using xset methods
-                ts.xset_or_create('ReadingType', 'Total')
-                ts.xset_or_create('TimeSeriesReadingQuantity', 'Energy')
-                ts.set_start_and_end_timestamps_monthly(start_date_time.dup)
-                ts.xset_or_create('IntervalFrequency', 'Month')
-
-                # Makes sure the value is in the correct units
-                interval_reading_val = help_convert(os_results[key_to_find], monthly_units, native_units)
-                ts.xset_or_create('IntervalReading', interval_reading_val)
-
-
-                ru_id = ts.xget_or_create('ResourceUseID')
-                ru_id.add_attribute('IDref', resource_use.xget_id)
               else
                 OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.os_parse_monthly_all_end_uses_results', "Scenario ID: #{xget_id}: Key #{key_to_find} not found in results['OpenStudioResults'].  Make sure monthly data is being output by os_results measure")
               end

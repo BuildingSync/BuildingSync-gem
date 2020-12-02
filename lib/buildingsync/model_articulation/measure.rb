@@ -50,12 +50,6 @@ module BuildingSync
       @ns = ns
 
       help_element_class_type_check(base_xml, 'Measure')
-
-      read_xml
-    end
-
-    def read_xml
-
     end
   end
 end

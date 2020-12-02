@@ -48,6 +48,7 @@
                   <auc:IdentifierValue>151</auc:IdentifierValue>
                 </auc:PremisesIdentifier>
               </auc:PremisesIdentifiers>
+              <auc:OccupancyClassification>Retail</auc:OccupancyClassification>
               <auc:FloorsAboveGrade>1</auc:FloorsAboveGrade>
               <auc:FloorsBelowGrade>0</auc:FloorsBelowGrade>
               <auc:FloorAreas>

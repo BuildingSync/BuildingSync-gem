@@ -93,7 +93,6 @@ module BuildingSync
       @interval_reading_monthly = []
       @interval_reading_yearly = []
       @spaces_excluded_from_gross_floor_area = nil
-      @premises_notes_for_not_applicable = nil
 
       # parameter to read and write.
       @energy_resource = nil
@@ -418,8 +417,6 @@ module BuildingSync
           @auditor_years_experience = user_defined_field.elements["#{@ns}:FieldValue"].text
         elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Spaces Excluded From Gross Floor Area'
           @spaces_excluded_from_gross_floor_area = user_defined_field.elements["#{@ns}:FieldValue"].text
-        elsif user_defined_field.elements["#{@ns}:FieldName"].text == 'Premises Notes For Not Applicable'
-          @premises_notes_for_not_applicable = user_defined_field.elements["#{@ns}:FieldValue"].text
         end
       end
 
@@ -444,7 +441,7 @@ module BuildingSync
                                 add_space_type_loads = true, add_constructions = true, add_elevators = false, add_exterior_lights = false,
                                 add_exhaust = true, add_swh = true, add_hvac = true, add_thermostat = true, remove_objects = false)
       model = @site.get_model
-      template = @site.get_building_template
+      template = @site.get_standard_template
       system_type = @site.get_system_type
       climate_zone = @site.get_climate_zone
 
@@ -454,6 +451,7 @@ module BuildingSync
       initial_objects = model.getModelObjects.size
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
+      puts "BuildingSync.Facility.create_building_system - The building started with #{initial_objects} objects."
 
       # TODO: systems_xml.elements["#{@ns}:LightingSystems"]
       # Make the open_studio_system_standard applier
@@ -558,6 +556,7 @@ module BuildingSync
 
       # report final condition of model
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building finished with #{model.getModelObjects.size} objects.")
+      puts "BuildingSync.Facility.create_building_system - The building finished with #{model.getModelObjects.size} objects."
     end
 
     # write osm

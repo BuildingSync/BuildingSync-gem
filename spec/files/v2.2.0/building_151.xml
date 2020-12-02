@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019"
-  xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.2.0">
+                  xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.2.0">
   <auc:Facilities>
     <auc:Facility ID="Facility1">
       <auc:Sites>
@@ -49,6 +49,7 @@
                   <auc:IdentifierValue>151</auc:IdentifierValue>
                 </auc:PremisesIdentifier>
               </auc:PremisesIdentifiers>
+              <auc:OccupancyClassification>Retail</auc:OccupancyClassification>
               <auc:FloorsAboveGrade>1</auc:FloorsAboveGrade>
               <auc:FloorsBelowGrade>0</auc:FloorsBelowGrade>
               <auc:FloorAreas>

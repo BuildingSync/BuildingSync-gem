@@ -214,18 +214,17 @@ module BuildingSync
     # (common measures, model articulation, etc.) to find the lib/measures/[measure_dir] specified.
     # It is inserted at the relative position according to its type
     # @param measure_goal_type [String] one of: 'EnergyPlusMeasure', 'ReportingMeasure', or 'ModelMeasure'
-    # @param measure_dir [String] name of the measure directory, also what one would find in the <name/> field of the
-    #   measure.xml file.
-    #   @example 'openstudio_results', 'scale_geometry', etc.
+    # @param measure_dir_name [String] the directory name for the measure, as it appears
+    #   in any of the gems, i.e. openstudio-common-measures-gem/lib/measures/[measure_dir_name]
     # @param relative_position [Integer] the position where the measure should be inserted with respect to the measure_goal_type
     # @param args_hash [hash]
-    def insert_measure_into_workflow(measure_goal_type, measure_dir, relative_position = 0, args_hash = {})
+    def insert_measure_into_workflow(measure_goal_type, measure_dir_name, relative_position = 0, args_hash = {})
       successfully_added = false
       count = 0 # count for all of the measures, regardless of the type
       measure_type_count = 0 # count of measures specific to the measure_goal_type
       measure_type_found = false
       new_step = {}
-      new_step['measure_dir_name'] = measure_dir
+      new_step['measure_dir_name'] = measure_dir_name
       new_step['arguments'] = args_hash
       if @workflow['steps'].empty?
         @workflow['steps'].insert(count, new_step)
@@ -239,16 +238,16 @@ module BuildingSync
             measure_type_found = true
             if measure_type_count == relative_position
               # insert measure here
-              OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
-              puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
+              OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir_name} and type: #{get_measure_type(measure_dir_name)}")
+              puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir_name} and type: #{get_measure_type(measure_dir_name)}"
               @workflow['steps'].insert(count, new_step)
               successfully_added = true
               break
             end
             measure_type_count += 1
           elsif measure_type_found
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
-            puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}"
+            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir_name} and type: #{get_measure_type(measure_dir_name)}")
+            puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir_name} and type: #{get_measure_type(measure_dir_name)}"
             @workflow['steps'].insert(count - 1, new_step)
             successfully_added = true
             break
@@ -257,18 +256,19 @@ module BuildingSync
         end
       end
       if !successfully_added
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure_into_workflow', "CANNOT insert measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir} and type: #{get_measure_type(measure_dir)}")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure_into_workflow', "CANNOT insert measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir_name} and type: #{get_measure_type(measure_dir_name)}")
       end
       return successfully_added
     end
 
     # gets the measure type of a measure given its directory - looking up the measure type in the measure.xml file
-    # @param measure_dir [String]
+    # @param measure_dir_name [String] the directory name for the measure, as it appears
+    #   in any of the gems, i.e. openstudio-common-measures-gem/lib/measures/[measure_dir_name]
     # @return [String]
-    def get_measure_type(measure_dir)
+    def get_measure_type(measure_dir_name)
       measure_type = nil
       get_measure_directories_array.each do |potential_measure_path|
-        measure_dir_full_path = "#{potential_measure_path}/#{measure_dir}"
+        measure_dir_full_path = "#{potential_measure_path}/#{measure_dir_name}"
         if Dir.exist?(measure_dir_full_path)
           measure_xml_doc = nil
           File.open(measure_dir_full_path + '/measure.xml', 'r') do |file|
@@ -285,7 +285,8 @@ module BuildingSync
       return measure_type
     end
 
-    # configure for scenario
+    # Based on the MeasureIDs defined by the Scenario, configure the workflow provided
+    # using the default measure arguments defined by the lib/buildingsync/makers/workflow_maker.json
     # @param base_workflow [Hash] a Hash map of the @workflow.  DO NOT  use @workflow directly, should be a deep clone
     # @param scenario [BuildingSync::Scenario] a Scenario object
     def configure_workflow_for_scenario(base_workflow, scenario)
@@ -293,7 +294,6 @@ module BuildingSync
 
       num_measures = 0
       scenario.get_measure_ids.each do |measure_id|
-        puts measure_id
         measure = @facility.measures.find { |m| m.xget_id == measure_id }
         current_num_measure = num_measures
 
@@ -330,12 +330,15 @@ module BuildingSync
       return successful
     end
 
-    # set argument details
-    # @param osw [String]
-    # @param argument [hash]
-    # @param measure_dir_name [String]
+    # TODO: Update this as I believe no longer will work as expected, keys being searched for
+    #       by the @facility_xml['key'] don't make sense.
+    # set argument details, used when the condition
+    # @param workflow [Hash] a hash of the openstudio workflow
+    # @param argument [Hash]
+    # @param measure_dir_name [String] the directory name for the measure, as it appears
+    #   in any of the gems, i.e. openstudio-common-measures-gem/lib/measures/[measure_dir_name]
     # @param measure_name [String]
-    def set_argument_detail(osw, argument, measure_dir_name, measure_name)
+    def set_argument_detail(workflow, argument, measure_dir_name, measure_name)
       argument_name = ''
       argument_value = ''
 
@@ -369,7 +372,7 @@ module BuildingSync
         puts "BuildingSync.WorkflowMakerPhaseZero.set_argument_detail: Measure dir name not found #{measure_name}."
       end
 
-      set_measure_argument(osw, measure_dir_name, argument_name, argument_value) if !argument_name.nil? && !argument_name.empty?
+      set_measure_argument(workflow, measure_dir_name, argument_name, argument_value) if !argument_name.nil? && !argument_name.empty?
     end
 
     # write workflows for scenarios into osw files.  This includes:
@@ -378,6 +381,7 @@ module BuildingSync
     # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
     # @return [Boolean] whether writing of all the new workflows was successful
     def write_osws(main_output_dir)
+      # make sure paths exist
       super
 
       if @facility.cb_modeled.nil?
@@ -413,17 +417,19 @@ module BuildingSync
 
       # configure the workflow based on measures in this scenario
       begin
+        # The workflow is updated by configure_workflow, put with pass by reference
+        # we are ok to use it later without returning
         if !configure_workflow_for_scenario(base_workflow, scenario)
           successful = false
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osw', "Could not configure workflow for scenario #{scenario.xget_name}")
         else
-          # The workflow is updated by configure_workflow, so passing in here is ok
+          purge_skipped_from_workflow(base_workflow)
           scenario.set_workflow(base_workflow)
           scenario.write_osw(main_output_dir)
         end
 
       rescue StandardError => e
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osw', "Could not configure for scenario #{scenario.xget_name}")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osw', "Could not configure for scenario #{scenario.xget_name}. Error: #{e}")
         puts "Could not configure for scenario #{scenario.xget_name}"
         puts e.backtrace.join("\n\t")
         successful = false
@@ -440,14 +446,33 @@ module BuildingSync
       Dir.glob("#{output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
 
       runner = OpenStudio::Extension::Runner.new(dirname = Dir.pwd, bundle_without = [], options = runner_options)
+
+      # This doesn't run the workflow defined by the Sizing Run
       return runner.run_osws(osw_files - osw_sr_files)
     end
 
     # Creates a deep copy of the @workflow be serializing and reloading with JSON
+    # @return [Hash] a new workflow object
     def deep_copy_workflow
       return JSON.load(JSON.generate(@workflow))
     end
 
+    # Removes unused measures from a workflow, where __SKIP__ == true
+    # @param workflow [Hash] a hash of the openstudio workflow, typically after a deep
+    # copy is made and the measures are configured for the specific scenario
+    def purge_skipped_from_workflow(workflow)
+      non_skipped = []
+      if !workflow.nil? && !workflow['steps'].nil? && workflow.has_key?('steps')
+        workflow['steps'].each do |step|
+          if !step.nil? && step.has_key?('arguments') && !step['arguments'].nil?
+            if step['arguments'].has_key?('__SKIP__') && step['arguments']['__SKIP__'] == false
+              non_skipped << step
+            end
+          end
+        end
+        workflow['steps'] = non_skipped
+      end
+    end
 
     # get failed scenarios
     # @return [array]
@@ -455,14 +480,23 @@ module BuildingSync
       return @failed_scenarios
     end
 
-    # save BuildingSync xml
-    # @param filename [String]
+    # TODO: add a schema validation and re-ordering mechanism for XML elements
+    # Format, add declaration, and write xml to disk
+    # @param filename [String] full path including filename, i.e. output/path/results.xml
     def save_xml(filename)
       # first we make sure all directories exist
       FileUtils.mkdir_p(File.dirname(filename))
-      # then we can save the file
+
+      # Setup formatting
       formatter = REXML::Formatters::Pretty.new
       formatter.compact = true
+
+      # Setup document declaration
+      decl = REXML::XMLDecl.new
+      decl.encoding = REXML::XMLDecl::DEFAULT_ENCODING # UTF-8
+      @doc << decl
+
+      # Write file
       File.open(filename, 'w') do |file|
         formatter.write(@doc, file)
       end

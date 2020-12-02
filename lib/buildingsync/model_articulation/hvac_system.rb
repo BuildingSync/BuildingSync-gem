@@ -122,17 +122,97 @@ module BuildingSync
         # identify thermal thermostat and apply to zones (apply_internal_load_schedules names )
         model.getThermostatSetpointDualSetpoints.each do |thermostat|
           next if !thermostat.name.to_s.include?(space_type.name.to_s)
+          if !thermostat.coolingSetpointTemperatureSchedule.is_initialized
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.HVACSystem.add_thermostats', "#{thermostat.name} has no cooling setpoint.")
+          end
+          if !thermostat.heatingSetpointTemperatureSchedule.is_initialized
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.HVACSystem.add_thermostats', "#{thermostat.name} has no heating setpoint.")
+          end
 
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_thermostats', "Assigning #{thermostat.name} to thermal zones with #{space_type.name} assigned.")
+          puts "BuildingSync.HVACSystem.add_thermostats - Assigning #{thermostat.name} to thermal zones with #{space_type.name} assigned."
           space_type.spaces.each do |space|
             next if !space.thermalZone.is_initialized
 
             space.thermalZone.get.setThermostatSetpointDualSetpoint(thermostat)
           end
-          next
         end
+
+        puts "ThermalZones: #{model.getThermalZones.size}"
+        add_setpoints_to_thermostats_if_none(model)
       end
       return true
+    end
+
+    # @return [Boolean] true if ALL thermostats have heating and cooling setpoints
+    def add_setpoints_to_thermostats_if_none(model)
+      successful = true
+
+      # seperate out thermostats that need heating vs. cooling schedules
+      tstats_cooling = []
+      tstats_heating = []
+      model.getThermostatSetpointDualSetpoints.each do |tstat|
+        tstats_cooling << tstat if !tstat.coolingSetpointTemperatureSchedule.is_initialized
+        tstats_heating << tstat if !tstat.heatingSetpointTemperatureSchedule.is_initialized
+      end
+
+      puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (#{tstats_cooling.size} thermostats needing cooling schedule"
+      puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (#{tstats_heating.size} thermostats needing heating schedule"
+
+
+      htg_setpoints = [
+          # [Time.new(days, hours, mins seconds), temp_value_celsius]
+          [OpenStudio::Time.new(0, 9, 0, 0), 17],
+          [OpenStudio::Time.new(0, 17, 0, 0), 20],
+          [OpenStudio::Time.new(0, 24, 0, 0), 17],
+      ]
+      clg_setpoints = [
+          # [Time.new(days, hours, mins seconds), temp_value_celsius]
+          [OpenStudio::Time.new(0, 9, 0, 0), 27],
+          [OpenStudio::Time.new(0, 17, 0, 0), 24],
+          [OpenStudio::Time.new(0, 24, 0, 0), 27],
+      ]
+
+      heating_sp_schedule = create_schedule_ruleset(model, htg_setpoints, 'Thermostat Heating SP')
+      cooling_sp_schedule = create_schedule_ruleset(model, clg_setpoints, 'Thermostat Cooling SP')
+
+      tstats_cooling.each do |thermostat|
+        success = thermostat.setCoolingSetpointTemperatureSchedule(cooling_sp_schedule)
+        if success
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none', "Cooling Schedule (#{cooling_sp_schedule.nameString}) added to Thermostat: #{thermostat.nameString}")
+          puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - Cooling Schedule (#{cooling_sp_schedule.nameString}) added to Thermostat: #{thermostat.nameString}"
+        else
+          successful = false
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none', "No Cooling Schedule for Thermostat: #{thermostat.nameString}")
+          puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - No Cooling Schedule for Thermostat: #{thermostat.nameString}"
+        end
+      end
+
+      tstats_heating.each do |thermostat|
+        success = thermostat.setHeatingSetpointTemperatureSchedule(heating_sp_schedule)
+        if success
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none', "Heating Schedule (#{heating_sp_schedule.nameString}) added to Thermostat: #{thermostat.nameString}")
+          puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - Heating Schedule (#{heating_sp_schedule.nameString}) added to Thermostat: #{thermostat.nameString}"
+        else
+          successful = false
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none', "No Heating Schedule for Thermostat: #{thermostat.nameString}")
+          puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - No Heating Schedule for Thermostat: #{thermostat.nameString}"
+        end
+      end
+      return successful
+    end
+
+    # @param model [OpenStudio::Model::Model]
+    # @param values [Array<Array<OpenStudio::Time, Float>>] [[cutoff_time, value_until_cutoff]]
+    # @return [OpenStudio::Model::ScheduleRuleset] a new schedule ruleset with values added to the default day
+    def create_schedule_ruleset(model, values, name)
+      ruleset = OpenStudio::Model::ScheduleRuleset.new(model)
+      ruleset.setName(name)
+      dd = ruleset.defaultDaySchedule
+      values.each do |v|
+        dd.addValue(v[0], v[1])
+      end
+      return ruleset
     end
 
     # map principal hvac system type to cbecs system type

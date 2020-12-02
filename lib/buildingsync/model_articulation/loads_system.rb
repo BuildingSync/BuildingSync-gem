@@ -71,6 +71,7 @@ module BuildingSync
         model.getDefaultScheduleSets.each(&:remove)
       end
 
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "Adding internal loads")
       model.getSpaceTypes.each do |space_type|
         # Don't add infiltration here; will be added later in the script
         test = standard.space_type_apply_internal_loads(space_type, true, true, true, true, true, false)
@@ -81,7 +82,10 @@ module BuildingSync
 
         # apply internal load schedules
         # the last bool test it to make thermostat schedules. They are now added in HVAC section instead of here
-        standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
+        success = standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
+        if !success
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "space_type_apply_internal_load_schedules unsuccessful for #{space_type.name}")
+        end
 
         # here we adjust the people schedules according to user input of hours per week and weeks per year
         if !building_sections.empty?

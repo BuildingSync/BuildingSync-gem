@@ -50,7 +50,7 @@ RSpec.describe 'BuildingSpec' do
       # Should not reach this line
       expect(false).to be true
     rescue StandardError => e
-      expect(e.message.to_s).to eq('Building ID: Building1. Year of Construction is blank in your BuildingSync file.')
+      expect(e.message.to_s).to eq('Building ID: Building1. Year of Construction is blank in your BuildingSync file, but is required.')
     end
   end
 
@@ -84,8 +84,8 @@ RSpec.describe 'BuildingSpec' do
     g = BuildingSync::Generator.new
     building = g.create_minimum_building('Retail', '1954', 'Gross', '69452')
     building.determine_open_studio_standard(CA_TITLE24)
-    puts "expected building template: CBES Pre-1978 but got: #{building.get_building_template} " if building.get_building_template != 'CBES Pre-1978'
-    expect(building.get_building_template == 'CBES Pre-1978').to be true
+    puts "expected building template: CBES Pre-1978 but got: #{building.get_standard_template} " if building.get_standard_template != 'CBES Pre-1978'
+    expect(building.get_standard_template == 'CBES Pre-1978').to be true
   end
 
   it 'Should successfully set an ASHRAE 90.1 climate zone' do
@@ -104,172 +104,69 @@ RSpec.describe 'BuildingSpec' do
     expect(building.set_climate_zone('Climate Zone 6', CA_TITLE24, '')).to be true
   end
 
-  it 'Should return the year of last energy audit' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = 2010
+  describe 'Building XmlGetSet Accessors' do
+    before(:all) do
+      # -- Setup
+      file_name = 'building_151_level1.xml'
+      std = ASHRAE90_1
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+      @building = BuildingSync::Generator.new.get_building_from_file(xml_path)
+    end
 
-    # -- Assert
-    puts "expected year_of_last_energy_audit: #{expected_value} but got: #{building.year_of_last_energy_audit} " if building.year_of_last_energy_audit != expected_value
-    expect(building.year_of_last_energy_audit == expected_value).to be true
+    expectations = [
+        # [expected value, method used to access, element_name]
+        ['Property management company', 'xget_text', ['Ownership']],
+        ['Health care-Inpatient hospital', 'xget_text', ['OccupancyClassification']],
+        ['Contact1', 'xget_attribute_for_element', ['PrimaryContactID', 'IDref']],
+        [Date.new(2019, 1, 1), 'xget_text_as_date', ['RetrocommissioningDate']],
+        [true, 'xget_text_as_bool', ['BuildingAutomationSystem']],
+        [true, 'xget_text_as_bool', ['HistoricalLandmark']],
+        [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
+        [2003, 'xget_text_as_integer', ['YearOfLastMajorRemodel']],
+        [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
+        [60.0, 'xget_text_as_float', ['PercentOccupiedByOwner']],
+    ]
+
+    expectations.each do |e|
+      it "#{e[2][0]} accessed via #{e[1]} should equal '#{e[0]}'" do
+        expect(@building.send(e[1], *e[2])).to eq(e[0])
+      end
+    end
   end
 
-  it 'Should return ownership' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = 'Property management company'
+  describe 'Building Attribute Accessors' do
+    before(:all) do
+      # -- Setup
+      file_name = 'building_151_level1.xml'
+      std = ASHRAE90_1
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+      @building = BuildingSync::Generator.new.get_building_from_file(xml_path)
+    end
+    it 'Should return OccupantQuantity' do
+      # -- Setup
+      expected_value = '15000'
 
-    # -- Assert
-    puts "expected ownership: #{expected_value} but got: #{building.ownership} " if building.ownership != expected_value
-    expect(building.ownership == expected_value).to be true
+      # -- Assert
+      puts "expected occupant_quantity: #{expected_value} but got: #{@building.occupant_quantity} " if @building.occupant_quantity != expected_value
+      expect(@building.occupant_quantity == expected_value).to be true
+    end
+
+    it 'Should return NumberOfUnits' do
+      # -- Setup
+      expected_value = '18'
+
+      # -- Assert
+      puts "expected number_of_units: #{expected_value} but got: #{@building.number_of_units} " if @building.number_of_units != expected_value
+      expect(@building.number_of_units == expected_value).to be true
+    end
+
+    it 'Should return built_year' do
+      expected_value = Integer('2003')
+
+      # -- Assert
+      puts "expected built_year: #{expected_value} but got: #{@building.built_year} " if @building.built_year != expected_value
+      expect(@building.built_year == expected_value).to be true
+    end
   end
 
-  it 'Should return occupancy_classification' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = 'Health care-Inpatient hospital'
-
-    # -- Assert
-    puts "expected occupancy_classification: #{expected_value} but got: #{building.occupancy_classification} " if building.occupancy_classification != expected_value
-    expect(building.occupancy_classification == expected_value).to be true
-  end
-
-  it 'Should return the IDref attribute for PrimaryContactID' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = 'Contact1'
-
-    # -- Assert
-    puts "expected primary_contact_id: #{expected_value} but got: #{building.primary_contact_id} " if building.primary_contact_id != expected_value
-    expect(building.primary_contact_id == expected_value).to be true
-  end
-
-  it 'Should return RetrocommissioningDate' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = Date.parse '1/1/2019'
-
-    # -- Assert
-    puts "expected retro_commissioning_date: #{expected_value} but got: #{building.year_last_commissioning} " if building.year_last_commissioning != expected_value
-    expect(building.year_last_commissioning == expected_value).to be true
-  end
-
-  it 'Should return BuildingAutomationSystem' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = true
-
-    # -- Assert
-    puts "expected building_automation_system: #{expected_value} but got: #{building.building_automation_system} " if building.building_automation_system != expected_value
-    expect(building.building_automation_system == expected_value).to be true
-  end
-
-  it 'Should return HistoricalLandmark' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = true
-
-    # -- Assert
-    puts "expected historical_landmark: #{expected_value} but got: #{building.historical_landmark} " if building.historical_landmark != expected_value
-    expect(building.historical_landmark == expected_value).to be true
-  end
-
-  it 'Should return PercentOccupiedByOwner' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = '60'
-
-    # -- Assert
-    puts "expected percent_occupied_by_owner: #{expected_value} but got: #{building.percent_occupied_by_owner} " if building.percent_occupied_by_owner != expected_value
-    expect(building.percent_occupied_by_owner == expected_value).to be true
-  end
-
-  it 'Should return OccupantQuantity' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = '15000'
-
-    # -- Assert
-    puts "expected occupant_quantity: #{expected_value} but got: #{building.occupant_quantity} " if building.occupant_quantity != expected_value
-    expect(building.occupant_quantity == expected_value).to be true
-  end
-
-  it 'Should return NumberOfUnits' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = '18'
-
-    # -- Assert
-    puts "expected number_of_units: #{expected_value} but got: #{building.number_of_units} " if building.number_of_units != expected_value
-    expect(building.number_of_units == expected_value).to be true
-  end
-
-  it 'Should return built_year' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = Integer('2003')
-
-    # -- Assert
-    puts "expected built_year: #{expected_value} but got: #{building.built_year} " if building.built_year != expected_value
-    expect(building.built_year == expected_value).to be true
-  end
-
-  it 'Should return major_remodel_year' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = Integer('2003')
-
-    # -- Assert
-    puts "expected major_remodel_year: #{expected_value} but got: #{building.year_major_remodel} " if building.year_major_remodel != expected_value
-    expect(building.year_major_remodel == expected_value).to be true
-  end
-
-  it 'Should return year_of_last_energy_audit' do
-    # -- Setup
-    file_name = 'building_151_level1.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    building = BuildingSync::Generator.new.get_building_from_file(xml_path)
-    expected_value = Integer('2010')
-
-    # -- Assert
-    puts "expected year_of_last_energy_audit: #{expected_value} but got: #{building.year_of_last_energy_audit} " if building.year_of_last_energy_audit != expected_value
-    expect(building.year_of_last_energy_audit == expected_value).to be true
-  end
 end

@@ -170,7 +170,7 @@ RSpec.describe 'BuildingSync' do
   #   end
   # end
 
-  it 'AT_example_report_332.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - should error since Occupancy type: "Food Service" is not defined in bldg_and_system_types.json' do
+  it 'AT_example_report_332.xml ASHRAE90_1 USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw - should error since Occupancy type: "Food Service" is not defined in building_and_system_types.json' do
     # -- Setup
     file_name = 'AT_example_report_332.xml'
     std = ASHRAE90_1
@@ -180,7 +180,7 @@ RSpec.describe 'BuildingSync' do
       # -- Assert
       translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
     rescue StandardError => e
-      expect(e.message.include?('Occupancy type Food service is not available in the bldg_and_system_types.json dictionary')).to be true
+      expect(e.message.include?('Occupancy type Food service is not available in the building_and_system_types.json dictionary')).to be true
     end
   end
 

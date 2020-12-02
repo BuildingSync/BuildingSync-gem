@@ -69,6 +69,22 @@ module BuildingSync
       return v.to_f
     end
 
+    def help_get_text_value_as_integer(xml_element)
+      v = help_get_text_value(xml_element)
+      return v.to_i
+    end
+
+    def help_get_text_value_as_bool(xml_element)
+      v = help_get_text_value(xml_element)
+      return v.to_bool
+    end
+
+    # convert between supported units
+    # @param val [Numeric] value to convert, i.e. 1
+    # @param from_unit [String] starting units
+    # @param to_unit [String] desired end units
+    # @return [Float] if successful, converted value
+    # @return [nil] if unsuccessful
     def help_convert(val, from_unit, to_unit)
       if from_unit == to_unit
         return val

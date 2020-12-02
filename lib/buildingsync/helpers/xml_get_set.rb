@@ -39,7 +39,8 @@ require 'rexml/document'
 require 'buildingsync/helpers/helper'
 
 module BuildingSync
-  # helper class for helper methods in BuildingSync
+  # Used for getting, setting, and creating XML snippets
+  # for BuildingSync classes with an @base_xml attribute
   module XmlGetSet
 
     # Get the id attribute of the @base_xml
@@ -48,9 +49,10 @@ module BuildingSync
       return help_get_attribute_value(@base_xml, 'ID')
     end
 
-    # Get the name of the element
-    # @example scenario.get_name , returns text for ScenarioName element
-    # @example site.get_name , returns text for SiteName
+    # Get the name of the element, based on the type of element
+    # @example scenario.get_name, returns text for ScenarioName element
+    # @example site.get_name, returns text for SiteName
+    # @return [String] name associated with the @base_xml
     def xget_name
       premises = ['Site', 'Building', 'Section', 'ThermalZone', 'Space']
       if premises.include? @base_xml.name
@@ -63,34 +65,57 @@ module BuildingSync
       end
     end
 
+    def xget_attribute_for_element(element_name, attribute)
+      element = @base_xml.elements["./#{@ns}:#{element_name}"]
+      return help_get_attribute_value(element, attribute)
+    end
+
     # returns the first element with the specified element name
     # @param element_name [String] non-namespaced element name, 'EnergyResource'
     # @return [REXML::Element] if element exists
-    # @return [nil] if element doesn't
+    # @return [nil] if element doesnt exist
     def xget_element(element_name)
       return @base_xml.elements["./#{@ns}:#{element_name}"]
     end
 
-    # only creates new if doesn't exist
+    # get or create a new element
+    # @param element_name [String] non-namespaced element name, 'EnergyResource'
+    # @see help_get_or_create
     def xget_or_create(element_name)
       return help_get_or_create(@base_xml, "#{@ns}:#{element_name}")
     end
 
+    # @param element_name [String] non-namespaced element name, 'EnergyResource'
     # @see help_get_text_value
     def xget_text(element_name)
       return help_get_text_value(@base_xml.elements["./#{@ns}:#{element_name}"])
     end
 
+    # @param element_name [String] non-namespaced element name, 'YearOfConstruction'
     # @see help_get_text_value_as_float
     def xget_text_as_float(element_name)
       return help_get_text_value_as_float(@base_xml.elements["./#{@ns}:#{element_name}"])
     end
 
+    # @param element_name [String] non-namespaced element name, 'YearOfConstruction'
+    # @see help_get_text_value_as_integer
+    def xget_text_as_integer(element_name)
+      return help_get_text_value_as_integer(@base_xml.elements["./#{@ns}:#{element_name}"])
+    end
+
+    # @param element_name [String] non-namespaced element name, 'BuildingAutomationSystem'
+    # @see help_get_text_value_as_bool
+    def xget_text_as_bool(element_name)
+      return help_get_text_value_as_bool(@base_xml.elements["./#{@ns}:#{element_name}"])
+    end
+
+    # @param element_name [String] non-namespaced element name, 'RetrocommissioningDate'
     # @see help_get_text_value_as_date
     def xget_text_as_date(element_name)
       return help_get_text_value_as_date(@base_xml.elements["./#{@ns}:#{element_name}"])
     end
 
+    # @param element_name [String] non-namespaced element name, 'StartTimestamp'
     # @see help_get_text_value_as_datetime
     def xget_text_as_dt(element_name)
       return help_get_text_value_as_datetime(@base_xml.elements["./#{@ns}:#{element_name}"])
@@ -99,9 +124,9 @@ module BuildingSync
     # Gets all of the IDref attributes of the element_name provided
     # assumes there is a parent child containment downstream of the base_xml,
     # where the parent is a plural version of the element_name provided
-    # @example xget_idrefs('Measure') #=> Searches for Measures/Measure
+    # @example xget_idrefs('Measure') #=> Searches for .//Measures/Measure
     # @param element_name [String] name of the non-pluralized element, i.e. Measure
-    # @return [Array<String>]
+    # @return [Array<String>] all associated IDs ['Measure-1', 'Measure-2', etc.]
     def xget_idrefs(element_name)
       id_elements = @base_xml.get_elements(".//#{@ns}:#{element_name}s/#{@ns}:#{element_name}")
       to_return = []
@@ -113,7 +138,7 @@ module BuildingSync
 
     # Get the linked premises ids of the @base_xml element
     # @return [Hash] where keys are premise types and values are an array of ids
-    # @example {'Building' => ['Building-1', 'Building-1', 'Section' => ['Section-4']]}
+    # @example {'Building' => ['Building-1', 'Building-1'], 'Section' => ['Section-4']]}
     def xget_linked_premises
       map = {}
       premises = @base_xml.get_elements(".//#{@ns}:LinkedPremises").first()
@@ -131,6 +156,11 @@ module BuildingSync
       return map
     end
 
+    # Only sets the text for an element if it exists
+    # @param element_name [String] non-namespaced element name, 'EnergyResource'
+    # @param new_value [String] new text value to use, 'Electricity'
+    # @return [REXML::Element] if element exists
+    # @return [nil] if element doesn't exist
     def xset_text(element_name, new_value)
       element = @base_xml.elements["./#{@ns}:#{element_name}"]
       if !element.nil?
@@ -139,6 +169,12 @@ module BuildingSync
       return element
     end
 
+    # Sets the text for an element if it exists, or creates the element then sets
+    # the text if it doesn't exist
+    # @param element_name [String] non-namespaced element name, 'EnergyResource'
+    # @param new_value [String] new text value to use, 'Electricity'
+    # @param override [Boolean] whether to override the text value if the element already has text
+    # @return [REXML::Element] the element
     def xset_or_create(element_name, new_value, override = true)
       element = @base_xml.elements["./#{@ns}:#{element_name}"]
       if !element.nil?
