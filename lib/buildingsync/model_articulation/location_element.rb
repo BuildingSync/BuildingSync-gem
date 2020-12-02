@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -61,7 +63,6 @@ module BuildingSync
 
       # read city and state name
       read_city_and_state_name
-
     end
 
     # read climate zone
@@ -82,7 +83,6 @@ module BuildingSync
       if @climate_zone_ashrae.nil? && @climate_zone_ca_t24.nil?
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LocationElement.read_climate_zone', "Element ID: #{xget_id} - Title24 Climate Zone and ASHRAE Climate Zone not found")
       end
-
     end
 
     # read city and state name
@@ -98,6 +98,5 @@ module BuildingSync
         @state_name = nil
       end
     end
-
   end
 end

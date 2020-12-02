@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -60,7 +62,7 @@ module BuildingSync
       end_date = start_date_time >>= 1
 
       # += shifts a datetime by 1 day.  the following shifts it by negative 1 minute
-      end_date += - Rational(1, 24.0*60)
+      end_date += - Rational(1, 24.0 * 60)
 
       # Always sets to last minute of the month:
       # 2020-01-31T23:59:00

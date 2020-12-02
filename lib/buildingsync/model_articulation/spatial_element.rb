@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -152,7 +154,7 @@ module BuildingSync
 
       if !occupancy_classification.nil? && !total_floor_area.nil?
 
-        building_and_system_types =eval(File.read(BUILDING_AND_SYSTEMS_FILE_PATH))
+        building_and_system_types = eval(File.read(BUILDING_AND_SYSTEMS_FILE_PATH))
 
         process_bldg_and_system_type(building_and_system_types, occupancy_classification, total_floor_area, total_number_floors)
 
@@ -191,47 +193,36 @@ module BuildingSync
       puts "Element ID: #{xget_id} started with occupancy_classification #{occupancy_classification} and total floor area: #{total_floor_area}"
       min_floor_area_correct = false
       max_floor_area_correct = false
-      if !building_and_system_types[:"#{occupancy_classification}"].nil?
-        building_and_system_types[:"#{occupancy_classification}"].each do |occ_type|
-          if !occ_type[:standards_building_type].nil?
-            if occ_type[:min_floor_area] || occ_type[:max_floor_area]
-              if occ_type[:min_floor_area] && occ_type[:min_floor_area].to_f < total_floor_area
-                min_floor_area_correct = true
-              end
-              if occ_type[:max_floor_area] && occ_type[:max_floor_area].to_f > total_floor_area
-                max_floor_area_correct = true
-              end
-              if (min_floor_area_correct && max_floor_area_correct) || (!occ_type[:min_floor_area] && max_floor_area_correct) || (min_floor_area_correct && !occ_type[:max_floor_area])
-                puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
-                return sets_occupancy_bldg_system_types(occ_type)
-              end
-            elsif occ_type[:min_number_floors] || occ_type[:max_number_floors]
-              if occ_type[:min_number_floors] && occ_type[:min_number_floors].to_i <= total_number_floors
-                puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
-                return sets_occupancy_bldg_system_types(occ_type)
-              elsif occ_type[:max_number_floors] && occ_type[:max_number_floors].to_i > total_number_floors
-                puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
-                return sets_occupancy_bldg_system_types(occ_type)
-              end
-            else
-              # otherwise we assume the first one is correct and we select this
+      building_and_system_types[:"#{occupancy_classification}"]&.each do |occ_type|
+        if !occ_type[:standards_building_type].nil?
+          if occ_type[:min_floor_area] || occ_type[:max_floor_area]
+            if occ_type[:min_floor_area] && occ_type[:min_floor_area].to_f < total_floor_area
+              min_floor_area_correct = true
+            end
+            if occ_type[:max_floor_area] && occ_type[:max_floor_area].to_f > total_floor_area
+              max_floor_area_correct = true
+            end
+            if (min_floor_area_correct && max_floor_area_correct) || (!occ_type[:min_floor_area] && max_floor_area_correct) || (min_floor_area_correct && !occ_type[:max_floor_area])
+              puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
+              return sets_occupancy_bldg_system_types(occ_type)
+            end
+          elsif occ_type[:min_number_floors] || occ_type[:max_number_floors]
+            if occ_type[:min_number_floors] && occ_type[:min_number_floors].to_i <= total_number_floors
+              puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
+              return sets_occupancy_bldg_system_types(occ_type)
+            elsif occ_type[:max_number_floors] && occ_type[:max_number_floors].to_i > total_number_floors
               puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
               return sets_occupancy_bldg_system_types(occ_type)
             end
           else
             # otherwise we assume the first one is correct and we select this
+            puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
             return sets_occupancy_bldg_system_types(occ_type)
           end
+        else
+          # otherwise we assume the first one is correct and we select this
+          return sets_occupancy_bldg_system_types(occ_type)
         end
-      # else
-      #   # if the bldgsync occupancy type is not found, we try to match it with the bldg_type (for backwards compatibility)
-      #   json.each do |full_occ_type|
-      #     full_occ_type[1].each do |occ_type|
-      #       if occ_type[:standards_building_type] == occupancy_classification
-      #         return sets_occupancy_bldg_system_types(occ_type)
-      #       end
-      #     end
-      #   end
       end
       raise "BuildingSync Occupancy type #{occupancy_classification} is not available in the building_and_system_types.json dictionary"
       return false
@@ -308,7 +299,7 @@ module BuildingSync
         final_floor_area = ratio_of_bldg_total * total_bldg_floor_area # I think I can just pass ratio but passing in area is cleaner
         @space_types_floor_area[hash[:space_type]] = { floor_area: final_floor_area }
       end
-      puts "BuildingSync.SpatialElement.create_space_types"
+      puts 'BuildingSync.SpatialElement.create_space_types'
       return @space_types_floor_area
     end
 
@@ -332,7 +323,6 @@ module BuildingSync
 
     # write parameters to xml for spatial element
     def prepare_final_xml_for_spatial_element
-
       add_user_defined_field_to_xml_file('StandardsBuildingType', @standards_building_type)
       add_user_defined_field_to_xml_file('SystemType', @system_type)
       add_user_defined_field_to_xml_file('BarDivisionMethod', @bar_division_method)

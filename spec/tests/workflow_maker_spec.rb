@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -47,7 +49,7 @@ RSpec.describe 'WorkflowMaker' do
       begin
         workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
       rescue StandardError => e
-        expect(e.message).to eql "doc must be an REXML::Document.  Passed object of class: String"
+        expect(e.message).to eql 'doc must be an REXML::Document.  Passed object of class: String'
       end
     end
 
@@ -60,7 +62,7 @@ RSpec.describe 'WorkflowMaker' do
       begin
         workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
       rescue StandardError => e
-        expect(e.message).to eql "ns must be String.  Passed object of class: Int"
+        expect(e.message).to eql 'ns must be String.  Passed object of class: Int'
       end
     end
   end
@@ -159,7 +161,7 @@ RSpec.describe 'WorkflowMaker' do
 
       # -- Assert
       # Just check the name of one measure we know is in the common measures gem
-      expect(available_measures[cm.measures_dir].find { |item| item == "SetEnergyPlusMinimumOutdoorAirFlowRate" }).to_not be nil
+      expect(available_measures[cm.measures_dir].find { |item| item == 'SetEnergyPlusMinimumOutdoorAirFlowRate' }).to_not be nil
     end
   end
 
@@ -241,20 +243,19 @@ RSpec.describe 'WorkflowMaker' do
     end
 
     measure_inserts_to_check = [
-        ['EnergyPlusMeasure', 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects', 1, 27, {
-            "ratedTotalCoolingCapacity" => 999.9,
-            "ratedCOP" => 0.99,
-            "ratedAirFlowRate" => 0.999,
-            "condensateRemovalStart" => 9.999,
-            "evapLatentRatio" => 0.0999,
-            "latentCapTimeConstant" => 4.0
-        }],
-        ['ReportingMeasure', 'openstudio_results', 0, 29, nil],
-        ['ModelMeasure', 'scale_geometry', 3, 3, nil]
+      ['EnergyPlusMeasure', 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects', 1, 27, {
+        'ratedTotalCoolingCapacity' => 999.9,
+        'ratedCOP' => 0.99,
+        'ratedAirFlowRate' => 0.999,
+        'condensateRemovalStart' => 9.999,
+        'evapLatentRatio' => 0.0999,
+        'latentCapTimeConstant' => 4.0
+      }],
+      ['ReportingMeasure', 'openstudio_results', 0, 29, nil],
+      ['ModelMeasure', 'scale_geometry', 3, 3, nil]
     ]
     measure_inserts_to_check.each do |to_check|
       it "insert_measure_into_workflow: #{to_check[0]} (#{to_check[1]}) at the expected position and still simulates" do
-
         # -- Setup
         # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
         # -- Assert
@@ -290,8 +291,7 @@ RSpec.describe 'WorkflowMaker' do
       end
     end
 
-
-    it "remove measures then insert_measure_into_workflow: EnergyPlusMeasure (ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects) at the expected position and still simulate" do
+    it 'remove measures then insert_measure_into_workflow: EnergyPlusMeasure (ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects) at the expected position and still simulate' do
       # -- Setup
       # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
       measure_type = 'EnergyPlusMeasure'
@@ -299,12 +299,12 @@ RSpec.describe 'WorkflowMaker' do
       item = 1
       final_expected_position = 0
       args = {
-          "ratedTotalCoolingCapacity" => 999.9,
-          "ratedCOP" => 0.99,
-          "ratedAirFlowRate" => 0.999,
-          "condensateRemovalStart" => 9.999,
-          "evapLatentRatio" => 0.0999,
-          "latentCapTimeConstant" => 4.0
+        'ratedTotalCoolingCapacity' => 999.9,
+        'ratedCOP' => 0.99,
+        'ratedAirFlowRate' => 0.999,
+        'condensateRemovalStart' => 9.999,
+        'evapLatentRatio' => 0.0999,
+        'latentCapTimeConstant' => 4.0
       }
 
       @workflow_maker.clear_all_measures
@@ -336,7 +336,6 @@ RSpec.describe 'WorkflowMaker' do
       # the measure will get run in the cb_modeled scenario.
       expect(@workflow_maker.get_facility.cb_modeled.simulation_success?).to be true
     end
-
   end
 
   describe 'Results Processing' do
@@ -376,5 +375,4 @@ RSpec.describe 'WorkflowMaker' do
       expect(File.exist?(output_xml_path2)).to be true
     end
   end
-
 end

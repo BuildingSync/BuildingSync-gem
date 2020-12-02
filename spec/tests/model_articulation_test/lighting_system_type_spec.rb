@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -53,7 +55,7 @@ RSpec.describe 'LightingSystemType' do
     begin
       BuildingSync::LightingSystemType.new(facility_xml, ns)
     rescue StandardError => e
-      expect(e.message).to eql "Attempted to initialize LightingSystem object with Element name of: Facility"
+      expect(e.message).to eql 'Attempted to initialize LightingSystem object with Element name of: Facility'
     end
   end
 
@@ -66,7 +68,7 @@ RSpec.describe 'LightingSystemType' do
     facility_xml = g.get_first_facility_element(doc)
 
     # -- Setup paths
-    output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__, File.extname(__FILE__))}")
+    output_path = File.join(SPEC_OUTPUT_DIR, File.basename(__FILE__, File.extname(__FILE__)).to_s)
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
 
     facility = BuildingSync::Facility.new(facility_xml, ns)
@@ -80,10 +82,10 @@ RSpec.describe 'LightingSystemType' do
     lighting_system = facility.add_blank_lighting_system(building_id, 'Building')
 
     # -- Assert Lighting System has been properly added
-    expect(facility.systems_map.has_key?("LightingSystems")).to be true
-    expect(facility.systems_map["LightingSystems"].size).to eq(1)
-    expect(facility.systems_map["LightingSystems"][0]).to be lighting_system
-    expect(lighting_system.xget_linked_premises).to eq({"Building" => ["Building1"]})
+    expect(facility.systems_map.key?('LightingSystems')).to be true
+    expect(facility.systems_map['LightingSystems'].size).to eq(1)
+    expect(facility.systems_map['LightingSystems'][0]).to be lighting_system
+    expect(lighting_system.xget_linked_premises).to eq('Building' => ['Building1'])
 
     # we need to create a site and call the generate_baseline_osm method in order to set the space types in the model, why are those really needed?
     facility.generate_baseline_osm(epw_file_path, output_path, std)

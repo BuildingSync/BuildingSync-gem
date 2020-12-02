@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -62,10 +64,10 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.read_xml', "Site with ID: #{xget_id} has no Building elements.  Cannot initialize Site.")
         raise StandardError, "Site with ID: #{xget_id} has no Building elements.  Cannot initialize Site."
       elsif building_xml_temp.size > 1
-        @building_xml = building_xml_temp.first()
+        @building_xml = building_xml_temp.first
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.read_xml', "Site ID: #{xget_id}. There is more than one (#{building_xml_temp.size}) Building elements.  Only the first Building will be considered (ID: #{@building_xml.attributes['ID']}.")
       else
-        @building_xml = building_xml_temp.first()
+        @building_xml = building_xml_temp.first
       end
 
       # read other data
@@ -73,7 +75,6 @@ module BuildingSync
       read_location_values
 
       @building = BuildingSync::Building.new(@building_xml, xget_text('OccupancyClassification'), @total_floor_area, @ns)
-
     end
 
     # set all function to set all parameters for each building

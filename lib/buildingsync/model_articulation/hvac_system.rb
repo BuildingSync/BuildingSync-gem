@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -56,13 +58,9 @@ module BuildingSync
     end
 
     # read xml
-    def read_xml
+    def read_xml; end
 
-    end
-
-    def get_linked_ids
-
-    end
+    def get_linked_ids; end
 
     # get principal hvac system type
     # @return [String]
@@ -156,21 +154,20 @@ module BuildingSync
         tstats_heating << tstat if !tstat.heatingSetpointTemperatureSchedule.is_initialized
       end
 
-      puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (#{tstats_cooling.size} thermostats needing cooling schedule"
-      puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (#{tstats_heating.size} thermostats needing heating schedule"
-
+      puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (#{tstats_cooling.size}) thermostats needing cooling schedule"
+      puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (#{tstats_heating.size}) thermostats needing heating schedule"
 
       htg_setpoints = [
-          # [Time.new(days, hours, mins seconds), temp_value_celsius]
-          [OpenStudio::Time.new(0, 9, 0, 0), 17],
-          [OpenStudio::Time.new(0, 17, 0, 0), 20],
-          [OpenStudio::Time.new(0, 24, 0, 0), 17],
+        # [Time.new(days, hours, mins seconds), temp_value_celsius]
+        [OpenStudio::Time.new(0, 9, 0, 0), 17],
+        [OpenStudio::Time.new(0, 17, 0, 0), 20],
+        [OpenStudio::Time.new(0, 24, 0, 0), 17]
       ]
       clg_setpoints = [
-          # [Time.new(days, hours, mins seconds), temp_value_celsius]
-          [OpenStudio::Time.new(0, 9, 0, 0), 27],
-          [OpenStudio::Time.new(0, 17, 0, 0), 24],
-          [OpenStudio::Time.new(0, 24, 0, 0), 27],
+        # [Time.new(days, hours, mins seconds), temp_value_celsius]
+        [OpenStudio::Time.new(0, 9, 0, 0), 27],
+        [OpenStudio::Time.new(0, 17, 0, 0), 24],
+        [OpenStudio::Time.new(0, 24, 0, 0), 27]
       ]
 
       heating_sp_schedule = create_schedule_ruleset(model, htg_setpoints, 'Thermostat Heating SP')
@@ -343,13 +340,11 @@ module BuildingSync
     # @param system_type [String]
     # @return [String]
     def get_system_type_from_zone(zone_hash, zones, system_type)
-      if zone_hash
-        zone_hash.each do |id, zone_list|
-          zone_name_list = help_get_zone_name_list(zone_list)
-          zones.each do |zone|
-            if zone_name_list.include? zone.name.get
-              return map_to_cbecs(get_principal_hvac_system_type, system_type)
-            end
+      zone_hash&.each do |id, zone_list|
+        zone_name_list = help_get_zone_name_list(zone_list)
+        zones.each do |zone|
+          if zone_name_list.include? zone.name.get
+            return map_to_cbecs(get_principal_hvac_system_type, system_type)
           end
         end
       end

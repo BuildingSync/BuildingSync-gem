@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -50,7 +52,7 @@ RSpec.describe 'HVACSystemSpec' do
     begin
       BuildingSync::HVACSystem.new(facility_xml, ns)
     rescue StandardError => e
-      expect(e.message).to eql "Attempted to initialize HVACSystem object with Element name of: Facility"
+      expect(e.message).to eql 'Attempted to initialize HVACSystem object with Element name of: Facility'
     end
   end
   it 'Should add a Exhaust in HVAC system successfully' do
@@ -110,7 +112,7 @@ RSpec.describe 'HVACSystemSpec' do
 
     hvac_system = BuildingSync::HVACSystem.new(hvac_system_xml, ns)
 
-    output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(__FILE__, File.extname(__FILE__))}")
+    output_path = File.join(SPEC_OUTPUT_DIR, File.basename(__FILE__, File.extname(__FILE__)).to_s)
     expect(hvac_system.apply_sizing_and_assumptions(model, output_path, standard, 'Retail', 'PSZ-AC with gas coil heat', '')).to be false
   end
 
@@ -126,5 +128,4 @@ RSpec.describe 'HVACSystemSpec' do
     puts "expected primary_hvac_system_type : #{expected_value} but got: #{hvac_system.get_principal_hvac_system_type} " if hvac_system.get_principal_hvac_system_type != expected_value
     expect(hvac_system.get_principal_hvac_system_type == expected_value).to be true
   end
-
 end

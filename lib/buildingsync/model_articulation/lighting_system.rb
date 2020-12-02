@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -55,9 +57,7 @@ module BuildingSync
     end
 
     # read
-    def read_xml
-
-    end
+    def read_xml; end
 
     # add exterior lights
     # @param model [OpenStudio::Model]

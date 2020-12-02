@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -42,7 +44,7 @@ begin
 rescue LoadError, StandardError
   module BuildingSync
     # location of openstudio CLI
-    OPENSTUDIO_EXE = 'openstudio'.freeze
+    OPENSTUDIO_EXE = 'openstudio'
 
     # one or more measure paths
     OPENSTUDIO_MEASURES = [].freeze
@@ -83,16 +85,16 @@ RSpec.configure do |config|
 
       # The output path will look something like:
       # to/spec/output/translator_baseline_generation_spec/building_151/Caliornia
-      output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(spec_file_name , File.extname(spec_file_name ))}/#{File.basename(xml_path, File.extname(xml_path))}")
-      output_path = File.join(output_path, "#{std.split('.')[0]}")
+      output_path = File.join(SPEC_OUTPUT_DIR, "#{File.basename(spec_file_name, File.extname(spec_file_name))}/#{File.basename(xml_path, File.extname(xml_path))}")
+      output_path = File.join(output_path, (std.split('.')[0]).to_s)
     else
       xml_path = File.join(SPEC_FILES_DIR, version, file_name)
 
       # The output path will look something like:
       # to/spec/output/translator_baseline_generation_spec/building_151/Caliornia
 
-      output_path = File.join(SPEC_OUTPUT_DIR, version, "#{File.basename(spec_file_name , File.extname(spec_file_name ))}/#{File.basename(xml_path, File.extname(xml_path))}")
-      output_path = File.join(output_path, "#{std.split('.')[0]}")
+      output_path = File.join(SPEC_OUTPUT_DIR, version, "#{File.basename(spec_file_name, File.extname(spec_file_name))}/#{File.basename(xml_path, File.extname(xml_path))}")
+      output_path = File.join(output_path, (std.split('.')[0]).to_s)
     end
 
     # -- Setup
@@ -111,7 +113,9 @@ RSpec.configure do |config|
   end
 
   def numeric?(val)
-    Float(val) != nil rescue false
+    !Float(val).nil?
+  rescue StandardError
+    false
   end
 
   # run baseline simulation
@@ -279,7 +283,6 @@ RSpec.configure do |config|
   # @param standard_to_be_used [String]
   # @param epw_file_name [String]
   def test_baseline_and_scenario_creation(file_name, output_path, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
-
     translator = translator_sizing_run_and_check(file_name, output_path, standard_to_be_used, epw_file_name)
     translator.write_osws
 
@@ -292,7 +295,6 @@ RSpec.configure do |config|
     expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
     return translator
   end
-
 
   # run minimum facility
   # @param occupancy_classification [String]
@@ -442,14 +444,14 @@ RSpec.configure do |config|
     expect(doc).to be_an_instance_of(REXML::Document)
 
     # There should be one Current Building Modeled scenario (referred to as Baseline)
-    current_building_modeled_scenario = REXML::XPath.match(doc, "//auc:Scenarios/auc:Scenario[auc:ScenarioType/auc:CurrentBuilding/auc:CalculationMethod/auc:Modeled]")
+    current_building_modeled_scenario = REXML::XPath.match(doc, '//auc:Scenarios/auc:Scenario[auc:ScenarioType/auc:CurrentBuilding/auc:CalculationMethod/auc:Modeled]')
     expect(current_building_modeled_scenario.size).to eql 1
 
     expected_resource_uses.each do |use|
       # Check that the energy resource use actually gets created
       resource = REXML::XPath.match(current_building_modeled_scenario, "./auc:ResourceUses/auc:ResourceUse[auc:EnergyResource/text()='#{use}']")
       expect(resource.size).to eql 1
-      resource = resource.first()
+      resource = resource.first
       expect(resource).to be_an_instance_of(REXML::Element)
 
       # Check that 12 months of TimeSeries data is inserted into the document
@@ -461,7 +463,7 @@ RSpec.configure do |config|
         # Check that there is an actual value for an interval reading and that it can be cast to a float
         interval_reading = ts_element.get_elements('./auc:IntervalReading')
         expect(interval_reading.size).to eql 1
-        interval_reading = interval_reading.first()
+        interval_reading = interval_reading.first
         expect(interval_reading).to be_an_instance_of(REXML::Element)
         expect(interval_reading.has_text?).to be true
         text = interval_reading.get_text.to_s
@@ -477,7 +479,7 @@ RSpec.configure do |config|
     Dir.glob("#{main_output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
 
     # -- Assert - simulations are as we expect them
-    expect(osw_files.size).to eq(expected_number_scenarios_excluding_sr + 1)  # includes SR
+    expect(osw_files.size).to eq(expected_number_scenarios_excluding_sr + 1) # includes SR
     expect(osw_sr_files.size).to eq(1)
 
     osw_exclude_sr = osw_files - osw_sr_files

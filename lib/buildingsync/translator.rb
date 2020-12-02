@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -41,7 +43,6 @@ require_relative 'model_articulation/spatial_element'
 require_relative 'makers/workflow_maker'
 require_relative 'selection_tool'
 require_relative 'extension'
-
 
 module BuildingSync
   # Translator class
@@ -216,21 +217,21 @@ module BuildingSync
         workflow = json_workflow
       end
 
-      OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.create_baseline_osw", "WorkflowJSON: #{workflow.to_s}")
-      OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.create_baseline_osw", "osw_path #{osw_path}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.create_baseline_osw', "WorkflowJSON: #{workflow}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.create_baseline_osw', "osw_path #{osw_path}")
       return osw_path
     end
 
     # run osm - running the baseline simulation
     # @param path_to_epw_file [String] if provided and file exists, overrides the attribute building.@epw_file_path
     # @param runner_options [hash]
-    def run_baseline_osm(path_to_epw_file = nil, runner_options = {run_simulations: true, verbose: false, num_parallel: 1, max_to_run: Float::INFINITY})
+    def run_baseline_osm(path_to_epw_file = nil, runner_options = { run_simulations: true, verbose: false, num_parallel: 1, max_to_run: Float::INFINITY })
       if !path_to_epw_file.nil? && File.exist?(path_to_epw_file) && File.to_s.end_with?('.epw')
         @epw_file_path = path_to_epw_file
-        OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.run_baseline_osm", "EPW path updated to: #{path_to_epw_file}")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.run_baseline_osm', "EPW path updated to: #{path_to_epw_file}")
       else
         @epw_file_path = @workflow_maker.get_facility.get_epw_file_path
-        OpenStudio.logFree(OpenStudio::Info, "BuildingSync.Translator.run_baseline_osm", "EPW path not updated.  Using: #{path_to_epw_file}")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.run_baseline_osm', "EPW path not updated.  Using: #{path_to_epw_file}")
       end
       file_name = 'in.osm'
 
@@ -253,7 +254,7 @@ module BuildingSync
 
     # run osws - running all scenario simulations
     # @param runner_options [hash]
-    def run_osws(runner_options = {run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY})
+    def run_osws(runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
       @workflow_maker.run_osws(@output_dir, runner_options)
     end
 
@@ -262,7 +263,7 @@ module BuildingSync
       if @results_gathered
         @workflow_maker.prepare_final_xml
       else
-        puts "Prepare final file before attempting to save (translator.prepare_final_xml)"
+        puts 'Prepare final file before attempting to save (translator.prepare_final_xml)'
       end
     end
 
@@ -272,7 +273,7 @@ module BuildingSync
       if @final_xml_prepared
         @workflow_maker.save_xml(file_name)
       else
-        puts "Prepare final file before attempting to save (translator.prepare_final_xml)"
+        puts 'Prepare final file before attempting to save (translator.prepare_final_xml)'
       end
     end
 

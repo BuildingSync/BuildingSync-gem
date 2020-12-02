@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -38,7 +40,7 @@ require 'buildingsync/generator'
 
 RSpec.describe 'BuildingSync::Generator' do
   it 'should set the version to nil if it is not a supported type' do
-    g = BuildingSync::Generator.new('auc',"asdflkj")
+    g = BuildingSync::Generator.new('auc', 'asdflkj')
     expect(g.version.nil?).to be true
   end
 

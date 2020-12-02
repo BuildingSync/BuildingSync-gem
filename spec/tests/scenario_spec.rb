@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -42,7 +44,6 @@ require 'buildingsync/scenario'
 require_relative './../spec_helper'
 
 RSpec.describe 'Scenario' do
-
   it 'should raise an error given a non-Scenario REXML Element' do
     # -- Setup
     ns = 'auc'
@@ -55,9 +56,9 @@ RSpec.describe 'Scenario' do
 
     # -- Create scenario object from report
     begin
-      scenario = BuildingSync::Scenario.new(report_elements.first(), ns)
+      scenario = BuildingSync::Scenario.new(report_elements.first, ns)
     rescue StandardError => e
-      expect(e.message).to eql "Attempted to initialize Scenario object with Element name of: Report"
+      expect(e.message).to eql 'Attempted to initialize Scenario object with Element name of: Report'
     end
   end
 
@@ -70,7 +71,7 @@ RSpec.describe 'Scenario' do
     doc = REXML::Document.new(doc_string)
     g.add_report_to_first_facility(doc)
     g.add_scenario_to_first_report(doc)
-    scenario_element = doc.get_elements("//#{ns}:Scenarios/#{ns}:Scenario").first()
+    scenario_element = doc.get_elements("//#{ns}:Scenarios/#{ns}:Scenario").first
 
     # -- Create new Scenario object
     scenario = BuildingSync::Scenario.new(scenario_element, ns)
@@ -78,11 +79,11 @@ RSpec.describe 'Scenario' do
     # -- Assert
     expect(scenario.xget_id == 'Scenario-1').to be true
     expect(scenario.xget_element('ScenarioType')).to be_an_instance_of(REXML::Element)
-    expect(scenario.xget_element('ScenarioType').to_s == "<auc:ScenarioType><auc:CurrentBuilding><auc:CalculationMethod><auc:Measured/></auc:CalculationMethod></auc:CurrentBuilding></auc:ScenarioType>")
+    expect(scenario.xget_element('ScenarioType').to_s == '<auc:ScenarioType><auc:CurrentBuilding><auc:CalculationMethod><auc:Measured/></auc:CalculationMethod></auc:CurrentBuilding></auc:ScenarioType>')
   end
 end
 
-RSpec.describe "Scenario Measures" do
+RSpec.describe 'Scenario Measures' do
   it 'building_151_one_scenario.xml should set measure_ids correctly for each Scenario' do
     # -- Setup
     file_name = 'building_151_one_scenario.xml'
@@ -95,8 +96,8 @@ RSpec.describe "Scenario Measures" do
     pom_scenario_xml = doc.get_elements("//#{ns}:Scenario")[1]
 
     # -- Assert we have correct scenarios
-    expect(baseline_scenario_xml.attributes['ID']).to eql "Baseline"
-    expect(pom_scenario_xml.attributes['ID']).to eql "Scenario1"
+    expect(baseline_scenario_xml.attributes['ID']).to eql 'Baseline'
+    expect(pom_scenario_xml.attributes['ID']).to eql 'Scenario1'
 
     # -- Setup - create new scenario elements
     baseline_scenario = BuildingSync::Scenario.new(baseline_scenario_xml, ns)
@@ -105,18 +106,18 @@ RSpec.describe "Scenario Measures" do
     # -- Assert
     expect(baseline_scenario.get_measure_ids.empty?).to be true
     expect(pom_scenario.get_measure_ids.size).to eql 1
-    expect(pom_scenario.get_measure_ids[0]).to eql "Measure1"
+    expect(pom_scenario.get_measure_ids[0]).to eql 'Measure1'
   end
 end
 
-RSpec.describe "Scenario Type Discovery Methods" do
+RSpec.describe 'Scenario Type Discovery Methods' do
   to_test = [
-      ['CBMeasured', true, false, false, false, false],
-      [nil, false, false, false, false, false],
-      ['CBModeled', false, false, true, false, false],
-      ['POM', false, true, false, false, false],
-      ['Benchmark', false, false, false, true, false],
-      ['Target', false, false, false, false, true]
+    ['CBMeasured', true, false, false, false, false],
+    [nil, false, false, false, false, false],
+    ['CBModeled', false, false, true, false, false],
+    ['POM', false, true, false, false, false],
+    ['Benchmark', false, false, false, true, false],
+    ['Target', false, false, false, false, true]
   ]
   to_test.each do |test|
     it 'cb_measured?, cb_modeled?, pom?, benchmark?, target? methods should evaluate as expected' do
@@ -178,7 +179,6 @@ RSpec.describe 'Scenario data creation' do
         expect(s.get_time_series_data.size).to eql 1
       end
     end
-
   end
   it 'should have attributes (all_resource_totals, resource_uses, time_series_data) with the correct types' do
     # -- Setup
@@ -221,7 +221,7 @@ RSpec.describe 'Scenario workflow configuration' do
     # -- Setup
     # Only requirements for a workflow is that it is a Hash
     workflow = {
-        "seed_file": "../in.osm"
+      "seed_file": '../in.osm'
     }
     scenario = g.add_scenario_to_first_report(doc, 'CBModeled')
     s = BuildingSync::Scenario.new(scenario, ns)
@@ -254,7 +254,7 @@ RSpec.describe 'Scenario workflow configuration' do
       # should not get here
       expect(false).to be true
     rescue StandardError => e
-      expect(e.message).to eql "BuildingSync.Scenario.set_workflow Scenario ID: Scenario-1.  Cannot set_workflow, argument must be a Hash, not a TrueClass"
+      expect(e.message).to eql 'BuildingSync.Scenario.set_workflow Scenario ID: Scenario-1.  Cannot set_workflow, argument must be a Hash, not a TrueClass'
     end
   end
   it 'set_main_output_dir should set the @main_output_dir attribute' do
@@ -345,7 +345,7 @@ RSpec.describe 'Scenario workflow configuration' do
     begin
       s.osw_mkdir_p
     rescue StandardError => e
-      expect(e.message).to eql "BuildingSync.Scenario.osw_mkdir_p Scenario ID: Scenario-1.  @osw_dir must be set first"
+      expect(e.message).to eql 'BuildingSync.Scenario.osw_mkdir_p Scenario ID: Scenario-1.  @osw_dir must be set first'
     end
 
     # -- Assert - @osw_dir set, should work.
@@ -383,7 +383,7 @@ RSpec.describe 'Scenario workflow configuration' do
 
     # -- Setup
     workflow = {
-        "seed_file": "../in.osm"
+      "seed_file": '../in.osm'
     }
 
     # -- Assert - should work with
@@ -395,10 +395,8 @@ RSpec.describe 'Scenario workflow configuration' do
   end
 end
 
-RSpec.describe "Scenario Results Parsing" do
+RSpec.describe 'Scenario Results Parsing' do
   describe 'Annual Results' do
-
-
     it 'os_add_resource_uses should create two ResourceUses (Electricity, Natural gas) and add correct child elements and values' do
       # -- Setup
       ns = 'auc'

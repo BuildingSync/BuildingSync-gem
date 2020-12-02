@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Model class
 class OpenStudio::Model::Model
   # Adds the HVAC system as derived from the combinations of

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -61,7 +63,7 @@ RSpec.describe 'XmlGetSet' do
 
       # -- Assert
       expected_keys.each do |k|
-        expect(@links.has_key?(k)).to be true
+        expect(@links.key?(k)).to be true
       end
     end
 

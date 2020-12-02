@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -79,7 +81,7 @@ module BuildingSync
       # @loads_systems = []
       # @lighting_systems = []
       @contacts = []
-      
+
       @auditor_contact_id = nil
       @audit_date_level_1 = nil
       @audit_date_level_2 = nil
@@ -111,17 +113,16 @@ module BuildingSync
 
     # read xml
     def read_xml
-
       # Site - checks
       site_xml_temp = @base_xml.get_elements("#{@ns}:Sites/#{@ns}:Site")
       if site_xml_temp.nil? || site_xml_temp.empty?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.read_xml', "Facility ID: #{xget_id} has no Site elements.  Cannot initialize Facility.")
         raise StandardError, "Facility with ID: #{xget_id} has no Site elements.  Cannot initialize Facility."
       elsif site_xml_temp.size > 1
-        @site_xml = site_xml_temp.first()
+        @site_xml = site_xml_temp.first
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', "Facility ID: #{xget_id}. There is more than one (#{site_xml_temp.size}) Site elements. Only the first Site will be considered (ID: #{@site_xml.attributes['ID']}")
       else
-        @site_xml = site_xml_temp.first()
+        @site_xml = site_xml_temp.first
       end
       # Create new Site
       @site = BuildingSync::Site.new(@site_xml, @ns)
@@ -132,10 +133,10 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.read_xml', "Facility with ID: #{xget_id} has no Report elements.  Cannot initialize Facility.")
         raise StandardError, "Facility with ID: #{xget_id} has no Report elements.  Cannot initialize Facility."
       elsif report_xml_temp.size > 1
-        @report_xml = report_xml_temp.first()
+        @report_xml = report_xml_temp.first
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', "There are more than one (#{report_xml_temp.size}) Report elements in your BuildingSync file. Only the first Report will be considered (ID: #{@report_xml.attributes['ID']}")
       else
-        @report_xml = report_xml_temp.first()
+        @report_xml = report_xml_temp.first
       end
 
       scenarios_xml_temp = @report_xml.get_elements("#{@ns}:Scenarios/#{@ns}:Scenario")
@@ -143,15 +144,13 @@ module BuildingSync
 
       # Scenarios - create and checks
       cb_modeled = []
-      if !scenarios_xml_temp.nil?
-        scenarios_xml_temp.each do |scenario_xml|
-          if scenario_xml.is_a? REXML::Element
-            sc = BuildingSync::Scenario.new(scenario_xml, @ns)
-            @scenarios.push(sc)
-            cb_modeled << sc if sc.cb_modeled?
-            @cb_measured << sc if sc.cb_measured?
-            @poms << sc if sc.pom?
-          end
+      scenarios_xml_temp&.each do |scenario_xml|
+        if scenario_xml.is_a? REXML::Element
+          sc = BuildingSync::Scenario.new(scenario_xml, @ns)
+          @scenarios.push(sc)
+          cb_modeled << sc if sc.cb_modeled?
+          @cb_measured << sc if sc.cb_measured?
+          @poms << sc if sc.pom?
         end
       end
 
@@ -167,12 +166,12 @@ module BuildingSync
 
       # -- Issue warnings for undesirable situations
       if @scenarios.empty?
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', "No Scenario elements found")
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', 'No Scenario elements found')
       end
 
       # -- Logging for Scenarios
-      if cb_modeled.size == 0
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', "A Current Building Modeled Scenario is required.")
+      if cb_modeled.empty?
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', 'A Current Building Modeled Scenario is required.')
       elsif cb_modeled.size > 1
         @cb_modeled = cb_modeled[0]
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', "Only 1 Current Building Modeled Scenario is supported.  Using Scenario with ID: #{@cb_modeled.xget_id}")
@@ -205,7 +204,6 @@ module BuildingSync
     # @param ddy_file [String]
     # @return [Boolean]
     def generate_baseline_osm(epw_file_path, output_path, standard_to_be_used, ddy_file = nil)
-
       @site.generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file)
 
       @epw_file_path = @site.get_epw_file_path
@@ -241,7 +239,6 @@ module BuildingSync
 
     def get_measure_given_id(measure_id)
       @measures.each do |measure|
-
       end
     end
 
@@ -283,8 +280,8 @@ module BuildingSync
 
     # read systems
     def read_and_create_initial_systems
-      systems_xml = xget_or_create("Systems")
-      if systems_xml.elements.size > 0
+      systems_xml = xget_or_create('Systems')
+      if !systems_xml.elements.empty?
         systems_xml.elements.each do |system_type|
           @systems_map[system_type.name] = []
           system_type.elements.each do |system_xml|
@@ -325,19 +322,19 @@ module BuildingSync
     # @param premise_type [String] type of premise, i.e. Building, Section, etc.
     # @param lighting_system_id [String] id for new lighting system
     # @return [BuildingSync::LightingSystemType] new lighting system object
-    def add_blank_lighting_system(premise_id, premise_type, lighting_system_id="LightingSystem-1")
+    def add_blank_lighting_system(premise_id, premise_type, lighting_system_id = 'LightingSystem-1')
       # Create new lighting system and link it
       lighting_system_xml = @g.add_lighting_system_to_facility(@base_xml, lighting_system_id)
       @g.add_linked_premise(lighting_system_xml, premise_id, premise_type)
 
       # Create a new array if doesn't yet exist
-      if !@systems_map.has_key?("LightingSystems")
-        @systems_map["LightingSystems"] = []
+      if !@systems_map.key?('LightingSystems')
+        @systems_map['LightingSystems'] = []
       end
 
       # Create new lighting system and add to array
       new_system = BuildingSync::LightingSystemType.new(lighting_system_xml, @ns)
-      @systems_map["LightingSystems"] << new_system
+      @systems_map['LightingSystems'] << new_system
       return new_system
     end
 
@@ -347,7 +344,6 @@ module BuildingSync
     # - Utility information
     # - UDFs
     def read_other_details
-
       # Get Contact information
       @base_xml.elements.each("#{@ns}:Contacts/#{@ns}:Contact") do |contact|
         contact.elements.each("#{@ns}:ContactRoles/#{@ns}:ContactRole") do |role|
@@ -388,22 +384,16 @@ module BuildingSync
 
       # Read Utility Information
       utilities = @report_xml.elements["#{@ns}:Utilities"]
-      if utilities
-        utilities.elements.each("#{@ns}:Utility") do |utility|
-          @utility_name = help_get_text_value(utility.elements["#{@ns}:UtilityName"])
-          @metering_configuration = help_get_text_value(utility.elements["#{@ns}:MeteringConfiguration"])
-          meter_numbers = utility.get_elements("#{@ns}:UtilityMeterNumbers/#{@ns}:UtilityMeterNumber")
-          rate_schedules = utility.get_elements("#{@ns}:RateSchedules/#{@ns}:RateSchedule")
-          if meter_numbers
-            meter_numbers.each do |mn|
-              @utility_meter_numbers << help_get_text_value(mn)
-            end
-          end
-          if rate_schedules
-            rate_schedules.each do |rs|
-              @rate_schedules_xml << rs
-            end
-          end
+      utilities&.elements&.each("#{@ns}:Utility") do |utility|
+        @utility_name = help_get_text_value(utility.elements["#{@ns}:UtilityName"])
+        @metering_configuration = help_get_text_value(utility.elements["#{@ns}:MeteringConfiguration"])
+        meter_numbers = utility.get_elements("#{@ns}:UtilityMeterNumbers/#{@ns}:UtilityMeterNumber")
+        rate_schedules = utility.get_elements("#{@ns}:RateSchedules/#{@ns}:RateSchedule")
+        meter_numbers&.each do |mn|
+          @utility_meter_numbers << help_get_text_value(mn)
+        end
+        rate_schedules&.each do |rs|
+          @rate_schedules_xml << rs
         end
       end
 
@@ -419,7 +409,6 @@ module BuildingSync
           @spaces_excluded_from_gross_floor_area = user_defined_field.elements["#{@ns}:FieldValue"].text
         end
       end
-
     end
 
     # create building systems

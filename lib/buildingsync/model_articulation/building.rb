@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -100,7 +102,6 @@ module BuildingSync
     # @param site_occupancy_classification [String]
     # @param site_total_floor_area [String]
     def read_xml(site_occupancy_classification, site_total_floor_area)
-
       # floor areas
       @total_floor_area = read_floor_areas(site_total_floor_area)
       # read location specific values
@@ -124,7 +125,6 @@ module BuildingSync
           puts "Unknown section type found:#{section.section_type}:"
         end
       end
-
 
       # generate building name
       read_other_building_details
@@ -304,7 +304,6 @@ module BuildingSync
 
     # read other building details
     def read_other_building_details
-
       if @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"]
         @occupant_quantity = @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"].text
       else
@@ -575,7 +574,6 @@ module BuildingSync
           @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(@state_name, @city_name)
         end
 
-
       else
         puts "case 3: climate zone #{climate_zone} lat #{latitude} long #{longitude}"
         @epw_file_path = set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
@@ -728,7 +726,7 @@ module BuildingSync
       weather_file.setLongitude(weather_lon)
       weather_file.setTimeZone(epw_file.timeZone)
       weather_file.setElevation(epw_file.elevation)
-      weather_file.setString(10, "#{epw_file.path}")
+      weather_file.setString(10, epw_file.path.to_s)
 
       weather_name = "#{epw_file.city}_#{epw_file.stateProvinceRegion}_#{epw_file.country}"
       weather_time = epw_file.timeZone
@@ -777,7 +775,7 @@ module BuildingSync
       ddy_model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each do |d|
         # grab only the ones that matter
         ddy_list = /(Htg 99.6. Condns DB)|(Clg .4. Condns WB=>MDB)|(Clg .4% Condns DB=>MWB)/
-        if d.name.get =~ ddy_list
+        if d.name.get.match?(ddy_list)
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', "Adding object #{d.name}")
 
           # add the object to the existing model
@@ -800,7 +798,6 @@ module BuildingSync
 
     # generate baseline model in osm file format
     def generate_baseline_osm
-
       # checking that the fractions add up
       check_building_fraction
 
@@ -856,7 +853,7 @@ module BuildingSync
         end
 
         # bottom_story_ground_exposed_floor and top_story_exterior_exposed_roof already setup as bool
-        bar_hash[:stories]["key #{i}"] = {story_party_walls: party_walls, story_min_multiplier: 1, story_included_in_building_area: true, below_partial_story: below_partial_story, bottom_story_ground_exposed_floor: true, top_story_exterior_exposed_roof: true}
+        bar_hash[:stories]["key #{i}"] = { story_party_walls: party_walls, story_min_multiplier: 1, story_included_in_building_area: true, below_partial_story: below_partial_story, bottom_story_ground_exposed_floor: true, top_story_exterior_exposed_roof: true }
       end
 
       # store expected floor areas to check after bar made

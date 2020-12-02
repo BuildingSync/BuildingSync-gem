@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -49,33 +51,29 @@ RSpec.describe 'BuildingSection' do
       puts @section_xml
     end
     it 'should raise an error given a non-Section REXML Element' do
-      begin
-        BuildingSync::BuildingSection.new(@facility_xml, nil, nil, nil, @ns)
-      rescue StandardError => e
-        expect(e.message).to eql "Attempted to initialize Section object with Element name of: Facility"
-      end
+      BuildingSync::BuildingSection.new(@facility_xml, nil, nil, nil, @ns)
+    rescue StandardError => e
+      expect(e.message).to eql 'Attempted to initialize Section object with Element name of: Facility'
     end
 
     it 'Should generate meaningful error when passing empty XML data' do
-      begin
-        section = BuildingSync::BuildingSection.new(@section_xml, nil, nil, nil, @ns)
+      section = BuildingSync::BuildingSection.new(@section_xml, nil, nil, nil, @ns)
 
-        # Should not reach this line
-        expect(false).to be true
-      rescue StandardError => e
-        puts e.message.to_s
-        puts "expected error message:Building type '' is nil but got: #{e.message} " if !e.message.include?("Building type '' is nil")
-        expect(e.message.include?("Building type '' is nil")).to be true
-      end
+      # Should not reach this line
+      expect(false).to be true
+    rescue StandardError => e
+      puts e.message.to_s
+      puts "expected error message:Building type '' is nil but got: #{e.message} " if !e.message.include?("Building type '' is nil")
+      expect(e.message.include?("Building type '' is nil")).to be true
     end
   end
 end
 
-RSpec.describe "BuildingSection methods" do
+RSpec.describe 'BuildingSection methods' do
   to_test = [
-      ['Retail', "xget_text", ["OccupancyClassification"]],
-      ['40.0', 'typical_occupant_usage_value_hours', []],
-      ['50.0', 'typical_occupant_usage_value_weeks', []]
+    ['Retail', 'xget_text', ['OccupancyClassification']],
+    ['40.0', 'typical_occupant_usage_value_hours', []],
+    ['50.0', 'typical_occupant_usage_value_weeks', []]
   ]
   to_test.each do |test|
     it 'building_151_level1.xml: Should return values as expected' do
@@ -89,5 +87,4 @@ RSpec.describe "BuildingSection methods" do
       expect(building_section.send(test[1], *test[2]) == test[0]).to be true
     end
   end
-
 end

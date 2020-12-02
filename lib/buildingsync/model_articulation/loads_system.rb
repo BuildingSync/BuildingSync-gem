@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -71,7 +73,7 @@ module BuildingSync
         model.getDefaultScheduleSets.each(&:remove)
       end
 
-      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "Adding internal loads")
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', 'Adding internal loads')
       model.getSpaceTypes.each do |space_type|
         # Don't add infiltration here; will be added later in the script
         test = standard.space_type_apply_internal_loads(space_type, true, true, true, true, true, false)

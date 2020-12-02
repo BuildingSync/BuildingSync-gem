@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -40,17 +42,17 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-    it 'building_151.xml ASHRAE90_1 - SR, Baseline, gather_results and save_xml' do
-      # -- Setup
-      file_name = 'building_151.xml'
-      std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-      epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
-      expect(File.exist?(epw_file_path)).to be true
+  it 'building_151.xml ASHRAE90_1 - SR, Baseline, gather_results and save_xml' do
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
+    expect(File.exist?(epw_file_path)).to be true
 
-      # -- Assert
-      translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
-    end
+    # -- Assert
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path, std)
+  end
 
   it 'L100_Audit.xml ASHRAE90_1 - SR, Baseline, gather_results and save_xml' do
     # -- Setup
@@ -79,7 +81,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'L000_OpenStudio_Pre-Simulation_02.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__,'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = nil
 
     translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_path, std)
@@ -89,7 +91,7 @@ RSpec.describe 'BuildingSync' do
     # -- Setup
     file_name = 'L000_OpenStudio_Pre-Simulation_03.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__,'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = nil
 
     translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_path, std)

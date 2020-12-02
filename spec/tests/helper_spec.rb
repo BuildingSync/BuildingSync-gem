@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -125,14 +127,14 @@ RSpec.describe 'BuildingSync::Helper' do
   end
 end
 
-RSpec.describe "BuildingSync::Helper convert" do
+RSpec.describe 'BuildingSync::Helper convert' do
   to_test = [
-      [1000, "Btu", "kBtu", 1],
-      [1000000, "Btu", "MMBtu", 1],
-      [0.001, "kBtu", "Btu", 1],
-      [1000, "kBtu", "MMBtu", 1],
-      [0.000001, "MMBtu", "Btu", 1],
-      [0.001, "MMBtu", "kBtu", 1],
+    [1000, 'Btu', 'kBtu', 1],
+    [1000000, 'Btu', 'MMBtu', 1],
+    [0.001, 'kBtu', 'Btu', 1],
+    [1000, 'kBtu', 'MMBtu', 1],
+    [0.000001, 'MMBtu', 'Btu', 1],
+    [0.001, 'MMBtu', 'kBtu', 1]
   ]
   to_test.each do |test|
     # 1000 Btu should equal 1 kBtu, etc.

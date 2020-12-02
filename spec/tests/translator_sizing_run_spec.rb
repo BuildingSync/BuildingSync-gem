@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -227,5 +229,4 @@ RSpec.describe 'BuildingSync' do
     # -- Assert
     translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
   end
-
 end

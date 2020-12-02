@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -42,7 +44,6 @@ module BuildingSync
   # Used for getting, setting, and creating XML snippets
   # for BuildingSync classes with an @base_xml attribute
   module XmlGetSet
-
     # Get the id attribute of the @base_xml
     # @see help_get_attribute_value
     def xget_id
@@ -56,7 +57,7 @@ module BuildingSync
     def xget_name
       premises = ['Site', 'Building', 'Section', 'ThermalZone', 'Space']
       if premises.include? @base_xml.name
-        return xget_text("PremisesName")
+        return xget_text('PremisesName')
       elsif @base_xml.name == 'Measure'
         m = @base_xml.elements[".//#{@ns}:MeasureName"]
         return help_get_text_value(m)
@@ -141,16 +142,12 @@ module BuildingSync
     # @example {'Building' => ['Building-1', 'Building-1'], 'Section' => ['Section-4']]}
     def xget_linked_premises
       map = {}
-      premises = @base_xml.get_elements(".//#{@ns}:LinkedPremises").first()
-      if !premises.nil?
-        premises.elements.each do |premise_type|
-          map[premise_type.name] = []
-          idref_elements = premise_type.get_elements(".//*[@IDref]")
-          if !idref_elements.nil?
-            idref_elements.each do |element|
-              map[premise_type.name] << element.attributes["IDref"]
-            end
-          end
+      premises = @base_xml.get_elements(".//#{@ns}:LinkedPremises").first
+      premises&.elements&.each do |premise_type|
+        map[premise_type.name] = []
+        idref_elements = premise_type.get_elements('.//*[@IDref]')
+        idref_elements&.each do |element|
+          map[premise_type.name] << element.attributes['IDref']
         end
       end
       return map
@@ -191,6 +188,5 @@ module BuildingSync
       end
       return element
     end
-
   end
 end

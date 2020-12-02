@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -87,7 +89,6 @@ module BuildingSync
     # @param building_occupancy_classification [String]
     # @param building_total_floor_area [Float]
     def read_xml
-
       # floor areas
       # based on the occupancy type set building type, system type and bar division method
       read_building_section_other_detail

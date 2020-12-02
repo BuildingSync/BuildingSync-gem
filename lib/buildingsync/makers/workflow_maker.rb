@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -60,7 +62,7 @@ module BuildingSync
       end
 
       if !ns.is_a?(String)
-        raise StandardError, "ns must be String.  Passed object of class: Int"
+        raise StandardError, 'ns must be String.  Passed object of class: Int'
       end
 
       @facility_xml = nil
@@ -73,9 +75,8 @@ module BuildingSync
         @workflow = JSON.parse(file.read)
       end
 
-
       File.open(WORKFLOW_MAKER_JSON_FILE_PATH, 'r') do |file|
-        @workflow_maker_json = JSON.parse(file.read, {:symbolize_names => true})
+        @workflow_maker_json = JSON.parse(file.read, symbolize_names: true)
       end
 
       # Add all of the measure directories from the extension gems
@@ -93,10 +94,10 @@ module BuildingSync
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.populate_facility_report_and_scenarios', 'There are no Facility elements in your BuildingSync file.')
         raise StandardError, 'There are no Facility elements in your BuildingSync file.'
       elsif facility_xml_temp.size > 1
-        @facility_xml = facility_xml_temp.first()
+        @facility_xml = facility_xml_temp.first
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.populate_facility_report_and_scenarios', "There are more than one (#{facility_xml_temp.size}) Facility elements in your BuildingSync file. Only the first Facility will be considered (ID: #{@facility_xml.attributes['ID']}")
       else
-        @facility_xml = facility_xml_temp.first()
+        @facility_xml = facility_xml_temp.first
       end
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.read_xml', "Setting up workflow for Facility ID: #{@facility_xml.attributes['ID']}")
@@ -297,7 +298,7 @@ module BuildingSync
         measure = @facility.measures.find { |m| m.xget_id == measure_id }
         current_num_measure = num_measures
 
-        sym_to_find = "#{measure.xget_text('SystemCategoryAffected')}".to_sym
+        sym_to_find = measure.xget_text('SystemCategoryAffected').to_s.to_sym
         categories_found = @workflow_maker_json.key?(sym_to_find)
         if categories_found
           @workflow_maker_json[sym_to_find].each do |category|
@@ -315,9 +316,8 @@ module BuildingSync
             end
           end
         else
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Category: #{measure.xget_text("SystemCategoryAffected")} not found in workflow_maker.json.")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Category: #{measure.xget_text('SystemCategoryAffected')} not found in workflow_maker.json.")
         end
-
 
         if current_num_measure == num_measures
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Measure ID: #{measure.xget_id} could not be processed!")
@@ -385,8 +385,8 @@ module BuildingSync
       super
 
       if @facility.cb_modeled.nil?
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', "OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method")
-        raise StandardError, "OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method"
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', 'OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method')
+        raise StandardError, 'OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method'
       end
 
       # Write a workflow for the current building modeled scenario
@@ -402,7 +402,7 @@ module BuildingSync
       end
 
       # Compare the total number of potential successes to the number of actual successes
-      really_successful = number_successful == @facility.poms.size + 1 ? true : false
+      really_successful = number_successful == @facility.poms.size + 1
       return really_successful
     end
 
@@ -427,7 +427,6 @@ module BuildingSync
           scenario.set_workflow(base_workflow)
           scenario.write_osw(main_output_dir)
         end
-
       rescue StandardError => e
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osw', "Could not configure for scenario #{scenario.xget_name}. Error: #{e}")
         puts "Could not configure for scenario #{scenario.xget_name}"
@@ -439,7 +438,7 @@ module BuildingSync
 
     # run osws - running all scenario simulations
     # @param runner_options [hash]
-    def run_osws(output_dir, runner_options = {run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY})
+    def run_osws(output_dir, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
       osw_files = []
       osw_sr_files = []
       Dir.glob("#{output_dir}/**/in.osw") { |osw| osw_files << osw }
@@ -462,10 +461,10 @@ module BuildingSync
     # copy is made and the measures are configured for the specific scenario
     def purge_skipped_from_workflow(workflow)
       non_skipped = []
-      if !workflow.nil? && !workflow['steps'].nil? && workflow.has_key?('steps')
+      if !workflow.nil? && !workflow['steps'].nil? && workflow.key?('steps')
         workflow['steps'].each do |step|
-          if !step.nil? && step.has_key?('arguments') && !step['arguments'].nil?
-            if step['arguments'].has_key?('__SKIP__') && step['arguments']['__SKIP__'] == false
+          if !step.nil? && step.key?('arguments') && !step['arguments'].nil?
+            if step['arguments'].key?('__SKIP__') && step['arguments']['__SKIP__'] == false
               non_skipped << step
             end
           end
@@ -527,7 +526,6 @@ module BuildingSync
     # @param baseline_only [Boolean]
     # @return [Boolean]
     def gather_results(year_val = Date.today.year, baseline_only = false)
-
       # Gather results for the Current Building Modeled (Baseline) Scenario
       @facility.cb_modeled.os_gather_results(year_val)
 
@@ -538,6 +536,5 @@ module BuildingSync
         end
       end
     end
-
   end
 end

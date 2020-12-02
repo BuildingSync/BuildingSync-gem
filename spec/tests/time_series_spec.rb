@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -55,8 +57,8 @@ RSpec.describe 'TimeSeries' do
       # Should not reach this
       expect(false).to be true
     rescue StandardError => e
-      puts (e.message)
-      expect(e.message).to eql "Attempted to initialize TimeSeries object with Element name of: Facility"
+      puts e.message
+      expect(e.message).to eql 'Attempted to initialize TimeSeries object with Element name of: Facility'
     end
   end
 end

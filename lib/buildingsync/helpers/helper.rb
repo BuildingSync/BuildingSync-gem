@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -37,7 +39,6 @@
 module BuildingSync
   # helper class for helper methods in BuildingSync
   module Helper
-
     def help_element_class_type_check(xml_element, expected_type)
       if xml_element.name != expected_type
         OpenStudio.logFree(OpenStudio::Error, "BuildingSync.#{expected_type}.initialize", "Attempted to initialize #{expected_type} object with Element name of: #{xml_element.name}")
@@ -91,23 +92,23 @@ module BuildingSync
       end
 
       btu_multiples = [
-          {
-              "from" => "Btu",
-              "kBtu" => 0.001,
-              "MMBtu" => 0.000001
-          },
-          {
-              "from" => "kBtu",
-              "Btu" => 1000,
-              "MMBtu" => 0.001
-          },
-          {
-              "from" => "MMBtu",
-              "Btu" => 1000000,
-              "kBtu" => 1000
-          }
+        {
+          'from' => 'Btu',
+          'kBtu' => 0.001,
+          'MMBtu' => 0.000001
+        },
+        {
+          'from' => 'kBtu',
+          'Btu' => 1000,
+          'MMBtu' => 0.001
+        },
+        {
+          'from' => 'MMBtu',
+          'Btu' => 1000000,
+          'kBtu' => 1000
+        }
       ]
-      map = btu_multiples.find { |from| from["from"] == from_unit }
+      map = btu_multiples.find { |from| from['from'] == from_unit }
       if !map.nil? && !map.empty?
         mult = map[to_unit]
         if !mult.nil?
@@ -120,7 +121,6 @@ module BuildingSync
         return nil
       end
     end
-
 
     # get attribute value from xml element
     # @param xml_element [REXML::Element]

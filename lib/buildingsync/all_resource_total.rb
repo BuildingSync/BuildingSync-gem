@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -45,7 +47,6 @@ module BuildingSync
       @ns = ns
 
       help_element_class_type_check(base_xml, 'AllResourceTotal')
-
     end
   end
 end

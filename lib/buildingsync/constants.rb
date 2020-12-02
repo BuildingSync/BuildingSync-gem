@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -35,12 +37,12 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-SCHEMA_2_0_URL = 'https://raw.githubusercontent.com/BuildingSync/schema/v2.0/BuildingSync.xsd'.freeze
-SCHEMA_2_2_0_URL = 'https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd'.freeze
+SCHEMA_2_0_URL = 'https://raw.githubusercontent.com/BuildingSync/schema/v2.0/BuildingSync.xsd'
+SCHEMA_2_2_0_URL = 'https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd'
 PHASE_0_BASE_OSW_FILE_PATH = File.expand_path(File.join(__dir__, 'makers/phase_zero_base.osw'))
 WORKFLOW_MAKER_JSON_FILE_PATH = File.expand_path(File.join(__dir__, 'makers/workflow_maker.json'))
 BUILDING_AND_SYSTEMS_FILE_PATH = File.expand_path(File.join(__dir__, 'model_articulation/building_and_system_types.json'))
 
 # Standards strings
-ASHRAE90_1 = 'ASHRAE90.1'.freeze
-CA_TITLE24 = 'CaliforniaTitle24'.freeze
+ASHRAE90_1 = 'ASHRAE90.1'
+CA_TITLE24 = 'CaliforniaTitle24'

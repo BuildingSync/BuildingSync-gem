@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -121,14 +123,13 @@ require 'buildingsync/generator'
 #   end
 # end
 
-RSpec.describe "Facility Scenario Parsing" do
+RSpec.describe 'Facility Scenario Parsing' do
   before(:each) do
     # -- Setup
     @ns = 'auc'
     g = BuildingSync::Generator.new
     @doc = g.create_minimum_snippet('Retail')
     @facility_xml = g.get_first_facility_element(@doc)
-
   end
   it 'building_151.xml get_scenarios should return an Array of length 30 with elements of type BuildingSync::Scenario' do
     # -- Setup
@@ -145,7 +146,7 @@ RSpec.describe "Facility Scenario Parsing" do
     end
   end
   it 'scenarios should return an empty array if no scenario elements are found' do
-    scenarios = @doc.get_elements("//#{@ns}:Scenarios").first()
+    scenarios = @doc.get_elements("//#{@ns}:Scenarios").first
     scenarios.elements.delete("#{@ns}:Scenario")
 
     scenario_elements = @doc.get_elements("//#{@ns}:Scenarios/#{@ns}:Scenario")
@@ -159,7 +160,7 @@ RSpec.describe "Facility Scenario Parsing" do
   end
 end
 
-RSpec.describe "Facility Systems Mapping" do
+RSpec.describe 'Facility Systems Mapping' do
   before(:all) do
     # -- Setup
     @ns = 'auc'
@@ -168,8 +169,8 @@ RSpec.describe "Facility Systems Mapping" do
     doc_no_systems = g.create_minimum_snippet('Retail)')
     @facility_no_systems_xml = g.get_first_facility_element(doc_no_systems)
 
-    g.add_hvac_system_to_first_facility(doc, "HVACSystem-1", "VAV with Hot Water Reheat")
-    g.add_hvac_system_to_first_facility(doc, "HVACSystem-2", "VAV with Hot Water Reheat")
+    g.add_hvac_system_to_first_facility(doc, 'HVACSystem-1', 'VAV with Hot Water Reheat')
+    g.add_hvac_system_to_first_facility(doc, 'HVACSystem-2', 'VAV with Hot Water Reheat')
     g.add_lighting_system_to_first_facility(doc)
     g.add_plug_load_to_first_facility(doc)
 
@@ -178,7 +179,6 @@ RSpec.describe "Facility Systems Mapping" do
   end
   describe 'with systems defined' do
     it 'should be of the correct data structure' do
-
       # -- Assert
       expect(@facility.systems_map).to be_an_instance_of(Hash)
     end
@@ -235,7 +235,6 @@ RSpec.describe 'Facility Methods' do
     @facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
   end
   describe 'building_151_level1.xml' do
-
     it 'Should return benchmark_eui' do
       expected_value = '9.7'
 
@@ -309,9 +308,9 @@ RSpec.describe 'Facility Methods' do
 
     it 'Should return rate_schedules ' do
       # -- Setup
-      expected_value = REXML::Element.new("auc:CriticalPeakPricing")
+      expected_value = REXML::Element.new('auc:CriticalPeakPricing')
       rate_schedule = @facility.rate_schedules_xml[0]
-      rate_structure_type = rate_schedule.get_elements("auc:TypeOfRateStructure/*")[0]
+      rate_structure_type = rate_schedule.get_elements('auc:TypeOfRateStructure/*')[0]
 
       # -- Assert
       expect(rate_structure_type.to_s == expected_value.to_s).to be true
@@ -327,7 +326,6 @@ RSpec.describe 'Facility Methods' do
       expect(meter_number == expected_value).to be true
     end
   end
-
 end
 
 RSpec.describe 'Facility Methods' do
@@ -343,16 +341,14 @@ RSpec.describe 'Facility Methods' do
     it 'Should return error about number of stories below grade' do
       # -- Setup
 
-      begin
-        BuildingSync::Generator.new.get_facility_from_file(@xml_path)
+      BuildingSync::Generator.new.get_facility_from_file(@xml_path)
 
-        # Should not get here
-        expect(false).to be true
-      rescue StandardError => e
-        # -- Assert
-        puts "rescued StandardError: #{e.message}"
-        expect(e.message.include?('Number of stories below grade is larger than')).to be true
-      end
+      # Should not get here
+      expect(false).to be true
+    rescue StandardError => e
+      # -- Assert
+      puts "rescued StandardError: #{e.message}"
+      expect(e.message.include?('Number of stories below grade is larger than')).to be true
     end
 
     it 'Should return contact_name' do

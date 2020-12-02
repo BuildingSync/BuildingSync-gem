@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
@@ -56,15 +58,15 @@ task :remove_tabs do
     end
 
     doc.xpath('//comment()').each do |node|
-      if node.text =~ /XMLSpy/
+      if node.text.match?(/XMLSpy/)
         node.remove
       end
     end
 
-    File.open(file, 'w') { |f| f << doc.to_xml(:indent => 2) }
+    File.open(file, 'w') { |f| f << doc.to_xml(indent: 2) }
   end
 
-  if File.exist? "BuildingSync.json"
+  if File.exist? 'BuildingSync.json'
     f = JSON.parse(File.read('BuildingSync.json'))
     File.open('BuildingSync.json', 'w') do |file|
       file << JSON.pretty_generate(f)

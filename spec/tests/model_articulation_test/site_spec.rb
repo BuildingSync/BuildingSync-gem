@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -118,5 +120,4 @@ RSpec.describe 'SiteSpec' do
 
     expect(line_not_match_counter == 0).to be true
   end
-
 end

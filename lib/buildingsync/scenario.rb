@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -76,78 +78,78 @@ module BuildingSync
 
       # Define mappings for native units by Resource Use
       @native_units_map = {
-          'Electricity' => 'kWh',
-          'Natural gas' => 'kBtu'
+        'Electricity' => 'kWh',
+        'Natural gas' => 'kBtu'
       }
 
       # Define a mapping between BuildingSync concepts to openstudio concepts
       # available in the results.json file
       @bsync_openstudio_resources_map = {
-          "IP" => {
-              "ResourceUse" => [
-                  {
-                      "EnergyResource" => "Electricity",
-                      "EndUse" => "All end uses",
-                      "fields" => [
-                          {
-                              # AnnualFuelUseConsistentUnits is in MMBtu/yr
-                              "bsync_element_name" => "AnnualFuelUseConsistentUnits",
-                              "bsync_element_units" => "MMBtu",
-                              "os_results_key" => "fuel_electricity",
-                              "os_results_unit" => "kBtu"
-                          },
-                          {
-                              "bsync_element_name" => "AnnualPeakConsistentUnits",
-                              "bsync_element_units" => "kW",
-                              "os_results_key" => "annual_peak_electric_demand",
-                              "os_results_unit" => "kW"
-                          }
-                      ],
-                      "monthly" => {
-                          # [bracket text] is replaced when processed
-                          'text' => 'electricity_ip_[month]',
-                          'os_results_unit' => 'kWh'
-                      }
-                  },
-                  {
-                      "EnergyResource" => "Natural gas",
-                      "EndUse" => "All end uses",
-                      "fields" => [
-                          {
-                              # AnnualFuelUseConsistentUnits is in MMBtu/yr
-                              "bsync_element_name" => "AnnualFuelUseConsistentUnits",
-                              "bsync_element_units" => "MMBtu",
-                              "os_results_key" => "fuel_natural_gas",
-                              "os_results_unit" => "kBtu"
-                          }
-                      ],
-                      "monthly" => {
-                          # [bracket text] is replaced when processed
-                          'text' => 'natural_gas_ip_[month]',
-                          'os_results_unit' => 'MMBtu'
-                      }
-                  }
+        'IP' => {
+          'ResourceUse' => [
+            {
+              'EnergyResource' => 'Electricity',
+              'EndUse' => 'All end uses',
+              'fields' => [
+                {
+                  # AnnualFuelUseConsistentUnits is in MMBtu/yr
+                  'bsync_element_name' => 'AnnualFuelUseConsistentUnits',
+                  'bsync_element_units' => 'MMBtu',
+                  'os_results_key' => 'fuel_electricity',
+                  'os_results_unit' => 'kBtu'
+                },
+                {
+                  'bsync_element_name' => 'AnnualPeakConsistentUnits',
+                  'bsync_element_units' => 'kW',
+                  'os_results_key' => 'annual_peak_electric_demand',
+                  'os_results_unit' => 'kW'
+                }
               ],
-              "AllResourceTotal" => [
-                  {
-                      "EndUse" => "All end uses",
-                      "fields" => [
-                          {
-                              "bsync_element_name" => "SiteEnergyUse",
-                              "bsync_element_units" => "kBtu",
-                              "os_results_key" => "total_site_energy",
-                              "os_results_unit" => "kBtu"
-                          },
-                          {
-                              "bsync_element_name" => "SiteEnergyUseIntensity",
-                              "bsync_element_units" => "kBtu/ft^2",
-                              "os_results_key" => "total_site_eui",
-                              "os_results_unit" => "kBtu/ft^2"
-                          }
-                      ]
-                  }
+              'monthly' => {
+                # [bracket text] is replaced when processed
+                'text' => 'electricity_ip_[month]',
+                'os_results_unit' => 'kWh'
+              }
+            },
+            {
+              'EnergyResource' => 'Natural gas',
+              'EndUse' => 'All end uses',
+              'fields' => [
+                {
+                  # AnnualFuelUseConsistentUnits is in MMBtu/yr
+                  'bsync_element_name' => 'AnnualFuelUseConsistentUnits',
+                  'bsync_element_units' => 'MMBtu',
+                  'os_results_key' => 'fuel_natural_gas',
+                  'os_results_unit' => 'kBtu'
+                }
+              ],
+              'monthly' => {
+                # [bracket text] is replaced when processed
+                'text' => 'natural_gas_ip_[month]',
+                'os_results_unit' => 'MMBtu'
+              }
+            }
+          ],
+          'AllResourceTotal' => [
+            {
+              'EndUse' => 'All end uses',
+              'fields' => [
+                {
+                  'bsync_element_name' => 'SiteEnergyUse',
+                  'bsync_element_units' => 'kBtu',
+                  'os_results_key' => 'total_site_energy',
+                  'os_results_unit' => 'kBtu'
+                },
+                {
+                  'bsync_element_name' => 'SiteEnergyUseIntensity',
+                  'bsync_element_units' => 'kBtu/ft^2',
+                  'os_results_key' => 'total_site_eui',
+                  'os_results_unit' => 'kBtu/ft^2'
+                }
               ]
-          }
+            }
+          ]
+        }
       }
 
       read_xml
@@ -158,13 +160,11 @@ module BuildingSync
       end
     end
 
-
     def read_xml
       # Read in data about ResourceUses, AllResourceTotals, and TimeSeriesData
       read_resource_uses
       read_all_resource_totals
       read_time_series_data
-
     end
 
     # @return [REXML::Element]
@@ -344,7 +344,7 @@ module BuildingSync
       return success
     end
 
-    def results_available_and_correct_units?(results=@results_json)
+    def results_available_and_correct_units?(results = @results_json)
       results_available = true
 
       if !results.nil?
@@ -377,7 +377,6 @@ module BuildingSync
       elsif !results_available_and_correct_units?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.os_gather_results', "Scenario ID: #{xget_id}. Unable to gather results as results are not available.")
       end
-
     end
 
     def os_parse_annual_results(results = @results_json)
@@ -388,22 +387,22 @@ module BuildingSync
     def os_parse_monthly_all_end_uses_results(year_val = Date.today.year, results = @results_json)
       if results_available_and_correct_units?(results)
         time_series_data_xml = xget_or_create('TimeSeriesData')
-        resource_use_map = @bsync_openstudio_resources_map["IP"]["ResourceUse"]
+        resource_use_map = @bsync_openstudio_resources_map['IP']['ResourceUse']
         os_results = results['OpenStudioResults']
         get_all_end_use_resource_uses.each do |resource_use|
-          resource_use_hash = resource_use_map.each.find { |h| h["EnergyResource"] == resource_use.xget_text("EnergyResource") && h["EndUse"] == 'All end uses' }
+          resource_use_hash = resource_use_map.each.find { |h| h['EnergyResource'] == resource_use.xget_text('EnergyResource') && h['EndUse'] == 'All end uses' }
           if resource_use_hash.nil?
             OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.os_parse_monthly_all_end_uses_results', "Scenario ID: #{xget_id}: Unable to find mapping for ResourceUse: #{resource_use.xget_id} and 'All end uses'. Cannot parse monthly results")
           else
             monthly_text = resource_use_hash['monthly']['text']
             monthly_units = resource_use_hash['monthly']['os_results_unit']
-            native_units = @native_units_map[resource_use.xget_text("EnergyResource")]
+            native_units = @native_units_map[resource_use.xget_text('EnergyResource')]
             (1..12).each do |month|
               start_date_time = DateTime.new(year_val, month, 1)
 
               # substitues [month] with oct, for example, so we get electricity_ip_oct
-              key_to_find = monthly_text.gsub("[month]", start_date_time.strftime('%b').downcase)
-              if os_results.has_key?(key_to_find)
+              key_to_find = monthly_text.gsub('[month]', start_date_time.strftime('%b').downcase)
+              if os_results.key?(key_to_find)
                 # We always use the first day of the month as the start day
                 time_series_xml = REXML::Element.new("#{@ns}:TimeSeries", time_series_data_xml)
                 time_series_xml.add_attribute('ID', "TS-#{start_date_time.strftime('%b').upcase}-#{resource_use.xget_id}")
@@ -418,15 +417,12 @@ module BuildingSync
               else
                 OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.os_parse_monthly_all_end_uses_results', "Scenario ID: #{xget_id}: Key #{key_to_find} not found in results['OpenStudioResults'].  Make sure monthly data is being output by os_results measure")
               end
-
-
             end
           end
         end
       else
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.get_timeseries_element', 'Cannot add monthly report values to the BldgSync file since it is missing.')
       end
-
     end
 
     # Use the bsync to openstudio resources map to add results from the openstudio
@@ -435,7 +431,7 @@ module BuildingSync
     def os_add_resource_uses(results)
       @results_json = results
       ip_map = @bsync_openstudio_resources_map['IP']
-      os_results = @results_json["OpenStudioResults"]
+      os_results = @results_json['OpenStudioResults']
 
       # Loop through ResourceUses in the resource_use_map
       ip_map['ResourceUse'].each do |resource_use_map|
@@ -452,7 +448,7 @@ module BuildingSync
           resource_use_xml = @g.add_energy_resource_use_to_scenario(@base_xml, ru_type, end_use, ru_id, native_units)
         else
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Scenario.parse_annual_results', "Scenario ID: #{xget_id}.  Resource Use of type: #{ru_type} and end use: #{end_use} already exists")
-          resource_use_xml = resource_use_element.first()
+          resource_use_xml = resource_use_element.first
         end
 
         # Map in the fields for each ResourceUse element into the xml
@@ -465,7 +461,7 @@ module BuildingSync
 
     def os_add_all_resource_totals(results)
       ip_map = @bsync_openstudio_resources_map['IP']
-      os_results = results["OpenStudioResults"]
+      os_results = results['OpenStudioResults']
 
       # Loop through ResourceUses in the resource_use_map
       ip_map['AllResourceTotal'].each do |map|
@@ -480,7 +476,7 @@ module BuildingSync
           all_resource_total_xml = @g.add_all_resource_total_to_scenario(@base_xml, end_use, art_id)
         else
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Scenario.parse_annual_results', "Scenario ID: #{xget_id}.  Resource Use of type: #{ru_type} and end use: #{end_use} already exists")
-          all_resource_total_xml = element.first()
+          all_resource_total_xml = element.first
         end
 
         add_fields_from_map(map['fields'], os_results, all_resource_total_xml)
@@ -512,7 +508,7 @@ module BuildingSync
       result = []
       File.open(eplustbl_path, 'r') do |f|
         while line = f.gets
-          if /\<td align=\"right\"\>Total Source Energy\<\/td\>/.match(line)
+          if /\<td align=\"right\"\>Total Source Energy\<\/td\>/.match?(line)
             result << /\<td align=\"right\"\>(.*?)<\/td\>/.match(f.gets)[1].to_f
             result << /\<td align=\"right\"\>(.*?)<\/td\>/.match(f.gets)[1].to_f
             break
@@ -546,7 +542,6 @@ module BuildingSync
         end
       end
     end
-
 
     def read_resource_uses
       resource_use = @base_xml.get_elements("./#{@ns}:ResourceUses/#{@ns}:ResourceUse")

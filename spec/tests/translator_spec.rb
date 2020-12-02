@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -40,8 +42,6 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-
-
   it 'should write parameter value into XML' do
     # -- Setup
     file_name = 'building_151_one_scenario.xml'
@@ -57,5 +57,4 @@ RSpec.describe 'BuildingSync' do
     translator.prepare_final_xml(results_xml)
     expect(File.exist?(results_xml)).to be true
   end
-
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -44,11 +46,11 @@ module BuildingSync
   class Generator
     include BuildingSync::Helper
     # @param version [String] version of BuildingSync
-    def initialize(ns = 'auc', version = "2.2.0")
-      supported_versions = ["2.0", "2.2.0"]
+    def initialize(ns = 'auc', version = '2.2.0')
+      supported_versions = ['2.0', '2.2.0']
       if !supported_versions.include? version
         @version = nil
-        OpenStudio.logFree(OpenStudio::Error, "BuildingSync.Generator.initialize", "The version: #{version} is not one of the supported versions: #{supported_versions}")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Generator.initialize', "The version: #{version} is not one of the supported versions: #{supported_versions}")
       else
         @version = version
       end
@@ -61,22 +63,21 @@ module BuildingSync
     # @return [String] string formatted XML document
     def create_bsync_root_to_building
       xml = Builder::XmlMarkup.new(indent: 2)
-      auc_ns = "http://buildingsync.net/schemas/bedes-auc/2019"
+      auc_ns = 'http://buildingsync.net/schemas/bedes-auc/2019'
       location = "https://raw.githubusercontent.com/BuildingSync/schema/v#{@version}/BuildingSync.xsd"
       xml.instruct! :xml
-      xml.tag!("#{@ns}:BuildingSync", {
-          :"xmlns:#{@ns}" => auc_ns,
-          :"xsi:schemaLocation" => "#{auc_ns} #{location}",
-          :"xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
-          :version => "#{@version}"
-      }) do |buildsync|
+      xml.tag!("#{@ns}:BuildingSync",
+               :"xmlns:#{@ns}" => auc_ns,
+               :"xsi:schemaLocation" => "#{auc_ns} #{location}",
+               :"xmlns:xsi" => 'http://www.w3.org/2001/XMLSchema-instance',
+               :version => @version.to_s) do |buildsync|
 
         buildsync.tag!("#{@ns}:Facilities") do |faclts|
-          faclts.tag!("#{@ns}:Facility", {:ID => "Facility1"}) do |faclt|
+          faclts.tag!("#{@ns}:Facility", ID: 'Facility1') do |faclt|
             faclt.tag!("#{@ns}:Sites") do |sites|
-              sites.tag!("#{@ns}:Site", {:ID => "Site1"}) do |site|
+              sites.tag!("#{@ns}:Site", ID: 'Site1') do |site|
                 site.tag!("#{@ns}:Buildings") do |builds|
-                  builds.tag!("#{@ns}:Building", {:ID => "Building1"}) do |build|
+                  builds.tag!("#{@ns}:Building", ID: 'Building1') do |build|
                   end
                 end
               end
@@ -87,13 +88,13 @@ module BuildingSync
     end
 
     def get_or_create_linked_premises(element_xml)
-      linked_premises_xml = help_get_or_create(element_xml,"#{@ns}:LinkedPremises")
+      linked_premises_xml = help_get_or_create(element_xml, "#{@ns}:LinkedPremises")
       return linked_premises_xml
     end
 
     def add_linked_premise_of_type(premise_type_xml, premise_type, id)
       linked_xml = REXML::Element.new("#{@ns}:Linked#{premise_type}ID", premise_type_xml)
-      linked_xml.add_attribute("IDref", id)
+      linked_xml.add_attribute('IDref', id)
       return linked_xml
     end
 
@@ -118,19 +119,19 @@ module BuildingSync
     end
 
     # @see add_hvac_system_to_facility
-    def add_hvac_system_to_first_facility(doc, id = "HVACSystem-1", principal_hvac_system_type = nil)
+    def add_hvac_system_to_first_facility(doc, id = 'HVACSystem-1', principal_hvac_system_type = nil)
       facility_xml = get_first_facility_element(doc)
       return add_hvac_system_to_facility(facility_xml, id, principal_hvac_system_type)
     end
 
     # @see add_lighting_system_to_facility
-    def add_lighting_system_to_first_facility(doc, id = "LightingSystem-1")
+    def add_lighting_system_to_first_facility(doc, id = 'LightingSystem-1')
       facility_xml = get_first_facility_element(doc)
       return add_lighting_system_to_facility(facility_xml, id)
     end
 
     # @see add_plug_load_to_facility
-    def add_plug_load_to_first_facility(doc, id = "PlugLoad-1")
+    def add_plug_load_to_first_facility(doc, id = 'PlugLoad-1')
       facility_xml = get_first_facility_element(doc)
       return add_plug_load_to_facility(facility_xml, id)
     end
@@ -139,11 +140,11 @@ module BuildingSync
     # @see get_or_create_system_of_type
     # @param facility_xml [REXML::Element]
     # @param id [String]
-    def add_hvac_system_to_facility(facility_xml, id = "HVACSystem-1", principal_hvac_system_type = nil)
+    def add_hvac_system_to_facility(facility_xml, id = 'HVACSystem-1', principal_hvac_system_type = nil)
       systems_xml = get_or_create_systems(facility_xml)
       hvac_system_xml = get_or_create_system_of_type(systems_xml, 'HVACSystem')
 
-      hvac_system_xml.add_attribute("ID", id)
+      hvac_system_xml.add_attribute('ID', id)
       if !principal_hvac_system_type.nil?
         principal_xml = REXML::Element.new("#{@ns}:PrincipalHVACSystemType", hvac_system_xml)
         principal_xml.text = principal_hvac_system_type
@@ -155,10 +156,10 @@ module BuildingSync
     # @see get_or_create_system_of_type
     # @param facility_xml [REXML::Element]
     # @param id [String]
-    def add_lighting_system_to_facility(facility_xml, id="LightingSystem-1")
+    def add_lighting_system_to_facility(facility_xml, id = 'LightingSystem-1')
       systems_xml = get_or_create_systems(facility_xml)
       lighting_system_xml = get_or_create_system_of_type(systems_xml, 'LightingSystem')
-      lighting_system_xml.add_attribute("ID", id)
+      lighting_system_xml.add_attribute('ID', id)
       return lighting_system_xml
     end
 
@@ -166,10 +167,10 @@ module BuildingSync
     # @see get_or_create_system_of_type
     # @param facility_xml [REXML::Element]
     # @param id [String]
-    def add_plug_load_to_facility(facility_xml, id="PlugLoad-1")
+    def add_plug_load_to_facility(facility_xml, id = 'PlugLoad-1')
       systems_xml = get_or_create_systems(facility_xml)
       new_system_xml = get_or_create_system_of_type(systems_xml, 'PlugLoad')
-      new_system_xml.add_attribute("ID", id)
+      new_system_xml.add_attribute('ID', id)
       return new_system_xml
     end
 
@@ -196,16 +197,16 @@ module BuildingSync
       return help_get_or_create(facility_xml, "#{@ns}:Systems")
     end
 
-    def add_section_to_first_building(doc, id = "Section-1")
+    def add_section_to_first_building(doc, id = 'Section-1')
       building_xml = get_first_building_element(doc)
       sections_xml = help_get_or_create(building_xml, "#{@ns}:Sections")
       section = REXML::Element.new("#{@ns}:Section", sections_xml)
-      section.add_attribute("ID", id)
+      section.add_attribute('ID', id)
       return section
     end
 
     def add_energy_resource_use_to_scenario(scenario_xml, energy_resource_type = 'Electricity', end_use = 'All end uses', id = 'ResourceUse-1', native_units = nil)
-      resource_uses = help_get_or_create(scenario_xml,"#{@ns}:ResourceUses")
+      resource_uses = help_get_or_create(scenario_xml, "#{@ns}:ResourceUses")
 
       # Define ResourceUse and add ID
       resource_use = REXML::Element.new("#{@ns}:ResourceUse", resource_uses)
@@ -249,8 +250,8 @@ module BuildingSync
     # @param scenario_type [String] see add_scenario_type_to_scenario
     # @param id [String] id for the new scenario
     # @return [REXML::Element] newly added scenario
-    def add_scenario_to_first_report(doc, scenario_type = nil, id = "Scenario-1")
-      report = doc.get_elements(".//#{@ns}:Reports/#{@ns}:Report").first()
+    def add_scenario_to_first_report(doc, scenario_type = nil, id = 'Scenario-1')
+      report = doc.get_elements(".//#{@ns}:Reports/#{@ns}:Report").first
       return add_scenario_to_report(report, scenario_type, id)
     end
 
@@ -260,13 +261,13 @@ module BuildingSync
     # @param scenario_type [String] see add_scenario_type_to_scenario
     # @param id [String] id of the Scenario element to add
     # @return [REXML::Element] the newly created Scenario element
-    def add_scenario_to_report(report_xml, scenario_type = nil, id = "Scenario-1")
-      scenarios = report_xml.get_elements("./#{@ns}:Scenarios").first()
+    def add_scenario_to_report(report_xml, scenario_type = nil, id = 'Scenario-1')
+      scenarios = report_xml.get_elements("./#{@ns}:Scenarios").first
       if scenarios.nil?
         scenarios = REXML::Element.new("#{@ns}:Scenarios", report_xml)
       end
       scenario = REXML::Element.new("#{@ns}:Scenario", scenarios)
-      scenario.add_attribute("ID", id)
+      scenario.add_attribute('ID', id)
       return add_scenario_type_to_scenario(scenario, scenario_type)
     end
 
@@ -275,8 +276,8 @@ module BuildingSync
     # @param doc [REXML::Document] a buildingsync document with atleast an auc:Facility
     # @param id [String] id of the Report element to add
     # @return [REXML::Element] the newly created Report element
-    def add_report_to_first_facility(doc, id = "Report-1")
-      facility_xml = doc.get_elements(".//#{@ns}:Facilities/#{@ns}:Facility").first()
+    def add_report_to_first_facility(doc, id = 'Report-1')
+      facility_xml = doc.get_elements(".//#{@ns}:Facilities/#{@ns}:Facility").first
       reports = help_get_or_create(facility_xml, "#{@ns}:Reports")
       report = REXML::Element.new("#{@ns}:Report", reports)
       report.add_attribute('ID', id)
@@ -364,7 +365,6 @@ module BuildingSync
         expect(facility_element.nil?).to be false
       end
     end
-
 
     # create minimum site
     # @param occupancy_classification [String]
@@ -456,32 +456,32 @@ module BuildingSync
     end
 
     def get_first_facility_element(doc)
-      facility = doc.get_elements("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility").first()
+      facility = doc.get_elements("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility").first
       return facility
     end
 
     def get_first_site_element(doc)
-      site = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site").first()
+      site = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site").first
       return site
     end
 
     def get_first_building_element(doc)
-      building = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building").first()
+      building = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building").first
       return building
     end
 
     def get_first_building_section_element(doc)
-      section = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building/#{@ns}:Sections/#{@ns}:Section").first()
+      section = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building/#{@ns}:Sections/#{@ns}:Section").first
       return section
     end
 
     def get_first_scenario_element(doc)
-      scenario = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario").first()
+      scenario = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario").first
       return scenario
     end
 
     def get_first_hvac_system_element(doc)
-      scenario = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Systems/#{@ns}:HVACSystems/#{@ns}:HVACSystem").first()
+      scenario = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Systems/#{@ns}:HVACSystems/#{@ns}:HVACSystem").first
       return scenario
     end
 

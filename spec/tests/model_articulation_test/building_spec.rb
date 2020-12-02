@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -114,17 +116,17 @@ RSpec.describe 'BuildingSpec' do
     end
 
     expectations = [
-        # [expected value, method used to access, element_name]
-        ['Property management company', 'xget_text', ['Ownership']],
-        ['Health care-Inpatient hospital', 'xget_text', ['OccupancyClassification']],
-        ['Contact1', 'xget_attribute_for_element', ['PrimaryContactID', 'IDref']],
-        [Date.new(2019, 1, 1), 'xget_text_as_date', ['RetrocommissioningDate']],
-        [true, 'xget_text_as_bool', ['BuildingAutomationSystem']],
-        [true, 'xget_text_as_bool', ['HistoricalLandmark']],
-        [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
-        [2003, 'xget_text_as_integer', ['YearOfLastMajorRemodel']],
-        [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
-        [60.0, 'xget_text_as_float', ['PercentOccupiedByOwner']],
+      # [expected value, method used to access, element_name]
+      ['Property management company', 'xget_text', ['Ownership']],
+      ['Health care-Inpatient hospital', 'xget_text', ['OccupancyClassification']],
+      ['Contact1', 'xget_attribute_for_element', ['PrimaryContactID', 'IDref']],
+      [Date.new(2019, 1, 1), 'xget_text_as_date', ['RetrocommissioningDate']],
+      [true, 'xget_text_as_bool', ['BuildingAutomationSystem']],
+      [true, 'xget_text_as_bool', ['HistoricalLandmark']],
+      [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
+      [2003, 'xget_text_as_integer', ['YearOfLastMajorRemodel']],
+      [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
+      [60.0, 'xget_text_as_float', ['PercentOccupiedByOwner']]
     ]
 
     expectations.each do |e|
@@ -168,5 +170,4 @@ RSpec.describe 'BuildingSpec' do
       expect(@building.built_year == expected_value).to be true
     end
   end
-
 end
