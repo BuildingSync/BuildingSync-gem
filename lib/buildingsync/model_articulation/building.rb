@@ -806,7 +806,9 @@ module BuildingSync
         @model.getBuilding.setNorthAxis(building_rotation)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "Set Building Rotation to #{@model.getBuilding.northAxis}")
       end
-      @model.getBuilding.setName(name)
+      if !@name.nil?
+        @model.getBuilding.setName(@name)
+      end
 
       create_bldg_space_types(@model)
 

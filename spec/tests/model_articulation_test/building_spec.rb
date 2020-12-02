@@ -39,7 +39,27 @@
 require 'buildingsync/model_articulation/building'
 
 RSpec.describe 'BuildingSpec' do
-  it 'Should generate meaningful error when passing empty XML data' do
+  it 'should raise an StandardError given a non-Building REXML Element' do
+    # -- Setup
+    ns = 'auc'
+    v = '2.2.0'
+    g = BuildingSync::Generator.new(ns, v)
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    facility_element = doc.elements["//#{ns}:Facility"]
+
+    # -- Create Building object from Facility
+    begin
+      BuildingSync::Building.new(facility_element, '', '', ns)
+
+      # Should not reach this
+      expect(false).to be true
+    rescue StandardError => e
+      puts e.message
+      expect(e.message).to eql 'Attempted to initialize Building object with Element name of: Facility'
+    end
+  end
+  it 'Should raise StandardError when OccupancyClassification not provided at the Site or Building level' do
     # -- Setup
     g = BuildingSync::Generator.new
     doc_string = g.create_bsync_root_to_building
@@ -48,6 +68,23 @@ RSpec.describe 'BuildingSpec' do
 
     begin
       b = BuildingSync::Building.new(building_xml, '', '', 'auc')
+
+      # Should not reach this line
+      expect(false).to be true
+    rescue StandardError => e
+      expect(e.message.to_s).to eq('BuildingSync.Building.check_occupancy_classification: OccupancyClassification must be set at either the Site or Building')
+    end
+  end
+
+  it 'Should raise StandardError when YearOfConstruction not provided at the Building level' do
+    # -- Setup
+    g = BuildingSync::Generator.new
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    building_xml = g.get_first_building_element(doc)
+
+    begin
+      b = BuildingSync::Building.new(building_xml, 'Retail', '', 'auc')
 
       # Should not reach this line
       expect(false).to be true

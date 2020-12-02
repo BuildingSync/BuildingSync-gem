@@ -42,18 +42,24 @@ require 'openstudio/workflow/util/energyplus'
 require 'buildingsync/generator'
 
 RSpec.describe 'SiteSpec' do
-  it 'Should generate meaningful error when passing empty XML data' do
-    g = BuildingSync::Generator.new
+  it 'should raise an StandardError given a non-Site REXML Element' do
+    # -- Setup
+    ns = 'auc'
+    v = '2.2.0'
+    g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
-    site_xml = g.get_first_site_element(doc)
-    begin
-      s = BuildingSync::Site.new(site_xml, 'auc')
+    facility_element = doc.elements["//#{ns}:Facility"]
 
-      # Should not reach this line
+    # -- Create Site object from Facility
+    begin
+      BuildingSync::Site.new(facility_element, ns)
+
+      # Should not reach this
       expect(false).to be true
     rescue StandardError => e
-      expect(e.message.to_s).to eq('Building ID: Building1. Year of Construction is blank in your BuildingSync file, but is required.')
+      puts e.message
+      expect(e.message).to eql 'Attempted to initialize Site object with Element name of: Facility'
     end
   end
 

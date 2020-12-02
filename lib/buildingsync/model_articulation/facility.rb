@@ -120,7 +120,7 @@ module BuildingSync
         raise StandardError, "Facility with ID: #{xget_id} has no Site elements.  Cannot initialize Facility."
       elsif site_xml_temp.size > 1
         @site_xml = site_xml_temp.first
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', "Facility ID: #{xget_id}. There is more than one (#{site_xml_temp.size}) Site elements. Only the first Site will be considered (ID: #{@site_xml.attributes['ID']}")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.read_xml', "Facility ID: #{xget_id}. There is more than one (#{site_xml_temp.size}) Site elements. Only the first Site will be considered (ID: #{@site_xml.attributes['ID']}")
       else
         @site_xml = site_xml_temp.first
       end
@@ -449,6 +449,7 @@ module BuildingSync
 
       # add internal loads to space types
       if add_space_type_loads
+        puts @systems_map
         @load_system.add_internal_loads(model, open_studio_system_standard, template, @site.get_building_sections, remove_objects)
         new_occupancy_peak = @site.get_peak_occupancy
         new_occupancy_peak.each do |id, occupancy_peak|

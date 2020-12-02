@@ -49,6 +49,7 @@
                   <n1:IdentifierValue>151</n1:IdentifierValue>
                 </n1:PremisesIdentifier>
               </n1:PremisesIdentifiers>
+              <n1:OccupancyClassification>Retail</n1:OccupancyClassification>
               <n1:FloorsAboveGrade>1</n1:FloorsAboveGrade>
               <n1:FloorsBelowGrade>0</n1:FloorsBelowGrade>
               <n1:FloorAreas>

@@ -49,7 +49,7 @@
                   <auc:IdentifierValue>151</auc:IdentifierValue>
                 </auc:PremisesIdentifier>
               </auc:PremisesIdentifiers>
-              <auc:OccupancyClassification>Health care-Inpatient hospital</auc:OccupancyClassification>
+              <auc:OccupancyClassification>Retail</auc:OccupancyClassification>
               <auc:OccupancyLevels>
                 <auc:OccupancyLevel>
                   <auc:OccupantQuantity>15000</auc:OccupantQuantity>

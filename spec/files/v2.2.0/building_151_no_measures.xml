@@ -49,7 +49,7 @@
                   <auc:IdentifierValue>151</auc:IdentifierValue>
                 </auc:PremisesIdentifier>
               </auc:PremisesIdentifiers>
-              <auc:OccupancyClassification>Office</auc:OccupancyClassification>
+              <auc:OccupancyClassification>Retail</auc:OccupancyClassification>
               <auc:FloorsAboveGrade>1</auc:FloorsAboveGrade>
               <auc:FloorsBelowGrade>0</auc:FloorsBelowGrade>
               <auc:FloorAreas>
@@ -73,7 +73,7 @@
               <auc:Sections>
                 <auc:Section ID="Default_Subsection">
                   <auc:SectionType>Space function</auc:SectionType>
-                  <auc:OccupancyClassification>Office</auc:OccupancyClassification>
+                  <auc:OccupancyClassification>Retail</auc:OccupancyClassification>
                   <auc:TypicalOccupantUsages>
                     <auc:TypicalOccupantUsage>
                       <auc:TypicalOccupantUsageValue>40.0</auc:TypicalOccupantUsageValue>

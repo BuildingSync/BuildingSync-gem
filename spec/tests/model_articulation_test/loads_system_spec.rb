@@ -63,7 +63,7 @@ RSpec.describe 'LoadSystemSpec' do
     expect(load_system.add_daylighting_controls(model, standard, 'DOE Ref Pre-1980')).to be true
   end
 
-  xit 'should parse and write building_151.xml and adjust schedules successfully' do
+  it 'should parse and write building_151.xml and adjust schedules successfully' do
     # -- Setup
     file_name = 'building_151.xml'
     std = CA_TITLE24
