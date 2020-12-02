@@ -189,7 +189,7 @@ module BuildingSync
     # @param total_number_floors [Integer]
     # @return [Boolean]
     def process_bldg_and_system_type(building_and_system_types, occupancy_classification, total_floor_area, total_number_floors)
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.sets_occupancy_bldg_system_types', "Element ID: #{xget_id} started with occupancy_classification #{occupancy_classification} and total floor area: #{total_floor_area}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.process_bldg_and_system_type', "Element ID: #{xget_id} started with occupancy_classification #{occupancy_classification} and total floor area: #{total_floor_area}")
       puts "Element ID: #{xget_id} started with occupancy_classification #{occupancy_classification} and total floor area: #{total_floor_area}"
       min_floor_area_correct = false
       max_floor_area_correct = false

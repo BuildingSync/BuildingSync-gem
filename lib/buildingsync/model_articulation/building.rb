@@ -343,7 +343,6 @@ module BuildingSync
         end
         zone_hash[bldg_subsec.xget_id] = zone_list
       end
-      puts "build_zone_hash: #{zone_hash}"
       return zone_hash
     end
 

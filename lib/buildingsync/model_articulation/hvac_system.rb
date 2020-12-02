@@ -136,9 +136,10 @@ module BuildingSync
           end
         end
 
-        puts "ThermalZones: #{model.getThermalZones.size}"
-        add_setpoints_to_thermostats_if_none(model)
       end
+      puts "ThermalZones: #{model.getThermalZones.size}"
+      puts "ThermostatDSPs: #{model.getThermostatSetpointDualSetpoints.size}"
+      add_setpoints_to_thermostats_if_none(model)
       return true
     end
 

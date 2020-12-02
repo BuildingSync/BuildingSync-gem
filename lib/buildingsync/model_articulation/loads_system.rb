@@ -74,7 +74,28 @@ module BuildingSync
       end
 
       OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', 'Adding internal loads')
+      count_not_found = 0
       model.getSpaceTypes.each do |space_type|
+        data = standard.space_type_get_standards_data(space_type)
+        if data.empty?
+          original_building_type = space_type.standardsBuildingType.get
+          alternate_building_type = standard.model_get_lookup_name(original_building_type)
+          if alternate_building_type != original_building_type
+            space_type.setStandardsBuildingType(alternate_building_type)
+            data = standard.space_type_get_standards_data(space_type)
+            if data.empty?
+              OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "Unable to get standards data for Space Type: #{space_type.name}.  Tried standards building type: #{original_building_type} and #{alternate_building_type} with standards space type: #{space_type.standardsSpaceType.get}")
+              count_not_found += 1
+              next
+            else
+              OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "Space Type: #{space_type.name}. Standards building type changed from #{original_building_type} to #{alternate_building_type} with standards space type: #{space_type.standardsSpaceType.get}")
+            end
+          else
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "Unable to get standards data for Space Type: #{space_type.name}.  Standards building type: #{space_type.standardsBuildingType.get}, space type: #{space_type.standardsSpaceType.get}")
+            count_not_found += 1
+            next
+          end
+        end
         # Don't add infiltration here; will be added later in the script
         test = standard.space_type_apply_internal_loads(space_type, true, true, true, true, true, false)
         if test == false
@@ -96,7 +117,10 @@ module BuildingSync
         # extend space type name to include the template. Consider this as well for load defs
         space_type.setName("#{space_type.name} - #{template}")
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LoadsSystem.add_internal_loads', "Adding loads to space type named #{space_type.name}")
-        return true
+      end
+
+      if count_not_found > 0
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "#{count_not_found} of #{model.getSpaceTypes.size} Space Types have no internal loads")
       end
 
       # warn if spaces in model without space type

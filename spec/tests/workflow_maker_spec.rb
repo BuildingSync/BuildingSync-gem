@@ -243,16 +243,16 @@ RSpec.describe 'WorkflowMaker' do
     end
 
     measure_inserts_to_check = [
-      ['EnergyPlusMeasure', 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects', 1, 27, {
-        'ratedTotalCoolingCapacity' => 999.9,
-        'ratedCOP' => 0.99,
-        'ratedAirFlowRate' => 0.999,
-        'condensateRemovalStart' => 9.999,
-        'evapLatentRatio' => 0.0999,
-        'latentCapTimeConstant' => 4.0
-      }],
-      ['ReportingMeasure', 'openstudio_results', 0, 29, nil],
-      ['ModelMeasure', 'scale_geometry', 3, 3, nil]
+        ['EnergyPlusMeasure', 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects', 1, 27, {
+            'ratedTotalCoolingCapacity' => 999.9,
+            'ratedCOP' => 0.99,
+            'ratedAirFlowRate' => 0.999,
+            'condensateRemovalStart' => 9.999,
+            'evapLatentRatio' => 0.0999,
+            'latentCapTimeConstant' => 4.0
+        }],
+        ['ReportingMeasure', 'openstudio_results', 0, 29, nil],
+        ['ModelMeasure', 'scale_geometry', 3, 3, nil]
     ]
     measure_inserts_to_check.each do |to_check|
       it "insert_measure_into_workflow: #{to_check[0]} (#{to_check[1]}) at the expected position and still simulates" do
@@ -299,12 +299,12 @@ RSpec.describe 'WorkflowMaker' do
       item = 1
       final_expected_position = 0
       args = {
-        'ratedTotalCoolingCapacity' => 999.9,
-        'ratedCOP' => 0.99,
-        'ratedAirFlowRate' => 0.999,
-        'condensateRemovalStart' => 9.999,
-        'evapLatentRatio' => 0.0999,
-        'latentCapTimeConstant' => 4.0
+          'ratedTotalCoolingCapacity' => 999.9,
+          'ratedCOP' => 0.99,
+          'ratedAirFlowRate' => 0.999,
+          'condensateRemovalStart' => 9.999,
+          'evapLatentRatio' => 0.0999,
+          'latentCapTimeConstant' => 4.0
       }
 
       @workflow_maker.clear_all_measures
@@ -339,40 +339,47 @@ RSpec.describe 'WorkflowMaker' do
   end
 
   describe 'Results Processing' do
-    it 'building_151_one_scenario: should simula' do
-      # -- Setup
-      file_name = 'building_151_one_scenario.xml'
-      std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-      doc = help_load_doc(xml_path)
-      ns = 'auc'
+    standards = [
+        [ASHRAE90_1],
+        [CA_TITLE24]
+    ]
+    standards.each do |standard|
+      it "building_151_one_scenario: #{standard[0]} should simulate and write two results files" do
 
-      workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
-      workflow_maker.setup_and_sizing_run(output_path, nil, std)
+        # -- Setup
+        file_name = 'building_151_one_scenario.xml'
+        std = standard[0]
+        xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+        doc = help_load_doc(xml_path)
+        ns = 'auc'
 
-      # -- Assert SR completed successfully
-      sizing_run_checks(output_path)
+        workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+        workflow_maker.setup_and_sizing_run(output_path, nil, std)
 
-      workflows_successfully_written = workflow_maker.write_osws(output_path)
-      # -- Assert - should only have 1 workflow written
-      expect(workflows_successfully_written).to be true
+        # -- Assert SR completed successfully
+        sizing_run_checks(output_path)
 
-      # -- Setup - actually run the osws
-      failures = workflow_maker.run_osws(output_path)
+        workflows_successfully_written = workflow_maker.write_osws(output_path)
+        # -- Assert - should only have 1 workflow written
+        expect(workflows_successfully_written).to be true
 
-      expect(failures.empty?).to be true
+        # -- Setup - actually run the osws
+        failures = workflow_maker.run_osws(output_path)
 
-      workflow_maker.gather_results
+        expect(failures.empty?).to be true
 
-      output_xml_path = File.join(output_path, 'results.xml')
-      workflow_maker.save_xml(output_xml_path)
+        workflow_maker.gather_results
 
-      output_xml_path2 = File.join(output_path, 'results_prepared.xml')
-      workflow_maker.prepare_final_xml
-      workflow_maker.save_xml(output_xml_path2)
+        output_xml_path = File.join(output_path, 'results.xml')
+        workflow_maker.save_xml(output_xml_path)
 
-      expect(File.exist?(output_xml_path)).to be true
-      expect(File.exist?(output_xml_path2)).to be true
+        output_xml_path2 = File.join(output_path, 'results_prepared.xml')
+        workflow_maker.prepare_final_xml
+        workflow_maker.save_xml(output_xml_path2)
+
+        expect(File.exist?(output_xml_path)).to be true
+        expect(File.exist?(output_xml_path2)).to be true
+      end
     end
   end
 end
