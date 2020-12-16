@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -37,29 +39,24 @@
 
 require 'fileutils'
 require 'json'
-require_relative 'model_maker_base'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
-  class WorkflowMakerBase < ModelMakerBase
+  class WorkflowMakerBase
+    # initialize
+    # @param doc [REXML::Document]
+    # @param ns [String]
+    def initialize(doc, ns)
+      @doc = doc
+      @ns = ns
+      @workflow = nil
+    end
+
     # write OpenStudio workflows in osw files (base method)
     # @param facility [REXML::Element]
     # @param dir [String]
-    def write_osws(facility, dir)
+    def write_osws(dir)
       FileUtils.mkdir_p(dir)
-    end
-
-    # gather results (base method)
-    # @param dir [String]
-    # @param year_val [Integer]
-    # @param baseline_only [Boolean]
-    # @return [Boolean]
-    def gather_results(dir, year_val, baseline_only = false); end
-
-    # returns failed scenarios (base method)
-    # @return [Array]
-    def failed_scenarios
-      return []
     end
 
     # save xml file
@@ -71,17 +68,16 @@ module BuildingSync
     end
 
     # set only one measure path
-    # @param osw [OpenStudio::WorkflowJSON]
+    # @param workflow [Hash] a hash of the openstudio workflow
     # @param measures_dir [String]
-    def set_measure_path(osw, measures_dir)
-      osw['measure_paths'] = [measures_dir]
+    def set_measure_path(workflow, measures_dir)
+      workflow['measure_paths'] = [measures_dir]
     end
 
     # set multiple measure paths
-    # @param osw [OpenStudio::WorkflowJSON]
     # @param measures_dir_array [Array]
-    def set_measure_paths(osw, measures_dir_array)
-      osw['measure_paths'] = measures_dir_array
+    def set_measure_paths(measures_dir_array)
+      @workflow['measure_paths'] = measures_dir_array
     end
 
     # clear all measures from the list in the workflow
@@ -104,14 +100,15 @@ module BuildingSync
     end
 
     # set measure argument
-    # @param osw [OpenStudio::WorkflowJSON]
-    # @param measure_dir_name [String]
+    # @param workflow [Hash] a hash of the openstudio workflow
+    # @param measure_dir_name [String] the directory name for the measure, as it appears
+    #   in any of the gems, i.e. openstudio-common-measures-gem/lib/measures/[measure_dir_name]
     # @param argument_name [String]
     # @param argument_value [String]
     # @return [Boolean]
-    def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
+    def set_measure_argument(workflow, measure_dir_name, argument_name, argument_value)
       result = false
-      osw['steps'].each do |step|
+      workflow['steps'].each do |step|
         if step['measure_dir_name'] == measure_dir_name
           step['arguments'][argument_name] = argument_value
           result = true
@@ -125,13 +122,14 @@ module BuildingSync
       return result
     end
 
-    # add new measure
-    # @param osw [OpenStudio::WorkflowJSON]
-    # @param measure_dir_name [String]
-    # @return [Boolean]
-    def add_new_measure(osw, measure_dir_name)
+    # Adds a new measure to the workflow ONLY if it doesn't already exist
+    # @param workflow [Hash] a hash of the openstudio workflow
+    # @param measure_dir_name [String] the directory name for the measure, as it appears
+    #   in any of the gems, i.e. openstudio-common-measures-gem/lib/measures/[measure_dir_name]
+    # @return [Boolean] whether or not a new measure was added
+    def add_new_measure(workflow, measure_dir_name)
       # first we check if the measure already exists
-      osw['steps'].each do |step|
+      workflow['steps'].each do |step|
         if step['measure_dir_name'] == measure_dir_name
           return false
         end
@@ -139,7 +137,7 @@ module BuildingSync
       # if it does not exist we add it
       new_step = {}
       new_step['measure_dir_name'] = measure_dir_name
-      osw['steps'].unshift(new_step)
+      workflow['steps'].unshift(new_step)
       return true
     end
   end

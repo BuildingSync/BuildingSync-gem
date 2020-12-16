@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.0/BuildingSync.xsd">
+<auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.2.0">
   <auc:Facilities>
     <auc:Facility ID="Facility1">
       <auc:Sites>
         <auc:Site ID="Site1">
           <auc:Buildings>
-            <auc:Building ID="Willis_Tower">
-              <auc:PremisesName>Willis Tower</auc:PremisesName>
-              <auc:Address>
-                <auc:City>Chicago</auc:City>
-                <auc:State>IL</auc:State>
-              </auc:Address>
+            <auc:Building ID="Office_Carolina">
+              <auc:PremisesName>Office Carolina</auc:PremisesName>
+              <auc:ClimateZoneType>
+                <auc:ASHRAE>
+                  <auc:ClimateZone>6A</auc:ClimateZone>
+                </auc:ASHRAE>
+              </auc:ClimateZoneType>
               <auc:BuildingClassification>Commercial</auc:BuildingClassification>
               <auc:OccupancyClassification>Office</auc:OccupancyClassification>
               <auc:FloorAreas>
                 <auc:FloorArea>
                   <auc:FloorAreaType>Gross</auc:FloorAreaType>
-                  <auc:FloorAreaValue>4477800.0</auc:FloorAreaValue>
+                  <auc:FloorAreaValue>31053</auc:FloorAreaValue>
                 </auc:FloorArea>
               </auc:FloorAreas>
-              <auc:YearOfConstruction>1973</auc:YearOfConstruction>
+              <auc:YearOfConstruction>1915</auc:YearOfConstruction>
             </auc:Building>
           </auc:Buildings>
         </auc:Site>
@@ -32,10 +33,17 @@
               <auc:ScenarioType>
                 <auc:CurrentBuilding>
                   <auc:CalculationMethod>
-                    <auc:Modeled/>
+                    <auc:Modeled>
+                      <auc:SimulationCompletionStatus>Not Started</auc:SimulationCompletionStatus>
+                    </auc:Modeled>
                   </auc:CalculationMethod>
                 </auc:CurrentBuilding>
               </auc:ScenarioType>
+              <auc:LinkedPremises>
+                <auc:Building>
+                  <auc:LinkedBuildingID IDref="Office_Carolina"/>
+                </auc:Building>
+              </auc:LinkedPremises>
             </auc:Scenario>
           </auc:Scenarios>
         </auc:Report>

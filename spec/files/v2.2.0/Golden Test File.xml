@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<BuildingSync xmlns="http://buildingsync.net/schemas/bedes-auc/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 ../BuildingSync.xsd">
+<BuildingSync xmlns="http://buildingsync.net/schemas/bedes-auc/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd" version="2.2.0">
   <Facilities>
-    <Facility>
+    <Facility ID="Facility1">
       <Sites>
         <Site ID="SiteA">
           <PremisesName>NREL Campus</PremisesName>
@@ -34,7 +34,7 @@
               </FloorAreas>
               <YearOfConstruction>2011</YearOfConstruction>
               <Sections>
-                <Section>
+                <Section ID="Section1">
                   <SectionType>Whole building</SectionType>
                   <Roofs>
                     <Roof>
@@ -107,7 +107,7 @@
             </Plants>
             <HeatingAndCoolingSystems>
               <HeatingSources>
-                <HeatingSource>
+                <HeatingSource ID="HeatingSource1">
                   <HeatingSourceType>
                     <SourceHeatingPlantID IDref="HeatingPlant1"/>
                   </HeatingSourceType>
@@ -137,14 +137,14 @@
               <CondenserPlants>
                 <CondenserPlant ID="CondenserPlant1">
                   <AirCooled>
-                    <EvaporativelyCooledCondenser/>
+                    <EvaporativelyCooledCondenser ID="EvaporativelyCooledCondenser1"/>
                   </AirCooled>
                 </CondenserPlant>
               </CondenserPlants>
             </Plants>
             <HeatingAndCoolingSystems>
               <CoolingSources>
-                <CoolingSource>
+                <CoolingSource ID="CoolingSource1">
                   <CoolingSourceType>
                     <CoolingPlantID IDref="CoolingPlant1"/>
                   </CoolingSourceType>
@@ -220,12 +220,12 @@
         </Measure>
       </Measures>
       <Reports>
-        <Report>
+        <Report ID="Report1">
           <Scenarios>
             <Scenario ID="Scenario1">
               <ScenarioName>Remove all the PV from the RSF</ScenarioName>
               <ScenarioType>
-                <PackageOfMeasures>
+                <PackageOfMeasures ID="PackageOfMeasures1">
                   <MeasureIDs>
                     <MeasureID IDref="Building1RemovePV"/>
                   </MeasureIDs>
@@ -235,7 +235,7 @@
             <Scenario ID="Scenario2">
               <ScenarioName>Remove all the PV from campus</ScenarioName>
               <ScenarioType>
-                <PackageOfMeasures>
+                <PackageOfMeasures ID="PackageOfMeasures2">
                   <MeasureIDs>
                     <MeasureID IDref="WholeSiteRemovePV"/>
                   </MeasureIDs>

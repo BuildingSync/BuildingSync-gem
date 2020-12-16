@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -34,24 +36,13 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require 'fileutils'
-require 'json'
 
-module BuildingSync
-  # base class for objects that will configure model maker based on building sync files
-  class ModelMakerBase
-    # initialize
-    # @param doc [REXML::Document]
-    # @param ns [String]
-    def initialize(doc, ns)
-      @doc = doc
-      @ns = ns
-    end
+SCHEMA_2_0_URL = 'https://raw.githubusercontent.com/BuildingSync/schema/v2.0/BuildingSync.xsd'
+SCHEMA_2_2_0_URL = 'https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd'
+PHASE_0_BASE_OSW_FILE_PATH = File.expand_path(File.join(__dir__, 'makers/phase_zero_base.osw'))
+WORKFLOW_MAKER_JSON_FILE_PATH = File.expand_path(File.join(__dir__, 'makers/workflow_maker.json'))
+BUILDING_AND_SYSTEMS_FILE_PATH = File.expand_path(File.join(__dir__, 'model_articulation/building_and_system_types.json'))
 
-    # generate baseline model
-    def generate_baseline; end
-
-    # write ism file
-    def write_osm; end
-  end
-end
+# Standards strings
+ASHRAE90_1 = 'ASHRAE90.1'
+CA_TITLE24 = 'CaliforniaTitle24'

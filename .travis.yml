@@ -31,31 +31,52 @@ jobs:
       - $SH "bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/hvac_system_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/loads_system_spec.rb"
+      - $SH "bundle exec rspec spec/tests/model_articulation_test/lighting_system_type_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/service_hot_water_system_spec.rb"
       - $SH "bundle exec rspec spec/tests/model_articulation_test/site_spec.rb"
       # - $SH "bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb"  // fails sometimes due to connection issues, so we exclude it here
       name: "Model Articulation Tests"
     - script:
+        - travis_wait 40 $SH "bundle exec rspec spec/tests/model_articulation_test/hospital_occupancy_type_spec.rb"
+      name: "Model Articulation Hospital Occupancy Type Spec"
+    - script:
+        - $SH "bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb"
+      name: "Model Articulation Occupancy Types Spec"
+    - script:
       - travis_wait 50 $SH "bundle exec rspec spec/tests/translator_spec.rb"
       name: "Translator Spec"
     - script:
-      - travis_wait 40 $SH "bundle exec rspec spec/tests/model_articulation_test/hospital_occupancy_type_spec.rb"
-      name: "Hospital Occupancy Type Spec"
+        - $SH "bundle exec rspec spec/tests/translator_sizing_run_spec.rb"
+      name: "Translator Sizing Run Spec"
     - script:
-      - $SH "bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb"
-      name: "Occupancy Types Spec"
+        - $SH "bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb"
+      name: "Translator Perform SR and Baseline Simulation Spec"
     - script:
-      - $SH "bundle exec rspec spec/tests/translator_baseline_generation_spec.rb"
+        - $SH "bundle exec rspec spec/tests/translator_baseline_gather_save_spec.rb"
+      name: "Translator Perform SR and Baseline Simulations, Gather and Save Results Spec"
+    - script:
       - $SH "bundle exec rspec spec/tests/translator_scenario_generation_spec.rb"
       name: "Translator Generation Specs"
-    - script:
-      - $SH "bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb"
-      name: "Translator Baseline Simulation Spec"
     - script:
       - $SH "bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb"
       name: "Translator Scenario Simulation Spec"
     - script:
+      - $SH "bundle exec rspec spec/tests/report_spec.rb"
+      - $SH "bundle exec rspec spec/tests/utility_spec.rb"
+      - $SH "bundle exec rspec spec/tests/scenario_spec.rb"
+      - $SH "bundle exec rspec spec/tests/time_series_spec.rb"
+      - $SH "bundle exec rspec spec/tests/resource_use_spec.rb"
+      - $SH "bundle exec rspec spec/tests/all_resource_total_spec.rb"
+      name: "Report and Scenario Related Specs"
+    - script:
+      - $SH "bundle exec rspec spec/tests/workflow_maker_spec.rb"
+      name: "WorkflowMaker Spec"
+    - script:
       - $SH "bundle exec rspec spec/tests/building_sync_spec.rb"
       - $SH "bundle exec rspec spec/tests/epw_test_spec.rb"
+      - $SH "bundle exec rspec spec/tests/constants_spec.rb"
+      - $SH "bundle exec rspec spec/tests/generator_spec.rb"
+      - $SH "bundle exec rspec spec/tests/helper_spec.rb"
+      - $SH "bundle exec rspec spec/tests/xml_get_set_spec.rb"
       # - $SH "bundle exec rspec spec/tests/selection_tool_spec.rb"  # selection tool is not working with ASHRAE level 1.5 yet
       name: "Other Specs"

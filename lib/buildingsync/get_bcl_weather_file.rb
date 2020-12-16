@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -40,7 +42,7 @@ module BuildingSync
   # GetBCLWeatherFile class to manage the process of getting weather files from BCL
   class GetBCLWeatherFile
     # prefix for data weather path
-    $weather_file_path_prefix = '../data/weather/'.freeze
+    $weather_file_path_prefix = '../data/weather/'
 
     # download weather file from city name
     # @param state [String]

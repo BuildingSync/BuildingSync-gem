@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -40,19 +42,29 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24 and all simulations' do
-    test_baseline_and_scenario_creation_with_simulation('building_151.xml', 30)
+  it 'should parse and write building_151.xml (phase zero) with auc namespace for CA_TITLE24 and all simulations' do
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = CA_TITLE24
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    expected_measures = 30
+    epw_file_path = nil
+    simulate = true
+
+    # -- Assert
+    test_baseline_and_scenario_creation_with_simulation(xml_path, output_path, expected_measures, std, epw_file_path, simulate)
   end
 
   it 'should parse and write DC GSA Headquarters.xml (phase zero) with auc namespace for ASHRAE90_1 and just run all simulations' do
-    test_baseline_and_scenario_creation_with_simulation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw')
-  end
+    # -- Setup
+    file_name = 'DC GSA Headquarters.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
+    expected_measures = 2
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
+    simulate = true
 
-  it 'should parse and write building_151.xml (phase zero) with auc namespace for CAT24, process all simulations and gather their results also' do
-    test_baseline_and_scenario_creation_with_simulation('building_151.xml', 30)
-  end
-
-  it 'should parse and write DC GSA Headquarters.xml (phase zero) with auc namespace for ASHRAE90_1, process all simulations and gather their results also' do
-    test_baseline_and_scenario_creation_with_simulation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw')
+    # -- Assert
+    test_baseline_and_scenario_creation_with_simulation(xml_path, output_path, expected_measures, std, epw_file_path, simulate)
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -34,90 +36,118 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'openstudio/extension/core/os_lib_geometry'
+
+require 'buildingsync/report'
+require 'buildingsync/contact'
+require 'buildingsync/helpers/helper'
+require 'buildingsync/helpers/xml_get_set'
+require 'buildingsync/helpers/Model.hvac'
+require 'buildingsync/helpers/metered_energy'
+
 require_relative 'site'
 require_relative 'loads_system'
 require_relative 'envelope_system'
 require_relative 'hvac_system'
+require_relative 'lighting_system'
 require_relative 'service_hot_water_system'
 require_relative 'measure'
-require 'openstudio/extension/core/os_lib_geometry'
-require_relative '../helpers/Model.hvac'
-require_relative '../helpers/metered_energy'
-require_relative '../helpers/helper'
 
 module BuildingSync
   # Facility class
   class Facility
     include OsLib_Geometry
-
+    include BuildingSync::Helper
+    include BuildingSync::XmlGetSet
     # initialize
-    # @param facility_xml [REXML:Element]
+    # @param base_xml [REXML:Element]
     # @param ns [String]
-    def initialize(facility_xml, ns)
-      # code to initialize
-      # an array that contains all the sites
-      @sites = []
-      @measures = []
-      @auditor_contact_id = nil
-      @audit_date_level_1 = nil
-      @audit_date_level_2 = nil
-      @audit_date_level_3 = nil
-      @contact_auditor_name = nil
-      @contact_owner_name = nil
-      @auditor_years_experience = nil
-      @utility_name = nil
-      @utility_meter_number = nil
-      @metering_configuration = nil
-      @rate_schedules = nil
-      @interval_reading_monthly = []
-      @interval_reading_yearly = []
-      @audit_notes = nil
-      @audit_team_notes = nil
-      @spaces_excluded_from_gross_floor_area = nil
-      @premises_notes_for_not_applicable = nil
+    def initialize(base_xml, ns)
+      @base_xml = base_xml
+      @ns = ns
+      @g = BuildingSync::Generator.new(ns)
 
-      # parameter to read and write.
-      @energy_resource = nil
-      @benchmark_source = nil
-      @building_eui = nil
-      @building_eui_benchmark = nil
-      @energy_cost = nil
-      @annual_fuel_use_native_units = nil
+      help_element_class_type_check(base_xml, 'Facility')
+
+      @report_xml = nil
+      @site_xml = nil
+
+      @site = nil
+      @report = nil
+
+      @measures = []
+      @contacts = []
+      @systems_map = {}
+
+      # TODO: Go under Report
+      @utility_name = nil
+      @utility_meter_numbers = []
+      @metering_configuration = nil
+      @spaces_excluded_from_gross_floor_area = nil
 
       @load_system = nil
       @hvac_system = nil
 
       # reading the xml
-      read_xml(facility_xml, ns)
+      read_xml
     end
 
     # read xml
-    # @param facility_xml [REXML:Element]
-    # @param ns [String]
-    def read_xml(facility_xml, ns)
-      facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-        @sites.push(Site.new(site_element, ns))
+    def read_xml
+      # Site - checks
+      site_xml_temp = @base_xml.get_elements("#{@ns}:Sites/#{@ns}:Site")
+      if site_xml_temp.nil? || site_xml_temp.empty?
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.read_xml', "Facility ID: #{xget_id} has no Site elements.  Cannot initialize Facility.")
+        raise StandardError, "Facility with ID: #{xget_id} has no Site elements.  Cannot initialize Facility."
+      elsif site_xml_temp.size > 1
+        @site_xml = site_xml_temp.first
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.read_xml', "Facility ID: #{xget_id}. There is more than one (#{site_xml_temp.size}) Site elements. Only the first Site will be considered (ID: #{@site_xml.attributes['ID']}")
+      else
+        @site_xml = site_xml_temp.first
+      end
+      # Create new Site
+      @site = BuildingSync::Site.new(@site_xml, @ns)
+
+      # Report - checks
+      report_xml_temp = @base_xml.get_elements("#{@ns}:Reports/#{@ns}:Report")
+      if report_xml_temp.nil? || report_xml_temp.empty?
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.read_xml', "Facility with ID: #{xget_id} has no Report elements.  Cannot initialize Facility.")
+        raise StandardError, "Facility with ID: #{xget_id} has no Report elements.  Cannot initialize Facility."
+      elsif report_xml_temp.size > 1
+        @report_xml = report_xml_temp.first
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.read_xml', "There are more than one (#{report_xml_temp.size}) Report elements in your BuildingSync file. Only the first Report will be considered (ID: #{@report_xml.attributes['ID']}")
+      else
+        @report_xml = report_xml_temp.first
+      end
+      # Create new Report
+      @report = BuildingSync::Report.new(@report_xml, @ns)
+
+      measures_xml_temp = @base_xml.get_elements("#{@ns}:Measures/#{@ns}:Measure")
+
+      # Measures - create
+      if !measures_xml_temp.nil?
+        measures_xml_temp.each do |measure_xml|
+          if measure_xml.is_a? REXML::Element
+            @measures.push(BuildingSync::Measure.new(measure_xml, @ns))
+          end
+        end
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.read_xml', "Facility with ID: #{xget_id} has #{@measures.size} Measure Objects")
       end
 
-      facility_xml.elements.each("#{ns}:Measures/#{ns}:Measure") do |measure_element|
-        @measures.push(Measure.new(measure_element, ns))
-      end
-
-      read_other_details(facility_xml, ns)
-      read_interval_reading(facility_xml, ns)
-      read_systems(facility_xml, ns)
+      read_other_details
+      read_and_create_initial_systems
     end
 
-    # set all function that iterates over the sites and calls their set all function
+    # set_all wrapper for Site
     def set_all
-      @sites.each(&:set_all)
+      @site.set_all
     end
 
     # determine open studio standard
     # @param standard_to_be_used [String]
     # @return [Standard]
     def determine_open_studio_standard(standard_to_be_used)
-      return @sites[0].determine_open_studio_standard(standard_to_be_used)
+      return @site.determine_open_studio_standard(standard_to_be_used)
     end
 
     # generating the OpenStudio model based on the imported BuildingSync Data
@@ -127,19 +157,11 @@ module BuildingSync
     # @param ddy_file [String]
     # @return [Boolean]
     def generate_baseline_osm(epw_file_path, output_path, standard_to_be_used, ddy_file = nil)
-      if @sites.count == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', 'There are no sites attached to this facility in your BuildingSync file.')
-        raise 'There are no sites attached to this facility in your BuildingSync file.'
-      elsif @sites.count > 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.generate_baseline_osm', "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file.")
-        raise "There are more than one (#{@sites.count}) sites attached to this facility in your BuildingSync file."
-      else
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.generate_baseline_osm', "Info: There is/are #{@sites.count} sites in this facility.")
-      end
-      @sites[0].generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file)
+      @site.generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file)
 
-      zone_hash = build_zone_hash(@sites[0])
-      create_building_systems(output_path, zone_hash)
+      @epw_file_path = @site.get_epw_file_path
+      zone_hash = build_zone_hash(@site)
+      create_building_systems(main_output_dir: output_path, zone_hash: zone_hash, remove_objects: true)
       return true
     end
 
@@ -151,139 +173,112 @@ module BuildingSync
     end
 
     # get sites
-    # return [Array]
-    def get_sites
-      return @sites
+    # return [BuildingSync::Site]
+    def get_site
+      return @site
     end
 
     # get space types
     # @return [Array<OpenStudio::Model::SpaceType>]
     def get_space_types
-      return @sites[0].get_space_types
+      return @site.get_space_types
+    end
+
+    # get epw_file_path
+    # @return [String]
+    def get_epw_file_path
+      @site.get_epw_file_path
+    end
+
+    # Get the ContactName specified by the AuditorContactID/@IDref
+    # @return [String] if exists
+    # @return [nil] if not
+    def get_auditor_contact_name
+      auditor_id = @report.get_auditor_contact_id
+      if !auditor_id.nil?
+        contact = @contacts.find { |contact| contact.xget_id == auditor_id}
+        return contact.xget_text('ContactName')
+      end
+      return nil
+    end
+
+    # get OpenStudio model
+    # @return [OpenStudio::Model]
+    def get_model
+      return @site.get_model
     end
 
     # determine OpenStudio system standard
     # @return [Standard]
     def determine_open_studio_system_standard
-      return @sites[0].determine_open_studio_system_standard
-    end
-
-    # read interval reading
-    # @param facility_xml [REXML::Element]
-    # @param ns [String]
-    def read_interval_reading(facility_xml, ns)
-      interval_frequency = ''
-      reading_type = ''
-      interval_reading = ''
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"]
-        @energy_resource = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"].text
-      else
-        @energy_resource = nil
-      end
-
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalFrequency"]
-        interval_frequency = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalFrequency"].text
-      end
-
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:ReadingType"]
-        reading_type = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:ReadingType"].text
-      end
-
-      if facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalReading"]
-        interval_reading = facility_xml.elements["#{ns}:Reports/#{ns}:Report/#{ns}:Scenarios/#{ns}:Scenario/#{ns}:TimeSeriesData/#{ns}:TimeSeriesType/#{ns}:IntervalReading"].text
-      end
-
-      if interval_frequency == 'Month'
-        @interval_reading_monthly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
-      elsif interval_frequency == 'Year'
-        @interval_reading_yearly.push(MeteredEnergy.new(@energy_resource, interval_frequency, reading_type, interval_reading))
-      end
+      return @site.determine_open_studio_system_standard
     end
 
     # read systems
-    # @param facility_xml [REXML::Element]
-    # @param ns [String]
-    def read_systems(facility_xml, ns)
-      systems_xml = facility_xml.elements["#{ns}:Systems"]
-      if systems_xml
-        @load_system = LoadsSystem.new(systems_xml.elements["#{ns}:PlugLoads"], ns)
-        @hvac_system = HVACSystem.new(systems_xml.elements["#{ns}:HVACSystems"], ns)
+    def read_and_create_initial_systems
+      systems_xml = xget_or_create('Systems')
+      if !systems_xml.elements.empty?
+        systems_xml.elements.each do |system_type|
+          @systems_map[system_type.name] = []
+          system_type.elements.each do |system_xml|
+            if system_xml.name == 'HVACSystem'
+              @systems_map[system_type.name] << BuildingSync::HVACSystem.new(system_xml, @ns)
+            elsif system_xml.name == 'LightingSystem'
+              @systems_map[system_type.name] << BuildingSync::LightingSystemType.new(system_xml, @ns)
+            else
+              @systems_map[system_type.name] << system_xml
+            end
+          end
+        end
       else
+        hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
+        lighting_xml = @g.add_lighting_system_to_facility(@base_xml)
+        @hvac_system = HVACSystem.new(hvac_xml, @ns)
+        @lighting_system = LightingSystemType.new(lighting_xml, @ns)
         @load_system = LoadsSystem.new
-        @hvac_system = HVACSystem.new
       end
     end
 
-    # read other details
-    # @param facility_xml [REXML::Element]
-    # @param ns [String]
-    def read_other_details(facility_xml, ns)
-      facility_xml.elements.each("#{ns}:Contacts/#{ns}:Contact") do |contact|
-        contact.elements.each("#{ns}:ContactRoles/#{ns}:ContactRole") do |role|
-          if role.text == 'Energy Auditor'
-            @contact_auditor_name = contact.elements["#{ns}:ContactName"].text
-          elsif role.text == 'Owner'
-            @contact_owner_name = contact.elements["#{ns}:ContactName"].text
-          end
-        end
+    # @see BuildingSync::Report.add_cb_modeled
+    def add_cb_modeled(id = "Scenario-#{BuildingSync::BASELINE}")
+      @report.add_cb_modeled(id)
+    end
+
+    # Add a minimal lighting system in the doc and as an object
+    # @param premise_id [String] id of the premise which the system will be linked to
+    # @param premise_type [String] type of premise, i.e. Building, Section, etc.
+    # @param lighting_system_id [String] id for new lighting system
+    # @return [BuildingSync::LightingSystemType] new lighting system object
+    def add_blank_lighting_system(premise_id, premise_type, lighting_system_id = 'LightingSystem-1')
+      # Create new lighting system and link it
+      lighting_system_xml = @g.add_lighting_system_to_facility(@base_xml, lighting_system_id)
+      @g.add_linked_premise(lighting_system_xml, premise_id, premise_type)
+
+      # Create a new array if doesn't yet exist
+      if !@systems_map.key?('LightingSystems')
+        @systems_map['LightingSystems'] = []
       end
 
-      report = facility_xml.elements["#{ns}:Reports/#{ns}:Report"]
-      if !report.nil?
-        @auditor_contact_id = BuildingSync::Helper.get_text_value(report.elements["#{ns}:AuditorContactID"])
-        report.elements.each("#{ns}:AuditDates/#{ns}:AuditDate") do |audit_date|
-          if audit_date.elements["#{ns}:CustomDateType"].text == 'Level 1: Walk-through'
-            @audit_date_level_1 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
-            @audit_date = @audit_date_level_1
-          elsif audit_date.elements["#{ns}:CustomDateType"].text == 'Level 2: Energy Survey and Analysis'
-            @audit_date_level_2 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
-            @audit_date = @audit_date_level_2
-          elsif audit_date.elements["#{ns}:CustomDateType"].text == 'Level 3: Detailed Survey and Analysis'
-            @audit_date_level_3 = BuildingSync::Helper.get_date_value(audit_date.elements["#{ns}:Date"])
-            @audit_date = @audit_date_level_3
-          end
-        end
+      # Create new lighting system and add to array
+      new_system = BuildingSync::LightingSystemType.new(lighting_system_xml, @ns)
+      @systems_map['LightingSystems'] << new_system
+      return new_system
+    end
 
-        # here we iterate over the scenarios to find the one "currentBuilding" and "benchmark"
-        report.elements.each("#{ns}:Scenarios/#{ns}:Scenario") do |scenario|
-          if scenario.elements["#{ns}:ScenarioType/#{ns}:CurrentBuilding"]
-            @building_eui = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"])
-            @annual_fuel_use_native_units = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"])
-            @energy_cost = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"])
-          elsif scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark"]
-            @building_eui_benchmark = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"])
-            @benchmark_source = BuildingSync::Helper.get_text_value(scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"])
-          end
-        end
-
-        report.elements.each("#{ns}:UserDefinedFields/#{ns}:UserDefinedField") do |user_defined_field|
-          if user_defined_field.elements["#{ns}:FieldName"].text == 'Audit Notes'
-            @audit_notes = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Audit Team Notes'
-            @audit_team_notes = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Auditor Years Of Experience'
-            @auditor_years_experience = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Spaces Excluded From Gross Floor Area'
-            @spaces_excluded_from_gross_floor_area = user_defined_field.elements["#{ns}:FieldValue"].text
-          elsif user_defined_field.elements["#{ns}:FieldName"].text == 'Premises Notes For Not Applicable'
-            @premises_notes_for_not_applicable = user_defined_field.elements["#{ns}:FieldValue"].text
-          end
-        end
-      end
-
-      utilities = facility_xml.elements["#{ns}:Utilities"]
-      if utilities
-        @utility_meter_number = BuildingSync::Helper.get_text_value(utilities.elements["#{ns}:UtilityMeterNumbers/#{ns}:UtilityMeterNumber"])
-        utilities.elements.each("#{ns}:Utility") do |utility|
-          @utility_name = BuildingSync::Helper.get_text_value(utility.elements["#{ns}:UtilityName"])
-          @metering_configuration = BuildingSync::Helper.get_text_value(utility.elements["#{ns}:MeteringConfiguration"])
-          @rate_schedules = BuildingSync::Helper.get_text_value(utility.elements["#{ns}:RateSchedules"])
-        end
+    # read other details from the xml
+    # - contact information
+    # - audit levels and dates
+    # - Utility information
+    # - UDFs
+    def read_other_details
+      # Get Contact information
+      @base_xml.elements.each("#{@ns}:Contacts/#{@ns}:Contact") do |contact|
+        @contacts << BuildingSync::Contact.new(contact, @ns)
       end
     end
 
     # create building systems
-    # @param output_path [String]
+    # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
     # @param zone_hash [Hash]
     # @param hvac_delivery_type [String]
     # @param htg_src [String]
@@ -297,13 +292,13 @@ module BuildingSync
     # @param add_hvac [Boolean]
     # @param add_thermostat [Boolean]
     # @param remove_objects [Boolean]
-    def create_building_systems(output_path, zone_hash = nil, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity',
-                                add_space_type_loads = true, add_constructions = true, add_elevators = false, add_exterior_lights = false,
-                                add_exhaust = true, add_swh = true, add_hvac = true, add_thermostat = true, remove_objects = false)
-      model = @sites[0].get_model
-      template = @sites[0].get_building_template
-      system_type = @sites[0].get_system_type
-      climate_zone = @sites[0].get_climate_zone
+    def create_building_systems(main_output_dir:, zone_hash: nil, hvac_delivery_type: 'Forced Air', htg_src: 'NaturalGas', clg_src: 'Electricity',
+                                add_space_type_loads: true, add_constructions: true, add_elevators: false, add_exterior_lights: false,
+                                add_exhaust: true, add_swh: true, add_hvac: true, add_thermostat: true, remove_objects: false)
+      model = @site.get_model
+      template = @site.get_standard_template
+      system_type = @site.get_system_type
+      climate_zone = @site.get_climate_zone
 
       onsite_parking_fraction = 1.0
       exterior_lighting_zone = '3 - All Other Areas'
@@ -311,21 +306,22 @@ module BuildingSync
       initial_objects = model.getModelObjects.size
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building started with #{initial_objects} objects.")
+      puts "BuildingSync.Facility.create_building_system - The building started with #{initial_objects} objects."
 
-      # TODO: systems_xml.elements["#{ns}:LightingSystems"]
+      # TODO: systems_xml.elements["#{@ns}:LightingSystems"]
       # Make the open_studio_system_standard applier
       open_studio_system_standard = determine_open_studio_system_standard
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Building Standard with template: #{template}.")
 
       # add internal loads to space types
       if add_space_type_loads
-        @load_system.add_internal_loads(model, open_studio_system_standard, template, @sites[0].get_building_sections, remove_objects)
-        new_occupancy_peak = @sites[0].get_peak_occupancy
+        @load_system.add_internal_loads(model, open_studio_system_standard, template, @site.get_building_sections, remove_objects)
+        new_occupancy_peak = @site.get_peak_occupancy
         new_occupancy_peak.each do |id, occupancy_peak|
-          floor_area = @sites[0].get_floor_area[id]
+          floor_area = @site.get_floor_area[id]
           if occupancy_peak && floor_area && floor_area > 0.0
             puts "new peak occupancy value found: absolute occupancy: #{occupancy_peak} occupancy per area: #{occupancy_peak.to_f / floor_area.to_f} and area: #{floor_area} m2"
-            @load_system.adjust_occupancy_peak(model, occupancy_peak, floor_area, @sites[0].get_space_types_from_hash(id))
+            @load_system.adjust_occupancy_peak(model, occupancy_peak, floor_area, @site.get_space_types_from_hash(id))
           end
         end
       end
@@ -363,7 +359,14 @@ module BuildingSync
 
       # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
       if add_exterior_lights
-        @load_system.add_exterior_lights(model, open_studio_system_standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
+        if !@systems_map['LightingSystems'].nil?
+          @systems_map['LightingSystems'].each do |lighting_system|
+            lighting_system.add_exterior_lights(model, open_studio_system_standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
+          end
+        else
+          new_lighting_system = add_blank_lighting_system(@site.get_building.xget_id, 'Building')
+          new_lighting_system.add_exterior_lights(model, open_studio_system_standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
+        end
       end
 
       # add_exhaust
@@ -377,26 +380,18 @@ module BuildingSync
         service_hot_water_system.add(model, open_studio_system_standard, remove_objects)
       end
 
-      @load_system.add_daylighting_controls(model, open_studio_system_standard, template)
+      # TODO: Make this better
+      @lighting_system.add_daylighting_controls(model, open_studio_system_standard, template, main_output_dir)
 
+      # TODO: - add internal mass
+      # TODO: - add slab modeling and slab insulation
+      # TODO: - fuel customization for cooking and laundry
       # TODO: - add refrigeration
       # remove refrigeration equipment
       if remove_objects
         model.getRefrigerationSystems.each(&:remove)
       end
 
-      # TODO: - add internal mass
-      # remove internal mass
-      # if remove_objects
-      #  model.getSpaceLoads.each do |instance|
-      #    next if not instance.to_InternalMass.is_initialized
-      #    instance.remove
-      #  end
-      # end
-
-      # TODO: - add slab modeling and slab insulation
-
-      # TODO: - fuel customization for cooking and laundry
       # works by switching some fraction of electric loads to gas if requested (assuming base load is electric)
       # add thermostats
       if add_thermostat
@@ -410,7 +405,12 @@ module BuildingSync
 
       # set hvac controls and efficiencies (this should be last model articulation element)
       if add_hvac
-        @hvac_system.apply_sizing_and_assumptions(model, output_path, open_studio_system_standard, primary_bldg_type, system_type, climate_zone)
+        if remove_objects
+          model.purgeUnusedResourceObjects
+          objects_after_cleanup = initial_objects - model.getModelObjects.size
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "Removing #{objects_after_cleanup} objects from model")
+        end
+        @hvac_system.apply_sizing_and_assumptions(model, main_output_dir, open_studio_system_standard, primary_bldg_type, system_type, climate_zone)
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)
@@ -424,44 +424,23 @@ module BuildingSync
 
       # report final condition of model
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "The building finished with #{model.getModelObjects.size} objects.")
+      puts "BuildingSync.Facility.create_building_system - The building finished with #{model.getModelObjects.size} objects."
     end
 
     # write osm
     # @param dir [String]
     # @return [Array]
     def write_osm(dir)
-      scenario_types = {}
-      @sites.each do |site|
-        scenario_types = site.write_osm(dir)
-      end
+      scenario_types = @site.write_osm(dir)
       return scenario_types
     end
 
+    # TODO: I don't think we want any of this.
     # write parameters to xml
-    # @param facility [REXML::Element]
-    # @param ns [String]
-    def write_parameters_to_xml(facility, ns)
-      report = facility.elements["#{ns}:Reports/#{ns}:Report"]
-      report.elements.each("#{ns}:Scenarios/#{ns}:Scenario") do |scenario|
-        scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:EnergyResource"].text = @energy_resource if !@energy_resource.nil?
-        scenario.elements["#{ns}:ScenarioType/#{ns}:Benchmark/#{ns}:BenchmarkType/#{ns}:Other"].text = @benchmark_source if !@benchmark_source.nil?
-        scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text = @building_eui if !@building_eui.nil?
-        scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:SiteEnergyUseIntensity"].text = @building_eui_benchmark if !@building_eui_benchmark.nil?
-        scenario.elements["#{ns}:AllResourceTotals/#{ns}:AllResourceTotal/#{ns}:EnergyCost"].text = @energy_cost if !@energy_cost.nil?
-        scenario.elements["#{ns}:ResourceUses/#{ns}:ResourceUse/#{ns}:AnnualFuelUseNativeUnits"].text = @annual_fuel_use_native_units if !@annual_fuel_use_native_units.nil?
-      end
-      facility.elements.each("#{ns}:Sites/#{ns}:Site") do |site|
-        @sites[0].write_parameters_to_xml(site, ns)
-      end
+    def prepare_final_xml
+      @site.prepare_final_xml
     end
 
-    # get OpenStudio model
-    # @return [OpenStudio::Model]
-    def get_model
-      return @sites[0].get_model
-    end
-
-    attr_reader :building_eui_benchmark, :building_eui, :auditor_contact_id, :annual_fuel_use_native_units, :audit_date, :benchmark_source, :contact_auditor_name, :energy_cost, :energy_resource,
-                :rate_schedules, :utility_meter_number, :utility_name, :metering_configuration
+    attr_reader :systems_map, :site, :report, :measures, :contacts
   end
 end

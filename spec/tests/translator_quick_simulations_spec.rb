@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -38,10 +40,16 @@ require_relative './../spec_helper'
 
 RSpec.describe 'BuildingSync' do
   it 'should parse building_151_one_scenario.xml (phase zero) for Title24 and perform a baseline simulation' do
-    test_baseline_creation_and_simulation('building_151_one_scenario.xml', CA_TITLE24, 'CZ01RV2.epw')
+    # -- Setup
+    file_name = 'L000_OpenStudio_Pre-Simulation_01.xml'
+    std = CA_TITLE24
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
+
+    translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, std, epw_file_path)
   end
 
-  it 'should parse and write building_151_one_scenario.xml (phase zero) with auc namespace for CAT24 and all simulations' do
+  xit 'should parse and write building_151_one_scenario.xml (phase zero) with auc namespace for CAT24 and all simulations' do
     test_baseline_and_scenario_creation_with_simulation('building_151_one_scenario.xml', 2)
   end
 end

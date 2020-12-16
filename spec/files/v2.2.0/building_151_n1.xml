@@ -1,9 +1,11 @@
-<!-- edited with XMLSpy v2016 rel. 2 sp1 (x64) (http://www.altova.com) by NREL (NREL) -->
-<n1:BuildingSync xmlns:n1="http://buildingsync.net/schemas/bedes-auc/2019" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://cdn.rawgit.com/BuildingSync/schema/develop/BuildingSync.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="UTF-8"?>
+<n1:BuildingSync xmlns:n1="http://buildingsync.net/schemas/bedes-auc/2019"
+  xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.2.0">
   <n1:Facilities>
-    <n1:Facility>
+    <n1:Facility ID="Facility1">
       <n1:Sites>
-        <n1:Site>
+        <n1:Site ID="Site1">
           <n1:Address>
             <n1:StreetAddressDetail>
               <n1:Simplified>
@@ -47,6 +49,7 @@
                   <n1:IdentifierValue>151</n1:IdentifierValue>
                 </n1:PremisesIdentifier>
               </n1:PremisesIdentifiers>
+              <n1:OccupancyClassification>Retail</n1:OccupancyClassification>
               <n1:FloorsAboveGrade>1</n1:FloorsAboveGrade>
               <n1:FloorsBelowGrade>0</n1:FloorsBelowGrade>
               <n1:FloorAreas>
@@ -115,8 +118,8 @@
               </n1:LightingImprovements>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Retrofit with light emitting diode technologies</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>12</n1:UsefulLife>
@@ -140,8 +143,8 @@
               </n1:PlugLoadReductions>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Replace with ENERGY STAR rated</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>9</n1:UsefulLife>
@@ -165,8 +168,8 @@
               </n1:BuildingEnvelopeModifications>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Air seal envelope</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>11</n1:UsefulLife>
@@ -190,8 +193,8 @@
               </n1:OtherHVAC>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Replace package units</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>15</n1:UsefulLife>
@@ -215,8 +218,8 @@
               </n1:OtherHVAC>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Replace burner</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>20</n1:UsefulLife>
@@ -240,8 +243,8 @@
               </n1:LightingImprovements>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Add daylight controls</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>8</n1:UsefulLife>
@@ -265,8 +268,8 @@
               </n1:LightingImprovements>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Add occupancy sensors</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>8</n1:UsefulLife>
@@ -290,8 +293,8 @@
               </n1:PlugLoadReductions>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Install plug load controls</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>5.6</n1:UsefulLife>
@@ -315,8 +318,8 @@
               </n1:BuildingEnvelopeModifications>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Increase wall insulation</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>20</n1:UsefulLife>
@@ -340,8 +343,8 @@
               </n1:BuildingEnvelopeModifications>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Insulate thermal bypasses</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>20</n1:UsefulLife>
@@ -366,6 +369,7 @@
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Increase roof insulation</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>20</n1:UsefulLife>
@@ -374,7 +378,6 @@
           <n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
           <n1:Recommended>true</n1:Recommended>
           <n1:ImplementationStatus>Proposed</n1:ImplementationStatus>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
         </n1:Measure>
         <n1:Measure ID="Measure12">
           <n1:SystemCategoryAffected>Ceiling</n1:SystemCategoryAffected>
@@ -390,8 +393,8 @@
               </n1:BuildingEnvelopeModifications>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Increase ceiling insulation</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>20</n1:UsefulLife>
@@ -415,8 +418,8 @@
               </n1:BuildingEnvelopeModifications>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Add window films</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>10</n1:UsefulLife>
@@ -440,8 +443,8 @@
               </n1:OtherHVAC>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Upgrade operating protocols, calibration, and/or sequencing</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>11</n1:UsefulLife>
@@ -465,8 +468,8 @@
               </n1:ChilledWaterHotWaterAndSteamDistributionSystems>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Replace or upgrade water heater</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>10</n1:UsefulLife>
@@ -490,8 +493,8 @@
               </n1:Refrigeration>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Replace ice/refrigeration equipment with high efficiency units</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>12.5</n1:UsefulLife>
@@ -515,8 +518,8 @@
               </n1:BuildingEnvelopeModifications>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Replace windows</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>20</n1:UsefulLife>
@@ -540,8 +543,8 @@
               </n1:BoilerPlantImprovements>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Replace boiler</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>20</n1:UsefulLife>
@@ -565,8 +568,8 @@
               </n1:OtherHVAC>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Replace AC and heating units with ground coupled heat pump systems</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>15</n1:UsefulLife>
@@ -590,8 +593,8 @@
               </n1:OtherHVAC>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>Replace HVAC system type to VRF</n1:CustomMeasureName>
           <n1:LongDescription>VRF with DOAS</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>10</n1:UsefulLife>
@@ -615,8 +618,8 @@
               </n1:OtherHVAC>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>Replace HVAC system type to PZHP</n1:CustomMeasureName>
           <n1:LongDescription>Replace HVAC system type to PZHP</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>15</n1:UsefulLife>
@@ -640,8 +643,8 @@
               </n1:OtherElectricMotorsAndDrives>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Replace with higher efficiency</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>15</n1:UsefulLife>
@@ -665,8 +668,8 @@
               </n1:OtherHVAC>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Improve ventilation fans</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>4.4</n1:UsefulLife>
@@ -690,8 +693,8 @@
               </n1:OtherHVAC>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Install demand control ventilation</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>10</n1:UsefulLife>
@@ -715,8 +718,8 @@
               </n1:OtherHVAC>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Add or repair economizer</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>12.5</n1:UsefulLife>
@@ -740,8 +743,8 @@
               </n1:OtherHVAC>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Add energy recovery</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>14</n1:UsefulLife>
@@ -765,8 +768,8 @@
               </n1:ChilledWaterHotWaterAndSteamDistributionSystems>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Add pipe insulation</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>12</n1:UsefulLife>
@@ -790,8 +793,8 @@
               </n1:ChilledWaterHotWaterAndSteamDistributionSystems>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Add recirculating pumps</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>15</n1:UsefulLife>
@@ -815,9 +818,9 @@
               </n1:WaterAndSewerConservationSystems>
             </n1:TechnologyCategory>
           </n1:TechnologyCategories>
-          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:MeasureScaleOfApplication>Entire building</n1:MeasureScaleOfApplication>
-          <n1:LongDescription>Install low-flow fn1ets and showerheads</n1:LongDescription>
+          <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
+          <n1:LongDescription>Install low-flow faucets and showerheads</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
           <n1:UsefulLife>10</n1:UsefulLife>
           <n1:MeasureTotalFirstCost>69452.0</n1:MeasureTotalFirstCost>
@@ -828,7 +831,7 @@
         </n1:Measure>
       </n1:Measures>
       <n1:Reports>
-        <n1:Report>
+        <n1:Report ID="Report1">
           <n1:Scenarios>
             <n1:Scenario ID="Baseline">
               <n1:ScenarioName>Baseline</n1:ScenarioName>
@@ -840,10 +843,10 @@
                 </n1:CurrentBuilding>
               </n1:ScenarioType>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario1">
               <n1:ScenarioName>LED Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures1">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure1"/>
@@ -862,10 +865,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario2">
               <n1:ScenarioName>Electric_Appliance_30%_Reduction Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures2">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure2"/>
@@ -884,10 +887,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario3">
               <n1:ScenarioName>Air_Seal_Infiltration_30%_More_Airtight Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures3">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure3"/>
@@ -906,10 +909,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario4">
               <n1:ScenarioName>Cooling_System_SEER 14 Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures4">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure4"/>
@@ -928,10 +931,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario5">
               <n1:ScenarioName>Heating_System_Efficiency_0.93 Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures5">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure5"/>
@@ -950,10 +953,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario  ID="Scenario6">
               <n1:ScenarioName>Add daylight controls Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures6">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure6"/>
@@ -972,10 +975,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario  ID="Scenario7">
               <n1:ScenarioName>Add occupancy sensors Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures7">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure7"/>
@@ -994,10 +997,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario  ID="Scenario8">
               <n1:ScenarioName>Install plug load controls Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures8">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure8"/>
@@ -1016,10 +1019,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario9">
               <n1:ScenarioName>Increase wall insulation Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures9">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure9"/>
@@ -1038,10 +1041,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario10">
               <n1:ScenarioName>Insulate thermal bypasses Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures10">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure10"/>
@@ -1060,10 +1063,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario11">
               <n1:ScenarioName>Increase roof insulation Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures11">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure11"/>
@@ -1082,10 +1085,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario12">
               <n1:ScenarioName>Increase ceiling insulation Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures12">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure12"/>
@@ -1104,10 +1107,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario13">
               <n1:ScenarioName>Add window films Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures13">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure13"/>
@@ -1126,10 +1129,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario14">
               <n1:ScenarioName>Upgrade operating protocols calibration and-or sequencing Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures14">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure14"/>
@@ -1148,10 +1151,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario15">
               <n1:ScenarioName>Replace or upgrade water heater Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures15">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure15"/>
@@ -1170,10 +1173,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario16">
               <n1:ScenarioName>Replace ice-refrigeration equipment with high efficiency units Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures16">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure16"/>
@@ -1192,10 +1195,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario  ID="Scenario17">
               <n1:ScenarioName>Replace windows Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures17">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure17"/>
@@ -1214,10 +1217,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario18">
               <n1:ScenarioName>Replace boiler Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures18">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure18"/>
@@ -1236,10 +1239,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario19">
               <n1:ScenarioName>Replace HVAC with GSHP and DOAS Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures19">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure19"/>
@@ -1258,10 +1261,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario  ID="Scenario20">
               <n1:ScenarioName>VRF with DOAS Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures20">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure20"/>
@@ -1280,10 +1283,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario21">
               <n1:ScenarioName>Replace HVAC system type to PZHP Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures21">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure21"/>
@@ -1302,10 +1305,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario22">
               <n1:ScenarioName>Replace with higher efficiency Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures22">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure22"/>
@@ -1324,10 +1327,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario23">
               <n1:ScenarioName>Improve ventilation fans Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures23">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure23"/>
@@ -1346,10 +1349,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario24">
               <n1:ScenarioName>Install demand control ventilation Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures24">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure24"/>
@@ -1368,10 +1371,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario25">
               <n1:ScenarioName>Add or repair economizer Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures25">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure25"/>
@@ -1390,10 +1393,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario26">
               <n1:ScenarioName>Add energy recovery Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures26">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure26"/>
@@ -1412,10 +1415,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario27">
               <n1:ScenarioName>Add pipe insulation Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures27">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure27"/>
@@ -1434,10 +1437,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario28">
               <n1:ScenarioName>Add recirculating pumps Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures28">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure28"/>
@@ -1456,10 +1459,10 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario>
+            <n1:Scenario ID="Scenario29">
               <n1:ScenarioName>Install low-flow faucets and showerheads Only</n1:ScenarioName>
               <n1:ScenarioType>
-                <n1:PackageOfMeasures>
+                <n1:PackageOfMeasures ID="PackageOfMeasures29">
                   <n1:ReferenceCase IDref="Baseline"/>
                   <n1:MeasureIDs>
                     <n1:MeasureID IDref="Measure29"/>

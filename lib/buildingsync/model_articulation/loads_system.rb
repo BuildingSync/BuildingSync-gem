@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -34,12 +36,15 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative 'building_system'
 require 'openstudio/extension/core/os_lib_schedules.rb'
+
+require 'buildingsync/helpers/helper'
+require_relative 'building_system'
 
 module BuildingSync
   # LoadsSystem class that manages internal and external loads
   class LoadsSystem < BuildingSystem
+    include BuildingSync::Helper
     # initialize
     # @param system_element [REXML::Element]
     # @param ns [String]
@@ -68,7 +73,29 @@ module BuildingSync
         model.getDefaultScheduleSets.each(&:remove)
       end
 
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', 'Adding internal loads')
+      count_not_found = 0
       model.getSpaceTypes.each do |space_type|
+        data = standard.space_type_get_standards_data(space_type)
+        if data.empty?
+          original_building_type = space_type.standardsBuildingType.get
+          alternate_building_type = standard.model_get_lookup_name(original_building_type)
+          if alternate_building_type != original_building_type
+            space_type.setStandardsBuildingType(alternate_building_type)
+            data = standard.space_type_get_standards_data(space_type)
+            if data.empty?
+              OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "Unable to get standards data for Space Type: #{space_type.name}.  Tried standards building type: #{original_building_type} and #{alternate_building_type} with standards space type: #{space_type.standardsSpaceType.get}")
+              count_not_found += 1
+              next
+            else
+              OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "Space Type: #{space_type.name}. Standards building type changed from #{original_building_type} to #{alternate_building_type} with standards space type: #{space_type.standardsSpaceType.get}")
+            end
+          else
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "Unable to get standards data for Space Type: #{space_type.name}.  Standards building type: #{space_type.standardsBuildingType.get}, space type: #{space_type.standardsSpaceType.get}")
+            count_not_found += 1
+            next
+          end
+        end
         # Don't add infiltration here; will be added later in the script
         test = standard.space_type_apply_internal_loads(space_type, true, true, true, true, true, false)
         if test == false
@@ -78,7 +105,10 @@ module BuildingSync
 
         # apply internal load schedules
         # the last bool test it to make thermostat schedules. They are now added in HVAC section instead of here
-        standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
+        success = standard.space_type_apply_internal_load_schedules(space_type, true, true, true, true, true, true, false)
+        if !success
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "space_type_apply_internal_load_schedules unsuccessful for #{space_type.name}")
+        end
 
         # here we adjust the people schedules according to user input of hours per week and weeks per year
         if !building_sections.empty?
@@ -87,7 +117,10 @@ module BuildingSync
         # extend space type name to include the template. Consider this as well for load defs
         space_type.setName("#{space_type.name} - #{template}")
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LoadsSystem.add_internal_loads', "Adding loads to space type named #{space_type.name}")
-        return true
+      end
+
+      if count_not_found > 0
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LoadsSystem.add_internal_loads', "#{count_not_found} of #{model.getSpaceTypes.size} Space Types have no internal loads")
       end
 
       # warn if spaces in model without space type
@@ -176,22 +209,22 @@ module BuildingSync
       return unless !building_occupant_hours_per_week.nil?
       hours_per_week = building_occupant_hours_per_week
 
-      default_schedule_set = BuildingSync::Helper.get_default_schedule_set(model)
-      existing_number_of_people_sched = BuildingSync::Helper.get_schedule_rule_set_from_schedule(default_schedule_set.numberofPeopleSchedule)
+      default_schedule_set = help_get_default_schedule_set(model)
+      existing_number_of_people_sched = help_get_schedule_rule_set_from_schedule(default_schedule_set.numberofPeopleSchedule)
       return false if existing_number_of_people_sched.nil?
-      calc_hours_per_week = BuildingSync::Helper.calculate_hours(existing_number_of_people_sched)
+      calc_hours_per_week = help_calculate_hours(existing_number_of_people_sched)
       ratio_hours_per_week = hours_per_week / calc_hours_per_week
 
-      wkdy_start_time = BuildingSync::Helper.get_start_time_weekday(existing_number_of_people_sched)
-      wkdy_end_time = BuildingSync::Helper.get_end_time_weekday(existing_number_of_people_sched)
+      wkdy_start_time = help_get_start_time_weekday(existing_number_of_people_sched)
+      wkdy_end_time = help_get_end_time_weekday(existing_number_of_people_sched)
       wkdy_hours = wkdy_end_time - wkdy_start_time
 
-      sat_start_time = BuildingSync::Helper.get_start_time_sat(existing_number_of_people_sched)
-      sat_end_time = BuildingSync::Helper.get_end_time_sat(existing_number_of_people_sched)
+      sat_start_time = help_get_start_time_sat(existing_number_of_people_sched)
+      sat_end_time = help_get_end_time_sat(existing_number_of_people_sched)
       sat_hours = sat_end_time - sat_start_time
 
-      sun_start_time = BuildingSync::Helper.get_start_time_sun(existing_number_of_people_sched)
-      sun_end_time = BuildingSync::Helper.get_end_time_sun(existing_number_of_people_sched)
+      sun_start_time = help_get_start_time_sun(existing_number_of_people_sched)
+      sun_end_time = help_get_end_time_sun(existing_number_of_people_sched)
       sun_hours = sun_end_time - sun_start_time
 
       # determine new end times via ratios
@@ -203,7 +236,7 @@ module BuildingSync
       op_sch = standard.model_infer_hours_of_operation_building(model)
       default_schedule_set.setHoursofOperationSchedule(op_sch)
 
-      # BuildingSync::Helper.print_all_schedules("org_schedules-#{space_type.name}.csv", default_schedule_set)
+      # help_print_all_schedules("org_schedules-#{space_type.name}.csv", default_schedule_set)
 
       # Convert existing schedules in the model to parametric schedules based on current hours of operation
       standard.model_setup_parametric_schedules(model)
@@ -220,29 +253,6 @@ module BuildingSync
       # Apply new operating hours to parametric schedules to make schedules in model reflect modified hours of operation
       parametric_schedules = standard.model_apply_parametric_schedules(model, error_on_out_of_order: false)
       puts "Updated #{parametric_schedules.size} schedules with new hours of operation."
-      return true
-    end
-
-    # add exterior lights
-    # @param model [OpenStudio::Model]
-    # @param standard [Standard]
-    # @param onsite_parking_fraction [Float]
-    # @param exterior_lighting_zone [String]
-    # @param remove_objects [Boolean]
-    # @return boolean
-    def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
-      if remove_objects
-        model.getExteriorLightss.each do |ext_light|
-          next if ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name
-
-          ext_light.remove
-        end
-      end
-
-      exterior_lights = standard.model_add_typical_exterior_lights(model, exterior_lighting_zone.chars[0].to_i, onsite_parking_fraction)
-      exterior_lights.each do |k, v|
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LoadsSystem.add_exterior_lights', "Adding Exterior Lights named #{v.exteriorLightsDefinition.name} with design level of #{v.exteriorLightsDefinition.designLevel} * #{OpenStudio.toNeatString(v.multiplier, 0, true)}.")
-      end
       return true
     end
 
@@ -274,20 +284,5 @@ module BuildingSync
       return true
     end
 
-    # add daylighting controls
-    # @param model [OpenStudio::Model]
-    # @param standard [Standard]
-    # @param template [String]
-    # @return boolean
-    def add_daylighting_controls(model, standard, template)
-      # add daylight controls, need to perform a sizing run for 2010
-      if template == '90.1-2010'
-        if standard.model_run_sizing_run(model, "#{Dir.pwd}/SRvt") == false
-          return false
-        end
-      end
-      standard.model_add_daylighting_controls(model)
-      return true
-    end
   end
 end

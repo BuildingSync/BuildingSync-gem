@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -45,11 +47,12 @@ module BuildingSync
     # @note See documentation here: https://github.com/buildingsync/selection-tool#validator
     # @note Use core Net::HTTPS
     # @param xml_path [String]
-    def initialize(xml_path)
+    def initialize(xml_path, version = '2.0.0')
       @hash_response = nil
+      version = '2.0.0' if version.nil?
       url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
 
-      params = { 'schema_version' => '2.0.0' }
+      params = { 'schema_version' => version }
       params[:file] = UploadIO.new(xml_path, 'text/xml', File.basename(xml_path))
 
       request = Net::HTTP::Post::Multipart.new(url.path, params)
@@ -67,7 +70,7 @@ module BuildingSync
     def validate_use_case(use_case)
       if !@hash_response['validation_results']['use_cases'][use_case]['valid']
         @hash_response['validation_results']['use_cases'][use_case]['errors'].each do |error|
-          p "#{error['path']} => #{error['message']}"
+          puts error
         end
       end
 
@@ -79,11 +82,13 @@ module BuildingSync
     def validate_schema
       if !@hash_response['validation_results']['schema']['valid']
         @hash_response['validation_results']['schema']['errors'].each do |error|
-          p error['message']
+          puts error
         end
       end
 
       return @hash_response['validation_results']['schema']['valid']
     end
+
+    attr_reader :hash_response
   end
 end
