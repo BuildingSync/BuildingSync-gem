@@ -39,57 +39,104 @@
 require 'buildingsync/model_articulation/building'
 
 RSpec.describe 'BuildingSpec' do
-  it 'should raise an StandardError given a non-Building REXML Element' do
-    # -- Setup
-    ns = 'auc'
-    v = '2.2.0'
-    g = BuildingSync::Generator.new(ns, v)
-    doc_string = g.create_bsync_root_to_building
-    doc = REXML::Document.new(doc_string)
-    facility_element = doc.elements["//#{ns}:Facility"]
+  describe 'Expected Errors' do
 
-    # -- Create Building object from Facility
-    begin
-      BuildingSync::Building.new(facility_element, '', '', ns)
+    it 'should raise an StandardError given a non-Building REXML Element' do
+      # -- Setup
+      ns = 'auc'
+      v = '2.2.0'
+      g = BuildingSync::Generator.new(ns, v)
+      doc_string = g.create_bsync_root_to_building
+      doc = REXML::Document.new(doc_string)
+      facility_element = doc.elements["//#{ns}:Facility"]
 
-      # Should not reach this
-      expect(false).to be true
-    rescue StandardError => e
-      puts e.message
-      expect(e.message).to eql 'Attempted to initialize Building object with Element name of: Facility'
+      # -- Create Building object from Facility
+      begin
+        BuildingSync::Building.new(facility_element, '', '', ns)
+
+        # Should not reach this
+        expect(false).to be true
+      rescue StandardError => e
+        puts e.message
+        expect(e.message).to eql 'Attempted to initialize Building object with Element name of: Facility'
+      end
     end
-  end
-  it 'Should raise StandardError when OccupancyClassification not provided at the Site or Building level' do
-    # -- Setup
-    g = BuildingSync::Generator.new
-    doc_string = g.create_bsync_root_to_building
-    doc = REXML::Document.new(doc_string)
-    building_xml = g.get_first_building_element(doc)
+    it 'Should raise StandardError when YearOfConstruction not provided at the Building level' do
+      # -- Setup
+      g = BuildingSync::Generator.new
+      doc_string = g.create_bsync_root_to_building
+      doc = REXML::Document.new(doc_string)
+      building_xml = g.get_first_building_element(doc)
 
-    begin
-      b = BuildingSync::Building.new(building_xml, '', '', 'auc')
+      begin
+        b = BuildingSync::Building.new(building_xml, 'Retail', '', 'auc')
 
-      # Should not reach this line
-      expect(false).to be true
-    rescue StandardError => e
-      expect(e.message.to_s).to eq('BuildingSync.Building.check_occupancy_classification: OccupancyClassification must be set at either the Site or Building')
+        # Should not reach this line
+        expect(false).to be true
+      rescue StandardError => e
+        expect(e.message.to_s).to eq('Building ID: Building1. Year of Construction is blank in your BuildingSync file, but is required.')
+      end
     end
-  end
+    it 'Should raise StandardError when Site OccupancyClassification provided is empty string' do
+      # -- Setup
+      g = BuildingSync::Generator.new
+      doc_string = g.create_bsync_root_to_building
+      doc = REXML::Document.new(doc_string)
+      building_xml = g.get_first_building_element(doc)
+      # -- Setup - add necessary data
+      year_of_construction = help_get_or_create(building_xml, 'auc:YearOfConstruction')
+      year_of_construction.text = 1990
 
-  it 'Should raise StandardError when YearOfConstruction not provided at the Building level' do
-    # -- Setup
-    g = BuildingSync::Generator.new
-    doc_string = g.create_bsync_root_to_building
-    doc = REXML::Document.new(doc_string)
-    building_xml = g.get_first_building_element(doc)
+      begin
+        b = BuildingSync::Building.new(building_xml, '', '', 'auc')
 
-    begin
-      b = BuildingSync::Building.new(building_xml, 'Retail', '', 'auc')
+        # Should not reach this line
+        expect(false).to be true
+      rescue StandardError => e
+        expect(e.message.to_s).to eq('Unable to set OccupancyClassification to be empty')
+      end
+    end
+    it 'Should raise StandardError when Site OccupancyClassification provided is nil' do
+      # -- Setup
+      g = BuildingSync::Generator.new
+      doc_string = g.create_bsync_root_to_building
+      doc = REXML::Document.new(doc_string)
+      building_xml = g.get_first_building_element(doc)
+      # -- Setup - add necessary data
+      year_of_construction = help_get_or_create(building_xml, 'auc:YearOfConstruction')
+      year_of_construction.text = 1990
 
-      # Should not reach this line
-      expect(false).to be true
-    rescue StandardError => e
-      expect(e.message.to_s).to eq('Building ID: Building1. Year of Construction is blank in your BuildingSync file, but is required.')
+      begin
+        b = BuildingSync::Building.new(building_xml, nil, '', 'auc')
+
+        # Should not reach this line
+        expect(false).to be true
+      rescue StandardError => e
+        expect(e.message.to_s).to eq('Unable to set OccupancyClassification to nil')
+      end
+    end
+
+    it 'Should raise StandardError when FloorsBelowGrade or ConditionedFloorsBelowGrade > 1' do
+      # -- Setup
+      g = BuildingSync::Generator.new
+      doc_string = g.create_bsync_root_to_building
+      doc = REXML::Document.new(doc_string)
+      building_xml = g.get_first_building_element(doc)
+
+      # -- Setup - add necessary data
+      year_of_construction = help_get_or_create(building_xml, 'auc:YearOfConstruction')
+      year_of_construction.text = 1990
+      floors_below_grade = help_get_or_create(building_xml, 'auc:FloorsBelowGrade')
+      floors_below_grade.text = 2
+
+      begin
+        b = BuildingSync::Building.new(building_xml, 'Retail', '', 'auc')
+
+        # Should not reach this line
+        expect(false).to be true
+      rescue StandardError => e
+        expect(e.message.to_s).to eq("Building ID: Building1. Number of stories below grade is > 1 (2.0).  Currently, only one story below grade is supported.")
+      end
     end
   end
 
@@ -153,17 +200,17 @@ RSpec.describe 'BuildingSpec' do
     end
 
     expectations = [
-      # [expected value, method used to access, element_name]
-      ['Property management company', 'xget_text', ['Ownership']],
-      ['Health care-Inpatient hospital', 'xget_text', ['OccupancyClassification']],
-      ['Contact1', 'xget_attribute_for_element', ['PrimaryContactID', 'IDref']],
-      [Date.new(2019, 1, 1), 'xget_text_as_date', ['RetrocommissioningDate']],
-      [true, 'xget_text_as_bool', ['BuildingAutomationSystem']],
-      [true, 'xget_text_as_bool', ['HistoricalLandmark']],
-      [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
-      [2003, 'xget_text_as_integer', ['YearOfLastMajorRemodel']],
-      [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
-      [60.0, 'xget_text_as_float', ['PercentOccupiedByOwner']]
+        # [expected value, method used to access, element_name]
+        ['Property management company', 'xget_text', ['Ownership']],
+        ['Retail', 'xget_text', ['OccupancyClassification']],
+        ['Contact1', 'xget_attribute_for_element', ['PrimaryContactID', 'IDref']],
+        [Date.new(2019, 1, 1), 'xget_text_as_date', ['RetrocommissioningDate']],
+        [true, 'xget_text_as_bool', ['BuildingAutomationSystem']],
+        [true, 'xget_text_as_bool', ['HistoricalLandmark']],
+        [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
+        [2003, 'xget_text_as_integer', ['YearOfLastMajorRemodel']],
+        [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
+        [60.0, 'xget_text_as_float', ['PercentOccupiedByOwner']]
     ]
 
     expectations.each do |e|

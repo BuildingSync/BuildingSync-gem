@@ -475,14 +475,42 @@ module BuildingSync
       return section
     end
 
+    def get_first_report_element(doc)
+      report = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report").first
+      return report
+    end
+
     def get_first_scenario_element(doc)
       scenario = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Scenarios/#{@ns}:Scenario").first
+      return scenario
+    end
+
+    def get_first_utility_element(doc)
+      scenario = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Reports/#{@ns}:Report/#{@ns}:Utilities/#{@ns}:Utility").first
       return scenario
     end
 
     def get_first_hvac_system_element(doc)
       scenario = doc.get_elements("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Systems/#{@ns}:HVACSystems/#{@ns}:HVACSystem").first
       return scenario
+    end
+
+    def get_utility_from_file(xml_file_path)
+      doc = nil
+      File.open(xml_file_path, 'r') do |file|
+        doc = REXML::Document.new(file)
+      end
+      report = get_first_utility_element(doc)
+      return BuildingSync::Utility.new(report, @ns)
+    end
+
+    def get_report_from_file(xml_file_path)
+      doc = nil
+      File.open(xml_file_path, 'r') do |file|
+        doc = REXML::Document.new(file)
+      end
+      report = get_first_report_element(doc)
+      return BuildingSync::Report.new(report, @ns)
     end
 
     def get_facility_from_file(xml_file_path)

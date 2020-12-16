@@ -38,10 +38,12 @@
 # *******************************************************************************
 
 module BuildingSync
-  # ResourceUse class
+  # AllResourceTotal class
   class AllResourceTotal
     include BuildingSync::Helper
     include BuildingSync::XmlGetSet
+    # @param base_xml [REXML::Element]
+    # @param ns [String]
     def initialize(base_xml, ns)
       @base_xml = base_xml
       @ns = ns

@@ -40,88 +40,95 @@ require 'builder'
 
 require 'buildingsync/generator'
 
-# RSpec.describe 'FacilitySpec' do
-#   it 'Should generate meaningful error when passing empty XML data' do
-#     # -- Setup
-#     g = BuildingSync::Generator.new
-#     doc_string = g.create_bsync_root_to_building
-#     doc = REXML::Document.new(doc_string)
-#     facility_xml = g.get_first_facility_element(doc)
-#     begin
-#       f = BuildingSync::Facility.new(facility_xml, 'auc')
-#
-#       # Should not reach this line
-#       expect(false).to be true
-#     rescue StandardError => e
-#       puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
-#       expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
-#     end
-#   end
-#
-#   # TODO: Add actual assertions
-#   it 'Should create an instance of the facility class with minimal XML snippet' do
-#     generator = BuildingSync::Generator.new
-#     generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
-#   end
-#
-#   it 'Should return the boolean value for creating osm file correctly or not.' do
-#     # -- Setup
-#     file_name = 'building_151.xml'
-#     std = ASHRAE90_1
-#     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-#     epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
-#     expect(File.exist?(epw_path)).to be true
-#
-#     generator = BuildingSync::Generator.new
-#     facility = generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
-#     facility.determine_open_studio_standard(std)
-#
-#     # -- Assert
-#     expect(facility.generate_baseline_osm(epw_path, output_path, std)).to be true
-#   end
-#
-#   # TODO: Add actual assertions
-#   it 'Should create a building system with parameters set to true' do
-#     # -- Setup
-#     file_name = 'building_151.xml'
-#     std = ASHRAE90_1
-#     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-#     doc = nil
-#     File.open(xml_path, 'r') do |file|
-#       doc = REXML::Document.new(file)
-#     end
-#     ns = 'auc'
-#
-#     # -- Act
-#     facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
-#     facility.determine_open_studio_standard(ASHRAE90_1)
-#     facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
-#     facility.create_building_systems(output_path, nil, 'Forced Air', 'Electricity', 'Electricity',
-#                                      true, true, true, true,
-#                                      true, true, true, true, true)
-#   end
-#
-#   # TODO: Add actual assertions
-#   it 'Should create a building system with parameters set to false' do
-#     # -- Setup
-#     file_name = 'building_151.xml'
-#     std = ASHRAE90_1
-#     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-#     doc = nil
-#     File.open(xml_path, 'r') do |file|
-#       doc = REXML::Document.new(file)
-#     end
-#
-#     # -- Act
-#     ns = 'auc'
-#     facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
-#     facility.determine_open_studio_standard(ASHRAE90_1)
-#     facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
-#     facility.create_building_systems(output_path, 'Forced Air', 'Electricity', 'Electricity',
-#                                      false, false, false, false,
-#                                      false, false, false, false, false)
-#   end
-# end
+RSpec.describe 'FacilitySpec' do
+  describe 'Expected Errors' do
+
+    it 'should raise an StandardError given a non-Facility REXML Element' do
+      # -- Setup
+      ns = 'auc'
+      v = '2.2.0'
+      g = BuildingSync::Generator.new(ns, v)
+      doc_string = g.create_bsync_root_to_building
+      doc = REXML::Document.new(doc_string)
+
+      # -- Create Building object from Facility
+      begin
+        BuildingSync::Facility.new(doc.root, ns)
+
+        # Should not reach this
+        expect(false).to be true
+      rescue StandardError => e
+        puts e.message
+        expect(e.message).to eql 'Attempted to initialize Facility object with Element name of: BuildingSync'
+      end
+    end
+  end
+
+  # TODO: Add actual assertions
+  it 'Should create an instance of the facility class with minimal XML snippet' do
+    generator = BuildingSync::Generator.new
+    generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
+  end
+
+  it 'Should return the boolean value for creating osm file correctly or not.' do
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
+    expect(File.exist?(epw_path)).to be true
+
+    generator = BuildingSync::Generator.new
+    facility = generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
+    facility.determine_open_studio_standard(std)
+
+    # -- Assert
+    expect(facility.generate_baseline_osm(epw_path, output_path, std)).to be true
+  end
+
+  # TODO: Add actual assertions
+  it 'Should create a building system with parameters set to true' do
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    doc = nil
+    File.open(xml_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+    end
+    ns = 'auc'
+
+    # -- Act
+    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
+    facility.determine_open_studio_standard(ASHRAE90_1)
+    facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
+    facility.create_building_systems(output_path: output_path, htg_src: 'Electricity',
+                                     add_elevators: true, add_exterior_lights: true, remove_objects: true)
+  end
+
+# TODO: Add actual assertions
+  it 'Should create a building system with parameters set to false' do
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    doc = nil
+    File.open(xml_path, 'r') do |file|
+      doc = REXML::Document.new(file)
+    end
+
+    # -- Act
+    ns = 'auc'
+    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
+    facility.determine_open_studio_standard(ASHRAE90_1)
+    facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
+    facility.create_building_systems(output_path: output_path, zone_hash: nil, hvac_delivery_type: 'Forced Air',
+                                     htg_src: 'Electricity', clg_src: 'Electricity', add_space_type_loads: false,
+                                     add_constructions: false, add_elevators: false, add_exterior_lights: false,
+                                     add_exhaust: false, add_swh: false, add_hvac: false, add_thermostat: false,
+                                     remove_objects: false)
+  end
+end
 
 RSpec.describe 'Facility Scenario Parsing' do
   before(:each) do
@@ -140,8 +147,8 @@ RSpec.describe 'Facility Scenario Parsing' do
     facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
 
     # -- Assert
-    expect(facility.scenarios.size).to eq 30
-    facility.scenarios.each do |scenario|
+    expect(facility.report.scenarios.size).to eq 30
+    facility.report.scenarios.each do |scenario|
       expect(scenario).to be_an_instance_of(BuildingSync::Scenario)
     end
   end
@@ -155,8 +162,8 @@ RSpec.describe 'Facility Scenario Parsing' do
     facility = BuildingSync::Facility.new(@facility_xml, @ns)
 
     # -- Assert
-    expect(facility.scenarios).to be_an_instance_of(Array)
-    expect(facility.scenarios.empty?).to be true
+    expect(facility.report.scenarios).to be_an_instance_of(Array)
+    expect(facility.report.scenarios.empty?).to be true
   end
 end
 
@@ -235,35 +242,13 @@ RSpec.describe 'Facility Methods' do
     @facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
   end
   describe 'building_151_level1.xml' do
-    it 'Should return benchmark_eui' do
-      expected_value = '9.7'
 
-      # -- Assert
-      expect(@facility.building_eui_benchmark == expected_value).to be true
-    end
-
-    it 'Should return eui_building' do
+    it 'Should return contact_name' do
       # -- Setup
-      expected_value = '10.5'
+      expected_value = 'a contact person'
 
       # -- Assert
-      expect(@facility.building_eui == expected_value).to be true
-    end
-
-    it 'Should return auditor_contact_id' do
-      # -- Setup
-      expected_value = 'Contact1'
-
-      # -- Assert
-      expect(@facility.auditor_contact_id == expected_value).to be true
-    end
-
-    it 'Should return benchmark_tool' do
-      # -- Setup
-      expected_value = 'Portfolio Manager'
-
-      # -- Assert
-      expect(@facility.benchmark_tool == expected_value).to be true
+      expect(@facility.get_auditor_contact_name).to eql(expected_value)
     end
 
     it 'Should return annual_fuel_use_native_units' do
@@ -280,22 +265,6 @@ RSpec.describe 'Facility Methods' do
 
       # -- Assert
       expect(@facility.energy_cost == expected_value).to be true
-    end
-
-    it 'Should return audit_date' do
-      # -- Setup
-      expected_value = Date.parse('2019-05-01')
-
-      # -- Assert
-      expect(@facility.audit_date == expected_value).to be true
-    end
-
-    it 'Should return utility_name' do
-      # -- Setup
-      expected_value = 'an utility'
-
-      # -- Assert
-      expect(@facility.utility_name == expected_value).to be true
     end
 
     it 'Should return metering_configuration ' do
@@ -316,47 +285,5 @@ RSpec.describe 'Facility Methods' do
       expect(rate_structure_type.to_s == expected_value.to_s).to be true
     end
 
-    it 'Should return utility_meter_numbers' do
-      # -- Setup
-      expected_value = '0123456'
-      meter_number = @facility.utility_meter_numbers[0]
-
-      # -- Assert
-      puts "expected utility_meter_number: #{expected_value} but got: #{meter_number} " if meter_number != expected_value
-      expect(meter_number == expected_value).to be true
-    end
-  end
-end
-
-RSpec.describe 'Facility Methods' do
-  before(:all) do
-    # -- Setup
-    file_name = 'report_479.xml'
-    std = ASHRAE90_1
-    @xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-
-    @facility = BuildingSync::Generator.new.get_facility_from_file(@xml_path)
-  end
-  describe 'report_479.xml' do
-    it 'Should return error about number of stories below grade' do
-      # -- Setup
-
-      BuildingSync::Generator.new.get_facility_from_file(@xml_path)
-
-      # Should not get here
-      expect(false).to be true
-    rescue StandardError => e
-      # -- Assert
-      puts "rescued StandardError: #{e.message}"
-      expect(e.message.include?('Number of stories below grade is larger than')).to be true
-    end
-
-    it 'Should return contact_name' do
-      # -- Setup
-      expected_value = 'John Doe'
-
-      # -- Assert
-      expect(@facility.contact_auditor_name == expected_value).to be true
-    end
   end
 end

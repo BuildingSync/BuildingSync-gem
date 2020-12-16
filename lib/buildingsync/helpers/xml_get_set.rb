@@ -137,6 +137,15 @@ module BuildingSync
       return to_return
     end
 
+    def xget_plurals_text_value(element_name)
+      plurals = @base_xml.get_elements(".//#{@ns}:#{element_name}s/#{@ns}:#{element_name}")
+      to_return = []
+      plurals.each do |p|
+        to_return << help_get_text_value(p)
+      end
+      return to_return
+    end
+
     # Get the linked premises ids of the @base_xml element
     # @return [Hash] where keys are premise types and values are an array of ids
     # @example {'Building' => ['Building-1', 'Building-1'], 'Section' => ['Section-4']]}
@@ -183,8 +192,14 @@ module BuildingSync
           element.text = new_value
         end
       else
-        new_element = REXML::Element.new("#{@ns}:#{element_name}", @base_xml)
-        new_element.text = new_value
+        element = REXML::Element.new("#{@ns}:#{element_name}", @base_xml)
+        element.text = new_value
+      end
+      if element.text.nil?
+        raise StandardError, "Unable to set #{element_name} to nil"
+      end
+      if element.text.empty?
+        raise StandardError, "Unable to set #{element_name} to be empty"
       end
       return element
     end

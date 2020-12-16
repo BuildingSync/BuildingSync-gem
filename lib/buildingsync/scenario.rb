@@ -215,6 +215,11 @@ module BuildingSync
       return @osw_dir
     end
 
+    def get_benchmark_tool
+      child = get_scenario_type_child_element
+      return help_get_text_value(child.elements["#{@ns}:BenchmarkTool"])
+    end
+
     # @param workflow [Hash] a hash of the openstudio workflow
     def set_workflow(workflow)
       if !workflow.is_a?(Hash)

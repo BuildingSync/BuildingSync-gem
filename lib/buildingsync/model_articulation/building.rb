@@ -150,14 +150,8 @@ module BuildingSync
     def check_occupancy_classification(site_occupancy_classification)
       # Set the OccupancyClassification text as that defined by the Site
       # ONLY if it is not already defined
-      if !site_occupancy_classification.nil? && !site_occupancy_classification.empty?
-        xset_or_create('OccupancyClassification', site_occupancy_classification, false)
-      end
+      xset_or_create('OccupancyClassification', site_occupancy_classification, false)
 
-      if xget_text('OccupancyClassification').nil? || xget_text('OccupancyClassification').empty?
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_occupancy_classification', 'OccupancyClassification must be set at either the Site or Building')
-        raise StandardError, 'BuildingSync.Building.check_occupancy_classification: OccupancyClassification must be set at either the Site or Building'
-      end
     end
 
     # Set the @built_year based on YearOfConstruction / YearOfLastMajorRemodel
@@ -197,7 +191,7 @@ module BuildingSync
 
       if @num_stories_below_grade > 1.0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_stories_above_and_below_grade', "Number of stories below grade is larger than 1: #{@num_stories_below_grade}, currently only one basement story is supported.")
-        raise "Error : Number of stories below grade is larger than 1: #{@num_stories_below_grade}, currently only one basement story is supported."
+        raise StandardError, "Building ID: #{xget_id}. Number of stories below grade is > 1 (#{num_stories_below_grade}).  Currently, only one story below grade is supported."
       end
     end
 

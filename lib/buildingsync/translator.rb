@@ -235,6 +235,7 @@ module BuildingSync
       end
       file_name = 'in.osm'
 
+
       # Create a new baseline directory: dir/@output_dir/Baseline
       osm_baseline_dir = File.join(@output_dir, BASELINE)
       if !File.exist?(osm_baseline_dir)

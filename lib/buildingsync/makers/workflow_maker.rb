@@ -133,7 +133,7 @@ module BuildingSync
     # get scenario elements
     # @return [Array<BuildingSync::Scenario>]
     def get_scenarios
-      return @facility.scenarios
+      return @facility.report.scenarios
     end
 
     # generate the baseline model as osm model
@@ -384,17 +384,17 @@ module BuildingSync
       # make sure paths exist
       super
 
-      if @facility.cb_modeled.nil?
+      if @facility.report.cb_modeled.nil?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', 'OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method')
         raise StandardError, 'OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method'
       end
 
       # Write a workflow for the current building modeled scenario
-      cb_modeled_success = write_osw(main_output_dir, @facility.cb_modeled)
+      cb_modeled_success = write_osw(main_output_dir, @facility.report.cb_modeled)
       number_successful = cb_modeled_success ? 1 : 0
 
       # write an osw for each Package Of Measures scenario
-      @facility.poms.each do |scenario|
+      @facility.report.poms.each do |scenario|
         successful = write_osw(main_output_dir, scenario)
         if successful
           number_successful += 1
@@ -402,7 +402,7 @@ module BuildingSync
       end
 
       # Compare the total number of potential successes to the number of actual successes
-      really_successful = number_successful == @facility.poms.size + 1
+      really_successful = number_successful == @facility.report.poms.size + 1
       return really_successful
     end
 
@@ -527,11 +527,11 @@ module BuildingSync
     # @return [Boolean]
     def gather_results(year_val = Date.today.year, baseline_only = false)
       # Gather results for the Current Building Modeled (Baseline) Scenario
-      @facility.cb_modeled.os_gather_results(year_val)
+      @facility.report.cb_modeled.os_gather_results(year_val)
 
       if !baseline_only
         # Gather results for the Package of Measures scenarios
-        @facility.poms.each do |scenario|
+        @facility.report.poms.each do |scenario|
           scenario.os_gather_results(year_val)
         end
       end

@@ -287,7 +287,7 @@ RSpec.describe 'WorkflowMaker' do
         # even though this is the cb_modeled scenario, because the main @workflow was directly
         # modified, and a deep copy of this is made in workflow_maker.write_osws.write_osw,
         # the measure will get run in the cb_modeled scenario.
-        expect(@workflow_maker.get_facility.cb_modeled.simulation_success?).to be true
+        expect(@workflow_maker.get_facility.report.cb_modeled.simulation_success?).to be true
       end
     end
 
@@ -334,7 +334,7 @@ RSpec.describe 'WorkflowMaker' do
       # even though this is the cb_modeled scenario, because the main @workflow was directly
       # modified, and a deep copy of this is made in workflow_maker.write_osws.write_osw,
       # the measure will get run in the cb_modeled scenario.
-      expect(@workflow_maker.get_facility.cb_modeled.simulation_success?).to be true
+      expect(@workflow_maker.get_facility.report.cb_modeled.simulation_success?).to be true
     end
   end
 
