@@ -102,7 +102,7 @@ RSpec.describe 'FacilitySpec' do
     facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
     facility.determine_open_studio_standard(ASHRAE90_1)
     facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
-    facility.create_building_systems(output_path: output_path, htg_src: 'Electricity',
+    facility.create_building_systems(main_output_dir: output_path, htg_src: 'Electricity',
                                      add_elevators: true, add_exterior_lights: true, remove_objects: true)
   end
 
@@ -122,7 +122,7 @@ RSpec.describe 'FacilitySpec' do
     facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
     facility.determine_open_studio_standard(ASHRAE90_1)
     facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
-    facility.create_building_systems(output_path: output_path, zone_hash: nil, hvac_delivery_type: 'Forced Air',
+    facility.create_building_systems(main_output_dir: output_path, zone_hash: nil, hvac_delivery_type: 'Forced Air',
                                      htg_src: 'Electricity', clg_src: 'Electricity', add_space_type_loads: false,
                                      add_constructions: false, add_elevators: false, add_exterior_lights: false,
                                      add_exhaust: false, add_swh: false, add_hvac: false, add_thermostat: false,

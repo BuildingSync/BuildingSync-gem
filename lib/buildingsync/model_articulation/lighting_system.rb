@@ -81,5 +81,22 @@ module BuildingSync
       end
       return true
     end
+
+    # add daylighting controls
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param template [String]
+    # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
+    # @return boolean
+    def add_daylighting_controls(model, standard, template, main_output_dir)
+      # add daylight controls, need to perform a sizing run for 2010
+      if template == '90.1-2010'
+        if standard.model_run_sizing_run(model, "#{main_output_dir}/SRvt") == false
+          return false
+        end
+      end
+      standard.model_add_daylighting_controls(model)
+      return true
+    end
   end
 end

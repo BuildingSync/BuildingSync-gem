@@ -152,6 +152,9 @@ RSpec.describe 'BuildingSync' do
     begin
       # -- Assert
       translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
+
+      # Should not get here
+      expect(false).to be true
     rescue StandardError => e
       puts "StandardError occured #{e.message}"
       expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
@@ -167,6 +170,9 @@ RSpec.describe 'BuildingSync' do
     begin
       # -- Assert
       translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
+
+      # Should not get here
+      expect(false).to be true
     rescue StandardError => e
       expect(e.message.include?('Error: There is more than one (3) building attached to this site in your BuildingSync file.')).to be true
     end
@@ -181,6 +187,9 @@ RSpec.describe 'BuildingSync' do
     begin
       # -- Assert
       translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
+
+      # Should not get here
+      expect(false).to be true
     rescue StandardError => e
       expect(e.message.include?('Occupancy type Food service is not available in the building_and_system_types.json dictionary')).to be true
     end

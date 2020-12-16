@@ -70,7 +70,7 @@ module BuildingSync
     def validate_use_case(use_case)
       if !@hash_response['validation_results']['use_cases'][use_case]['valid']
         @hash_response['validation_results']['use_cases'][use_case]['errors'].each do |error|
-          p "#{error['path']} => #{error['message']}"
+          puts error
         end
       end
 
@@ -82,11 +82,13 @@ module BuildingSync
     def validate_schema
       if !@hash_response['validation_results']['schema']['valid']
         @hash_response['validation_results']['schema']['errors'].each do |error|
-          p error['message']
+          puts error
         end
       end
 
       return @hash_response['validation_results']['schema']['valid']
     end
+
+    attr_reader :hash_response
   end
 end

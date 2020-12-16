@@ -161,7 +161,7 @@ module BuildingSync
 
       @epw_file_path = @site.get_epw_file_path
       zone_hash = build_zone_hash(@site)
-      create_building_systems(output_path: output_path, zone_hash: zone_hash, remove_objects: true)
+      create_building_systems(main_output_dir: output_path, zone_hash: zone_hash, remove_objects: true)
       return true
     end
 
@@ -232,7 +232,9 @@ module BuildingSync
         end
       else
         hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
+        lighting_xml = @g.add_lighting_system_to_facility(@base_xml)
         @hvac_system = HVACSystem.new(hvac_xml, @ns)
+        @lighting_system = LightingSystemType.new(lighting_xml, @ns)
         @load_system = LoadsSystem.new
       end
     end
@@ -276,7 +278,7 @@ module BuildingSync
     end
 
     # create building systems
-    # @param output_path [String]
+    # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
     # @param zone_hash [Hash]
     # @param hvac_delivery_type [String]
     # @param htg_src [String]
@@ -290,7 +292,7 @@ module BuildingSync
     # @param add_hvac [Boolean]
     # @param add_thermostat [Boolean]
     # @param remove_objects [Boolean]
-    def create_building_systems(output_path:, zone_hash: nil, hvac_delivery_type: 'Forced Air', htg_src: 'NaturalGas', clg_src: 'Electricity',
+    def create_building_systems(main_output_dir:, zone_hash: nil, hvac_delivery_type: 'Forced Air', htg_src: 'NaturalGas', clg_src: 'Electricity',
                                 add_space_type_loads: true, add_constructions: true, add_elevators: false, add_exterior_lights: false,
                                 add_exhaust: true, add_swh: true, add_hvac: true, add_thermostat: true, remove_objects: false)
       model = @site.get_model
@@ -313,7 +315,6 @@ module BuildingSync
 
       # add internal loads to space types
       if add_space_type_loads
-        puts @systems_map
         @load_system.add_internal_loads(model, open_studio_system_standard, template, @site.get_building_sections, remove_objects)
         new_occupancy_peak = @site.get_peak_occupancy
         new_occupancy_peak.each do |id, occupancy_peak|
@@ -379,7 +380,8 @@ module BuildingSync
         service_hot_water_system.add(model, open_studio_system_standard, remove_objects)
       end
 
-      @load_system.add_daylighting_controls(model, open_studio_system_standard, template)
+      # TODO: Make this better
+      @lighting_system.add_daylighting_controls(model, open_studio_system_standard, template, main_output_dir)
 
       # TODO: - add internal mass
       # TODO: - add slab modeling and slab insulation
@@ -408,7 +410,7 @@ module BuildingSync
           objects_after_cleanup = initial_objects - model.getModelObjects.size
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "Removing #{objects_after_cleanup} objects from model")
         end
-        @hvac_system.apply_sizing_and_assumptions(model, output_path, open_studio_system_standard, primary_bldg_type, system_type, climate_zone)
+        @hvac_system.apply_sizing_and_assumptions(model, main_output_dir, open_studio_system_standard, primary_bldg_type, system_type, climate_zone)
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)
