@@ -37,5 +37,5 @@ jobs:
     needs: before_install
     steps:
     - name: start container
-      run: docker run -d --name os-3.0.1 -e LANG=C.UTF-8 -v $(pwd):/travis -w /travis nrel/openstudio:3.0.1 tail -f /dev/null
+      run: docker start os-3.0.1
     - run: $SH "bundle install --path ."
