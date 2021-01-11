@@ -30,6 +30,8 @@ jobs:
         $SH "echo $LANG"
         $SH "gem install bundler"
         $SH "bundle -v"
+    - name: Bundle Install
+      run: $SH "bundle install --path ."
 
   install:
     name: install
