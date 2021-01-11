@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  before_install:
+    name: before_install
+    runs-on: ubuntu-latest
+    env:
+      SH: 'docker exec -t os-3.0.1 bash -c '
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+    - name: Setup Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: '2.5'
+    - name: Setup Docker
+      run: |
+        docker pull nrel/openstudio:3.0.1
+        docker images --all
+        docker run -d --name os-3.0.1 -e LANG=C.UTF-8 -v $(pwd):/travis -w /travis nrel/openstudio:3.0.1 tail -f /dev/null
+        docker ps -a
+        pwd
+        ls
+        $SH "env"
+        $SH "echo $LANG"
+        $SH "gem install bundler"
+        $SH "bundle -v"
+
+  install:
+    name: install
+    runs-on: ubuntu-latest
+    needs: before_install
+    steps:
+    - name: install
+      run: $SH "bundle install --path ."
