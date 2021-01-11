@@ -30,6 +30,9 @@ jobs:
         $SH "echo $LANG"
         $SH "gem install bundler"
         $SH "bundle -v"
+    - name: Save Docker
+      run: |
+        docker save -o os-3.0.1.tar os-3.0.1
 
   install:
     name: install
@@ -37,5 +40,7 @@ jobs:
     needs: before_install
     steps:
     - name: start container
-      run: docker start os-3.0.1
+      run: |
+        docker load -i os-3.0.1.tar
+	docker run os-3.0.1
     - run: $SH "bundle install --path ."
