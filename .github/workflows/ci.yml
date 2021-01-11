@@ -42,5 +42,5 @@ jobs:
     - name: start container
       run: |
         docker load -i os-3.0.1.tar
-	docker run os-3.0.1
+        docker run os-3.0.1
     - run: $SH "bundle install --path ."
