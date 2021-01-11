@@ -4,12 +4,13 @@ on:
   pull_request:
   push:
 
+env:
+  SH: 'docker exec -t os-3.0.1 bash -c '
+
 jobs:
   before_install:
     name: before_install
     runs-on: ubuntu-latest
-    env:
-      SH: 'docker exec -t os-3.0.1 bash -c '
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
