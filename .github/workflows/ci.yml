@@ -36,5 +36,5 @@ jobs:
     needs: before_install
     steps:
     - name: install
-      run: echo $SH
+      run: env
     - run: $SH "bundle install --path ."
