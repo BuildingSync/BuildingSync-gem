@@ -22,9 +22,9 @@ jobs:
         docker ps -a
         pwd
         ls
-	$SH "mkdir /test"
-	$SH "cp -R /travis/* /test/"
-	$SH "cd /test"
+        $SH "mkdir /test"
+        $SH "cp -R /travis/* /test/"
+        $SH "cd /test"
         $SH "env"
         $SH "echo $LANG"
         $SH "gem install bundler"
