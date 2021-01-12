@@ -12,10 +12,18 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
-    - name: Setup Docker
+    - name: Setup
       run: |
-        env
-        echo $LANG
         gem install bundler
-        bundle -v
-        ls
+        bundle install
+    - name: Tests
+        $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/hvac_system_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/loads_system_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/lighting_system_type_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/service_hot_water_system_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/site_spec.rb"
+        # $SH "bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb"  // fails sometimes due to connection issues, so we exclude it here
