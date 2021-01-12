@@ -14,10 +14,6 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
-    - name: Setup Ruby
-      uses: actions/setup-ruby@v1
-      with:
-        ruby-version: '2.5'
     - name: Setup Docker
       run: |
         docker pull nrel/openstudio:3.0.1
@@ -26,6 +22,9 @@ jobs:
         docker ps -a
         pwd
         ls
+	$SH "mkdir /test"
+	$SH "cp -R /travis/* /test/"
+	$SH "cd /test"
         $SH "env"
         $SH "echo $LANG"
         $SH "gem install bundler"
@@ -47,12 +46,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup_container
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
-    - name: Setup Ruby
-      uses: actions/setup-ruby@v1
-      with:
-        ruby-version: '2.5'
     - name: Download Container
       uses: actions/download-artifact@v2
       with:
@@ -60,7 +53,7 @@ jobs:
     - name: Start Container
       run: |
         docker load -i container.tar
-        docker run -d --name os-3.0.1 -v $(pwd):/travis -w /travis os-3.0.1
+        docker run -d --name os-3.0.1 -w /test os-3.0.1
     - name: Model Articulation Tests
       run: |
         $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
