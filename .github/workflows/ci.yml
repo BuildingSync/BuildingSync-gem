@@ -56,6 +56,8 @@ jobs:
         docker run -d --name os-3.0.1 -w /test os-3.0.1
     - name: Model Articulation Tests
       run: |
+        $SH pwd
+	$SH ls
         $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
         $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
         $SH "bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb"
