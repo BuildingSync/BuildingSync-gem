@@ -34,7 +34,7 @@ jobs:
       run: bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb
 
   translator_tests:
-    name: Model Articulation Tests
+    name: Translator Tests
     container: nrel/openstudio:3.0.1
     runs-on: ubuntu-latest
     steps:
@@ -80,7 +80,7 @@ jobs:
       run: bundle exec rspec spec/tests/workflow_maker_spec.rb
 
   other_specs:
-    name: Other Specs
+    name: Other Tests
     container: nrel/openstudio:3.0.1
     runs-on: ubuntu-latest
     steps:
