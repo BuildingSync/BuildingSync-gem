@@ -30,6 +30,7 @@ jobs:
         $SH "echo $LANG"
         $SH "gem install bundler"
         $SH "bundle -v"
+	$SH "ls"
     - name: Save Docker
       run: |
         docker commit -p $(docker ps -l -q) os-3.0.1 
@@ -61,4 +62,6 @@ jobs:
       run: |
         docker load -i container.tar
         docker run -d --name os-3.0.1 os-3.0.1
-    - run: $SH "bundle install --path ."
+    - run: |
+      $SH "ls"
+      $SH "bundle install --path ."
