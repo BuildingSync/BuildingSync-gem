@@ -30,7 +30,7 @@ jobs:
         $SH "echo $LANG"
         $SH "gem install bundler"
         $SH "bundle -v"
-	$SH "ls"
+        $SH "ls"
     - name: Save Docker
       run: |
         docker commit -p $(docker ps -l -q) os-3.0.1 
