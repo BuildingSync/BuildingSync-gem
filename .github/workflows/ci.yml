@@ -8,8 +8,8 @@ env:
   SH: 'docker exec -t os-3.0.1 bash -c '
 
 jobs:
-  before_install:
-    name: before_install
+  setup_container:
+    name: Setup Container
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
@@ -31,6 +31,7 @@ jobs:
         $SH "gem install bundler"
         $SH "bundle -v"
         $SH "ls"
+        $SH "bundle install --path ."
     - name: Save Docker
       run: |
         docker commit -p $(docker ps -l -q) os-3.0.1 
@@ -41,8 +42,8 @@ jobs:
         name: container
         path: container.tar
 
-  install:
-    name: install
+  run_tests:
+    name: Run Tests
     runs-on: ubuntu-latest
     needs: before_install
     steps:
@@ -56,12 +57,19 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: container
-    - name: debug print
-      run: ls
-    - name: start container
+    - name: Start Container
       run: |
         docker load -i container.tar
         docker run -d --name os-3.0.1 -v $(pwd):/travis -w /travis os-3.0.1
-    - run: |
-        $SH "ls"
-        $SH "bundle install --path ."
+    - name: Model Articulation Tests
+      run: |
+        $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/building_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/hvac_system_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/loads_system_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/lighting_system_type_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/service_hot_water_system_spec.rb"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/site_spec.rb"
+        # $SH "bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb"  // fails sometimes due to connection issues, so we exclude it here
