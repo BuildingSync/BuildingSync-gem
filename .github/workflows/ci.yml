@@ -30,7 +30,8 @@ jobs:
         $SH "gem install bundler"
         $SH "bundle -v"
         $SH "ls"
-        $SH "bundle install --path ."
+        $SH "bundle install"
+        $SH "bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb"
     - name: Save Docker
       run: |
         docker commit -p $(docker ps -l -q) os-3.0.1 
