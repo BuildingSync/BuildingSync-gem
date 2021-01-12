@@ -63,5 +63,5 @@ jobs:
         docker load -i container.tar
         docker run -d --name os-3.0.1 os-3.0.1
     - run: |
-      $SH "ls"
-      $SH "bundle install --path ."
+        $SH "ls"
+        $SH "bundle install --path ."
