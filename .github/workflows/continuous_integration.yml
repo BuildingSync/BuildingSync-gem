@@ -1,0 +1,21 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  model_articulation_tests:
+    name: Model Articulation Tests
+    container: nrel/openstudio:3.0.1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+    - name: Setup Docker
+      run:
+        env
+        echo $LANG
+        gem install bundler
+        bundle -v
+        ls
