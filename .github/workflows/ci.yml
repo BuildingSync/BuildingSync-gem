@@ -61,7 +61,7 @@ jobs:
     - name: start container
       run: |
         docker load -i container.tar
-        docker run -d --name os-3.0.1 os-3.0.1
+        docker run -d --name os-3.0.1 -v $(pwd):/travis -w /travis os-3.0.1
     - run: |
         $SH "ls"
         $SH "bundle install --path ."
