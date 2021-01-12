@@ -98,4 +98,4 @@ jobs:
         bundle exec rspec spec/tests/generator_spec.rb
         bundle exec rspec spec/tests/helper_spec.rb
         bundle exec rspec spec/tests/xml_get_set_spec.rb
-	# bundle exec rspec spec/tests/selection_tool_spec.rb  # selection tool is not working with ASHRAE level 1.5 yet
+        # bundle exec rspec spec/tests/selection_tool_spec.rb  # selection tool is not working with ASHRAE level 1.5 yet
