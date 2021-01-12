@@ -45,7 +45,7 @@ jobs:
   run_tests:
     name: Run Tests
     runs-on: ubuntu-latest
-    needs: before_install
+    needs: setup_container
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
