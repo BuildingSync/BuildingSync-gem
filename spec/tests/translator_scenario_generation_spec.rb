@@ -46,8 +46,14 @@ RSpec.describe 'BuildingSync' do
     tests = [
         # file_name, standard, epw_path, schema_version, expected_scenarios
         ['building_151.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
-        ['DC GSA Headquarters.xml', ASHRAE90_1, nil, nil, 2],
-        ['BuildingSync Website Valid Schema.xml', ASHRAE90_1, nil, nil, 2],
+        ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
+
+        # Although L100 has 4 scenarios, 1 is a Benchmark and 1 is a Target
+        # Scenario, which we do not create simulations for
+        # ['L100_Audit.xml', CA_TITLE24, nil, 'v2.2.0', 2],
+        ['DC GSA Headquarters.xml', ASHRAE90_1, nil, nil, 1],
+        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, nil, 1],
+        ['BuildingSync Website Valid Schema.xml', ASHRAE90_1, nil, nil, 15],
         ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
         ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
         ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
@@ -58,6 +64,43 @@ RSpec.describe 'BuildingSync' do
         xml_path, output_path = create_xml_path_and_output_path(test[0], test[1], __FILE__, test[3])
         translator = translator_sizing_run_and_check(xml_path, output_path, test[2], test[1])
         translator.write_osws
+
+        osw_files = []
+        osw_sr_files = []
+        Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
+        Dir.glob("#{output_path}/SR/in.osw") { |osw| osw_sr_files << osw }
+
+        # We always expect there to only be one
+        # sizing run file
+        expect(osw_sr_files.size).to eq 1
+
+        # Here we test the actual number of additional scenarios that got created
+        non_sr_osws = osw_files - osw_sr_files
+        expect(non_sr_osws.size).to eq test[4]
+      end
+    end
+  end
+
+  describe "Generate Only CB Modeled Scenario" do
+    tests = [
+        # file_name, standard, epw_path, schema_version, expected_scenarios
+        ['building_151.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        
+        # ['L100_Audit.xml', CA_TITLE24, nil, 'v2.2.0', 1],
+        ['DC GSA Headquarters.xml', ASHRAE90_1, nil, nil, 1],
+        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, nil, 1],
+        ['BuildingSync Website Valid Schema.xml', ASHRAE90_1, nil, nil, 1],
+        ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+    ]
+    tests.each do |test|
+      it "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}. Expected Scenarios: #{test[4]}" do
+        xml_path, output_path = create_xml_path_and_output_path(test[0], test[1], __FILE__, test[3])
+        translator = translator_sizing_run_and_check(xml_path, output_path, test[2], test[1])
+        translator.write_osws(only_cb_modeled = true)
 
         osw_files = []
         osw_sr_files = []
