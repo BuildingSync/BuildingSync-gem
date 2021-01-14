@@ -71,9 +71,6 @@ jobs:
     - name: Translator Sizing Run Spec
       run: bundle exec rspec spec/tests/translator_sizing_run_spec.rb
       if: always()
-    - name: Translator Perform SR and Baseline Simulations Spec
-      run: bundle exec rspec spec/tests/translator_baseline_simulation_spec.rb
-      if: always()
     - name: Translator Perform SR and Baseline Simulations, Gather and Save Results Spec
       run: bundle exec rspec spec/tests/translator_baseline_gather_save_spec.rb
       if: always()
