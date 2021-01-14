@@ -77,7 +77,7 @@ RSpec.describe 'LightingSystemType' do
     @facility.determine_open_studio_standard(@std)
 
     # Add a blank lighting system to the facility and link it to the building
-    building_id = @facility.get_site.get_building.xget_id
+    building_id = @facility.site.get_building.xget_id
     @lighting_system = @facility.add_blank_lighting_system(building_id, 'Building')
 
     # -- Assert Lighting System has been properly added
