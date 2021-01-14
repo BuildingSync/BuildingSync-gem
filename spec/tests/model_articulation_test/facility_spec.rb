@@ -253,36 +253,50 @@ RSpec.describe 'Facility Methods' do
 
     it 'Should return annual_fuel_use_native_units' do
       # -- Setup
-      expected_value = '123'
+      expected_value = 123
+      first_cb_measured = @facility.report.cb_measured[0]
+      first_ru = first_cb_measured.get_resource_uses[0]
 
       # -- Assert
-      expect(@facility.annual_fuel_use_native_units == expected_value).to be true
+      expect(first_cb_measured).to be_an_instance_of(BuildingSync::Scenario)
+      expect(first_ru).to be_an_instance_of(BuildingSync::ResourceUse)
+      expect(first_ru.xget_text_as_integer('AnnualFuelUseNativeUnits')).to eql expected_value
     end
 
     it 'Should return energy_cost' do
       # -- Setup
-      expected_value = '1000'
+      expected_value = 1000
+      first_cb_measured = @facility.report.cb_measured[0]
+      first_art = first_cb_measured.get_all_resource_totals[0]
 
       # -- Assert
-      expect(@facility.energy_cost == expected_value).to be true
+      expect(first_cb_measured).to be_an_instance_of(BuildingSync::Scenario)
+      expect(first_art).to be_an_instance_of(BuildingSync::AllResourceTotal)
+      expect(first_art.xget_text_as_integer('EnergyCost')).to eql expected_value
     end
 
     it 'Should return metering_configuration ' do
       # -- Setup
       expected_value = 'Direct metering'
+      first_utility = @facility.report.utilities[0]
+
 
       # -- Assert
-      expect(@facility.metering_configuration == expected_value).to be true
+      expect(first_utility).to be_an_instance_of(BuildingSync::Utility)
+      expect(first_utility.xget_text('MeteringConfiguration')).to eql expected_value
     end
 
     it 'Should return rate_schedules ' do
       # -- Setup
       expected_value = REXML::Element.new('auc:CriticalPeakPricing')
-      rate_schedule = @facility.rate_schedules_xml[0]
-      rate_structure_type = rate_schedule.get_elements('auc:TypeOfRateStructure/*')[0]
+      first_utility = @facility.report.utilities[0]
+      first_rate_sch = first_utility.get_rate_schedules[0]
+      rate_structure_type = first_rate_sch.get_elements("auc:TypeOfRateStructure/*")[0]
 
       # -- Assert
-      expect(rate_structure_type.to_s == expected_value.to_s).to be true
+      expect(first_utility).to be_an_instance_of(BuildingSync::Utility)
+      expect(first_rate_sch).to be_an_instance_of(REXML::Element)
+      expect(rate_structure_type.to_s).to eql expected_value.to_s
     end
 
   end
