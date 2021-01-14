@@ -52,18 +52,25 @@ module BuildingSync
       @workflow = nil
     end
 
-    # write OpenStudio workflows in osw files (base method)
-    # @param facility [REXML::Element]
-    # @param dir [String]
-    def write_osws(dir)
-      FileUtils.mkdir_p(dir)
-    end
-
-    # save xml file
-    # @param filename [String]
+    # TODO: add a schema validation and re-ordering mechanism for XML elements
+    # Format, add declaration, and write xml to disk
+    # @param filename [String] full path including filename, i.e. output/path/results.xml
     def save_xml(filename)
+      # first we make sure all directories exist
+      FileUtils.mkdir_p(File.dirname(filename))
+
+      # Setup formatting
+      formatter = REXML::Formatters::Pretty.new
+      formatter.compact = true
+
+      # Setup document declaration
+      decl = REXML::XMLDecl.new
+      decl.encoding = REXML::XMLDecl::DEFAULT_ENCODING # UTF-8
+      @doc << decl
+
+      # Write file
       File.open(filename, 'w') do |file|
-        @doc.write(file)
+        formatter.write(@doc, file)
       end
     end
 

@@ -149,7 +149,7 @@ module BuildingSync
       @facility.write_osm(dir)
     end
 
-    # writes the parameters determine during processing back to the BldgSync XML file
+    # writes the parameters determined during processing back to the BldgSync XML file
     def prepare_final_xml
       @facility.prepare_final_xml
     end
@@ -380,9 +380,9 @@ module BuildingSync
     #   - Current Building Modeled (Baseline) Scenario
     # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
     # @return [Boolean] whether writing of all the new workflows was successful
-    def write_osws(main_output_dir)
+    def write_osws(main_output_dir, only_cb_modeled = false)
       # make sure paths exist
-      super
+      FileUtils.mkdir_p(dir)
 
       if @facility.report.cb_modeled.nil?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', 'OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method')
@@ -393,13 +393,16 @@ module BuildingSync
       cb_modeled_success = write_osw(main_output_dir, @facility.report.cb_modeled)
       number_successful = cb_modeled_success ? 1 : 0
 
-      # write an osw for each Package Of Measures scenario
-      @facility.report.poms.each do |scenario|
-        successful = write_osw(main_output_dir, scenario)
-        if successful
-          number_successful += 1
+      if not only_cb_modeled
+        # write an osw for each Package Of Measures scenario
+        @facility.report.poms.each do |scenario|
+          successful = write_osw(main_output_dir, scenario)
+          if successful
+            number_successful += 1
+          end
         end
       end
+
 
       # Compare the total number of potential successes to the number of actual successes
       really_successful = number_successful == @facility.report.poms.size + 1
@@ -437,11 +440,16 @@ module BuildingSync
     end
 
     # run osws - running all scenario simulations
+    # @param only_cb_modeled [Boolean] used to only run the simulations for the cb_modeled (baseline) scenario
     # @param runner_options [hash]
-    def run_osws(output_dir, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
+    def run_osws(output_dir, only_cb_modeled = false, runner_options = {run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY})
       osw_files = []
       osw_sr_files = []
-      Dir.glob("#{output_dir}/**/in.osw") { |osw| osw_files << osw }
+      if only_cb_modeled
+        osw_files << "#{@facility.report.cb_modeled.get_osw_dir}/in.osw"
+      else
+        Dir.glob("#{output_dir}/**/in.osw") { |osw| osw_files << osw }
+      end
       Dir.glob("#{output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
 
       runner = OpenStudio::Extension::Runner.new(dirname = Dir.pwd, bundle_without = [], options = runner_options)
@@ -477,28 +485,6 @@ module BuildingSync
     # @return [array]
     def get_failed_scenarios
       return @failed_scenarios
-    end
-
-    # TODO: add a schema validation and re-ordering mechanism for XML elements
-    # Format, add declaration, and write xml to disk
-    # @param filename [String] full path including filename, i.e. output/path/results.xml
-    def save_xml(filename)
-      # first we make sure all directories exist
-      FileUtils.mkdir_p(File.dirname(filename))
-
-      # Setup formatting
-      formatter = REXML::Formatters::Pretty.new
-      formatter.compact = true
-
-      # Setup document declaration
-      decl = REXML::XMLDecl.new
-      decl.encoding = REXML::XMLDecl::DEFAULT_ENCODING # UTF-8
-      @doc << decl
-
-      # Write file
-      File.open(filename, 'w') do |file|
-        formatter.write(@doc, file)
-      end
     end
 
     # cleanup larger files

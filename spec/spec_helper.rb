@@ -440,7 +440,7 @@ RSpec.configure do |config|
     expect(success).to be true
     expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
 
-    doc = translator.get_doc
+    doc = translator.doc
     expect(doc).to be_an_instance_of(REXML::Document)
 
     # There should be one Current Building Modeled scenario (referred to as Baseline)
