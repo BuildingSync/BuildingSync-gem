@@ -100,7 +100,7 @@ RSpec.describe 'SiteSpec' do
     expect(site.get_climate_zone.nil?).to be true
   end
 
-  it 'Should write the same OSM file as previously generated - comparing the translated IDF files' do
+  it 'Should write the same OSM and IDF files as previously generated' do
     # call generate_baseline_osm
     # call write_osm
     # compare this osm file with a file that was previously generated.
@@ -108,21 +108,32 @@ RSpec.describe 'SiteSpec' do
     @osm_file_path = File.join(SPEC_FILES_DIR, 'filecomparison')
     @site = g.create_minimum_site('Retail', '1980', 'Gross', '20000')
     @site.determine_open_studio_standard(ASHRAE90_1)
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     @site.generate_baseline_osm(epw_file_path, ASHRAE90_1)
     @site.write_osm(@osm_file_path)
 
     generate_idf_file(@site.get_model)
 
-    osm_file_full_path = "#{@osm_file_path}/in.idf"
-    to_be_comparison_path = "#{@osm_file_path}/originalfiles/in.idf"
+    new_idf = "#{@osm_file_path}/in.idf"
+    original_idf = "#{@osm_file_path}/originalfiles/in.idf"
 
-    original_file_size = File.size(to_be_comparison_path)
-    new_file_size = File.size(osm_file_full_path)
-    puts "original idf file size #{original_file_size} bytes versus new idf file size #{new_file_size} bytes"
-    expect((original_file_size - new_file_size).abs <= 1).to be true
+    new_osm = "#{@osm_file_path}/in.osm"
+    original_osm = "#{@osm_file_path}/originalfiles/in.osm"
 
-    line_not_match_counter = compare_two_idf_files("#{@osm_file_path}/in.idf", "#{@osm_file_path}/originalfiles/in.idf")
+    original_idf_size = File.size(original_idf)
+    new_idf_size = File.size(new_idf)
+
+    original_osm_size = File.size(original_osm)
+    new_osm_size = File.size(new_osm)
+
+
+    puts "original idf file size #{original_idf_size} bytes versus new idf file size #{new_idf_size} bytes"
+    expect((original_idf_size - new_idf_size).abs <= 1).to be true
+
+    puts "original osm file size #{original_osm_size} bytes versus new osm file size #{new_osm_size} bytes"
+    expect((original_osm_size - new_osm_size).abs <= 1).to be true
+
+    line_not_match_counter = compare_two_idf_files(original_idf, new_idf)
 
     expect(line_not_match_counter == 0).to be true
   end
