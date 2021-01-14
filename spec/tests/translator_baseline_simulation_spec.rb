@@ -42,7 +42,7 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  describe "Translator Should Perform a Sizing Run, then Run the cb_modeled Scenario" do
+  describe "Translator Should Perform a Sizing Run, then write and run ONLY the cb_modeled Scenario" do
     tests_to_run = [
         # file_name, standard, epw_path, schema_version
         ['building_151.xml', ASHRAE90_1, nil, 'v2.2.0'],
