@@ -198,12 +198,12 @@ RSpec.configure do |config|
   # @param epw_file_name [String]
   def test_baseline_and_scenario_creation(file_name, output_path, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
     translator = translator_sizing_run_and_check(file_name, output_path, standard_to_be_used, epw_file_name)
-    translator.write_osws
+    translator.write_osws()
 
     osw_files = []
     osw_sr_files = []
-    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
-    Dir.glob("#{out_path}/SR/*.osw") { |osw| osw_sr_files << osw }
+    Dir.glob("#{output_path}/**/*.osw") { |osw| osw_files << osw }
+    Dir.glob("#{output_path}/SR/*.osw") { |osw| osw_sr_files << osw }
 
     # we compare the counts, by also considering the two potential osw files in the SR directory
     expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size

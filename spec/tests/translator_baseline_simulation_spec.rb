@@ -57,6 +57,7 @@ RSpec.describe 'BuildingSync' do
         translator.write_osws(only_cb_modeled = true)
 
         failures = translator.run_osws()
+
       end
     end
   end

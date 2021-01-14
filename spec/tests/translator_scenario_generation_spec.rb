@@ -42,42 +42,36 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  it 'should parse the building_151.xml (phase zero) with auc namespace for CA Title 24 and generate baseline and scenarios' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    expected_measures = 30
-    epw_file_path = nil
-    simulate = false
+  describe "Generate All Scenarios" do
+    tests = [
+        # file_name, standard, epw_path, schema_version, expected_scenarios
+        ['building_151.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
+        ['DC GSA Headquarters.xml', ASHRAE90_1, nil, nil, 2],
+        ['BuildingSync Website Valid Schema.xml', ASHRAE90_1, nil, nil, 2],
+        ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+    ]
+    tests.each do |test|
+      it "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}. Expected Scenarios: #{test[4]}" do
+        xml_path, output_path = create_xml_path_and_output_path(test[0], test[1], __FILE__, test[3])
+        translator = translator_sizing_run_and_check(xml_path, output_path, test[2], test[1])
+        translator.write_osws
 
-    # -- Assert
-    test_baseline_and_scenario_creation_with_simulation(xml_path, output_path, expected_measures, std, epw_file_path, simulate)
-  end
+        osw_files = []
+        osw_sr_files = []
+        Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
+        Dir.glob("#{output_path}/SR/in.osw") { |osw| osw_sr_files << osw }
 
-  it 'should parse the DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
-    # -- Setup
-    file_name = 'DC GSA Headquarters.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    expected_measures = 2
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
-    simulate = false
+        # We always expect there to only be one
+        # sizing run file
+        expect(osw_sr_files.size).to eq 1
 
-    # -- Assert
-    test_baseline_and_scenario_creation_with_simulation(xml_path, output_path, expected_measures, std, epw_file_path, simulate)
-  end
-
-  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with CA Title 24 and generate baseline and scenarios' do
-    # -- Setup
-    file_name = 'BuildingSync Website Valid Schema.xml'
-    std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__)
-    expected_measures = 30
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
-    simulate = false
-
-    # -- Assert
-    test_baseline_and_scenario_creation_with_simulation(xml_path, output_path, expected_measures, std, epw_file_path, simulate)
+        # Here we test the actual number of additional scenarios that got created
+        non_sr_osws = osw_files - osw_sr_files
+        expect(non_sr_osws.size).to eq test[4]
+      end
+    end
   end
 end
