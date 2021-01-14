@@ -172,12 +172,6 @@ module BuildingSync
       return site.build_zone_hash
     end
 
-    # get sites
-    # return [BuildingSync::Site]
-    def get_site
-      return @site
-    end
-
     # get space types
     # @return [Array<OpenStudio::Model::SpaceType>]
     def get_space_types
