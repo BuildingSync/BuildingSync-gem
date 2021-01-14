@@ -55,10 +55,10 @@ RSpec.describe 'BuildingSync' do
         ['building_151_n1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
 
         # L100 Audit
-        ['L100_Audit.xml', CA_TITLE24, nil, 'v2.2.0'],
-        ['L100_Audit.xml', ASHRAE90_1, nil, 'v2.2.0'],
-        ['L100_Audit.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
-        ['L100_Audit.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
+        # ['L100_Audit.xml', CA_TITLE24, nil, 'v2.2.0'],
+        # ['L100_Audit.xml', ASHRAE90_1, nil, 'v2.2.0'],
+        # ['L100_Audit.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
+        # ['L100_Audit.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
 
         # DC GSA Headquarters
         # The CA_TITLE24 version of this fails and is included in the next section
