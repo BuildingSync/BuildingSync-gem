@@ -49,7 +49,15 @@ module BuildingSync
       @ns = ns
       help_element_class_type_check(base_xml, 'Utility')
 
-      @rate_schedules = []
+    end
+
+    # @return [Array<REXML::Element>]
+    def get_rate_schedules
+      rs = []
+      @base_xml.elements.each("#{@ns}:RateSchedules/#{@ns}:RateSchedule") do |rate_schedule|
+        rs << rate_schedule
+      end
+      return rs
     end
 
     # @return [Array<String>]
