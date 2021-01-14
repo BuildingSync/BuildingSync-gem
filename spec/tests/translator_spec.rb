@@ -54,7 +54,7 @@ RSpec.describe 'BuildingSync' do
     translator.write_osws
 
     results_xml = File.join(output_path, 'results.xml')
-    translator.prepare_final_xml(results_xml)
+    translator.prepare_final_xml
     expect(File.exist?(results_xml)).to be true
   end
 end
