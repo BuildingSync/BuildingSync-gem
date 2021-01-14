@@ -212,6 +212,6 @@ module BuildingSync
       end
     end
 
-    attr_reader :scenarios, :cb_modeled, :cb_measured, :poms
+    attr_reader :scenarios, :cb_modeled, :cb_measured, :poms, :utilities
   end
 end
