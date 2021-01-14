@@ -382,7 +382,7 @@ module BuildingSync
     # @return [Boolean] whether writing of all the new workflows was successful
     def write_osws(main_output_dir, only_cb_modeled = false)
       # make sure paths exist
-      FileUtils.mkdir_p(dir)
+      FileUtils.mkdir_p(main_output_dir)
 
       if @facility.report.cb_modeled.nil?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', 'OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method')
@@ -405,7 +405,14 @@ module BuildingSync
 
 
       # Compare the total number of potential successes to the number of actual successes
-      really_successful = number_successful == @facility.report.poms.size + 1
+      if only_cb_modeled
+        # In this case we should have only 1 success
+        really_successful = number_successful == 1
+      else
+        # In this case, all pom scenarios should be run + the cb_modeled scenario
+        really_successful = number_successful == @facility.report.poms.size + 1
+      end
+
       return really_successful
     end
 

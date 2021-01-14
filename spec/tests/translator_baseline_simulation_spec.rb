@@ -42,31 +42,25 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  it 'building_151.xml CA_TITLE24 - SR, Baseline' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = CA_TITLE24
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
+  describe "Translator Should Perform a Sizing Run, then Run the cb_modeled Scenario" do
+    tests_to_run = [
+        # file_name, standard, epw_path, schema_version
+        ['building_151.xml', ASHRAE90_1, nil, 'v2.2.0'],
+        ['building_151.xml', CA_TITLE24, nil, 'v2.2.0'],
+        ['building_151.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
+        ['building_151.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
+    ]
+    tests_to_run.each do |test|
+      it "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}" do
+        xml_path, output_path = create_xml_path_and_output_path(test[0], test[1], __FILE__, test[3])
+        translator = translator_sizing_run_and_check(xml_path, output_path, test[2], test[1])
+        translator.write_osws(only_cb_modeled = true)
 
-    # -- Assert
-    translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, std)
-    translator.run_baseline_osm(epw_file_path)
-    translator_run_baseline_osm_checks(output_path)
+        failures = translator.run_osws()
+      end
+    end
   end
 
-  it 'building_151.xml ASHRAE90_1 - SR, Baseline' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
-    epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
-
-    # -- Assert
-    translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, std)
-    translator.run_baseline_osm(epw_file_path)
-    translator_run_baseline_osm_checks(output_path)
-  end
 
   it 'building_151_level1.xml ASHRAE90_1 - SR, Baseline' do
     # -- Setup

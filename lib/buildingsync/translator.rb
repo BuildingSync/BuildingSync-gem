@@ -124,8 +124,8 @@ module BuildingSync
     end
 
     # write osws - write all workflows into osw files
-    def write_osws
-      super(@output_dir)
+    def write_osws(only_cb_modeled = false)
+      super(@output_dir, only_cb_modeled)
     end
 
     # gather results from simulated scenarios, for all or just the baseline scenario
@@ -147,20 +147,23 @@ module BuildingSync
       if @results_gathered
         super
       else
-        puts 'Prepare final file before attempting to save (translator.prepare_final_xml)'
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.prepare_final_xml', "All results have not yet been gathered.")
+        super
       end
+      @final_xml_prepared = true
     end
 
     # save xml that includes the results
     # @param file_name [String]
-    def save_xml(file_name)
+    def save_xml(file_name = 'results.xml')
+      output_file = File.join(@output_dir, file_name)
       if @final_xml_prepared
-        super(file_name)
+        super(output_file)
       else
         puts 'Prepare final file before attempting to save (translator.prepare_final_xml)'
       end
     end
 
-    attr_accessor :doc
+    attr_accessor :doc, :results_gathered, :final_xml_prepared
   end
 end

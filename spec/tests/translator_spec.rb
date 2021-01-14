@@ -41,20 +41,49 @@ require_relative './../spec_helper'
 require 'fileutils'
 require 'parallel'
 
-RSpec.describe 'BuildingSync' do
+RSpec.describe 'Translator' do
   it 'should write parameter value into XML' do
     # -- Setup
     file_name = 'building_151_one_scenario.xml'
     std = CA_TITLE24
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = nil
+    results_xml = File.join(output_path, 'results.xml')
 
+    # This should be the prototypical workflow in most cases.
+    # 1. Create new translator from file
+    # 2. Perform a SR to get an OSM with efficiencies / etc. for the location
+    #    determined from the location defined in the BSync file
+    # OR
+    #   for the location overriden by the epw file
+    # 3. Write new scenarios for
     translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
     translator.setup_and_sizing_run
-    translator.write_osws
 
-    results_xml = File.join(output_path, 'results.xml')
+    # -- Assert sizing run performs as expected
+    sizing_run_checks(output_path)
+
+    workflows_successfully_written = translator.write_osws
+
+    # -- Assert
+    expect(workflows_successfully_written).to be true
+    failures = translator.run_osws
+
+    # -- Assert no failures
+    expect(failures.empty?).to be true
+
+    translator.gather_results
+
+    # -- Assert result_gathered set to true
+    expect(translator.results_gathered).to be true
+
     translator.prepare_final_xml
+
+    # -- Assert final_xml_prepared set to true
+    expect(translator.final_xml_prepared).to be true
+
+    # Expect a results.xml file to exist
+    translator.save_xml
     expect(File.exist?(results_xml)).to be true
   end
 end

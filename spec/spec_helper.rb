@@ -118,83 +118,6 @@ RSpec.configure do |config|
     false
   end
 
-  # run baseline simulation
-  # @param osm_name [String]
-  # @param epw_file_path [String]
-  def run_baseline_simulation(osm_name, epw_file_path)
-    basic_dir = File.dirname(osm_name)
-    file_name = File.basename(osm_name)
-
-    osm_baseline_dir = File.join(basic_dir, BuildingSync::BASELINE)
-    if !File.exist?(osm_baseline_dir)
-      FileUtils.mkdir_p(osm_baseline_dir)
-    end
-    osm_baseline_path = File.join(osm_baseline_dir, file_name)
-    FileUtils.cp(osm_name, osm_baseline_dir)
-    workflow = OpenStudio::WorkflowJSON.new
-    workflow.setSeedFile(osm_baseline_path)
-    workflow.setWeatherFile(epw_file_path)
-    osw_path = osm_baseline_path.gsub('.osm', '.osw')
-    workflow.saveAs(File.absolute_path(osw_path.to_s))
-
-    extension = OpenStudio::Extension::Extension.new
-    runner_options = { run_simulations: true }
-    runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
-    runner.run_osw(osw_path, osm_baseline_dir)
-  end
-
-  # generate baseline idf and compare
-  # @param file_name [String]
-  # @param standard_to_be_used [String]
-  # @param epw_file_name [String]
-  def generated_baseline_idf_and_compare(file_name, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
-    xml_path = File.expand_path("./files/#{file_name}", File.dirname(__FILE__))
-    expect(File.exist?(xml_path)).to be true
-
-    out_path = File.expand_path("./output/#{File.basename(file_name, File.extname(file_name))}/", File.dirname(__FILE__))
-
-    if File.exist?(out_path)
-      FileUtils.rm_rf(out_path)
-    end
-    # expect(File.exist?(out_path)).not_to be true
-
-    FileUtils.mkdir_p(out_path)
-    expect(File.exist?(out_path)).to be true
-
-    epw_file_path = nil
-    if !epw_file_name.nil?
-      epw_file_path = File.expand_path("./weather/#{epw_file_name}", File.dirname(__FILE__))
-    end
-
-    translator = BuildingSync::Translator.new(xml_path, out_path, epw_file_path, standard_to_be_used)
-    translator.setup_and_sizing_run
-
-    base_file_name = File.basename(file_name, '.xml')
-    new_osm_file = "#{out_path}/#{base_file_name}.osm"
-    puts "Looking for the following OSM file: #{new_osm_file}"
-    expect(File.exist?(new_osm_file)).to be true
-
-    new_idf_file = "#{out_path}/#{base_file_name}.idf"
-    save_idf_from_osm(new_osm_file, new_idf_file)
-
-    osm_comparison_file_path = File.expand_path('files/filecomparison', File.dirname(__FILE__))
-    old_osm_file = "#{osm_comparison_file_path}/#{base_file_name}.osm"
-    puts "Looking for the following OSM file: #{old_osm_file}"
-    expect(File.exist?(old_osm_file)).to be true
-    old_idf_file = "#{osm_comparison_file_path}/#{base_file_name}.idf"
-    File.delete(old_idf_file) if File.exist?(old_idf_file)
-    save_idf_from_osm(old_osm_file, old_idf_file)
-
-    old_file_size = File.size(old_idf_file)
-    new_file_size = File.size(new_idf_file)
-    puts "original idf file size #{old_file_size} bytes versus new idf file size #{new_file_size} bytes"
-    expect((old_file_size - new_file_size).abs <= 1).to be true
-
-    line_not_match_counter = compare_two_idf_files(old_idf_file, new_idf_file)
-
-    expect(line_not_match_counter == 0).to be true
-  end
-
   # compare two idf files
   # @param old_idf_file [String]
   # @param new_idf_file [String]
@@ -237,15 +160,6 @@ RSpec.configure do |config|
     File.delete("#{original_file_path}/in.idf") if File.exist?("#{original_file_path}/in.idf")
 
     puts 'IDF file 2 successfully saved' if workspace.save("#{original_file_path}/in.idf")
-  end
-
-  # save idf from osm
-  # @param osm_file [String]
-  # @param idf_file [String]
-  def save_idf_from_osm(osm_file, idf_file)
-    model = OpenStudio::Model::Model.load(osm_file).get
-    workspace = OpenStudio::EnergyPlus::ForwardTranslator.new.translateModel(model)
-    puts "IDF file (#{File.basename(idf_file)})successfully saved" if workspace.save(idf_file)
   end
 
   # test baseline and scenario creation with simulation
@@ -401,27 +315,6 @@ RSpec.configure do |config|
     # Check in.osm written to the main output_path
     # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/in.osm
     expect(File.exist?(File.join(main_output_dir, 'in.osm'))).to be true
-  end
-
-  # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
-  def translator_run_baseline_osm_checks(main_output_dir)
-    # Check Baseline directory gets created
-    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/Baseline
-    baseline_path = File.join(main_output_dir, 'Baseline')
-    expect(Dir.exist?(baseline_path)).to be true
-
-    # Expect job not to have failed
-    failed_path = File.join(baseline_path, 'failed.job')
-    expect(File.exist?(failed_path)).to be false
-
-    # Expect job finished
-    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/Baseline/finished.job
-    finished_path = File.join(baseline_path, 'finished.job')
-    expect(File.exist?(finished_path)).to be true
-
-    # Expect SQL file available
-    eplusout_sql_path = File.join(baseline_path, 'eplusout.sql')
-    expect(File.exist?(eplusout_sql_path)).to be true
   end
 
   # Checks that results from a single Baseline modeling scenario have been added to the REXML::Document in memory
