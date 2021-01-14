@@ -86,7 +86,7 @@ RSpec.describe 'BuildingSync' do
         # file_name, standard, epw_path, schema_version, expected_scenarios
         ['building_151.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
         ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
-        
+
         # ['L100_Audit.xml', CA_TITLE24, nil, 'v2.2.0', 1],
         ['DC GSA Headquarters.xml', ASHRAE90_1, nil, nil, 1],
         ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, nil, 1],

@@ -173,7 +173,7 @@ RSpec.configure do |config|
     translator = test_baseline_and_scenario_creation(xml_path, output_path, expected_number_of_measures, standard_to_be_used, epw_file_name)
 
     osw_files = []
-    Dir.glob("#{out_path}/**/*.osw") { |osw| osw_files << osw }
+    Dir.glob("#{output_path}/**/*.osw") { |osw| osw_files << osw }
 
     if simulate
       translator.run_osws
