@@ -9,6 +9,10 @@
 /pkg/
 /spec/reports/
 /tmp/
+/spec/output/
+/SR1
+/SRvt
+.DS_Store
 
 # rspec failure tracking
 .rspec_status
@@ -20,3 +24,10 @@
 # measures tests
 lib/measures/.rubocop.yml
 lib/measures/test_results/*
+
+spec/files/filecomparison/in.idf
+spec/files/filecomparison/in.osm
+spec/files/filecomparison/originalfiles/in.idf
+spec/weather/weather_file.json
+
+.DS_Store
