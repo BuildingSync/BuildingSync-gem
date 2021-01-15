@@ -162,54 +162,6 @@ RSpec.configure do |config|
     puts 'IDF file 2 successfully saved' if workspace.save("#{original_file_path}/in.idf")
   end
 
-  # test baseline and scenario creation with simulation
-  # @param file_name [String]
-  # @param expected_number_of_measures [Integer]
-  # @param standard_to_be_used [String]
-  # @param epw_file_name [String]
-  # @param simulate [Boolean]
-  def test_baseline_and_scenario_creation_with_simulation(xml_path, output_path, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil, simulate = true)
-    current_year = Date.today.year
-    translator = test_baseline_and_scenario_creation(xml_path, output_path, expected_number_of_measures, standard_to_be_used, epw_file_name)
-
-    osw_files = []
-    Dir.glob("#{output_path}/**/*.osw") { |osw| osw_files << osw }
-
-    if simulate
-      translator.run_osws
-
-      dir_path = File.dirname(osw_files[0])
-      parent_dir_path = File.expand_path('..', dir_path)
-
-      successful = translator.gather_results(parent_dir_path)
-      puts 'Error during results gathering, please check earlier error messages for issues with measures.' if !successful
-      expect(successful).to be true
-      translator.save_xml(File.join(parent_dir_path, 'results.xml'))
-      expect(File.exist?(File.join(parent_dir_path, 'results.xml'))).to be true
-    else
-      puts 'Not simulate'
-    end
-  end
-
-  # test baseline and scenario creation
-  # @param file_name [String]
-  # @param expected_number_of_measures [Integer]
-  # @param standard_to_be_used [String]
-  # @param epw_file_name [String]
-  def test_baseline_and_scenario_creation(file_name, output_path, expected_number_of_measures, standard_to_be_used = CA_TITLE24, epw_file_name = nil)
-    translator = translator_sizing_run_and_check(file_name, output_path, standard_to_be_used, epw_file_name)
-    translator.write_osws()
-
-    osw_files = []
-    osw_sr_files = []
-    Dir.glob("#{output_path}/**/*.osw") { |osw| osw_files << osw }
-    Dir.glob("#{output_path}/SR/*.osw") { |osw| osw_sr_files << osw }
-
-    # we compare the counts, by also considering the two potential osw files in the SR directory
-    expect(osw_files.size).to eq expected_number_of_measures + osw_sr_files.size
-    return translator
-  end
-
   # run minimum facility
   # @param occupancy_classification [String]
   # @param year_of_const [Integer]
@@ -240,6 +192,30 @@ RSpec.configure do |config|
     facility.write_osm(output_path)
 
     sizing_run_checks(output_path)
+  end
+
+  # test writing scenarios
+  # @param translator [BuildingSync::Translator]
+  # @param output_path [String]
+  # @param expected_number_of_scenarios [Integer]
+  def translator_write_osws_and_check(translator, output_path, expected_number_of_scenarios)
+    workflows_successfully_written = translator.write_osws
+
+    # -- Assert
+    expect(workflows_successfully_written).to be true
+
+    osw_files = []
+    osw_sr_files = []
+    Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
+    Dir.glob("#{output_path}/SR/in.osw") { |osw| osw_sr_files << osw }
+
+    # We always expect there to only be one
+    # sizing run file
+    expect(osw_sr_files.size).to eq 1
+
+    # Here we test the actual number of additional scenarios that got created
+    non_sr_osws = osw_files - osw_sr_files
+    expect(non_sr_osws.size).to eq expected_number_of_scenarios
   end
 
   def translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
@@ -327,7 +303,13 @@ RSpec.configure do |config|
   # @param success [Boolean] the returned value from translator.gather_results
   # @param expected_resource_uses [Array<String>] auc:EnergyResource values to check, i.e. 'Electricity', 'Natural gas'
   # @return [void]
-  def translator_gather_results_check_current_building_modeled(translator, success, expected_resource_uses)
+  def translator_gather_results_checks(translator, expected_resource_uses)
+
+    translator.gather_results
+
+    # -- Assert result_gathered set to true
+    expect(translator.results_gathered).to be true
+
     # -- Assert
     # gather_results simply prepares all of the results in memory as an REXML::Document
     expect(success).to be true
@@ -397,6 +379,34 @@ RSpec.configure do |config|
 
     # -- Assert
     expect(File.exist?(results_file_path)).to be true
+  end
+
+  def get_tests
+    return [
+        # file_name, standard, epw_path, schema_version, expected_scenarios
+        ['building_151.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
+        ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
+        ['DC GSA Headquarters.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, 1],
+        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, nil, 1],
+        ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
+        ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+
+        # Test once issues get fixed
+        # See translator_sizing_run_spec errors
+        #
+        # ['building_151_level1.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
+        # ['L100_Audit.xml', CA_TITLE24, nil, 'v2.2.0', 2],
+        # ['Golden Test File.xml', CA_TITLE24, nil, 'v2.2.0', 2],
+
+        # These have inherent flaws in their file structure and will not pass
+        # They are kept here for reference.
+        # See translator_sizing_run_spec errors
+        #
+        # - BuildingSync Website Valid Schema.xml (OccupancyClassification not defined)
+        # - AT_example_property_report_25 (OccupancyClassification not defined)
+    ]
   end
 
   class DummyClass

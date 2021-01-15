@@ -80,10 +80,15 @@ RSpec.describe 'BuildingSync' do
         ['L000_OpenStudio_Pre-Simulation_03.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
         ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
 
-        # # L000_OpenStudio_Pre-Simulation-04
+        # L000_OpenStudio_Pre-Simulation-04
         ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, nil, 'v2.2.0'],
         ['L000_OpenStudio_Pre-Simulation_04.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
         ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
+
+        # Office_Carolina
+        ['Office_Carolina.xml', ASHRAE90_1, nil, 'v2.2.0'],
+        ['Office_Carolina.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
+        ['Office_Carolina.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
     ]
     tests_to_run.each do |test|
       it "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}" do
@@ -178,6 +183,11 @@ RSpec.describe 'BuildingSync' do
         ['AT_example_report_332.xml', ASHRAE90_1, nil, nil, 'Building ID: BuildingType-55083280. OccupancyClassification must be defined at either the Site or Building level.'],
         ['AT_example_report_332.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, 'Building ID: BuildingType-55083280. OccupancyClassification must be defined at either the Site or Building level.'],
         ['AT_example_report_332.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, 'Building ID: BuildingType-55083280. OccupancyClassification must be defined at either the Site or Building level.'],
+
+        #####################################
+        ## Office Carolina
+        # Really this fails because: Could not determine the weather file for climate zone: CEC T24-CEC6A.
+        ['Office_Carolina.xml', CA_TITLE24, nil, 'v2.2.0', 'no implicit conversion of nil into String'],
     ]
     tests_to_run.each do |test|
       it "Should fail with message: #{test[4]}" do

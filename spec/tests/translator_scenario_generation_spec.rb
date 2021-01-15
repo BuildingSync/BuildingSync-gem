@@ -43,32 +43,7 @@ require 'parallel'
 
 RSpec.describe 'BuildingSync' do
   before(:all) do
-    @tests = [
-        # file_name, standard, epw_path, schema_version, expected_scenarios
-        ['building_151.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
-        ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
-        ['DC GSA Headquarters.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, 1],
-        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, nil, 1],
-        ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
-        ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
-        ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
-        ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
-
-        # Test once issues get fixed
-        # See translator_sizing_run_spec errors
-        #
-        # ['building_151_level1.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
-        # ['L100_Audit.xml', CA_TITLE24, nil, 'v2.2.0', 2],
-        # ['Golden Test File.xml', CA_TITLE24, nil, 'v2.2.0', 2],
-
-        # These have inherent flaws in their file structure and will not pass
-        # They are kept here for reference.
-        # See translator_sizing_run_spec errors
-        #
-        # - BuildingSync Website Valid Schema.xml (OccupancyClassification not defined)
-        # - AT_example_property_report_25 (OccupancyClassification not defined)
-
-    ]
+    @tests = get_tests
   end
   describe "Generate All Scenarios" do
     @tests.each do |test|
