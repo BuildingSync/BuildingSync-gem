@@ -89,10 +89,13 @@ RSpec.describe 'Translator' do
         # -- Assert final_xml_prepared set to true
         expect(translator.final_xml_prepared).to be true
 
-        # Expect a results.xml file to exist
+        # -- Assert file doesn't exist
+        expect(File.exist?(results_xml)).to be false
+
         translator.save_xml
 
-        translator_save_xml_checks(translator, results_xml)
+        # -- Assert file exists
+        expect(File.exist?(results_xml)).to be true
       end
     end
   end
