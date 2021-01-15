@@ -399,8 +399,8 @@ module BuildingSync
         @open_studio_standard = Standard.build("#{@standard_template}_#{building_type}")
         update_name
       rescue StandardError => e
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.determine_open_studio_standard', e.message[0..100])
-        raise StandardError, "BuildingSync.Building.determine_open_studio_standard: #{e.message[0..100]}"
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.determine_open_studio_standard', e.message[0..20])
+        raise StandardError, "BuildingSync.Building.determine_open_studio_standard: #{e.message[0..20]}"
       end
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.determine_open_studio_standard', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
       return @open_studio_standard
@@ -579,13 +579,13 @@ module BuildingSync
       # Ensure a file path gets set, else raise error
       if @epw_file_path.nil?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path is nil and no way to set from Site or Building parameters.')
-        raise 'Error : epw_file_path is nil and no way to set from Site or Building parameters.'
+        raise StandardError, 'BuildingSync.Building.set_weather_and_climate_zone: epw_file_path is nil and no way to set from Site or Building parameters.'
       elsif !@epw_file_path
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "epw_file_path is false: #{@epw_file_path}")
-        raise "Error : epw_file_path is false: #{@epw_file_path}"
+        raise StandardError, "BuildingSync.Building.set_weather_and_climate_zone: epw_file_path is false: #{@epw_file_path}"
       elsif !File.exist?(@epw_file_path)
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "epw_file_path does not exist: #{@epw_file_path}")
-        raise "Error : epw_file_path does not exist: #{@epw_file_path}"
+        raise StandardError, "BuildingSync.Building.set_weather_and_climate_zone: epw_file_path does not exist: #{@epw_file_path}"
       end
 
       # setting the current year, so we do not get these annoying log messages:

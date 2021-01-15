@@ -59,6 +59,7 @@ RSpec.describe 'BuildingSync' do
 
         # DC GSA Headquarters with Climate Zone
         ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil],
+        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, nil],
 
         # L100 Audit
         # None working
@@ -95,6 +96,14 @@ RSpec.describe 'BuildingSync' do
   describe "Translator Sizing Runs Should Fail" do
     tests_to_run = [
         # file_name, standard, epw_path, schema_version, expected_error_message
+
+        #####################################
+        ## building_151_level1
+        ['building_151_level1.xml', CA_TITLE24, nil, 'v2.2.0', "undefined method `add_internal_loads' for nil:NilClass"],
+        ['building_151_level1.xml', ASHRAE90_1, nil, 'v2.2.0', "undefined method `add_internal_loads' for nil:NilClass"],
+        ['building_151_level1.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "undefined method `add_internal_loads' for nil:NilClass"],
+        ['building_151_level1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "undefined method `add_internal_loads' for nil:NilClass"],
+
         #####################################
         ## BuildingSync Website Valid Schema
         ['BuildingSync Website Valid Schema.xml', CA_TITLE24, nil, 'v2.2.0', 'Building ID: Building001. OccupancyClassification must be defined at either the Site or Building level.'],
@@ -104,50 +113,39 @@ RSpec.describe 'BuildingSync' do
 
         # #####################################
         # ## DC GSA Headquarters
-        ['DC GSA Headquarters.xml', ASHRAE90_1, nil, nil, ''],
-        # # ^^Failure mode:
-        # # case 2.2: SITE LEVEL city_name and state_name is not nil Washington DC
-        # # [BuildingSync.GetBCLWeatherFile.download_weather_file_from_city_name] <1> Error, could not find uid for state DC and city Washington. Initial count of weather files: 10. Please try a different weather file.
-        # # [BuildingSync.Building.set_weather_and_climate_zone] <1> epw_file_path is false: false
-        ['DC GSA Headquarters.xml', CA_TITLE24, nil, nil, "Did not find a class called 'CBES Pre-1978_LargeOffice' to create in"],
-        ['DC GSA Headquarters.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, "Did not find a class called 'CBES Pre-1978_LargeOffice' to create in"],
+        # Really this fails because: [BuildingSync.GetBCLWeatherFile.download_weather_file_from_city_name] <1> Error, could not find uid for state DC and city Washington. Initial count of weather files: 10. Please try a different weather file.
+        ['DC GSA Headquarters.xml', ASHRAE90_1, nil, nil, 'BuildingSync.Building.set_weather_and_climate_zone: epw_file_path is false: false'],
+        ['DC GSA Headquarters.xml', CA_TITLE24, nil, nil, "Did not find a", false],
+        ['DC GSA Headquarters.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, "Did not find a", false],
 
-        # #####################################
-        # ## DC GSA HeadquartersWithClimateZone
-        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, nil, ''],
-        ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, nil, nil, ""],
-        # # ^^Failure mode:
-        # # case 3: climate zone 2B lat  long
-        # # [BuildingSync.Building.set_weather_and_climate_zone_from_climate_zone] <0> Cannot add design days and weather file for climate zone: 2B, no epw file provided
-        # # 2B
-        # # CaliforniaTitle24
-        # #
-        # # NilClass
-        # # CEC T24-CEC2B
-        # # setting CA_TITLE24 climate zone to: 2
-
-        ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, "Did not find a class called 'CBES Pre-1978_LargeOffice' to create in"],
-        # # ^^Failure mode:
-        # # could not find open studio standard for template CBES Pre-1978 and bldg type: LargeOffice, trying the standard type alone
+        ####################################
+        # DC GSA HeadquartersWithClimateZone
+        ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, nil, nil, "Did not find a", false],
+        ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, "Did not find a", false],
 
         # #####################################
         # ## L100 Audit
-        # ['L100_Audit.xml', CA_TITLE24, nil, 'v2.2.0', ''],
-        # ['L100_Audit.xml', ASHRAE90_1, nil, 'v2.2.0', ''],
-        # ['L100_Audit.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', ''],
-        # ['L100_Audit.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', ''],
+        # Trace/BPT trap: 5 gets hit for following 2 lines
+        # ['L100_Audit.xml', CA_TITLE24, nil, 'v2.2.0', "Error, cannot find local component for: 1ed4ea50-edc6-0131-1b8b-48e0eb16a403.  Please try a different weather file."],
+        # ['L100_Audit.xml', ASHRAE90_1, nil, 'v2.2.0', "Error, cannot find local component for: 1ed4ea50-edc6-0131-1b8b-48e0eb16a403.  Please try a different weather file."],
+        ['L100_Audit.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "undefined method `add_internal_loads' for nil:NilClass"],
+        ['L100_Audit.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "undefined method `add_internal_loads' for nil:NilClass"],
 
 
         # #####################################
         # ## Golden File
-        ['Golden Test File.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', 'Error: There is more than one (2) building attached to this site in your BuildingSync file.'],
+        # Trace/BPT trap: 5 gets hit for following 2 lines
+        # ['Golden Test File.xml', CA_TITLE24, nil, 'v2.2.0', "Error, cannot find local component for: fa8c9ff0-edc4-0131-a9f8-48e0eb16a403.  Please try a different weather file."],
+        # ['Golden Test File.xml', ASHRAE90_1, nil, 'v2.2.0', "Error, cannot find local component for: fa8c9ff0-edc4-0131-a9f8-48e0eb16a403.  Please try a different weather file."],
+        ['Golden Test File.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "undefined method `add_internal_loads' for nil:NilClass"],
+        ['Golden Test File.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "undefined method `add_internal_loads' for nil:NilClass"],
 
         # #####################################
         # L000_OpenStudio_Pre-Simulation-01
         # TODO: Fix download BCL function or figure out workaround
-        # 2021-01-14 Having issues downloading from BCL.
-        ['L000_OpenStudio_Pre-Simulation_01.xml', CA_TITLE24, nil, 'v2.2.0', "Error, cannot find local component for: 1fd3d630-edc5-0131-b802-48e0eb16a403.  Please try a different weather file."],
-        ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, nil, 'v2.2.0', "Error, cannot find local component for: 1fd3d630-edc5-0131-b802-48e0eb16a403.  Please try a different weather file."],
+        # Trace/BPT trap: 5 gets hit for following 2 lines
+        # ['L000_OpenStudio_Pre-Simulation_01.xml', CA_TITLE24, nil, 'v2.2.0', "Error, cannot find local component for: 1fd3d630-edc5-0131-b802-48e0eb16a403.  Please try a different weather file."],
+        # ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, nil, 'v2.2.0', "Error, cannot find local component for: 1fd3d630-edc5-0131-b802-48e0eb16a403.  Please try a different weather file."],
 
         # We have issues with old CBES files
         ['L000_OpenStudio_Pre-Simulation_01.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "Did not find a class called 'CBES Pre-1978_LargeOffice' to create in", false],
@@ -169,11 +167,17 @@ RSpec.describe 'BuildingSync' do
 
         #####################################
         ## AT_example_property_report_25
-        ['AT_example_property_report_25.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, 'Error: There is more than one (3) building attached to this site in your BuildingSync file.'],
+        ['AT_example_property_report_25.xml', CA_TITLE24, nil, nil, 'Building ID: BuildingType-69900869908540. OccupancyClassification must be defined at either the Site or Building level.'],
+        ['AT_example_property_report_25.xml', ASHRAE90_1, nil, nil, 'Building ID: BuildingType-69900869908540. OccupancyClassification must be defined at either the Site or Building level.'],
+        ['AT_example_property_report_25.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, 'Building ID: BuildingType-69900869908540. OccupancyClassification must be defined at either the Site or Building level.'],
+        ['AT_example_property_report_25.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, 'Building ID: BuildingType-69900869908540. OccupancyClassification must be defined at either the Site or Building level.'],
 
         #####################################
         ## AT_example_report_332
-        ['AT_example_report_332.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, 'Occupancy type Food service is not available in the building_and_system_types.json dictionary']
+        ['AT_example_report_332.xml', CA_TITLE24, nil, nil, 'Building ID: BuildingType-55083280. OccupancyClassification must be defined at either the Site or Building level.'],
+        ['AT_example_report_332.xml', ASHRAE90_1, nil, nil, 'Building ID: BuildingType-55083280. OccupancyClassification must be defined at either the Site or Building level.'],
+        ['AT_example_report_332.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, 'Building ID: BuildingType-55083280. OccupancyClassification must be defined at either the Site or Building level.'],
+        ['AT_example_report_332.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, 'Building ID: BuildingType-55083280. OccupancyClassification must be defined at either the Site or Building level.'],
     ]
     tests_to_run.each do |test|
       it "Should fail with message: #{test[4]}" do

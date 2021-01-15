@@ -232,6 +232,8 @@ RSpec.describe 'WorkflowMaker' do
       @std = ASHRAE90_1
       xml_path, @output_path = create_xml_path_and_output_path(file_name, @std, __FILE__, 'v2.2.0')
       @doc = help_load_doc(xml_path)
+
+      @doc.ele
       @ns = 'auc'
 
       @workflow_maker = BuildingSync::WorkflowMaker.new(@doc, @ns)
