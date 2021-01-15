@@ -1,5 +1,21 @@
 # BuildingSync Gem
 
+## Version 0.2.0
+- Added many BuildingSync specific classes:
+    - AllResourceTotal
+    - AuditDate
+    - Contact
+
+- Added / modified modules / classes:
+    - Generator
+    - Helper
+    - Metered
+- Removed Classes:
+    - ModelMakerBase
+    
+- Added `constants.rb`
+    
+
 ## Version 0.1.0
 
 * Initial release
