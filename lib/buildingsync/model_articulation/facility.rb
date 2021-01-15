@@ -43,7 +43,6 @@ require 'buildingsync/contact'
 require 'buildingsync/helpers/helper'
 require 'buildingsync/helpers/xml_get_set'
 require 'buildingsync/helpers/Model.hvac'
-require 'buildingsync/helpers/metered_energy'
 
 require_relative 'site'
 require_relative 'loads_system'
