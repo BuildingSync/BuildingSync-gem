@@ -1,6 +1,7 @@
 /.bundle/
 /.yardoc
 /.ruby-version
+/.python-version
 /Gemfile.lock
 /gems
 /_yardoc/
@@ -27,7 +28,6 @@ lib/measures/test_results/*
 
 spec/files/filecomparison/in.idf
 spec/files/filecomparison/in.osm
-spec/files/filecomparison/originalfiles/in.idf
 spec/weather/weather_file.json
 
 .DS_Store

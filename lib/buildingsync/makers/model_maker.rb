@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -34,62 +36,26 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative '../model_articulation/facility'
-require_relative 'workflow_maker'
+require 'rexml/xpath'
+
+require 'buildingsync/model_articulation/facility'
+require 'buildingsync/makers/workflow_maker'
+
 module BuildingSync
-  class ModelMaker < ModelMakerBase
+  # ModelMaker class
+  class ModelMaker
+    # initialize the ModelMaker class
+    # @param doc [REXML::Document]
+    # @param ns [String]
     def initialize(doc, ns)
-      super
+      @doc = doc
+      @ns = ns
 
       @facilities = []
       @facility = nil
+      @facility_xml = nil
+      @scenario_types = nil
       read_xml
-    end
-
-    def read_xml
-      @doc.elements.each("/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
-        @facilities.push(Facility.new(facility_element, @ns))
-      end
-
-      if @facilities.count == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', 'There are no facilities in your BuildingSync file.')
-        raise 'Error: There are no facilities in your BuildingSync file.'
-      elsif @facilities.count > 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.ModelMakerLevelZero.generate_baseline', "There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now")
-        raise "Error: There are more than one (#{@facilities.count})facilities in your BuildingSync file. Only one if supported right now"
-      end
-    end
-
-    def get_facility
-      return @facility
-    end
-
-    def generate_baseline(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
-      @facilities.each(&:set_all)
-      open_studio_standard = @facilities[0].determine_open_studio_standard(standard_to_be_used)
-
-      @facilities[0].generate_baseline_osm(epw_file_path, dir, standard_to_be_used, ddy_file)
-      return write_osm(dir)
-    end
-
-    def get_space_types
-      return @facilities[0].get_space_types
-    end
-
-    def get_model
-      return @facilities[0].get_model
-    end
-
-    def write_parameters_to_xml
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
-        @facilities[0].write_parameters_to_xml(@ns, facility)
-      end
-    end
-
-    private
-
-    def write_osm(dir)
-      @facility = @facilities[0].write_osm(dir)
     end
   end
 end

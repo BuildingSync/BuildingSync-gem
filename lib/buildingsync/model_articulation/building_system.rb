@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -34,8 +36,14 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'buildingsync/helpers/helper'
+require 'buildingsync/helpers/xml_get_set'
+
 module BuildingSync
+  # BuildingSystem class to share functionality between system classes
   class BuildingSystem
-    # TODO: - Do we need this class to share functionality of the system
+    # no features here yet
+    include BuildingSync::Helper
+    include BuildingSync::XmlGetSet
   end
 end

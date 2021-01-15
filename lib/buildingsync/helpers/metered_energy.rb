@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -35,13 +37,35 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
-class MeteredEnergy
-  def initialize(energy_resource, interval_frequency, reading_type, interval_reading)
-    @energy_resource = energy_resource
-    @interval_frequency = interval_frequency
-    @reading_type = reading_type
-    @interval_reading = interval_reading
-  end
+module BuildingSync
+  # Metered Energy class
+  class MeteredEnergy
+    # initialize MeteredEnergy class
+    # @param energy_resource
+    # @param interval_frequency
+    # @param reading_type
+    # @param interval_reading
+    def initialize(energy_resource, interval_frequency, reading_type, interval_reading)
+      @energy_resource = energy_resource
+      @interval_frequency = interval_frequency
+      @reading_type = reading_type
+      @interval_reading = interval_reading
+    end
 
-  attr_reader :energy_resource, :interval_frequency, :reading_type, :interval_reading
+    # energy resource
+    # @return [String]
+    attr_reader :energy_resource
+
+    # interval frequency
+    # @return [String]
+    attr_reader :interval_frequency
+
+    # reading type
+    # @return [String]
+    attr_reader :reading_type
+
+    # interval reading
+    # @return [String]
+    attr_reader :interval_reading
+  end
 end

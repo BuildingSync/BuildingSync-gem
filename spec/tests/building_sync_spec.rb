@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -45,7 +47,7 @@ RSpec.describe 'BuildingSync' do
     expect(BuildingSync::VERSION).not_to be_nil
   end
 
- it 'has a measures directory' do
+  it 'has a measures directory' do
     instance = BuildingSync::Extension.new
     measure_path = File.expand_path('../../lib/measures', File.dirname(__FILE__))
     expect(instance.measures_dir).to eq measure_path

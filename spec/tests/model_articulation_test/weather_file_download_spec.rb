@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -34,7 +36,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative '../../../lib/buildingsync/get_bcl_weather_file'
+require 'buildingsync/get_bcl_weather_file'
 
 RSpec.describe 'WeatherFileDownload' do
   it 'weather file download from the nrel site with the help of state and city name' do
@@ -82,6 +84,6 @@ RSpec.describe 'WeatherFileDownload' do
     @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
     expect(File.exist?(@xml_path)).to be true
 
-    return create_xml_file_object(@xml_path)
+    return help_load_doc(@xml_path)
   end
 end

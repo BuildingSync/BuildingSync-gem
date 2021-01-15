@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -35,89 +37,66 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'builder'
+require 'buildingsync/generator'
+
+require_relative './../../spec_helper'
 
 RSpec.describe 'OccupancyTypeSpec' do
-  it 'Should generate osm and simulate baseline for all supported occupancy types' do
-    run_minimum_facility('Retail', '1954', 'Gross', '69452', ASHRAE90_1)
-
-    run_minimum_facility('Office', '1964', 'Gross', '10000', ASHRAE90_1)
-    run_minimum_facility('Office', '1974', 'Gross', '40000', ASHRAE90_1)
-    run_minimum_facility('Office', '1984', 'Gross', '80000', ASHRAE90_1)
-
-    run_minimum_facility('StripMall', '1994', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('PrimarySchool', '2004', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('SecondarySchool', '2014', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('Outpatient', '2001', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('Hospital', '2002', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('SmallHotel', '2003', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('LargeHotel', '2005', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('QuickServiceRestaurant', '2006', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('FullServiceRestaurant', '2007', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('MidriseApartment', '2008', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('HighriseApartment', '2009', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('Warehouse', '2012', 'Gross', '50000', ASHRAE90_1)
-    run_minimum_facility('SuperMarket', '2018', 'Gross', '50000', ASHRAE90_1)
+  it 'Should generate osm and simulate baseline for OccupancyType: Retail' do
+    run_minimum_facility('Retail', '1954', 'Gross', '69452', ASHRAE90_1, 'occupancy_types_spec')
   end
 
-  def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used)
-    facility = create_minimum_facility(occupancy_classification,  year_of_const, floor_area_type, floor_area_value)
-    facility.determine_open_studio_standard(standard_to_be_used)
-    epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
-    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
-    expect(facility.generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)).to be true
-    facility.write_osm(output_path)
-
-    run_baseline_simulation(output_path + '/in.osm', 'CZ01RV2.epw')
+  it 'Should generate osm and simulate baseline for OccupancyType: Office' do
+    run_minimum_facility('Office', '1964', 'Gross', '10000', ASHRAE90_1, 'occupancy_types_spec')
+    run_minimum_facility('Office', '1974', 'Gross', '40000', ASHRAE90_1, 'occupancy_types_spec')
+    run_minimum_facility('Office', '1984', 'Gross', '80000', ASHRAE90_1, 'occupancy_types_spec')
   end
 
-  def create_xml_file_object(xml_file_path)
-    doc = nil
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-    return doc
+  it 'Should generate osm and simulate baseline for OccupancyType: StripMall' do
+    run_minimum_facility('StripMall', '1994', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
   end
 
-  def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    xml_path = File.expand_path('../../files/building_151_Blank.xml', File.dirname(__FILE__))
-    ns = 'auc'
-    doc = create_xml_file_object(xml_path)
-    site_element = doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
-
-    occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
-    occupancy_classification_element.text = occupancy_classification
-    site_element.add_element(occupancy_classification_element)
-
-    building_element = site_element.elements["#{ns}:Buildings/#{ns}:Building"]
-
-    year_of_construction_element = REXML::Element.new("#{ns}:YearOfConstruction")
-    year_of_construction_element.text = year_of_const
-    building_element.add_element(year_of_construction_element)
-
-    floor_areas_element = REXML::Element.new("#{ns}:FloorAreas")
-    floor_area_element = REXML::Element.new("#{ns}:FloorArea")
-    floor_area_type_element = REXML::Element.new("#{ns}:FloorAreaType")
-    floor_area_type_element.text = floor_area_type
-    floor_area_value_element = REXML::Element.new("#{ns}:FloorAreaValue")
-    floor_area_value_element.text = floor_area_value
-
-    floor_area_element.add_element(floor_area_type_element)
-    floor_area_element.add_element(floor_area_value_element)
-    floor_areas_element.add_element(floor_area_element)
-    building_element.add_element(floor_areas_element)
-
-    # doc.write(File.open(xml_path, 'w'), 2)
-    return doc
+  it 'Should generate osm and simulate baseline for OccupancyType: PrimarySchool' do
+    run_minimum_facility('Education-Primary', '2004', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
   end
 
-  def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    ns = 'auc'
-    facility_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"]
-    if !facility_element.nil?
-      return BuildingSync::Facility.new(facility_element, 'auc')
-    else
-      expect(facility_element.nil?).to be false
-    end
+  it 'Should generate osm and simulate baseline for OccupancyType: SecondarySchool' do
+    run_minimum_facility('Education-Secondary', '2014', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
+  end
+
+  it 'Should generate osm and simulate baseline for OccupancyType: Outpatient' do
+    run_minimum_facility('Health care-Outpatient facility', '2001', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
+  end
+
+  it 'Should generate osm and simulate baseline for OccupancyType: SmallHotel' do
+    run_minimum_facility('Lodging', '2003', 'Gross', '20000', ASHRAE90_1, 'occupancy_types_spec')
+  end
+
+  it 'Should generate osm and simulate baseline for OccupancyType: LargeHotel' do
+    run_minimum_facility('Lodging', '2005', 'Gross', '60000', ASHRAE90_1, 'occupancy_types_spec')
+  end
+
+  it 'Should generate osm and simulate baseline for OccupancyType: QuickServiceRestaurant' do
+    run_minimum_facility('Food service-Fast', '2006', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
+  end
+
+  it 'Should generate osm and simulate baseline for OccupancyType: FullServiceRestaurant' do
+    run_minimum_facility('Food service-Full', '2007', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
+  end
+
+  it 'Should generate osm and simulate baseline for OccupancyType: MidriseApartment' do
+    run_minimum_facility('Multifamily', '2008', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec', 3)
+  end
+
+  it 'Should generate osm and simulate baseline for OccupancyType: HighriseApartment' do
+    run_minimum_facility('Multifamily', '2009', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec', 15)
+  end
+
+  it 'Should generate osm and simulate baseline for OccupancyType: Warehouse' do
+    run_minimum_facility('Warehouse', '2012', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
+  end
+
+  it 'Should generate osm and simulate baseline for OccupancyType: SuperMarket' do
+    run_minimum_facility('Food sales-Grocery store', '2018', 'Gross', '50000', ASHRAE90_1, 'occupancy_types_spec')
   end
 end

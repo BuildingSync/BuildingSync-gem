@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -34,41 +36,52 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'buildingsync/helpers/helper'
+require 'buildingsync/helpers/xml_get_set'
+
 module BuildingSync
+  # HVACSystem class
   class HVACSystem < BuildingSystem
-    def initialize(system_element = nil, ns = '')
+    include BuildingSync::Helper
+    include BuildingSync::XmlGetSet
+    # initialize
+    # @param system_element [REXML::Element]
+    # @param ns [String]
+    def initialize(base_xml, ns = 'auc')
+      @base_xml = base_xml
+      @ns = ns
+
+      help_element_class_type_check(base_xml, 'HVACSystem')
+
       # code to initialize
-      @primary_hvac_system_type = Hash.new
-      read_xml(system_element, ns) if system_element
+      read_xml
     end
 
-    def read_xml(system_element, ns)
-      system_element.elements.each("#{ns}:HVACSystem") do |hvac_system|
-        system_type = nil
-        if hvac_system.elements["#{ns}:PrimaryHVACSystemType"]
-          system_type = hvac_system.elements["#{ns}:PrimaryHVACSystemType"].text
-        end
-        if hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"]
-          linked_building = hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref']
-          puts "found primary system type: #{system_type} for linked building: #{linked_building}"
-          @primary_hvac_system_type[linked_building] = system_type
-        elsif hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"]
-          linked_section = hvac_system.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"].attributes['IDref']
-          puts "found primary system type: #{system_type} for linked section: #{linked_section}"
-          @primary_hvac_system_type[linked_section] = system_type
-        elsif system_type
-          puts "primary_hvac_system_type: #{system_type} is not linked to a building or section "
-        end
-      end
+    # read xml
+    def read_xml;
     end
 
-    def get_primary_hvac_system_type
-      if @primary_hvac_system_type
-        return @primary_hvac_system_type.values[0]
-      end
-      return nil
+    def get_linked_ids;
     end
 
+    # get principal hvac system type
+    # @return [String]
+    def get_principal_hvac_system_type
+      return xget_text('PrincipalHVACSystemType')
+    end
+
+    # adding the principal hvac system type to the hvac systems, overwrite existing values or create new elements if none are present
+    # @param id [String]
+    # @param principal_hvac_type [String]
+    def set_principal_hvac_system_type(principal_hvac_type)
+      xset_or_create('PrincipalHVACSystemType', principal_hvac_type)
+    end
+
+    # add exhaust
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param kitchen_makeup [String]
+    # @param remove_objects [Boolean]
     def add_exhaust(model, standard, kitchen_makeup, remove_objects)
       # remove exhaust objects
       if remove_objects
@@ -90,6 +103,10 @@ module BuildingSync
       return true
     end
 
+    # add thermostats
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param remove_objects [Boolean]
     def add_thermostats(model, standard, remove_objects)
       # remove thermostats
       if remove_objects
@@ -105,52 +122,152 @@ module BuildingSync
         # identify thermal thermostat and apply to zones (apply_internal_load_schedules names )
         model.getThermostatSetpointDualSetpoints.each do |thermostat|
           next if !thermostat.name.to_s.include?(space_type.name.to_s)
+          if !thermostat.coolingSetpointTemperatureSchedule.is_initialized
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.HVACSystem.add_thermostats', "#{thermostat.name} has no cooling setpoint.")
+          end
+          if !thermostat.heatingSetpointTemperatureSchedule.is_initialized
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.HVACSystem.add_thermostats', "#{thermostat.name} has no heating setpoint.")
+          end
 
           OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_thermostats', "Assigning #{thermostat.name} to thermal zones with #{space_type.name} assigned.")
+          puts "BuildingSync.HVACSystem.add_thermostats - Assigning #{thermostat.name} to thermal zones with #{space_type.name} assigned."
           space_type.spaces.each do |space|
             next if !space.thermalZone.is_initialized
 
             space.thermalZone.get.setThermostatSetpointDualSetpoint(thermostat)
           end
-          next
         end
+
       end
+      puts "ThermalZones: #{model.getThermalZones.size}"
+      puts "ThermostatDSPs: #{model.getThermostatSetpointDualSetpoints.size}"
+      add_setpoints_to_thermostats_if_none(model)
       return true
     end
 
-    def map_primary_hvac_system_type_to_cbecs_system_type(building_sync_primary_hvac_system_type, system_type)
-      case building_sync_primary_hvac_system_type
-      when "Packaged Terminal Air Conditioner"
-        return "PTAC with hot water heat"
-      when "Packaged Terminal Heat Pump"
-        return "PTHP"
-      when "Packaged Rooftop Air Conditioner"
-        return "PSZ-AC with gas coil heat"
-      when "Packaged Rooftop Heat Pump"
-        return "PSZ-HP"
-      when "Packaged Rooftop VAV with Hot Water Reheat"
-        return "PVAV with reheat"
-      when "Packaged Rooftop VAV with Electric Reheat"
-        return "PVAV with PFP boxes"
-      when "VAV with Hot Water Reheat"
-        return "VAV with reheat"
-      when "VAV with Electric Reheat"
-        return "VAV with PFP boxes"
+    # @return [Boolean] true if ALL thermostats have heating and cooling setpoints
+    def add_setpoints_to_thermostats_if_none(model)
+      successful = true
+
+      # seperate out thermostats that need heating vs. cooling schedules
+      tstats_cooling = []
+      tstats_heating = []
+      model.getThermalZones.each do |tz|
+        if tz.thermostatSetpointDualSetpoint.is_initialized
+          tstat = tz.thermostatSetpointDualSetpoint.get
+          tstats_cooling << tstat if !tstat.coolingSetpointTemperatureSchedule.is_initialized
+          tstats_heating << tstat if !tstat.heatingSetpointTemperatureSchedule.is_initialized
+        end
+      end
+
+      puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (#{tstats_cooling.size}) thermostats needing cooling schedule"
+      puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (#{tstats_heating.size}) thermostats needing heating schedule"
+
+      htg_setpoints = [
+          # [Time.new(days, hours, mins seconds), temp_value_celsius]
+          [OpenStudio::Time.new(0, 9, 0, 0), 17],
+          [OpenStudio::Time.new(0, 17, 0, 0), 20],
+          [OpenStudio::Time.new(0, 24, 0, 0), 17]
+      ]
+      clg_setpoints = [
+          # [Time.new(days, hours, mins seconds), temp_value_celsius]
+          [OpenStudio::Time.new(0, 9, 0, 0), 23],
+          [OpenStudio::Time.new(0, 17, 0, 0), 20],
+          [OpenStudio::Time.new(0, 24, 0, 0), 23]
+      ]
+
+      heating_sp_schedule = create_schedule_ruleset(model, htg_setpoints, 'Thermostat Heating SP')
+      cooling_sp_schedule = create_schedule_ruleset(model, clg_setpoints, 'Thermostat Cooling SP')
+
+      tstats_cooling.each do |thermostat|
+        success = thermostat.setCoolingSetpointTemperatureSchedule(cooling_sp_schedule)
+        if success
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none', "Cooling Schedule (#{cooling_sp_schedule.nameString}) added to Thermostat: #{thermostat.nameString}")
+          puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - Cooling Schedule (#{cooling_sp_schedule.nameString}) added to Thermostat: #{thermostat.nameString}"
+        else
+          successful = false
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none', "No Cooling Schedule for Thermostat: #{thermostat.nameString}")
+          puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - No Cooling Schedule for Thermostat: #{thermostat.nameString}"
+        end
+      end
+
+      tstats_heating.each do |thermostat|
+        success = thermostat.setHeatingSetpointTemperatureSchedule(heating_sp_schedule)
+        if success
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none', "Heating Schedule (#{heating_sp_schedule.nameString}) added to Thermostat: #{thermostat.nameString}")
+          puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - Heating Schedule (#{heating_sp_schedule.nameString}) added to Thermostat: #{thermostat.nameString}"
+        else
+          successful = false
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none', "No Heating Schedule for Thermostat: #{thermostat.nameString}")
+          puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - No Heating Schedule for Thermostat: #{thermostat.nameString}"
+        end
+      end
+      return successful
+    end
+
+    # @param model [OpenStudio::Model::Model]
+    # @param values [Array<Array<OpenStudio::Time, Float>>] [[cutoff_time, value_until_cutoff]]
+    # @return [OpenStudio::Model::ScheduleRuleset] a new schedule ruleset with values added to the default day
+    def create_schedule_ruleset(model, values, name)
+      ruleset = OpenStudio::Model::ScheduleRuleset.new(model)
+      ruleset.setName(name)
+      dd = ruleset.defaultDaySchedule
+      values.each do |v|
+        dd.addValue(v[0], v[1])
+      end
+      return ruleset
+    end
+
+    # map principal hvac system type to cbecs system type
+    # @param principal_hvac_system_type [String]
+    # @param fallback_system_type [String] the default system_type to use if the other is not found
+    # @return [String]
+    def map_to_cbecs(principal_hvac_system_type, fallback_system_type)
+      case principal_hvac_system_type
+      when 'Packaged Terminal Air Conditioner'
+        return 'PTAC with hot water heat'
+      when 'Packaged Terminal Heat Pump'
+        return 'PTHP'
+      when 'Packaged Rooftop Air Conditioner'
+        return 'PSZ-AC with gas coil heat'
+      when 'Packaged Rooftop Heat Pump'
+        return 'PSZ-HP'
+      when 'Packaged Rooftop VAV with Hot Water Reheat'
+        return 'PVAV with reheat'
+      when 'Packaged Rooftop VAV with Electric Reheat'
+        return 'PVAV with PFP boxes'
+      when 'VAV with Hot Water Reheat'
+        return 'VAV with reheat'
+      when 'VAV with Electric Reheat'
+        return 'VAV with PFP boxes'
       else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.HVACSystem.map_primary_hvac_system_type_to_cbecs_system_type', "building_sync_primary_hvac_system_type: #{building_sync_primary_hvac_system_type} does not have a mapping to the CBECS system type, using the system type from standards: #{system_type}")
-        return system_type
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.HVACSystem.map_to_cbecs', "HVACSystem ID: #{xget_id}: No mapping for #{principal_hvac_system_type} to CBECS. Using the system type from standards: #{fallback_system_type}")
+        return fallback_system_type
       end
     end
 
+    # add hvac
+    # @param model [OpenStudio::Model]
+    # @param zone_hash [hash]
+    # @param standard [Standard]
+    # @param system_type [String]
+    # @param hvac_delivery_type [String]
+    # @param htg_src [String]
+    # @param clg_src [String]
+    # @param remove_objects [Boolean]
+    # @return [Boolean]
     def add_hvac(model, zone_hash, standard, system_type, hvac_delivery_type = 'Forced Air', htg_src = 'NaturalGas', clg_src = 'Electricity', remove_objects = false)
       # remove HVAC objects
       if remove_objects
         standard.model_remove_prm_hvac(model)
       end
 
-      puts "system_type derived from standards: #{system_type} and primary hvac system type override is: #{@primary_hvac_system_type}"
-      if !@primary_hvac_system_type.empty?
-        system_type = map_primary_hvac_system_type_to_cbecs_system_type(@primary_hvac_system_type.first.first, system_type)
+      puts "HVAC System ID: #{xget_id}. System_type derived from standards: #{system_type} and principal hvac system type override is: #{get_principal_hvac_system_type}"
+      temp = get_principal_hvac_system_type
+      if !temp.nil? && !temp.empty?
+        previous_system_type = system_type
+        system_type = map_to_cbecs(get_principal_hvac_system_type, previous_system_type)
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.HVACSystem.add_hvac', "HVAC System ID: #{xget_id}. System type derived from standards: #{previous_system_type}, overriden to #{system_type}")
       end
 
       case system_type
@@ -170,7 +287,7 @@ module BuildingSync
 
         # For each group, infer the HVAC system type.
         sys_groups.each do |sys_group|
-          # Infer the primary system type
+          # Infer the principal system type
           # OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "template = #{template}, climate_zone = #{climate_zone}, occ_type = #{sys_group['type']}, hvac_delivery = #{hvac_delivery}, htg_src = #{htg_src}, clg_src = #{clg_src}, area_ft2 = #{sys_group['area_ft2']}, num_stories = #{sys_group['stories']}")
           sys_type, central_htg_fuel, zone_htg_fuel, clg_fuel = standard.model_typical_hvac_system_type(model,
                                                                                                         climate_zone,
@@ -216,27 +333,38 @@ module BuildingSync
         # Single-zone systems will get one per zone.
         story_groups.each do |zones|
           new_system_type = get_system_type_from_zone(zone_hash, zones, system_type)
-          puts "setting system: #{new_system_type} for zone names: #{BuildingSync::Helper.get_zone_name_list(zones)}"
+          puts "setting system: #{new_system_type} for zone names: #{help_get_zone_name_list(zones)}"
           model.add_cbecs_hvac_system(standard, new_system_type, zones)
         end
       end
       return true
     end
 
+    # get system type from zone
+    # @param zone_hash [hash]
+    # @param zones [array<OpenStudio::Model::ThermalZone>]
+    # @param system_type [String]
+    # @return [String]
     def get_system_type_from_zone(zone_hash, zones, system_type)
-      if zone_hash
-        zone_hash.each do |id, zone_list|
-          zone_name_list = BuildingSync::Helper.get_zone_name_list(zone_list)
-          zones.each do |zone|
-            if zone_name_list.include? zone.name.get
-              return map_primary_hvac_system_type_to_cbecs_system_type(@primary_hvac_system_type[id], system_type)
-            end
+      zone_hash&.each do |id, zone_list|
+        zone_name_list = help_get_zone_name_list(zone_list)
+        zones.each do |zone|
+          if zone_name_list.include? zone.name.get
+            return map_to_cbecs(get_principal_hvac_system_type, system_type)
           end
         end
       end
       return system_type
     end
 
+    # apply sizing and assumptions
+    # @param model [OpenStudio::Model]
+    # @param output_path [String]
+    # @param standard [Standard]
+    # @param primary_bldg_type [String]
+    # @param system_type [String]
+    # @param climate_zone [String]
+    # @return [Boolean]
     def apply_sizing_and_assumptions(model, output_path, standard, primary_bldg_type, system_type, climate_zone)
       case system_type
       when 'Ideal Air Loads'
@@ -264,6 +392,7 @@ module BuildingSync
       return true
     end
 
-    attr_reader :primary_hvac_system_type
+    # principal hvac system type
+    attr_reader :principal_hvac_system_type
   end
 end

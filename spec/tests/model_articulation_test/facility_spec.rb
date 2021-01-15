@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -36,240 +38,266 @@
 # *******************************************************************************
 require 'builder'
 
+require 'buildingsync/generator'
+
 RSpec.describe 'FacilitySpec' do
-  it 'Should generate meaningful error when passing empty XML data' do
-    begin
-      generate_baseline('building_151_Blank', 'auc')
-    rescue StandardError => e
-      puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
-      expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
+  describe 'Expected Errors' do
+
+    it 'should raise an StandardError given a non-Facility REXML Element' do
+      # -- Setup
+      ns = 'auc'
+      v = '2.2.0'
+      g = BuildingSync::Generator.new(ns, v)
+      doc_string = g.create_bsync_root_to_building
+      doc = REXML::Document.new(doc_string)
+
+      # -- Create Building object from Facility
+      begin
+        BuildingSync::Facility.new(doc.root, ns)
+
+        # Should not reach this
+        expect(false).to be true
+      rescue StandardError => e
+        puts e.message
+        expect(e.message).to eql 'Attempted to initialize Facility object with Element name of: BuildingSync'
+      end
     end
   end
 
+  # TODO: Add actual assertions
   it 'Should create an instance of the facility class with minimal XML snippet' do
-    create_minimum_facility('Retail', '1954', 'Gross', '69452')
+    generator = BuildingSync::Generator.new
+    generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
   end
 
   it 'Should return the boolean value for creating osm file correctly or not.' do
-    facility = create_minimum_facility('Retail', '1954', 'Gross', '69452')
-    facility.determine_open_studio_standard(ASHRAE90_1)
-    epw_file_path = File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__))
-    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
-    expect(facility.generate_baseline_osm(epw_file_path, output_path, ASHRAE90_1)).to be true
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
+    expect(File.exist?(epw_path)).to be true
+
+    generator = BuildingSync::Generator.new
+    facility = generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
+    facility.determine_open_studio_standard(std)
+
+    # -- Assert
+    expect(facility.generate_baseline_osm(epw_path, output_path, std)).to be true
   end
 
+  # TODO: Add actual assertions
   it 'Should create a building system with parameters set to true' do
-    xml_file_path = File.expand_path('./../../files/building_151.xml', File.dirname(__FILE__))
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     doc = nil
-    File.open(xml_file_path, 'r') do |file|
+    File.open(xml_path, 'r') do |file|
       doc = REXML::Document.new(file)
     end
     ns = 'auc'
+
+    # -- Act
     facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
     facility.determine_open_studio_standard(ASHRAE90_1)
-    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
-    facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
-    facility.create_building_systems(output_path, nil, 'Forced Air', 'Electricity', 'Electricity',
-                                     true, true, true, true,
-                                     true, true, true, true, true)
+    facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
+    facility.create_building_systems(main_output_dir: output_path, htg_src: 'Electricity',
+                                     add_elevators: true, add_exterior_lights: true, remove_objects: true)
   end
 
+# TODO: Add actual assertions
   it 'Should create a building system with parameters set to false' do
-    xml_file_path = File.expand_path('./../../files/building_151.xml', File.dirname(__FILE__))
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     doc = nil
-    File.open(xml_file_path, 'r') do |file|
+    File.open(xml_path, 'r') do |file|
       doc = REXML::Document.new(file)
     end
+
+    # -- Act
     ns = 'auc'
     facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
     facility.determine_open_studio_standard(ASHRAE90_1)
-    output_path = File.expand_path("../../output/#{File.basename(__FILE__, File.extname(__FILE__))}/", File.dirname(__FILE__))
-    facility.get_sites[0].generate_baseline_osm(nil, ASHRAE90_1)
-    facility.create_building_systems(output_path, 'Forced Air', 'Electricity', 'Electricity',
-                                     false, false, false, false,
-                                     false, false, false, false, false)
+    facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
+    facility.create_building_systems(main_output_dir: output_path, zone_hash: nil, hvac_delivery_type: 'Forced Air',
+                                     htg_src: 'Electricity', clg_src: 'Electricity', add_space_type_loads: false,
+                                     add_constructions: false, add_elevators: false, add_exterior_lights: false,
+                                     add_exhaust: false, add_swh: false, add_hvac: false, add_thermostat: false,
+                                     remove_objects: false)
   end
+end
 
-  it 'Should return benchmark_eui' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = '9.7'
-    puts "expected benchmark_eui: #{expected_value} but got: #{facility.building_eui_benchmark} " if facility.building_eui_benchmark != expected_value
-    expect(facility.building_eui_benchmark == expected_value).to be true
+RSpec.describe 'Facility Scenario Parsing' do
+  before(:each) do
+    # -- Setup
+    @ns = 'auc'
+    g = BuildingSync::Generator.new
+    @doc = g.create_minimum_snippet('Retail')
+    @facility_xml = g.get_first_facility_element(@doc)
   end
+  it 'building_151.xml get_scenarios should return an Array of length 30 with elements of type BuildingSync::Scenario' do
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
-  it 'Should return eui_building' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = '10.5'
-    puts "expected eui_building: #{expected_value} but got: #{facility.building_eui} " if facility.building_eui != expected_value
-    expect(facility.building_eui == expected_value).to be true
+    facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
+
+    # -- Assert
+    expect(facility.report.scenarios.size).to eq 30
+    facility.report.scenarios.each do |scenario|
+      expect(scenario).to be_an_instance_of(BuildingSync::Scenario)
+    end
   end
+  it 'scenarios should return an empty array if no scenario elements are found' do
+    scenarios = @doc.get_elements("//#{@ns}:Scenarios").first
+    scenarios.elements.delete("#{@ns}:Scenario")
 
-  it 'Should return auditor_contact_id' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = '123'
-    puts "expected auditor_contact_id: #{expected_value} but got: #{facility.auditor_contact_id} " if facility.auditor_contact_id != expected_value
-    expect(facility.auditor_contact_id == expected_value).to be true
+    scenario_elements = @doc.get_elements("//#{@ns}:Scenarios/#{@ns}:Scenario")
+    expect(scenario_elements.size).to eq(0)
+
+    facility = BuildingSync::Facility.new(@facility_xml, @ns)
+
+    # -- Assert
+    expect(facility.report.scenarios).to be_an_instance_of(Array)
+    expect(facility.report.scenarios.empty?).to be true
   end
+end
 
-  it 'Should return benchmark_source' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = 'Benchmark Type 1'
-    puts "expected benchmark_source: #{expected_value} but got: #{facility.benchmark_source} " if facility.benchmark_source != expected_value
-    expect(facility.benchmark_source == expected_value).to be true
+RSpec.describe 'Facility Systems Mapping' do
+  before(:all) do
+    # -- Setup
+    @ns = 'auc'
+    g = BuildingSync::Generator.new
+    doc = g.create_minimum_snippet('Retail')
+    doc_no_systems = g.create_minimum_snippet('Retail)')
+    @facility_no_systems_xml = g.get_first_facility_element(doc_no_systems)
+
+    g.add_hvac_system_to_first_facility(doc, 'HVACSystem-1', 'VAV with Hot Water Reheat')
+    g.add_hvac_system_to_first_facility(doc, 'HVACSystem-2', 'VAV with Hot Water Reheat')
+    g.add_lighting_system_to_first_facility(doc)
+    g.add_plug_load_to_first_facility(doc)
+
+    facility_xml = g.get_first_facility_element(doc)
+    @facility = BuildingSync::Facility.new(facility_xml, @ns)
   end
-
-  it 'Should return annual_fuel_use_native_units' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = 'kBtu/ft2'
-    puts "expected annual_fuel_use_native_units: #{expected_value} but got: #{facility.annual_fuel_use_native_units} " if facility.annual_fuel_use_native_units != expected_value
-    expect(facility.annual_fuel_use_native_units == expected_value).to be true
-  end
-
-  it 'Should return energy_cost' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = '1000'
-    puts "expected energy_cost: #{expected_value} but got: #{facility.energy_cost} " if facility.energy_cost != expected_value
-    expect(facility.energy_cost == expected_value).to be true
-  end
-
-  it 'Should return audit_date' do
-    facility = get_facility_from_file('report_478.xml', ASHRAE90_1)
-    expected_value = Date.parse('26/10/2019')
-    puts "expected audit_date: #{expected_value} but got: #{facility.audit_date} " if facility.audit_date != expected_value
-    expect(facility.audit_date == expected_value).to be true
-  end
-
-  it 'Should return contact_name' do
-    facility = get_facility_from_file('report_478.xml', ASHRAE90_1)
-    expected_value = 'John Doe'
-    puts "expected contact_name: #{expected_value} but got: #{facility.contact_auditor_name} " if facility.contact_auditor_name != expected_value
-    expect(facility.contact_auditor_name == expected_value).to be true
-  end
-
-  it 'Should return utility_name' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = 'an utility'
-    puts "expected utility_name: #{expected_value} but got: #{facility.utility_name} " if facility.utility_name != expected_value
-    expect(facility.utility_name == expected_value).to be true
-  end
-
-  it 'Should return metering_configuration ' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = 'metering config'
-    puts "expected metering_configuration: #{expected_value} but got: #{facility.metering_configuration} " if facility.metering_configuration != expected_value
-    expect(facility.metering_configuration == expected_value).to be true
-  end
-
-  it 'Should return rate_schedules ' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = 'rate schedule'
-    puts "expected rate_schedules: #{expected_value} but got: #{facility.rate_schedules} " if facility.rate_schedules != expected_value
-    expect(facility.rate_schedules == expected_value).to be true
-  end
-
-  it 'Should return rate_schedules ' do
-    facility = get_facility_from_file('building_151_level1.xml', ASHRAE90_1)
-    expected_value = 'meter 1'
-    puts "expected utility_meter_number: #{expected_value} but got: #{facility.utility_meter_number} " if facility.utility_meter_number != expected_value
-    expect(facility.utility_meter_number == expected_value).to be true
-  end
-
-  def get_facility_from_file(xml_file_name, standard_to_be_used)
-    xml_file_path = File.expand_path("../../files/#{xml_file_name}", File.dirname(__FILE__))
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-      ns = 'auc'
-      doc.elements.each("/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility|
-        return BuildingSync::Facility.new(facility, ns)
+  describe 'with systems defined' do
+    it 'should be of the correct data structure' do
+      # -- Assert
+      expect(@facility.systems_map).to be_an_instance_of(Hash)
+    end
+    it 'should have the correct keys' do
+      # -- Assert correct keys get created
+      expected_keys = ['HVACSystems', 'LightingSystems', 'PlugLoads']
+      expected_keys.each do |k|
+        expect(@facility.systems_map.key?(k)).to be true
       end
     end
-  end
 
-  def generate_baseline(file_name, ns)
-    facilities = []
-    @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
-    expect(File.exist?(@xml_path)).to be true
-    @doc = create_xml_file_object(@xml_path)
-
-    @doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_element|
-      facilities.push(BuildingSync::Facility.new(facility_element, ns))
+    it 'values should be of the correct type and size' do
+      # -- Assert values of keys are correct type and size
+      expect(@facility.systems_map['HVACSystems']).to be_an_instance_of(Array)
+      expect(@facility.systems_map['LightingSystems']).to be_an_instance_of(Array)
+      expect(@facility.systems_map['PlugLoads']).to be_an_instance_of(Array)
+      expect(@facility.systems_map['HVACSystems'].size).to eq(2)
+      expect(@facility.systems_map['LightingSystems'].size).to eq(1)
+      expect(@facility.systems_map['PlugLoads'].size).to eq(1)
     end
-    return facilities
-  end
 
-  def create_xml_file_object(xml_file_path)
-    doc = nil
-    File.open(xml_file_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-    return doc
-  end
-
-  def create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    xml_path = File.expand_path('../../files/building_151_Blank.xml', File.dirname(__FILE__))
-    ns = 'auc'
-    doc = create_xml_file_object(xml_path)
-    site_element = doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
-
-    occupancy_classification_element = REXML::Element.new("#{ns}:OccupancyClassification")
-    occupancy_classification_element.text = occupancy_classification
-    site_element.add_element(occupancy_classification_element)
-
-    building_element = site_element.elements["#{ns}:Buildings/#{ns}:Building"]
-
-    year_of_construction_element = REXML::Element.new("#{ns}:YearOfConstruction")
-    year_of_construction_element.text = year_of_const
-    building_element.add_element(year_of_construction_element)
-
-    floor_areas_element = REXML::Element.new("#{ns}:FloorAreas")
-    floor_area_element = REXML::Element.new("#{ns}:FloorArea")
-    floor_area_type_element = REXML::Element.new("#{ns}:FloorAreaType")
-    floor_area_type_element.text = floor_area_type
-    floor_area_value_element = REXML::Element.new("#{ns}:FloorAreaValue")
-    floor_area_value_element.text = floor_area_value
-
-    floor_area_element.add_element(floor_area_type_element)
-    floor_area_element.add_element(floor_area_value_element)
-    floor_areas_element.add_element(floor_area_element)
-    building_element.add_element(floor_areas_element)
-
-    # doc.write(File.open(xml_path, 'w'), 2)
-
-    return doc
-  end
-
-  def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
-    ns = 'auc'
-    facility_element = xml_snippet.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"]
-    if !facility_element.nil?
-      return BuildingSync::Facility.new(facility_element, 'auc')
-    else
-      expect(facility_element.nil?).to be false
+    it 'values in array should be of the correct type' do
+      # Only HVACSystem and LightingSystem should be typed as BSync element types (for now)
+      expect(@facility.systems_map['HVACSystems'][0]).to be_an_instance_of(BuildingSync::HVACSystem)
+      expect(@facility.systems_map['LightingSystems'][0]).to be_an_instance_of(BuildingSync::LightingSystemType)
+      expect(@facility.systems_map['PlugLoads'][0]).to be_an_instance_of(REXML::Element)
     end
   end
+  describe 'with no systems defined' do
+    it 'should not error when Systems has no children' do
+      # -- Setup - add a blank Systems element
+      REXML::Element.new("#{@ns}:Systems", @facility_no_systems_xml)
 
-  def create_blank_xml_file1
-    xml = Builder::XmlMarkup.new(indent: 2)
-    xml.instruct! :xml, encoding: 'ASCII'
-    xml.tag!('auc:BuildingSync') do |buildsync|
-      buildsync.tag!('auc:Facilities') do |faclts|
-        faclts.tag!('auc:Facility') do |faclt|
-          faclt.tag!('auc:Sites') do |sites|
-            sites.tag!('auc:Site') do |site|
-              site.tag!('auc:Buildings') do |builds|
-                builds.tag!('auc:Building') do |build|
-                  build.tag!('auc:Sections') do |subsects|
-                    subsects.tag!('auc:Section') do |subsect|
-                      subsect.Perimeter 1325
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
+      expect(@facility_no_systems_xml.get_elements("#{@ns}:Systems").size).to eq(1)
+      facility_no_systems = BuildingSync::Facility.new(@facility_no_systems_xml, @ns)
     end
+    it 'should not error when Systems does not exist' do
+      # -- Setup - remove the Systems element
+      @facility_no_systems_xml.elements.delete("#{@ns}:Systems")
+
+      expect(@facility_no_systems_xml.get_elements("#{@ns}:Systems").size).to eq(0)
+      facility_no_systems = BuildingSync::Facility.new(@facility_no_systems_xml, @ns)
+    end
+  end
+end
+
+RSpec.describe 'Facility Methods' do
+  before(:all) do
+    # -- Setup
+    file_name = 'building_151_level1.xml'
+    std = ASHRAE90_1
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    @facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
+  end
+  describe 'building_151_level1.xml' do
+
+    it 'Should return contact_name' do
+      # -- Setup
+      expected_value = 'a contact person'
+
+      # -- Assert
+      expect(@facility.get_auditor_contact_name).to eql(expected_value)
+    end
+
+    it 'Should return annual_fuel_use_native_units' do
+      # -- Setup
+      expected_value = 123
+      first_cb_measured = @facility.report.cb_measured[0]
+      first_ru = first_cb_measured.get_resource_uses[0]
+
+      # -- Assert
+      expect(first_cb_measured).to be_an_instance_of(BuildingSync::Scenario)
+      expect(first_ru).to be_an_instance_of(BuildingSync::ResourceUse)
+      expect(first_ru.xget_text_as_integer('AnnualFuelUseNativeUnits')).to eql expected_value
+    end
+
+    it 'Should return energy_cost' do
+      # -- Setup
+      expected_value = 1000
+      first_cb_measured = @facility.report.cb_measured[0]
+      first_art = first_cb_measured.get_all_resource_totals[0]
+
+      # -- Assert
+      expect(first_cb_measured).to be_an_instance_of(BuildingSync::Scenario)
+      expect(first_art).to be_an_instance_of(BuildingSync::AllResourceTotal)
+      expect(first_art.xget_text_as_integer('EnergyCost')).to eql expected_value
+    end
+
+    it 'Should return metering_configuration ' do
+      # -- Setup
+      expected_value = 'Direct metering'
+      first_utility = @facility.report.utilities[0]
+
+
+      # -- Assert
+      expect(first_utility).to be_an_instance_of(BuildingSync::Utility)
+      expect(first_utility.xget_text('MeteringConfiguration')).to eql expected_value
+    end
+
+    it 'Should return rate_schedules ' do
+      # -- Setup
+      expected_value = REXML::Element.new('auc:CriticalPeakPricing')
+      first_utility = @facility.report.utilities[0]
+      first_rate_sch = first_utility.get_rate_schedules[0]
+      rate_structure_type = first_rate_sch.get_elements("auc:TypeOfRateStructure/*")[0]
+
+      # -- Assert
+      expect(first_utility).to be_an_instance_of(BuildingSync::Utility)
+      expect(first_rate_sch).to be_an_instance_of(REXML::Element)
+      expect(rate_structure_type.to_s).to eql expected_value.to_s
+    end
+
   end
 end
