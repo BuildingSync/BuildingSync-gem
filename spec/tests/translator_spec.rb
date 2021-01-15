@@ -77,6 +77,7 @@ RSpec.describe 'Translator' do
         failures = translator.run_osws
 
         # -- Assert no failures
+        puts "Failures: #{failures}" if !failures.empty?
         expect(failures.empty?).to be true
 
         translator.gather_results
