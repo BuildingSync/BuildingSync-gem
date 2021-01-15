@@ -148,7 +148,7 @@ RSpec.describe 'BuildingSync' do
         # ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, nil, 'v2.2.0', "Error, cannot find local component for: 1fd3d630-edc5-0131-b802-48e0eb16a403.  Please try a different weather file."],
 
         # We have issues with old CBES files
-        ['L000_OpenStudio_Pre-Simulation_01.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "Did not find a class called 'CBES Pre-1978_LargeOffice' to create in", false],
+        ['L000_OpenStudio_Pre-Simulation_01.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "Did not find a", false],
 
         # #####################################
         # L000_OpenStudio_Pre-Simulation-02
