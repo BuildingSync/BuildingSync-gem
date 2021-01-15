@@ -50,15 +50,18 @@ translator.setup_and_sizing_run
 # path/to/output_dir/scenario_name
 translator.write_osws
 
-# running the baseline simulation
-# path/to/output_dir/Baseline/in.osm 
-translator.run_baseline_osm
 
 # run all simulations
 translator.run_osws
 
-# gather the results for all scenarios found in out_path
+# gather the results for all scenarios found in out_path,
+# such as annual and monthly data for different energy
+# sources (electricity, natural gas, etc.)
 translator.gather_results(out_path)
+
+# Add in UserDefinedFields, which contain information about the
+# OpenStudio model run 
+translator.prepare_final_xml
 
 # write results to xml
 save_file = File.join(out_path, 'results.xml')
@@ -93,8 +96,9 @@ Publish documentation for each release:
     
 # Releasing
 
-* Update change log
+* Update CHANGELOG.md
+* Run `rake rubocop:auto_correct`
 * Update version in `/lib/buildingsync/version.rb`
-* Merge down to master
-* Release via github
-* run `rake release` from master
+* Create PR to master, after tests and reviews complete, then merge
+* Locally - from the master branch, run `rake release`
+* On GitHub, go to the releases page and update the latest release tag. Name it “Version x.y.z” and copy the CHANGELOG entry into the description box.
