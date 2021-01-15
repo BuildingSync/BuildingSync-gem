@@ -399,7 +399,8 @@ module BuildingSync
         @open_studio_standard = Standard.build("#{@standard_template}_#{building_type}")
         update_name
       rescue StandardError => e
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.determine_open_studio_standard', e.message)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.determine_open_studio_standard', e.message[0..100])
+        raise StandardError, "BuildingSync.Building.determine_open_studio_standard: #{e.message[0..100]}"
       end
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.determine_open_studio_standard', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
       return @open_studio_standard
@@ -452,6 +453,7 @@ module BuildingSync
         # TODO: add ASHRAE 2016 once it is available
       else
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_standard_template', "Unknown standard_to_be_used #{standard_to_be_used}.")
+        raise StandardError, "BuildingSync.Building.get_standard_template: Unknown standard_to_be_used #{standard_to_be_used}."
       end
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.get_standard_template', "Using the following standard for default values #{@standard_template}.")
     end
