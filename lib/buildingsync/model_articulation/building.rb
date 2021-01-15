@@ -150,8 +150,12 @@ module BuildingSync
     def check_occupancy_classification(site_occupancy_classification)
       # Set the OccupancyClassification text as that defined by the Site
       # ONLY if it is not already defined
-      xset_or_create('OccupancyClassification', site_occupancy_classification, false)
-
+      if !site_occupancy_classification.nil?
+        xset_or_create('OccupancyClassification', site_occupancy_classification, false)
+      end
+      if xget_text('OccupancyClassification').nil?
+        raise StandardError, "Building ID: #{xget_id}. OccupancyClassification must be defined at either the Site or Building level."
+      end
     end
 
     # Set the @built_year based on YearOfConstruction / YearOfLastMajorRemodel
@@ -221,18 +225,6 @@ module BuildingSync
       end
     end
 
-    # get climate zone
-    # @param standard_to_be_used [String]
-    # @return [String]
-    def get_climate_zone(standard_to_be_used = nil)
-      if standard_to_be_used == ASHRAE90_1
-        return @climate_zone_ashrae
-      elsif standard_to_be_used == CA_TITLE24
-        return @climate_zone_ca_t24
-      else
-        return @climate_zone
-      end
-    end
 
     # get full path to epw file
     # return [String]
@@ -546,16 +538,18 @@ module BuildingSync
     def set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file, *weather_argb)
       initialize_model
 
+      determine_climate_zone(standard_to_be_used) if climate_zone.nil?
+
       # here we check if there is an valid EPW file, if there is we use that file otherwise everything will be generated from climate zone
       if !epw_file_path.nil? && File.exist?(epw_file_path)
         @epw_file_path = epw_file_path
         puts "case 1: epw file exists #{epw_file_path} and climate_zone is: #{climate_zone}"
         set_weather_and_climate_zone_from_epw(climate_zone, standard_to_be_used, latitude, longitude, ddy_file)
-      elsif climate_zone.nil?
+      elsif climate_zone.nil? && @climate_zone.nil?
         weather_station_id = weather_argb[1]
         state_name = weather_argb[2]
         city_name = weather_argb[3]
-        puts "case 2: climate_zone is nil #{climate_zone}"
+        puts "case 2: climate_zone is nil at the Site and Building level"
         if !weather_station_id.nil?
           puts "case 2.1: weather_station_id is not nil #{weather_station_id}"
           @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
@@ -568,7 +562,14 @@ module BuildingSync
         end
 
       else
-        puts "case 3: climate zone #{climate_zone} lat #{latitude} long #{longitude}"
+        puts "case 3: SITE LEVEL climate zone #{climate_zone} BUILDING LEVEL climate zone #{@climate_zone}."
+        puts "lat #{latitude} long #{longitude}"
+        if climate_zone.nil?
+          climate_zone = @climate_zone
+          puts "Climate Zone set at the Building level: #{climate_zone}"
+        else
+          puts "Climate Zone set at the Site level: #{climate_zone}"
+        end
         @epw_file_path = set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
         @epw_file_path = @epw_file_path.to_s
       end

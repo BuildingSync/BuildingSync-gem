@@ -38,21 +38,43 @@
 # *******************************************************************************
 require 'json'
 
+require 'buildingsync/constants'
+
 module BuildingSync
   # GetBCLWeatherFile class to manage the process of getting weather files from BCL
   class GetBCLWeatherFile
-    # prefix for data weather path
-    $weather_file_path_prefix = '../data/weather/'
+    def initialize
+      # prefix for data weather path
+      @weather_file_path_prefix = WEATHER_DIR
+      @weather_file = File.join(@weather_file_path_prefix, 'weather_file.json')
+      # Above structured as {"weather_file_name":[],"city_name":[],"state_code":[],"weather_id":[]}
+
+      FileUtils.mkdir_p(@weather_file_path_prefix)
+      if File.exist?(@weather_file)
+        File.open(@weather_file, 'r') do |file|
+          @weather_json = JSON.parse(file.read, {:symbolize_names => true})
+        end
+      else
+        arr = []
+        @weather_json = {
+            'weather_file_name': arr,
+            'city_name': arr,
+            'state_code': arr,
+            'weather_id': arr
+        }
+        File.open(@weather_file, 'w') { |f| f.write(@weather_json.to_json) }
+      end
+    end
 
     # download weather file from city name
     # @param state [String]
-    # @param city [String]
+    # @param city [String]c
     # @return string
     def download_weather_file_from_city_name(state, city)
       weather_file_name = get_weather_file_from_city(city)
 
       if !weather_file_name.empty?
-        return File.expand_path("#{$weather_file_path_prefix}#{weather_file_name}", File.dirname(__FILE__))
+        return File.join(@weather_file_path_prefix, weather_file_name)
       else
         wmo_no = 0
         remote = OpenStudio::RemoteBCL.new
@@ -88,10 +110,10 @@ module BuildingSync
     # @param weather_id [String]
     # @return string
     def download_weather_file_from_weather_id(weather_id)
-      weather_file_name = get_weather_file_from_weatherid(weather_id)
+      weather_file_name = get_weather_file_from_weather_id(weather_id)
 
       if !weather_file_name.empty?
-        return File.expand_path("#{$weather_file_path_prefix}#{weather_file_name}", File.dirname(__FILE__))
+        return File.join(@weather_file_path_prefix, weather_file_name)
       else
         wmo_no = 0
         remote = OpenStudio::RemoteBCL.new
@@ -156,12 +178,12 @@ module BuildingSync
         dir_path = File.dirname(epw_weather_file_path)
         weather_file_name = File.basename(epw_weather_file_path)
 
-        epw_path = File.expand_path($weather_file_path_prefix.to_s, File.dirname(__FILE__))
+        epw_path = File.expand_path(@weather_file_path_prefix.to_s, File.dirname(__FILE__))
 
         Dir.glob("#{dir_path}/**/*.*").each do |filename|
           FileUtils.mv(filename, epw_path)
         end
-        epw_path = File.expand_path("#{$weather_file_path_prefix}/#{weather_file_name}", File.dirname(__FILE__))
+        epw_path = File.expand_path("#{@weather_file_path_prefix}/#{weather_file_name}", File.dirname(__FILE__))
       end
 
       puts "Successfully set weather file to #{epw_path}"
@@ -210,12 +232,6 @@ module BuildingSync
       puts "Successfully downloaded ddy file to #{epw_path}"
       create_ddy_file(idf_path_collection, epw_path)
       puts "Successfully combined design day files to ddy file in #{epw_path}"
-      if update_json_file(epw_path)
-        puts 'JSON file updated'
-      else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.GetBCLWeatherFile.update_json_file',
-                           "Error, cannot write JSON file for downloaded weather file #{epw_path}.  The format of the weather file seems incorrect.")
-      end
     end
 
     # create design day file (ddy)
@@ -240,70 +256,22 @@ module BuildingSync
       design_day_file.close
     end
 
-    # update the JSON file
-    # @param epw_path [String]
-    # @return [Boolean]
-    def update_json_file(epw_path)
-      weather_file = File.open(epw_path)
-      location = weather_file.readlines.first.split(',')
-
-      weather_file_name = File.basename(epw_path)
-      if location.length < 5
-        return false
-      end
-      city_name = location[1]
-      state_code = location[2]
-      weather_id = location[5]
-
-      weather_file_path = File.expand_path("#{$weather_file_path_prefix}/weather_file.json", File.dirname(__FILE__))
-
-      if !File.exist?(weather_file_path)
-        create_json_file(weather_file_path)
-      end
-
-      weather_json = eval(File.read(weather_file_path))
-
-      weather_json[:weather_file_name] << weather_file_name
-      weather_json[:city_name] << city_name
-      weather_json[:state_code] << state_code
-      weather_json[:weather_id] << weather_id
-
-      File.open(weather_file_path, 'w') { |f| f.write(weather_json.to_json) }
-      return true
-    end
-
-    # read JSON file
-    def read_json_file
-      weather_file_path = File.expand_path("#{$weather_file_path_prefix}/weather_file.json", File.dirname(__FILE__))
-      File.open(weather_file_path) do |f|
-        str = f.gets
-        p str
-        # start parsing
-      end
-    end
-
     # get weather file from weather ID
     # @param weather_id [String]
     # @return [String]
-    def get_weather_file_from_weatherid(weather_id)
+    def get_weather_file_from_weather_id(weather_id)
       weather_file_name = ''
-
-      json = get_weather_json_data
-
-      is_found, counter = weatherid_found_in_json_data(json, weather_id)
-
-      weather_file_name = json[:weather_file_name][counter] if is_found
-
+      is_found, counter = find_weather_counter(weather_id)
+      weather_file_name = @weather_json[:weather_file_name][counter] if is_found
       return weather_file_name
     end
 
     # check if weather ID is found in JSON data
-    # @param json [JSON]
     # @param weather_id [String]
     # @return [array<boolean, int>]
-    def weatherid_found_in_json_data(json, weather_id)
+    def find_weather_counter(weather_id)
       counter = 0
-      json[:weather_id].each do |cname|
+      @weather_json[:weather_id].each do |cname|
         if cname.include? weather_id
           return true, counter
         end
@@ -317,56 +285,23 @@ module BuildingSync
     # @return [String]
     def get_weather_file_from_city(city)
       weather_file_name = ''
-
-      json = get_weather_json_data
-
-      is_found, counter = city_found_in_json_data(json, city)
-
-      weather_file_name = json[:weather_file_name][counter] if is_found
-
+      is_found, counter = city_found_in_json_data(city)
+      weather_file_name = @weather_json[:weather_file_name][counter] if is_found
       return weather_file_name
     end
 
     # city found in JSON data
-    # @param json [JSON]
     # @param city [String]
     # @return [array<boolean, int>]
-    def city_found_in_json_data(json, city)
+    def city_found_in_json_data(city)
       counter = 0
-      json[:city_name].each do |cname|
+      @weather_json[:city_name].each do |cname|
         if cname.include? city
           return true, counter
         end
         counter += 1
       end
       return false, counter
-    end
-
-    # city found in JSON data
-    # @return [object]
-    def get_weather_json_data
-      weather_file_path = File.expand_path("#{$weather_file_path_prefix}/weather_file.json", File.dirname(__FILE__))
-      create_json_file(weather_file_path) if !File.exist?(weather_file_path)
-
-      return eval(File.read(weather_file_path))
-    end
-
-    # create JSON file
-    # @param weather_file_path [String]
-    def create_json_file(weather_file_path)
-      weather_file_folder = File.expand_path($weather_file_path_prefix.to_s, File.dirname(__FILE__))
-      FileUtils.mkdir_p weather_file_folder
-      weather_file = File.new("#{weather_file_folder}/weather_file.json", 'w')
-
-      arr = []
-      weather_detail = {
-        'weather_file_name' => arr,
-        'city_name' => arr,
-        'state_code' => arr,
-        'weather_id' => arr
-      }
-
-      File.open(weather_file_path, 'w') { |f| f.write(weather_detail.to_json) }
     end
 
     # find response from given state

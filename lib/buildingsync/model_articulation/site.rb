@@ -194,10 +194,11 @@ module BuildingSync
     # @param ddy_file [String]
     def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
       set_all
-      @climate_zone = @climate_zone_ashrae
-      # for now we use the california climate zone if it is available
-      @climate_zone = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
-      @climate_zone = @building.get_climate_zone(standard_to_be_used) if @climate_zone.nil?
+      determine_climate_zone(standard_to_be_used)
+
+      # If we can't get the CZ from the site, we attempt to get from the building
+      @climate_zone = @building.get_climate_zone if @climate_zone.nil?
+
       OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Site.generate_baseline_osm', 'Could not find a climate zone in the BuildingSync file.') if @climate_zone.nil?
       lat = @building.xget_text('Latitude').nil? ? xget_text('Latitude') : @building.xget_text('Latitude')
       long = @building.xget_text('Longitude').nil? ? xget_text('Longitude') : @building.xget_text('Longitude')

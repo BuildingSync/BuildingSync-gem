@@ -54,6 +54,8 @@ module BuildingSync
       @climate_zone_ca_t24 = nil
       @city_name = nil
       @state_name = nil
+
+      read_location_values
     end
 
     # read location values
@@ -63,6 +65,31 @@ module BuildingSync
 
       # read city and state name
       read_city_and_state_name
+    end
+
+    def determine_climate_zone(standard_to_be_used = nil)
+      if standard_to_be_used == ASHRAE90_1
+        if !@climate_zone_ashrae.nil?
+          @climate_zone = @climate_zone_ashrae
+        elsif @climate_zone.nil? && !@climate_zone_ca_t24.nil?
+          @climate_zone = @climate_zone_ca_t24
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LocationElement.determine_climate_zone', "Element ID: #{xget_id} - Standard to use is #{standard_to_be_used} but ASHRAE Climate Zone is nil. Using CA T24: #{@climate_zone}")
+        end
+      elsif standard_to_be_used == CA_TITLE24
+        if !@climate_zone_ca_t24.nil?
+          @climate_zone = @climate_zone_ca_t24
+        elsif @climate_zone.nil? && !@climate_zone_ashrae.nil?
+          @climate_zone = @climate_zone_ashrae
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LocationElement.determine_climate_zone', "Element ID: #{xget_id} - Standard to use is #{standard_to_be_used} but CA T24 Climate Zone is nil. Using ASHRAE: #{@climate_zone}")
+        end
+      end
+    end
+
+    # get climate zone
+    # @param standard_to_be_used [String]
+    # @return [String]
+    def get_climate_zone
+      return @climate_zone
     end
 
     # read climate zone
