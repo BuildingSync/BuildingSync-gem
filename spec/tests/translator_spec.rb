@@ -45,8 +45,8 @@ RSpec.describe 'Translator' do
   describe "Example Full Workflow" do
     tests = [
         # file_name, standard, epw_path, schema_version
-        ['building_151_one_scenario.xml', CA_TITLE24, nil, 'v2.2.0'],
-        ['L000_OpenStudio_Pre-Simulation_01.xml', CA_TITLE24, nil, 'v2.2.0']
+        ['building_151.xml', CA_TITLE24, nil, 'v2.2.0'],
+        ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.2.0']
     ]
     tests.each do |test|
       it 'Should Run the Prototypical Workflow' do
