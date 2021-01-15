@@ -303,6 +303,13 @@ module BuildingSync
         if categories_found
           @workflow_maker_json[sym_to_find].each do |category|
             m_name = measure.xget_name.to_sym
+
+            # Where standardized measure names have not been adopted as enumerations
+            # in the BuildingSync Schema, a <MeasureName>Other</MeasureName> is used
+            # and the actual measure name added
+            if m_name == :Other
+              m_name = measure.xget_text("CustomMeasureName").to_sym
+            end
             if !category[m_name].nil?
               measure_dir_name = category[m_name][:measure_dir_name]
               num_measures += 1
@@ -386,11 +393,17 @@ module BuildingSync
 
       if @facility.report.cb_modeled.nil?
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', 'OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method')
-        raise StandardError, 'OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method'
+        raise StandardError, 'BuildingSync.WorkflowMaker.write_osws: OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method'
       end
 
       # Write a workflow for the current building modeled scenario
       cb_modeled_success = write_osw(main_output_dir, @facility.report.cb_modeled)
+
+      if !cb_modeled_success
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', 'A workflow was not successfully written for the cb_modeled (Current Building Modeled) Scenario.')
+        raise StandardError, 'BuildingSync.WorkflowMaker.write_osws: A workflow was not successfully written for the cb_modeled (Current Building Modeled) Scenario.'
+      end
+
       number_successful = cb_modeled_success ? 1 : 0
 
       if not only_cb_modeled
@@ -399,6 +412,8 @@ module BuildingSync
           successful = write_osw(main_output_dir, scenario)
           if successful
             number_successful += 1
+          else
+            OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', "Scenario ID: #{scenario.xget_id}. Unsuccessful write_osw")
           end
         end
       end
@@ -407,10 +422,16 @@ module BuildingSync
       # Compare the total number of potential successes to the number of actual successes
       if only_cb_modeled
         # In this case we should have only 1 success
-        really_successful = number_successful == 1
+        expected_successes = 1
+        really_successful = number_successful == expected_successes
       else
         # In this case, all pom scenarios should be run + the cb_modeled scenario
-        really_successful = number_successful == @facility.report.poms.size + 1
+        expected_successes = @facility.report.poms.size + 1
+        really_successful = number_successful == expected_successes
+      end
+
+      if !really_successful
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', "Facility ID: #{@facility.xget_id}. Expected #{expected_successes}, Got #{number_successful} OSWs")
       end
 
       return really_successful
