@@ -65,16 +65,13 @@ jobs:
       run: |
         gem install bundler
         bundle install
-    - name: Translator Spec
+    - name: Translator Example Spec
       run: bundle exec rspec spec/tests/translator_spec.rb
       if: always()
     - name: Translator Sizing Run Spec
       run: bundle exec rspec spec/tests/translator_sizing_run_spec.rb
       if: always()
-    - name: Translator Perform SR and Baseline Simulations, Gather and Save Results Spec
-      run: bundle exec rspec spec/tests/translator_baseline_gather_save_spec.rb
-      if: always()
-    - name: Translator Generation Specs
+    - name: Translator Scenario Generation Specs
       run: bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
       if: always()
     - name: Translator Scenario Simulation Spec
