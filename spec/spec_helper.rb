@@ -218,29 +218,6 @@ RSpec.configure do |config|
     expect(non_sr_osws.size).to eq expected_number_of_scenarios
   end
 
-  def translator_write_run_baseline_gather_save_perform_all_checks(xml_path, output_path, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
-    # -- Assert translator.write_osm checks
-    translator = translator_sizing_run_and_check(xml_path, output_path, epw_file_path, standard_to_be_used)
-
-    # -- Setup
-    epw_file_path = '' if epw_file_path.nil? || !File.exist?(epw_file_path)
-    translator.run_baseline_osm(epw_file_path)
-
-    # -- Assert translator.run_baseline_osm checks
-    translator_run_baseline_osm_checks(output_path)
-
-    # -- Setup
-    success = translator.gather_results(output_path)
-
-    # -- Assert
-    expected_resource_uses = ['Electricity', 'Natural gas']
-    translator_gather_results_check_current_building_modeled(translator, success, expected_resource_uses)
-
-    # -- Assert
-    results_file_path = File.join(output_path, 'results.xml')
-    translator_save_xml_checks(translator, results_file_path)
-  end
-
   # Creates a new Translator for the file specified and runs the setup_and_sizing_run method and checks:
   #  - output_path/SR directory created (for sizing run)
   #  - output_path/SR/run/finished.job exists
