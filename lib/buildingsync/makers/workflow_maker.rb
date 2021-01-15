@@ -299,6 +299,8 @@ module BuildingSync
         current_num_measure = num_measures
 
         sym_to_find = measure.xget_text('SystemCategoryAffected').to_s.to_sym
+
+        # 'Other HVAC' or 'Cooling System' as examples
         categories_found = @workflow_maker_json.key?(sym_to_find)
         if categories_found
           @workflow_maker_json[sym_to_find].each do |category|
@@ -310,12 +312,18 @@ module BuildingSync
             if m_name == :Other
               m_name = measure.xget_text("CustomMeasureName").to_sym
             end
+
+            # m_name is, for example: 'Replace HVAC system type to VRF'
+
             if !category[m_name].nil?
               measure_dir_name = category[m_name][:measure_dir_name]
               num_measures += 1
               category[m_name][:arguments].each do |argument|
+
+                # Certain arguments are only applied under specific conditions
+                #
                 if !argument[:condition].nil? && !argument[:condition].empty?
-                  set_argument_detail(base_workflow, argument, measure_dir_name, measure.xget_name)
+                  set_argument_detail(base_workflow, argument, measure_dir_name, m_name.to_s)
                 else
                   set_measure_argument(base_workflow, measure_dir_name, argument[:name], argument[:value])
                 end
@@ -350,33 +358,37 @@ module BuildingSync
       argument_value = ''
 
       if measure_name == 'Add daylight controls' || measure_name == 'Replace HVAC system type to PZHP'
-        if argument[:condition] == @facility_xml['bldg_type']
+        # For these measures, the condition is based on the standards building type determined
+        if argument[:condition] == @facility.site.get_building_type
           argument_name = argument[:name]
-          argument_value = "#{argument[:value]} #{@facility_xml['template']}"
+
+          # This is a really terrible way to do this.  It fails
+          # in many scenarios
+          argument_value = "#{argument[:value]} #{@facility.site.get_standard_template}"
         end
       elsif measure_name == 'Replace burner'
-        if argument[:condition] == @facility_xml['system_type']
+        if argument[:condition] == @facility.site.get_system_type
           argument_name = argument[:name]
           argument_value = argument[:value]
         end
       elsif measure_name == 'Replace boiler'
-        if argument[:condition] == @facility_xml['system_type']
+        if argument[:condition] == @facility.site.get_system_type
           argument_name = argument[:name]
           argument_value = argument[:value]
         end
       elsif measure_name == 'Replace package units'
-        if argument[:condition] == @facility_xml['system_type']
+        if argument[:condition] == @facility.site.get_system_type
           argument_name = argument[:name]
           argument_value = argument[:value]
         end
       elsif measure_name == 'Replace HVAC system type to VRF' || measure_name == 'Replace HVAC with GSHP and DOAS' || measure_name == 'Replace AC and heating units with ground coupled heat pump systems'
-        if argument[:condition] == @facility_xml['bldg_type']
-          argument_name = "#{argument[:name]} #{@facility_xml['template']}"
+        if argument[:condition] == @facility.site.get_building_type
+          argument_name = "#{argument[:name]}"
           argument_value = argument[:value]
         end
       else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.set_argument_detail', "measure dir name not found #{measure_name}.")
-        puts "BuildingSync.WorkflowMakerPhaseZero.set_argument_detail: Measure dir name not found #{measure_name}."
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.set_argument_detail', "measure dir name not found #{measure_name}.")
+        puts "BuildingSync.WorkflowMaker.set_argument_detail: Measure dir name not found #{measure_name}."
       end
 
       set_measure_argument(workflow, measure_dir_name, argument_name, argument_value) if !argument_name.nil? && !argument_name.empty?
