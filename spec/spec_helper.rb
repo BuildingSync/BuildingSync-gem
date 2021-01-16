@@ -359,7 +359,7 @@ RSpec.configure do |config|
   end
 
   def get_tests
-    return [
+    tests = [
         # file_name, standard, epw_path, schema_version, expected_scenarios
         ['building_151.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
         ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
@@ -384,6 +384,7 @@ RSpec.configure do |config|
         # - BuildingSync Website Valid Schema.xml (OccupancyClassification not defined)
         # - AT_example_property_report_25 (OccupancyClassification not defined)
     ]
+    return tests
   end
 
   class DummyClass

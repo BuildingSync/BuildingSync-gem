@@ -42,11 +42,9 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  before(:all) do
-    @tests = get_tests
-  end
   describe "Translator Simulate Full Workflow" do
-    @tests.each do |test|
+    tests = get_tests
+    tests.each do |test|
       it "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}. Expected Scenarios: #{test[4]}" do
         xml_path, output_path = create_xml_path_and_output_path(test[0], test[1], __FILE__, test[3])
         translator = translator_sizing_run_and_check(xml_path, output_path, test[2], test[1])
