@@ -112,7 +112,7 @@ RSpec.describe 'BuildingSpec' do
         # Should not reach this line
         expect(false).to be true
       rescue StandardError => e
-        expect(e.message.to_s).to eq('Unable to set OccupancyClassification to nil')
+        expect(e.message.to_s).to eq('Building ID: Building1. OccupancyClassification must be defined at either the Site or Building level.')
       end
     end
 
