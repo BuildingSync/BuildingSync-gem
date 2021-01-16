@@ -289,7 +289,6 @@ RSpec.configure do |config|
 
     # -- Assert
     # gather_results simply prepares all of the results in memory as an REXML::Document
-    expect(success).to be true
     expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
 
     doc = translator.doc
