@@ -63,7 +63,8 @@ RSpec.describe 'Translator' do
         #    determined from the location defined in the BSync file
         # OR
         #   for the location overriden by the epw file
-        # 3. Write new scenarios for
+        # 3. Write new scenarios for each scenario
+        #
         translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, std)
         translator.setup_and_sizing_run
 
