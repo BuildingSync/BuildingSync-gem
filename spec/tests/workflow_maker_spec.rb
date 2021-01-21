@@ -62,7 +62,7 @@ RSpec.describe 'WorkflowMaker' do
       begin
         workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
       rescue StandardError => e
-        expect(e.message).to eql 'ns must be String.  Passed object of class: Int'
+        expect(e.message).to eql 'ns must be String.  Passed object of class: Integer'
       end
     end
   end
