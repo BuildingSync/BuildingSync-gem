@@ -213,6 +213,15 @@
       <Reports>
         <Report>
           <Scenarios>
+            <Scenario ID="Base">
+              <ScenarioType>
+                <CurrentBuilding>
+                  <CalculationMethod>
+                    <Modeled/>
+                  </CalculationMethod>
+                </CurrentBuilding>
+              </ScenarioType>
+            </Scenario>
             <Scenario ID="Package1">
               <ScenarioName>AERG Package</ScenarioName>
               <ScenarioType>
