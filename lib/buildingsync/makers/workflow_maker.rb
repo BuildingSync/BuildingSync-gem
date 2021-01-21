@@ -57,18 +57,8 @@ module BuildingSync
     def initialize(doc, ns)
       super(doc, ns)
 
-      if !doc.is_a?(REXML::Document)
-        raise StandardError, "doc must be an REXML::Document.  Passed object of class: #{doc.class}"
-      end
-
-      if !ns.is_a?(String)
-        raise StandardError, 'ns must be String.  Passed object of class: Int'
-      end
-
       @facility_xml = nil
       @facility = nil
-
-      @failed_scenarios = []
 
       # TODO: Be consistent in symbolizing names in hashes or not
       File.open(PHASE_0_BASE_OSW_FILE_PATH, 'r') do |file|
@@ -522,9 +512,13 @@ module BuildingSync
     end
 
     # get failed scenarios
-    # @return [array]
+    # @return [Array<BuildingSync::Scenario>]
     def get_failed_scenarios
-      return @failed_scenarios
+      failed = []
+      @facility.report.scenarios.each do |scenario|
+        failed << scenario if !scenario.simulation_success?
+      end
+      return failed
     end
 
     # cleanup larger files

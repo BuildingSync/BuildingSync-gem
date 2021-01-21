@@ -47,6 +47,14 @@ module BuildingSync
     # @param doc [REXML::Document]
     # @param ns [String]
     def initialize(doc, ns)
+      if !doc.is_a?(REXML::Document)
+        raise StandardError, "doc must be an REXML::Document.  Passed object of class: #{doc.class}"
+      end
+
+      if !ns.is_a?(String)
+        raise StandardError, "ns must be String.  Passed object of class: #{ns.class}"
+      end
+
       @doc = doc
       @ns = ns
       @workflow = nil
