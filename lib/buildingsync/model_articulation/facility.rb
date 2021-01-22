@@ -233,7 +233,7 @@ module BuildingSync
     end
 
     # @see BuildingSync::Report.add_cb_modeled
-    def add_cb_modeled(id = "Scenario-#{BuildingSync::BASELINE}")
+    def add_cb_modeled(id = "Scenario-Baseline")
       @report.add_cb_modeled(id)
     end
 

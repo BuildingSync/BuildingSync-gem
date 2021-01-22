@@ -42,9 +42,4 @@
 module BuildingSync
   # version of the BuildingSync gem
   VERSION = '0.2.0'
-
-  # baseline string
-  BASELINE = 'Baseline'
-  # measured string
-  MEASURED = 'Measured'
 end

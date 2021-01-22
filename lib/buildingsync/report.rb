@@ -199,7 +199,7 @@ module BuildingSync
     # add a current building modeled scenario and set the @cb_modeled attribute
     # @param id [String] id to use for the scenario
     # @return [NilClass]
-    def add_cb_modeled(id = "Scenario-#{BuildingSync::BASELINE}")
+    def add_cb_modeled(id = "Scenario-Baseline")
       if @cb_modeled.nil? || @cb_modeled.empty?
         g = BuildingSync::Generator.new
         scenario_xml = g.add_scenario_to_report(@base_xml, 'CBModeled', id)
