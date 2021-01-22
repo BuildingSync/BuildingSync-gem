@@ -64,8 +64,9 @@ translator.gather_results(out_path)
 translator.prepare_final_xml
 
 # write results to xml
-save_file = File.join(out_path, 'results.xml')
-translator.save_xml(save_file)
+# default file name is 'results.xml' 
+file_name = 'abc-123.xml' 
+translator.save_xml(file_name)
 ```
 ## Testing
 
