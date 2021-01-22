@@ -288,24 +288,45 @@ module BuildingSync
         measure = @facility.measures.find { |m| m.xget_id == measure_id }
         current_num_measure = num_measures
 
-        sym_to_find = measure.xget_text('SystemCategoryAffected').to_s.to_sym
+        sym_to_find = measure.xget_text('SystemCategoryAffected')
+        if sym_to_find.nil? || sym_to_find.empty?
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Measure ID: #{measure.xget_id} does not define a SystemCategoryAffected.")
+          successful = false
+        else
+          sym_to_find = sym_to_find.to_s.to_sym
+        end
 
         # 'Other HVAC' or 'Cooling System' as examples
         categories_found = @workflow_maker_json.key?(sym_to_find)
         if categories_found
-          @workflow_maker_json[sym_to_find].each do |category|
-            m_name = measure.xget_name.to_sym
+          m_name = measure.xget_name
 
-            # Where standardized measure names have not been adopted as enumerations
-            # in the BuildingSync Schema, a <MeasureName>Other</MeasureName> is used
-            # and the actual measure name added
-            if m_name == :Other
-              m_name = measure.xget_text("CustomMeasureName").to_sym
+          if m_name.nil? || m_name.empty?
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Measure ID: #{measure.xget_id} does not have a MeasureName defined.")
+            successful = false
+          else
+            m_name = m_name.to_sym
+          end
+
+          # Where standardized measure names have not been adopted as enumerations
+          # in the BuildingSync Schema, a <MeasureName>Other</MeasureName> is used
+          # and the actual measure name added
+          if m_name == :Other
+            m_name = measure.xget_text("CustomMeasureName")
+            if m_name.nil? || m_name.empty?
+              OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Measure ID: #{measure.xget_id} has a MeasureName of 'Other' but does not have a CustomMeasureName defined.")
+              successful = false
+            else
+              m_name = m_name.to_sym
             end
+          end
+          measure_found = false
+          @workflow_maker_json[sym_to_find].each do |category|
 
             # m_name is, for example: 'Replace HVAC system type to VRF'
 
             if !category[m_name].nil?
+              measure_found = true
               measure_dir_name = category[m_name][:measure_dir_name]
               num_measures += 1
               category[m_name][:arguments].each do |argument|
@@ -320,6 +341,9 @@ module BuildingSync
               end
             end
           end
+          if !measure_found
+            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Could not find measure '#{m_name}' under category #{sym_to_find} in workflow_maker.json.")
+          end
         else
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Category: #{measure.xget_text('SystemCategoryAffected')} not found in workflow_maker.json.")
         end
@@ -331,7 +355,7 @@ module BuildingSync
       end
 
       # ensure that we didn't miss any measures by accident
-      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "#{scenario.get_measure_ids.size} measures expected, #{num_measures} found,  measure_ids = #{scenario.get_measure_ids}") if num_measures != scenario.get_measure_ids.size
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "#{scenario.get_measure_ids.size} measures expected, #{num_measures} resolved,  expected measure_ids = #{scenario.get_measure_ids}") if num_measures != scenario.get_measure_ids.size
       return successful
     end
 
