@@ -55,7 +55,6 @@ module BuildingSync
     # @param standard_to_be_used [String]
     # @param validate_xml_file_against_schema [Boolean]
     def initialize(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1, validate_xml_file_against_schema = true)
-      @doc = nil
       @schema_version = nil
       @xml_file_path = xml_file_path
       @output_dir = output_dir
@@ -77,17 +76,17 @@ module BuildingSync
         raise "File '#{xml_file_path}' does not exist" unless File.exist?(xml_file_path)
       end
 
-      @doc = help_load_doc(xml_file_path)
+      doc = help_load_doc(xml_file_path)
 
-      @schema_version = @doc.root.attributes['version']
+      @schema_version = doc.root.attributes['version']
       if @schema_version.nil?
         @schema_version = '2.0.0'
       end
 
       # test for the namespace
-      @ns = 'auc'
-      @doc.root.namespaces.each_pair do |k, v|
-        @ns = k if /bedes-auc/.match(v)
+      ns = 'auc'
+      doc.root.namespaces.each_pair do |k, v|
+        ns = k if /bedes-auc/.match(v)
       end
 
       if validate_xml_file_against_schema
@@ -97,7 +96,7 @@ module BuildingSync
         puts "File '#{xml_file_path}' was not validated against the BuildingSync schema"
       end
 
-      super(@doc, @ns)
+      super(doc, ns)
     end
 
     # Validate the xml file against the schema
@@ -164,6 +163,6 @@ module BuildingSync
       end
     end
 
-    attr_accessor :doc, :results_gathered, :final_xml_prepared
+    attr_accessor :doc, :results_gathered, :final_xml_prepared, :ns
   end
 end

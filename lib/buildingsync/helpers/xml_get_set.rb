@@ -44,6 +44,15 @@ module BuildingSync
   # Used for getting, setting, and creating XML snippets
   # for BuildingSync classes with an @base_xml attribute
   module XmlGetSet
+    
+    def get_prefix
+      if @ns == ''
+        return ''
+      else
+        return "#{@ns}:"
+      end
+    end
+    
     # Get the id attribute of the @base_xml
     # @see help_get_attribute_value
     def xget_id
@@ -59,7 +68,7 @@ module BuildingSync
       if premises.include? @base_xml.name
         return xget_text('PremisesName')
       elsif @base_xml.name == 'Measure'
-        m = @base_xml.elements[".//#{@ns}:MeasureName"]
+        m = @base_xml.elements[".//#{get_prefix}MeasureName"]
         return help_get_text_value(m)
       else
         return xget_text("#{@base_xml.name}Name")
@@ -67,7 +76,7 @@ module BuildingSync
     end
 
     def xget_attribute_for_element(element_name, attribute)
-      element = @base_xml.elements["./#{@ns}:#{element_name}"]
+      element = @base_xml.elements["./#{get_prefix}#{element_name}"]
       return help_get_attribute_value(element, attribute)
     end
 
@@ -76,50 +85,50 @@ module BuildingSync
     # @return [REXML::Element] if element exists
     # @return [nil] if element doesnt exist
     def xget_element(element_name)
-      return @base_xml.elements["./#{@ns}:#{element_name}"]
+      return @base_xml.elements["./#{get_prefix}#{element_name}"]
     end
 
     # get or create a new element
     # @param element_name [String] non-namespaced element name, 'EnergyResource'
     # @see help_get_or_create
     def xget_or_create(element_name)
-      return help_get_or_create(@base_xml, "#{@ns}:#{element_name}")
+      return help_get_or_create(@base_xml, "#{get_prefix}#{element_name}")
     end
 
     # @param element_name [String] non-namespaced element name, 'EnergyResource'
     # @see help_get_text_value
     def xget_text(element_name)
-      return help_get_text_value(@base_xml.elements["./#{@ns}:#{element_name}"])
+      return help_get_text_value(@base_xml.elements["./#{get_prefix}#{element_name}"])
     end
 
     # @param element_name [String] non-namespaced element name, 'YearOfConstruction'
     # @see help_get_text_value_as_float
     def xget_text_as_float(element_name)
-      return help_get_text_value_as_float(@base_xml.elements["./#{@ns}:#{element_name}"])
+      return help_get_text_value_as_float(@base_xml.elements["./#{get_prefix}#{element_name}"])
     end
 
     # @param element_name [String] non-namespaced element name, 'YearOfConstruction'
     # @see help_get_text_value_as_integer
     def xget_text_as_integer(element_name)
-      return help_get_text_value_as_integer(@base_xml.elements["./#{@ns}:#{element_name}"])
+      return help_get_text_value_as_integer(@base_xml.elements["./#{get_prefix}#{element_name}"])
     end
 
     # @param element_name [String] non-namespaced element name, 'BuildingAutomationSystem'
     # @see help_get_text_value_as_bool
     def xget_text_as_bool(element_name)
-      return help_get_text_value_as_bool(@base_xml.elements["./#{@ns}:#{element_name}"])
+      return help_get_text_value_as_bool(@base_xml.elements["./#{get_prefix}#{element_name}"])
     end
 
     # @param element_name [String] non-namespaced element name, 'RetrocommissioningDate'
     # @see help_get_text_value_as_date
     def xget_text_as_date(element_name)
-      return help_get_text_value_as_date(@base_xml.elements["./#{@ns}:#{element_name}"])
+      return help_get_text_value_as_date(@base_xml.elements["./#{get_prefix}#{element_name}"])
     end
 
     # @param element_name [String] non-namespaced element name, 'StartTimestamp'
     # @see help_get_text_value_as_datetime
     def xget_text_as_dt(element_name)
-      return help_get_text_value_as_datetime(@base_xml.elements["./#{@ns}:#{element_name}"])
+      return help_get_text_value_as_datetime(@base_xml.elements["./#{get_prefix}#{element_name}"])
     end
 
     # Gets all of the IDref attributes of the element_name provided
@@ -129,7 +138,7 @@ module BuildingSync
     # @param element_name [String] name of the non-pluralized element, i.e. Measure
     # @return [Array<String>] all associated IDs ['Measure-1', 'Measure-2', etc.]
     def xget_idrefs(element_name)
-      id_elements = @base_xml.get_elements(".//#{@ns}:#{element_name}s/#{@ns}:#{element_name}")
+      id_elements = @base_xml.get_elements(".//#{get_prefix}#{element_name}s/#{get_prefix}#{element_name}")
       to_return = []
       id_elements.each do |id|
         to_return << help_get_attribute_value(id, 'IDref')
@@ -138,7 +147,7 @@ module BuildingSync
     end
 
     def xget_plurals_text_value(element_name)
-      plurals = @base_xml.get_elements(".//#{@ns}:#{element_name}s/#{@ns}:#{element_name}")
+      plurals = @base_xml.get_elements(".//#{get_prefix}#{element_name}s/#{get_prefix}#{element_name}")
       to_return = []
       plurals.each do |p|
         to_return << help_get_text_value(p)
@@ -151,7 +160,7 @@ module BuildingSync
     # @example {'Building' => ['Building-1', 'Building-1'], 'Section' => ['Section-4']]}
     def xget_linked_premises
       map = {}
-      premises = @base_xml.get_elements(".//#{@ns}:LinkedPremises").first
+      premises = @base_xml.get_elements(".//#{get_prefix}LinkedPremises").first
       premises&.elements&.each do |premise_type|
         map[premise_type.name] = []
         idref_elements = premise_type.get_elements('.//*[@IDref]')
@@ -168,7 +177,7 @@ module BuildingSync
     # @return [REXML::Element] if element exists
     # @return [nil] if element doesn't exist
     def xset_text(element_name, new_value)
-      element = @base_xml.elements["./#{@ns}:#{element_name}"]
+      element = @base_xml.elements["./#{get_prefix}#{element_name}"]
       if !element.nil?
         element.text = new_value
       end
@@ -182,7 +191,7 @@ module BuildingSync
     # @param override [Boolean] whether to override the text value if the element already has text
     # @return [REXML::Element] the element
     def xset_or_create(element_name, new_value, override = true)
-      element = @base_xml.elements["./#{@ns}:#{element_name}"]
+      element = @base_xml.elements["./#{get_prefix}#{element_name}"]
       if !element.nil?
         # if there is no value, we set it
         if element.text.nil? || element.text.empty?
@@ -192,7 +201,7 @@ module BuildingSync
           element.text = new_value
         end
       else
-        element = REXML::Element.new("#{@ns}:#{element_name}", @base_xml)
+        element = REXML::Element.new("#{get_prefix}#{element_name}", @base_xml)
         element.text = new_value
       end
       if element.text.nil?

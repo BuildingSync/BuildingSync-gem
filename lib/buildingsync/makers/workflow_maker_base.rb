@@ -60,6 +60,14 @@ module BuildingSync
       @workflow = nil
     end
 
+    def get_prefix
+      if @ns == ''
+        return ''
+      else
+        return "#{@ns}:"
+      end
+    end
+
     # TODO: add a schema validation and re-ordering mechanism for XML elements
     # Format, add declaration, and write xml to disk
     # @param filename [String] full path including filename, i.e. output/path/results.xml

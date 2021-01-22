@@ -293,27 +293,28 @@ RSpec.configure do |config|
     expect(translator.get_failed_scenarios.empty?).to be(true), "Scenarios #{translator.get_failed_scenarios.join(', ')} failed to run"
 
     doc = translator.doc
+    prefix = translator.get_prefix
     expect(doc).to be_an_instance_of(REXML::Document)
 
     # There should be one Current Building Modeled scenario (referred to as Baseline)
-    current_building_modeled_scenario = REXML::XPath.match(doc, '//auc:Scenarios/auc:Scenario[auc:ScenarioType/auc:CurrentBuilding/auc:CalculationMethod/auc:Modeled]')
+    current_building_modeled_scenario = REXML::XPath.match(doc, "//#{prefix}Scenarios/#{prefix}Scenario[#{prefix}ScenarioType/#{prefix}CurrentBuilding/#{prefix}CalculationMethod/#{prefix}Modeled]")
     expect(current_building_modeled_scenario.size).to eql 1
 
     expected_resource_uses.each do |use|
       # Check that the energy resource use actually gets created
-      resource = REXML::XPath.match(current_building_modeled_scenario, "./auc:ResourceUses/auc:ResourceUse[auc:EnergyResource/text()='#{use}']")
+      resource = REXML::XPath.match(current_building_modeled_scenario, "./#{prefix}ResourceUses/#{prefix}ResourceUse[#{prefix}EnergyResource/text()='#{use}']")
       expect(resource.size).to eql 1
       resource = resource.first
       expect(resource).to be_an_instance_of(REXML::Element)
 
       # Check that 12 months of TimeSeries data is inserted into the document
-      xp = "./auc:TimeSeriesData/auc:TimeSeries[auc:ReadingType/text() = 'Total' and auc:IntervalFrequency/text() = 'Month' and auc:ResourceUseID/@IDref = '#{resource.attribute('ID')}']"
+      xp = "./#{prefix}TimeSeriesData/#{prefix}TimeSeries[#{prefix}ReadingType/text() = 'Total' and #{prefix}IntervalFrequency/text() = 'Month' and #{prefix}ResourceUseID/@IDref = '#{resource.attribute('ID')}']"
       ts_elements = REXML::XPath.match(current_building_modeled_scenario, xp)
 
       expect(ts_elements.size).to eql 12
       ts_elements.each do |ts_element|
         # Check that there is an actual value for an interval reading and that it can be cast to a float
-        interval_reading = ts_element.get_elements('./auc:IntervalReading')
+        interval_reading = ts_element.get_elements("./#{prefix}IntervalReading")
         expect(interval_reading.size).to eql 1
         interval_reading = interval_reading.first
         expect(interval_reading).to be_an_instance_of(REXML::Element)

@@ -77,7 +77,7 @@ module BuildingSync
     end
 
     def read_xml
-      facility_xml_temp = @doc.get_elements("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility")
+      facility_xml_temp = @doc.get_elements("#{get_prefix}BuildingSync/#{get_prefix}Facilities/#{get_prefix}Facility")
 
       # Raise errors for zero or multiple Facilities.  Not supported at this time.
       if facility_xml_temp.nil? || facility_xml_temp.empty?
