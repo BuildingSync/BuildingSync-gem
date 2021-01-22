@@ -360,11 +360,11 @@ RSpec.configure do |config|
 
   def get_tests
     tests = [
-        # file_name, standard, epw_path, schema_version, expected number of non-cb_modeled (baseline) scenarios
+        # file_name, standard, epw_path, schema_version, expected number of scenarios, including cb_modeled
         ['building_151.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
         ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.2.0', 30],
-        ['DC GSA Headquarters.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', 1],
-        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
+        ['DC GSA Headquarters.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', 2],
+        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, 'v2.2.0', 2],
         ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', 1],
         ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
         ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, nil, 'v2.2.0', 1],
