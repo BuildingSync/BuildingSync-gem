@@ -112,6 +112,7 @@ RSpec.configure do |config|
     return xml_path, output_path
   end
 
+  # @return [Boolean] if the value is numeric
   def numeric?(val)
     !Float(val).nil?
   rescue StandardError
@@ -318,7 +319,7 @@ RSpec.configure do |config|
         expect(interval_reading).to be_an_instance_of(REXML::Element)
         expect(interval_reading.has_text?).to be true
         text = interval_reading.get_text.to_s
-        expect(numeric?(text)).to be_an_instance_of(Float)
+        expect(numeric?(text)).to be true
       end
     end
   end
