@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<BuildingSync xmlns="http://buildingsync.net/schemas/bedes-auc/2019" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v1.0-patch/BuildingSync.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<BuildingSync xmlns="http://buildingsync.net/schemas/bedes-auc/2019"
+              xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.2.0">
   <Facilities>
     <Facility ID="FirstFuel">
       <Sites>
         <Site ID="DC0021ZZ">
-          <ClimateZoneType><ASHRAE><ClimateZone>2B</ClimateZone></ASHRAE></ClimateZoneType>
+          <ClimateZoneType>
+            <ASHRAE>
+              <ClimateZone>2B</ClimateZone>
+            </ASHRAE>
+          </ClimateZoneType>
           <PremisesName>DC0021ZZ GSA Headquarters</PremisesName>
           <OccupancyClassification>Office</OccupancyClassification>
           <Address>
@@ -48,69 +54,6 @@
         </Site>
       </Sites>
       <Measures>
-        <Measure ID="Measure1">
-          <TypeOfMeasure>
-            <Replacements/>
-          </TypeOfMeasure>
-          <SystemCategoryAffected>Other HVAC</SystemCategoryAffected>
-          <LinkedPremises>
-            <Site>
-              <LinkedSiteID IDref="DC0021ZZ"/>
-            </Site>
-          </LinkedPremises>
-          <TechnologyCategories>
-            <TechnologyCategory>
-              <BuildingAutomationSystems>
-                <MeasureName>Other</MeasureName>
-              </BuildingAutomationSystems>
-            </TechnologyCategory>
-          </TechnologyCategories>
-          <LongDescription>HVAC Scheduling Control</LongDescription>
-          <MeasureSavingsAnalysis>
-            <AnnualSavingsSiteEnergy>230408</AnnualSavingsSiteEnergy>
-            <AnnualSavingsSourceEnergy>19092</AnnualSavingsSourceEnergy>
-            <AnnualSavingsCost>20000</AnnualSavingsCost>
-            <AnnualSavingsByFuels>
-              <AnnualSavingsByFuel>
-                <EnergyResource>Electricity</EnergyResource>
-                <ResourceUnits>kWh</ResourceUnits>
-              </AnnualSavingsByFuel>
-              <AnnualSavingsByFuel>
-                <EnergyResource>District steam</EnergyResource>
-                <ResourceUnits>therms</ResourceUnits>
-              </AnnualSavingsByFuel>
-            </AnnualSavingsByFuels>
-          </MeasureSavingsAnalysis>
-        </Measure>
-        <Measure ID="Measure2">
-          <TypeOfMeasure>
-            <Replacements/>
-          </TypeOfMeasure>
-          <SystemCategoryAffected>Lighting</SystemCategoryAffected>
-          <LinkedPremises>
-            <Site>
-              <LinkedSiteID IDref="DC0021ZZ"/>
-            </Site>
-          </LinkedPremises>
-          <TechnologyCategories>
-            <TechnologyCategory>
-              <LightingImprovements>
-                <MeasureName>Retrofit with T-8</MeasureName>
-              </LightingImprovements>
-            </TechnologyCategory>
-          </TechnologyCategories>
-          <LongDescription>Lighting Retrofit</LongDescription>
-          <MeasureSavingsAnalysis>
-            <AnnualSavingsSiteEnergy>716748</AnnualSavingsSiteEnergy>
-            <AnnualSavingsCost>308000</AnnualSavingsCost>
-            <AnnualSavingsByFuels>
-              <AnnualSavingsByFuel>
-                <EnergyResource>Electricity</EnergyResource>
-                <ResourceUnits>kWh</ResourceUnits>
-              </AnnualSavingsByFuel>
-            </AnnualSavingsByFuels>
-          </MeasureSavingsAnalysis>
-        </Measure>
         <Measure ID="Measure3">
           <TypeOfMeasure>
             <ModificationRetrocommissions/>
@@ -145,73 +88,9 @@
             </AnnualSavingsByFuels>
           </MeasureSavingsAnalysis>
         </Measure>
-        <Measure ID="Measure4">
-          <TypeOfMeasure>
-            <ModificationRetrocommissions/>
-          </TypeOfMeasure>
-          <SystemCategoryAffected>Air Distribution</SystemCategoryAffected>
-          <LinkedPremises>
-            <Site>
-              <LinkedSiteID IDref="DC0021ZZ"/>
-            </Site>
-          </LinkedPremises>
-          <TechnologyCategories>
-            <TechnologyCategory>
-              <BuildingAutomationSystems>
-                <MeasureName>Other</MeasureName>
-              </BuildingAutomationSystems>
-            </TechnologyCategory>
-          </TechnologyCategories>
-          <LongDescription>Air Side and Water Side Economizer Maintenance</LongDescription>
-          <MeasureSavingsAnalysis>
-            <AnnualSavingsSourceEnergy>185558</AnnualSavingsSourceEnergy>
-            <AnnualSavingsCost>30400</AnnualSavingsCost>
-            <AnnualSavingsByFuels>
-              <AnnualSavingsByFuel>
-                <EnergyResource>Electricity</EnergyResource>
-                <ResourceUnits>kWh</ResourceUnits>
-              </AnnualSavingsByFuel>
-            </AnnualSavingsByFuels>
-          </MeasureSavingsAnalysis>
-        </Measure>
-        <Measure ID="Measure5">
-          <TypeOfMeasure>
-            <Additions/>
-          </TypeOfMeasure>
-          <SystemCategoryAffected>Air Distribution</SystemCategoryAffected>
-          <LinkedPremises>
-            <Site>
-              <LinkedSiteID IDref="DC0021ZZ"/>
-            </Site>
-          </LinkedPremises>
-          <TechnologyCategories>
-            <TechnologyCategory>
-              <OtherHVAC>
-                <MeasureName>Upgrade operating protocols, calibration, and/or sequencing</MeasureName>
-              </OtherHVAC>
-            </TechnologyCategory>
-          </TechnologyCategories>
-          <LongDescription>Demand Controlled Ventilation</LongDescription>
-          <MeasureSavingsAnalysis>
-            <AnnualSavingsSiteEnergy>99999</AnnualSavingsSiteEnergy>
-            <AnnualSavingsCost>85800</AnnualSavingsCost>
-            <AnnualSavingsByFuels>
-              <AnnualSavingsByFuel>
-                <EnergyResource>Electricity</EnergyResource>
-                <ResourceUnits>kWh</ResourceUnits>
-                <AnnualSavingsNativeUnits>50186</AnnualSavingsNativeUnits>
-              </AnnualSavingsByFuel>
-              <AnnualSavingsByFuel>
-                <EnergyResource>District steam</EnergyResource>
-                <ResourceUnits>therms</ResourceUnits>
-                <AnnualSavingsNativeUnits>6364</AnnualSavingsNativeUnits>
-              </AnnualSavingsByFuel>
-            </AnnualSavingsByFuels>
-          </MeasureSavingsAnalysis>
-        </Measure>
       </Measures>
       <Reports>
-        <Report>
+        <Report ID="Report1">
           <Scenarios>
             <Scenario ID="Base">
               <ScenarioType>
@@ -225,13 +104,9 @@
             <Scenario ID="Package1">
               <ScenarioName>AERG Package</ScenarioName>
               <ScenarioType>
-                <PackageOfMeasures>
+                <PackageOfMeasures ID="POM1">
                   <MeasureIDs>
-                    <MeasureID IDref="Measure1"/>
-                    <MeasureID IDref="Measure2"/>
                     <MeasureID IDref="Measure3"/>
-                    <MeasureID IDref="Measure4"/>
-                    <MeasureID IDref="Measure5"/>
                   </MeasureIDs>
                   <AnnualSavingsSiteEnergy>6830</AnnualSavingsSiteEnergy>
                   <AnnualSavingsCost>285400</AnnualSavingsCost>
