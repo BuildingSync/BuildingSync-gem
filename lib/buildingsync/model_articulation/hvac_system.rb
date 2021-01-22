@@ -58,11 +58,9 @@ module BuildingSync
     end
 
     # read xml
-    def read_xml;
-    end
+    def read_xml; end
 
-    def get_linked_ids;
-    end
+    def get_linked_ids; end
 
     # get principal hvac system type
     # @return [String]
@@ -137,7 +135,6 @@ module BuildingSync
             space.thermalZone.get.setThermostatSetpointDualSetpoint(thermostat)
           end
         end
-
       end
       puts "ThermalZones: #{model.getThermalZones.size}"
       puts "ThermostatDSPs: #{model.getThermostatSetpointDualSetpoints.size}"
@@ -164,16 +161,16 @@ module BuildingSync
       puts "BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (#{tstats_heating.size}) thermostats needing heating schedule"
 
       htg_setpoints = [
-          # [Time.new(days, hours, mins seconds), temp_value_celsius]
-          [OpenStudio::Time.new(0, 9, 0, 0), 17],
-          [OpenStudio::Time.new(0, 17, 0, 0), 20],
-          [OpenStudio::Time.new(0, 24, 0, 0), 17]
+        # [Time.new(days, hours, mins seconds), temp_value_celsius]
+        [OpenStudio::Time.new(0, 9, 0, 0), 17],
+        [OpenStudio::Time.new(0, 17, 0, 0), 20],
+        [OpenStudio::Time.new(0, 24, 0, 0), 17]
       ]
       clg_setpoints = [
-          # [Time.new(days, hours, mins seconds), temp_value_celsius]
-          [OpenStudio::Time.new(0, 9, 0, 0), 23],
-          [OpenStudio::Time.new(0, 17, 0, 0), 20],
-          [OpenStudio::Time.new(0, 24, 0, 0), 23]
+        # [Time.new(days, hours, mins seconds), temp_value_celsius]
+        [OpenStudio::Time.new(0, 9, 0, 0), 23],
+        [OpenStudio::Time.new(0, 17, 0, 0), 20],
+        [OpenStudio::Time.new(0, 24, 0, 0), 23]
       ]
 
       heating_sp_schedule = create_schedule_ruleset(model, htg_setpoints, 'Thermostat Heating SP')

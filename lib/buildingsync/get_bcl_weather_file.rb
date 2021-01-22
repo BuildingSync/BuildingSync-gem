@@ -52,15 +52,15 @@ module BuildingSync
       FileUtils.mkdir_p(@weather_file_path_prefix)
       if File.exist?(@weather_file)
         File.open(@weather_file, 'r') do |file|
-          @weather_json = JSON.parse(file.read, {:symbolize_names => true})
+          @weather_json = JSON.parse(file.read, symbolize_names: true)
         end
       else
         arr = []
         @weather_json = {
-            'weather_file_name': arr,
-            'city_name': arr,
-            'state_code': arr,
-            'weather_id': arr
+          'weather_file_name': arr,
+          'city_name': arr,
+          'state_code': arr,
+          'weather_id': arr
         }
         File.open(@weather_file, 'w') { |f| f.write(@weather_json.to_json) }
       end

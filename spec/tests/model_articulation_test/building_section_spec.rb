@@ -61,7 +61,7 @@ RSpec.describe 'BuildingSection' do
       # Should not reach this line
       expect(false).to be true
     rescue StandardError => e
-      expect(e.message.to_s).to eq("Unable to set OccupancyClassification to nil")
+      expect(e.message.to_s).to eq('Unable to set OccupancyClassification to nil')
     end
   end
 end

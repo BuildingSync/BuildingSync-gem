@@ -42,10 +42,10 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'Translator' do
-  describe "Example Full Workflow" do
+  describe 'Example Full Workflow' do
     tests = [
-        # file_name, standard, epw_path, schema_version
-        ['building_151.xml', CA_TITLE24, nil, 'v2.2.0'],
+      # file_name, standard, epw_path, schema_version
+      ['building_151.xml', CA_TITLE24, nil, 'v2.2.0']
     ]
     tests.each do |test|
       it 'Should Run the Prototypical Workflow' do
@@ -82,7 +82,7 @@ RSpec.describe 'Translator' do
         # 2021-01-21 Building 151 experiences failures in 5 scenarios.
         # See: https://github.com/BuildingSync/BuildingSync-gem/issues/107
         expect(failures.size).to eql(5)
-        expected_failure_ids = Set.new(["Scenario6", "Scenario19", "Scenario20", "Scenario21", "Scenario26"])
+        expected_failure_ids = Set.new(['Scenario6', 'Scenario19', 'Scenario20', 'Scenario21', 'Scenario26'])
         failed = translator.get_failed_scenarios
         failed_ids = []
         failed.each do |scenario|

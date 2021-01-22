@@ -40,7 +40,6 @@ require 'buildingsync/model_articulation/building'
 
 RSpec.describe 'BuildingSpec' do
   describe 'Expected Errors' do
-
     it 'should raise an StandardError given a non-Building REXML Element' do
       # -- Setup
       ns = 'auc'
@@ -135,7 +134,7 @@ RSpec.describe 'BuildingSpec' do
         # Should not reach this line
         expect(false).to be true
       rescue StandardError => e
-        expect(e.message.to_s).to eq("Building ID: Building1. Number of stories below grade is > 1 (2.0).  Currently, only one story below grade is supported.")
+        expect(e.message.to_s).to eq('Building ID: Building1. Number of stories below grade is > 1 (2.0).  Currently, only one story below grade is supported.')
       end
     end
   end
@@ -200,17 +199,17 @@ RSpec.describe 'BuildingSpec' do
     end
 
     expectations = [
-        # [expected value, method used to access, element_name]
-        ['Property management company', 'xget_text', ['Ownership']],
-        ['Retail', 'xget_text', ['OccupancyClassification']],
-        ['Contact1', 'xget_attribute_for_element', ['PrimaryContactID', 'IDref']],
-        [Date.new(2019, 1, 1), 'xget_text_as_date', ['RetrocommissioningDate']],
-        [true, 'xget_text_as_bool', ['BuildingAutomationSystem']],
-        [true, 'xget_text_as_bool', ['HistoricalLandmark']],
-        [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
-        [2003, 'xget_text_as_integer', ['YearOfLastMajorRemodel']],
-        [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
-        [60.0, 'xget_text_as_float', ['PercentOccupiedByOwner']]
+      # [expected value, method used to access, element_name]
+      ['Property management company', 'xget_text', ['Ownership']],
+      ['Retail', 'xget_text', ['OccupancyClassification']],
+      ['Contact1', 'xget_attribute_for_element', ['PrimaryContactID', 'IDref']],
+      [Date.new(2019, 1, 1), 'xget_text_as_date', ['RetrocommissioningDate']],
+      [true, 'xget_text_as_bool', ['BuildingAutomationSystem']],
+      [true, 'xget_text_as_bool', ['HistoricalLandmark']],
+      [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
+      [2003, 'xget_text_as_integer', ['YearOfLastMajorRemodel']],
+      [2010, 'xget_text_as_integer', ['YearOfLastEnergyAudit']],
+      [60.0, 'xget_text_as_float', ['PercentOccupiedByOwner']]
     ]
 
     expectations.each do |e|

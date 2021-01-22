@@ -42,7 +42,6 @@ require 'buildingsync/generator'
 
 RSpec.describe 'FacilitySpec' do
   describe 'Expected Errors' do
-
     it 'should raise an StandardError given a non-Facility REXML Element' do
       # -- Setup
       ns = 'auc'
@@ -106,7 +105,7 @@ RSpec.describe 'FacilitySpec' do
                                      add_elevators: true, add_exterior_lights: true, remove_objects: true)
   end
 
-# TODO: Add actual assertions
+  # TODO: Add actual assertions
   it 'Should create a building system with parameters set to false' do
     # -- Setup
     file_name = 'building_151.xml'
@@ -242,7 +241,6 @@ RSpec.describe 'Facility Methods' do
     @facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
   end
   describe 'building_151_level1.xml' do
-
     it 'Should return contact_name' do
       # -- Setup
       expected_value = 'a contact person'
@@ -280,7 +278,6 @@ RSpec.describe 'Facility Methods' do
       expected_value = 'Direct metering'
       first_utility = @facility.report.utilities[0]
 
-
       # -- Assert
       expect(first_utility).to be_an_instance_of(BuildingSync::Utility)
       expect(first_utility.xget_text('MeteringConfiguration')).to eql expected_value
@@ -291,13 +288,12 @@ RSpec.describe 'Facility Methods' do
       expected_value = REXML::Element.new('auc:CriticalPeakPricing')
       first_utility = @facility.report.utilities[0]
       first_rate_sch = first_utility.get_rate_schedules[0]
-      rate_structure_type = first_rate_sch.get_elements("auc:TypeOfRateStructure/*")[0]
+      rate_structure_type = first_rate_sch.get_elements('auc:TypeOfRateStructure/*')[0]
 
       # -- Assert
       expect(first_utility).to be_an_instance_of(BuildingSync::Utility)
       expect(first_rate_sch).to be_an_instance_of(REXML::Element)
       expect(rate_structure_type.to_s).to eql expected_value.to_s
     end
-
   end
 end

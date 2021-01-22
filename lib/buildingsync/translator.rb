@@ -103,17 +103,16 @@ module BuildingSync
     # using the SelectionTool
     def validate_xml
       # we wil try to validate the file, but if it fails, we will not cancel the process, but log an error
-      begin
-        selection_tool = BuildingSync::SelectionTool.new(@xml_file_path, @schema_version)
-        if !selection_tool.validate_schema
-          raise "File '#{@xml_file_path}' does not valid against the BuildingSync schema"
-        else
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' is valid against the BuildingSync schema")
-          puts "File '#{@xml_file_path}' is valid against the BuildingSync schema"
-        end
-      rescue StandardError
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' does not valid against the BuildingSync schema")
+
+      selection_tool = BuildingSync::SelectionTool.new(@xml_file_path, @schema_version)
+      if !selection_tool.validate_schema
+        raise "File '#{@xml_file_path}' does not valid against the BuildingSync schema"
+      else
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' is valid against the BuildingSync schema")
+        puts "File '#{@xml_file_path}' is valid against the BuildingSync schema"
       end
+    rescue StandardError
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' does not valid against the BuildingSync schema")
     end
 
     # @see WorkflowMaker.setup_and_sizing_run
@@ -137,7 +136,7 @@ module BuildingSync
 
     # run osws - running all scenario simulations
     # @param runner_options [hash]
-    def run_osws(only_cb_modeled = false, runner_options = {run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY})
+    def run_osws(only_cb_modeled = false, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
       super(@output_dir, only_cb_modeled, runner_options)
     end
 
@@ -146,7 +145,7 @@ module BuildingSync
       if @results_gathered
         super
       else
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.prepare_final_xml', "All results have not yet been gathered.")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.prepare_final_xml', 'All results have not yet been gathered.')
         super
       end
       @final_xml_prepared = true

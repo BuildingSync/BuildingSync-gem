@@ -225,7 +225,6 @@ module BuildingSync
       end
     end
 
-
     # get full path to epw file
     # return [String]
     def get_epw_file_path
@@ -551,7 +550,7 @@ module BuildingSync
         weather_station_id = weather_argb[1]
         state_name = weather_argb[2]
         city_name = weather_argb[3]
-        puts "case 2: climate_zone is nil at the Site and Building level"
+        puts 'case 2: climate_zone is nil at the Site and Building level'
         if !weather_station_id.nil?
           puts "case 2.1: weather_station_id is not nil #{weather_station_id}"
           @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)

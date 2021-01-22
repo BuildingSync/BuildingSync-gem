@@ -44,7 +44,6 @@ module BuildingSync
   # Used for getting, setting, and creating XML snippets
   # for BuildingSync classes with an @base_xml attribute
   module XmlGetSet
-    
     def get_prefix
       if @ns == ''
         return ''
@@ -52,7 +51,7 @@ module BuildingSync
         return "#{@ns}:"
       end
     end
-    
+
     # Get the id attribute of the @base_xml
     # @see help_get_attribute_value
     def xget_id

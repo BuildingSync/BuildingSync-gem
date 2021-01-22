@@ -160,8 +160,8 @@ module BuildingSync
       end
       if eui.size == 1
         return eui[0]
-      elsif eui.size == 0
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.get_benchmark_site_eui', "No Benchmark Scenarios exist with SiteEnergyUseIntensity defined")
+      elsif eui.empty?
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.get_benchmark_site_eui', 'No Benchmark Scenarios exist with SiteEnergyUseIntensity defined')
         return nil
       elsif eui.size > 1
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.get_benchmark_site_eui', "Multiple Benchmark Scenarios exist with SiteEnergyUseIntensity defined. Returning the value for Scenario ID: #{ids[0]}")
@@ -187,7 +187,7 @@ module BuildingSync
       end
       if eui.size == 1
         return eui[0]
-      elsif eui.size == 0
+      elsif eui.empty?
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.get_scenario_site_eui', "Scenario ID: #{@cb_modeled.xget_id} does not have a SiteEnergyUseIntensity defined in any of the AllResourceTotal elements.")
         return nil
       elsif eui.size > 1
@@ -199,7 +199,7 @@ module BuildingSync
     # add a current building modeled scenario and set the @cb_modeled attribute
     # @param id [String] id to use for the scenario
     # @return [NilClass]
-    def add_cb_modeled(id = "Scenario-Baseline")
+    def add_cb_modeled(id = 'Scenario-Baseline')
       if @cb_modeled.nil? || @cb_modeled.empty?
         g = BuildingSync::Generator.new
         scenario_xml = g.add_scenario_to_report(@base_xml, 'CBModeled', id)

@@ -85,8 +85,8 @@ RSpec.describe 'Report Spec' do
     it 'Should return BenchmarkTool value' do
       # -- Setup
       expected_value = 'Portfolio Manager'
-      benchmark = @report.scenarios.find { |scenario| scenario.benchmark? }
-      cb_modeled = @report.scenarios.find { |scenario| scenario.cb_modeled? }
+      benchmark = @report.scenarios.find(&:benchmark?)
+      cb_modeled = @report.scenarios.find(&:cb_modeled?)
 
       # -- Assert
       expect(benchmark.get_benchmark_tool).to eql(expected_value)

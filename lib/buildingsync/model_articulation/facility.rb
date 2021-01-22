@@ -189,7 +189,7 @@ module BuildingSync
     def get_auditor_contact_name
       auditor_id = @report.get_auditor_contact_id
       if !auditor_id.nil?
-        contact = @contacts.find { |contact| contact.xget_id == auditor_id}
+        contact = @contacts.find { |contact| contact.xget_id == auditor_id }
         return contact.xget_text('ContactName')
       end
       return nil
@@ -233,7 +233,7 @@ module BuildingSync
     end
 
     # @see BuildingSync::Report.add_cb_modeled
-    def add_cb_modeled(id = "Scenario-Baseline")
+    def add_cb_modeled(id = 'Scenario-Baseline')
       @report.add_cb_modeled(id)
     end
 

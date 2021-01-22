@@ -58,7 +58,7 @@ RSpec.describe 'SelectionTool' do
     file_name = 'building_151.xml'
     std = ASHRAE90_1
     version = '2.1.0'
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, "v2.2.0")
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
     selection_tool = BuildingSync::SelectionTool.new(xml_path, version)
     expect(selection_tool.validate_schema).to be false
@@ -78,12 +78,12 @@ RSpec.describe 'SelectionTool' do
 
   describe 'Use Case Validation' do
     files_to_check = [
-        'L000_OpenStudio_Pre-Simulation_01.xml',
-        'L000_OpenStudio_Pre-Simulation_02.xml',
+      'L000_OpenStudio_Pre-Simulation_01.xml',
+      'L000_OpenStudio_Pre-Simulation_02.xml',
 
-        # TODO: This should validate.  CZ should be able to be specified at the site level.
-        # 'L000_OpenStudio_Pre-Simulation_03.xml',
-        'L000_OpenStudio_Pre-Simulation_04.xml'
+      # TODO: This should validate.  CZ should be able to be specified at the site level.
+      # 'L000_OpenStudio_Pre-Simulation_03.xml',
+      'L000_OpenStudio_Pre-Simulation_04.xml'
     ]
     files_to_check.each do |file|
       describe "#{file} Use Case Validation" do
@@ -96,17 +96,16 @@ RSpec.describe 'SelectionTool' do
 
           @selection_tool = BuildingSync::SelectionTool.new(xml_path, version)
           expect(@selection_tool.validate_schema).to be true
-
         end
         expectations = [
-            ['BRICR_SEED', false],
-            ['SEED', false],
-            ['New York City Audit Use Case', false],
-            ['L000 OpenStudio Pre-Simulation', true],
-            ['L100 OpenStudio Pre-Simulation', false],
-            ['L000 Preliminary Analysis', false],
-            ['L100 Audit', false],
-            ['L200 Audit', false],
+          ['BRICR_SEED', false],
+          ['SEED', false],
+          ['New York City Audit Use Case', false],
+          ['L000 OpenStudio Pre-Simulation', true],
+          ['L100 OpenStudio Pre-Simulation', false],
+          ['L000 Preliminary Analysis', false],
+          ['L100 Audit', false],
+          ['L200 Audit', false]
         ]
         expectations.each do |e|
           it "Use Case #{e[0]} should be valid? #{e[1]}" do
@@ -114,7 +113,6 @@ RSpec.describe 'SelectionTool' do
           end
         end
       end
-
     end
   end
 
@@ -130,10 +128,10 @@ RSpec.describe 'SelectionTool' do
       expect(@selection_tool.validate_schema).to be true
     end
     expectations = [
-        ['BRICR_SEED', false],
-        ['SEED', false],
-        ['New York City Audit Use Case', false],
-        ['L000 OpenStudio Simulation', false]
+      ['BRICR_SEED', false],
+      ['SEED', false],
+      ['New York City Audit Use Case', false],
+      ['L000 OpenStudio Simulation', false]
     ]
     expectations.each do |e|
       it "Use Case #{e[0]} should be valid? #{e[1]}" do

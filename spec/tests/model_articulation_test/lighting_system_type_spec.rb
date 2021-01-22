@@ -91,7 +91,6 @@ RSpec.describe 'LightingSystemType' do
   end
   describe 'Model Manipulation' do
     it 'Should add exterior lights successfully' do
-
       # load_system = BuildingSync::LoadsSystem.new
       expect(@lighting_system.add_exterior_lights(@facility.get_model, @facility.determine_open_studio_system_standard, 1.0, '3 - All Other Areas', false)).to be true
     end

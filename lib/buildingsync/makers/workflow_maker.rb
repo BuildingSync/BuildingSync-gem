@@ -312,7 +312,7 @@ module BuildingSync
           # in the BuildingSync Schema, a <MeasureName>Other</MeasureName> is used
           # and the actual measure name added
           if m_name == :Other
-            m_name = measure.xget_text("CustomMeasureName")
+            m_name = measure.xget_text('CustomMeasureName')
             if m_name.nil? || m_name.empty?
               OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.WorkflowMaker.configure_workflow_for_scenario', "Measure ID: #{measure.xget_id} has a MeasureName of 'Other' but does not have a CustomMeasureName defined.")
               successful = false
@@ -322,7 +322,6 @@ module BuildingSync
           end
           measure_found = false
           @workflow_maker_json[sym_to_find].each do |category|
-
             # m_name is, for example: 'Replace HVAC system type to VRF'
 
             if !category[m_name].nil?
@@ -330,7 +329,6 @@ module BuildingSync
               measure_dir_name = category[m_name][:measure_dir_name]
               num_measures += 1
               category[m_name][:arguments].each do |argument|
-
                 # Certain arguments are only applied under specific conditions
                 #
                 if !argument[:condition].nil? && !argument[:condition].empty?
@@ -397,7 +395,7 @@ module BuildingSync
         end
       elsif measure_name == 'Replace HVAC system type to VRF' || measure_name == 'Replace HVAC with GSHP and DOAS' || measure_name == 'Replace AC and heating units with ground coupled heat pump systems'
         if argument[:condition] == @facility.site.get_building_type
-          argument_name = "#{argument[:name]}"
+          argument_name = (argument[:name]).to_s
           argument_value = argument[:value]
         end
       else
@@ -432,7 +430,7 @@ module BuildingSync
 
       number_successful = cb_modeled_success ? 1 : 0
 
-      if not only_cb_modeled
+      if !only_cb_modeled
         # write an osw for each Package Of Measures scenario
         @facility.report.poms.each do |scenario|
           successful = write_osw(main_output_dir, scenario)
@@ -443,7 +441,6 @@ module BuildingSync
           end
         end
       end
-
 
       # Compare the total number of potential successes to the number of actual successes
       if only_cb_modeled
@@ -496,7 +493,7 @@ module BuildingSync
     # run osws - running all scenario simulations
     # @param only_cb_modeled [Boolean] used to only run the simulations for the cb_modeled (baseline) scenario
     # @param runner_options [hash]
-    def run_osws(output_dir, only_cb_modeled = false, runner_options = {run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY})
+    def run_osws(output_dir, only_cb_modeled = false, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
       osw_files = []
       osw_sr_files = []
       if only_cb_modeled

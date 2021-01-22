@@ -244,16 +244,16 @@ RSpec.describe 'WorkflowMaker' do
     end
 
     measure_inserts_to_check = [
-        ['EnergyPlusMeasure', 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects', 1, 27, {
-            'ratedTotalCoolingCapacity' => 999.9,
-            'ratedCOP' => 0.99,
-            'ratedAirFlowRate' => 0.999,
-            'condensateRemovalStart' => 9.999,
-            'evapLatentRatio' => 0.0999,
-            'latentCapTimeConstant' => 4.0
-        }],
-        ['ReportingMeasure', 'openstudio_results', 0, 29, nil],
-        ['ModelMeasure', 'scale_geometry', 3, 3, nil]
+      ['EnergyPlusMeasure', 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects', 1, 27, {
+        'ratedTotalCoolingCapacity' => 999.9,
+        'ratedCOP' => 0.99,
+        'ratedAirFlowRate' => 0.999,
+        'condensateRemovalStart' => 9.999,
+        'evapLatentRatio' => 0.0999,
+        'latentCapTimeConstant' => 4.0
+      }],
+      ['ReportingMeasure', 'openstudio_results', 0, 29, nil],
+      ['ModelMeasure', 'scale_geometry', 3, 3, nil]
     ]
     measure_inserts_to_check.each do |to_check|
       it "insert_measure_into_workflow: #{to_check[0]} (#{to_check[1]}) at the expected position and still simulates" do
@@ -300,12 +300,12 @@ RSpec.describe 'WorkflowMaker' do
       item = 1
       final_expected_position = 0
       args = {
-          'ratedTotalCoolingCapacity' => 999.9,
-          'ratedCOP' => 0.99,
-          'ratedAirFlowRate' => 0.999,
-          'condensateRemovalStart' => 9.999,
-          'evapLatentRatio' => 0.0999,
-          'latentCapTimeConstant' => 4.0
+        'ratedTotalCoolingCapacity' => 999.9,
+        'ratedCOP' => 0.99,
+        'ratedAirFlowRate' => 0.999,
+        'condensateRemovalStart' => 9.999,
+        'evapLatentRatio' => 0.0999,
+        'latentCapTimeConstant' => 4.0
       }
 
       @workflow_maker.clear_all_measures
@@ -341,12 +341,11 @@ RSpec.describe 'WorkflowMaker' do
 
   describe 'Results Processing' do
     standards = [
-        [ASHRAE90_1],
-        [CA_TITLE24]
+      [ASHRAE90_1],
+      [CA_TITLE24]
     ]
     standards.each do |standard|
       it "building_151_one_scenario: #{standard[0]} should simulate and write two results files" do
-
         # -- Setup
         file_name = 'building_151_one_scenario.xml'
         std = standard[0]

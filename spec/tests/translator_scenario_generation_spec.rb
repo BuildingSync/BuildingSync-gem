@@ -43,8 +43,8 @@ require 'parallel'
 require 'rspec/expectations'
 
 RSpec.describe 'BuildingSync' do
-  describe "Generate All Scenarios" do
-  tests = get_tests
+  describe 'Generate All Scenarios' do
+    tests = get_tests
     tests.each do |test|
       xit "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}. Expected Scenarios: #{test[4]}" do
         xml_path, output_path = create_xml_path_and_output_path(test[0], test[1], __FILE__, test[3])
@@ -67,10 +67,10 @@ RSpec.describe 'BuildingSync' do
     end
   end
 
-  describe "Generate Only CB Modeled Scenario" do
+  describe 'Generate Only CB Modeled Scenario' do
     tests = get_tests
     tests.each do |test|
-      it "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}. Expected Scenarios: #{1}" do
+      it "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}. Expected Scenarios: 1" do
         xml_path, output_path = create_xml_path_and_output_path(test[0], test[1], __FILE__, test[3])
         translator = translator_sizing_run_and_check(xml_path, output_path, test[2], test[1])
         translator.write_osws(only_cb_modeled = true)

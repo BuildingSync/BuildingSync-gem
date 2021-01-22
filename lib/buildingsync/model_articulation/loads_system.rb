@@ -283,6 +283,5 @@ module BuildingSync
       end
       return true
     end
-
   end
 end

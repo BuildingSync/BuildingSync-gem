@@ -42,7 +42,7 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'BuildingSync' do
-  describe "Translator Simulate Full Workflow" do
+  describe 'Translator Simulate Full Workflow' do
     tests = get_tests
     tests.each do |test|
       it "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}. Expected Scenarios: #{test[4]}" do

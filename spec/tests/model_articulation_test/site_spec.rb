@@ -126,7 +126,6 @@ RSpec.describe 'SiteSpec' do
     original_osm_size = File.size(original_osm)
     new_osm_size = File.size(new_osm)
 
-
     puts "original idf file size #{original_idf_size} bytes versus new idf file size #{new_idf_size} bytes"
     expect((original_idf_size - new_idf_size).abs <= 1).to be true
 
