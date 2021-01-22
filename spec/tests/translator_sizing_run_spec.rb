@@ -55,11 +55,11 @@ RSpec.describe 'BuildingSync' do
         ['building_151_n1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
 
         # DC GSA Headquarters
-        ['DC GSA Headquarters.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil],
+        ['DC GSA Headquarters.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
 
         # DC GSA Headquarters with Climate Zone
-        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil],
-        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, nil],
+        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0'],
+        ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, 'v2.2.0'],
 
         # L100 Audit
         # None working
@@ -119,14 +119,14 @@ RSpec.describe 'BuildingSync' do
         # #####################################
         # ## DC GSA Headquarters
         # Really this fails because: [BuildingSync.GetBCLWeatherFile.download_weather_file_from_city_name] <1> Error, could not find uid for state DC and city Washington. Initial count of weather files: 10. Please try a different weather file.
-        ['DC GSA Headquarters.xml', ASHRAE90_1, nil, nil, 'BuildingSync.Building.set_weather_and_climate_zone: epw_file_path is false: false'],
-        ['DC GSA Headquarters.xml', CA_TITLE24, nil, nil, "Did not find a", false],
-        ['DC GSA Headquarters.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, "Did not find a", false],
+        ['DC GSA Headquarters.xml', ASHRAE90_1, nil, 'v2.2.0', 'BuildingSync.Building.set_weather_and_climate_zone: epw_file_path is false: false'],
+        ['DC GSA Headquarters.xml', CA_TITLE24, nil, 'v2.2.0', "Did not find a", false],
+        ['DC GSA Headquarters.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "Did not find a", false],
 
         ####################################
         # DC GSA HeadquartersWithClimateZone
-        ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, nil, nil, "Did not find a", false],
-        ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), nil, "Did not find a", false],
+        ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, nil, 'v2.2.0', "Did not find a", false],
+        ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.2.0', "Did not find a", false],
 
         # #####################################
         # ## L100 Audit
