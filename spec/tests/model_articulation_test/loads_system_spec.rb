@@ -58,7 +58,7 @@ RSpec.describe 'LoadSystemSpec' do
   it 'should parse and write building_151.xml and adjust schedules successfully' do
     # -- Setup
     file_name = 'building_151.xml'
-    std = CA_TITLE24
+    std = ASHRAE90_1
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
     epw_path = nil
     translator = translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
@@ -74,16 +74,20 @@ RSpec.describe 'LoadSystemSpec' do
 
       help_print_all_schedules("schedules-#{space_type.name}.csv", default_schedule_set)
 
-      expect(help_calculate_hours(default_schedule_set.numberofPeopleSchedule, cut_off_value).round(1)).to be 47.9
-      expect(help_calculate_hours(default_schedule_set.hoursofOperationSchedule, cut_off_value).round(1)). to be 40.0
-      expect(help_calculate_hours(default_schedule_set.peopleActivityLevelSchedule, cut_off_value).round(1)). to be 168.0
-      expect(help_calculate_hours(default_schedule_set.lightingSchedule, cut_off_value).round(1)). to be 67.0
-      expect(help_calculate_hours(default_schedule_set.electricEquipmentSchedule, cut_off_value).round(1)).to be 67.4
-      expect(help_calculate_hours(default_schedule_set.gasEquipmentSchedule, cut_off_value).round(1)).to be 0.0
-      expect(help_calculate_hours(default_schedule_set.hotWaterEquipmentSchedule, cut_off_value).round(1)).to be 0.0
-      expect(help_calculate_hours(default_schedule_set.infiltrationSchedule, cut_off_value).round(1)).to be 66.0
-      expect(help_calculate_hours(default_schedule_set.steamEquipmentSchedule, cut_off_value).round(1)).to be 0.0
-      expect(help_calculate_hours(default_schedule_set.otherEquipmentSchedule, cut_off_value).round(1)).to be 0.0
+      # TODO: Document what we expect these values to be
+      # 1. Before the schedule is adjusted
+      # 2. After the schedule is adjusted
+      # And why we expect the new values
+      expect(help_calculate_hours(default_schedule_set.numberofPeopleSchedule, cut_off_value).round(1)).to eql 33.3
+      expect(help_calculate_hours(default_schedule_set.hoursofOperationSchedule, cut_off_value).round(1)). to eql 40.0
+      expect(help_calculate_hours(default_schedule_set.peopleActivityLevelSchedule, cut_off_value).round(1)). to eql 168.0
+      expect(help_calculate_hours(default_schedule_set.lightingSchedule, cut_off_value).round(1)). to eql 41.2
+      expect(help_calculate_hours(default_schedule_set.electricEquipmentSchedule, cut_off_value).round(1)).to eql 52.7
+      expect(help_calculate_hours(default_schedule_set.gasEquipmentSchedule, cut_off_value).round(1)).to eql 0.0
+      expect(help_calculate_hours(default_schedule_set.hotWaterEquipmentSchedule, cut_off_value).round(1)).to eql 0.0
+      expect(help_calculate_hours(default_schedule_set.infiltrationSchedule, cut_off_value).round(1)).to eql 168.0
+      expect(help_calculate_hours(default_schedule_set.steamEquipmentSchedule, cut_off_value).round(1)).to eql 0.0
+      expect(help_calculate_hours(default_schedule_set.otherEquipmentSchedule, cut_off_value).round(1)).to eql 0.0
       break
     end
   end
