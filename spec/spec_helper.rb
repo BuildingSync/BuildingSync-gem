@@ -387,6 +387,42 @@ RSpec.configure do |config|
     return tests
   end
 
+  # Weather Spec Helper Functions
+  def check_weather_file_exist(epw_path)
+    # check weather file exist or not
+    expect(File.exist?(epw_path)).to be true
+
+    epw_path['.epw'] = '.ddy'
+
+    # check design day file exist or not
+    expect(File.exist?(epw_path)).to be true
+  end
+
+  def get_state_and_city_name(file_name, ns)
+    doc = get_xml_object(file_name)
+
+    address_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
+
+    city = address_element.elements["#{ns}:Address/#{ns}:City"].text
+    state = address_element.elements["#{ns}:Address/#{ns}:State"].text
+    return state, city
+  end
+
+  def get_weather_id(file_name, ns)
+    doc = get_xml_object(file_name)
+    site_element = doc.elements["#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility/#{ns}:Sites/#{ns}:Site"]
+
+    return site_element.elements["#{ns}:WeatherDataStationID"].text
+  end
+
+  def get_xml_object(file_name)
+
+    xml_path = File.join(SPEC_FILES_DIR, 'v2.2.0', file_name)
+    expect(File.exist?(xml_path)).to be true
+
+    return help_load_doc(xml_path)
+  end
+
   class DummyClass
     include BuildingSync::Helper
     include BuildingSync::XmlGetSet
