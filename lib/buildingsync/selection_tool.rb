@@ -68,13 +68,18 @@ module BuildingSync
     # @param use_case [String]
     # @return boolean
     def validate_use_case(use_case)
-      if !@hash_response['validation_results']['use_cases'][use_case]['valid']
-        @hash_response['validation_results']['use_cases'][use_case]['errors'].each do |error|
-          puts error
+      use_cases = @hash_response['validation_results']['use_cases']
+      if use_cases.key?(use_case)
+        if !use_cases[use_case]['valid']
+          use_cases[use_case]['errors'].each do |error|
+            puts error
+          end
         end
+        return use_cases[use_case]['valid']
+      else
+        puts "BuildingSync::SelectionTool.validate_use_case, Use Case #{use_case} is not an option.  The available use cases to validate against are: #{use_cases}"
+        return false
       end
-
-      return @hash_response['validation_results']['use_cases'][use_case]['valid']
     end
 
     # validate schema
@@ -85,7 +90,6 @@ module BuildingSync
           puts error
         end
       end
-
       return @hash_response['validation_results']['schema']['valid']
     end
 

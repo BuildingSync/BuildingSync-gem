@@ -42,9 +42,7 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'SelectionTool' do
-  # TODO: All SelectionTool tests are skipped since a server response
-  #  does not always come through.  Maybe figure out a better method for this.
-  xit 'building_151.xml should be valid for version: 2.2.0' do
+  it 'building_151.xml should be valid for version: 2.2.0' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
@@ -55,7 +53,7 @@ RSpec.describe 'SelectionTool' do
     expect(selection_tool.validate_schema).to be true
   end
 
-  xit 'building_151.xml should not be valid for version: 2.1.0' do
+  it 'building_151.xml should not be valid for version: 2.1.0' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
@@ -66,7 +64,7 @@ RSpec.describe 'SelectionTool' do
     expect(selection_tool.validate_schema).to be false
   end
 
-  xit 'Example - Invalid Schema.xml should not be valid for version 2.1.0' do
+  it 'Example - Invalid Schema.xml should not be valid for version 2.1.0' do
     # -- Setup
     file_name = 'Example - Invalid Schema.xml'
     std = ASHRAE90_1
@@ -77,6 +75,18 @@ RSpec.describe 'SelectionTool' do
 
     expect(selection_tool.validate_schema).to be false
   end
+
+  it 'Returns false when looking for validation results of an invalid use case' do
+    # -- Setup
+    file_name = 'building_151.xml'
+    std = ASHRAE90_1
+    version = '2.2.0'
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+
+    selection_tool = BuildingSync::SelectionTool.new(xml_path, version)
+    expect(selection_tool.validate_use_case("This use case does not exist")).to be false
+  end
+
 
   describe 'Use Case Validation' do
     files_to_check = [
@@ -100,7 +110,8 @@ RSpec.describe 'SelectionTool' do
           expect(@selection_tool.validate_schema).to be true
         end
         expectations = [
-          ['BRICR_SEED', true],
+          # use case name, should be valid?
+          ['BRICR SEED', false],
           ['SEED', false],
           ['New York City Audit Use Case', false],
           ['L000 OpenStudio Pre-Simulation', true],
@@ -110,7 +121,7 @@ RSpec.describe 'SelectionTool' do
           ['L200 Audit', false]
         ]
         expectations.each do |e|
-          xit "Use Case #{e[0]} should be valid? #{e[1]}" do
+          it "Use Case #{e[0]} should be valid? #{e[1]}" do
             expect(@selection_tool.validate_use_case(e[0])).to be e[1]
           end
         end
@@ -130,14 +141,13 @@ RSpec.describe 'SelectionTool' do
       expect(@selection_tool.validate_schema).to be true
     end
     expectations = [
-      ['BRICR_SEED', false],
-      ['SEED', false],
-      ['New York City Audit Use Case', false],
-      ['L000 OpenStudio Simulation', false]
+      ['BRICR SEED', false],
+      # ['SEED', false],
+      # ['New York City Audit Use Case', false],
+      # ['L000 OpenStudio Simulation', false]
     ]
     expectations.each do |e|
-      xit "Use Case #{e[0]} should be valid? #{e[1]}" do
-        puts @selection_tool.validate_use_case(e[0])
+      it "Use Case #{e[0]} should be valid? #{e[1]}" do
         expect(@selection_tool.validate_use_case(e[0])).to be e[1]
       end
     end
