@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -36,273 +38,205 @@
 # *******************************************************************************
 require_relative 'building'
 module BuildingSync
-  class Site < SpatialElement
+  # Site class
+  class Site < LocationElement
     # initialize
-    def initialize(build_element, ns)
-      # code to initialize
-      # an array that contains all the buildings
-      @buildings = []
-      @largest_building = nil
-      @premises_notes = nil
+    # @param base_xml [REXML::Element] an element corresponding to a single auc:Site
+    # @param ns [String] namespace, likely 'auc'
+    def initialize(base_xml, ns)
+      super(base_xml, ns)
+      @base_xml = base_xml
+      @ns = ns
+      help_element_class_type_check(base_xml, 'Site')
+
+      @building = nil
       @all_set = false
 
-
-      # parameter to read and write.
-      @climate_zone = nil
-      @climate_zone_ashrae = nil
-      @climate_zone_ca_t24 = nil
-      @weather_file_name = nil
-      @weather_station_id = nil
-      @city_name = nil
-      @state_name = nil
-      @latitude = nil
-      @longitude = nil
-      @street_address = nil
-      @postal_code = nil
-
-
-      # TM: just use the XML snippet to search for the buildings on the site
-      read_xml(build_element, ns)
+      # using the XML snippet to search for the buildings on the site
+      read_xml
     end
 
-    # adding a site to the facility
-    def read_xml(build_element, ns)
+    # read xml
+    def read_xml
       # first we check if the number of buildings is ok
-      number_of_buildings = 0
-      build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
-        number_of_buildings += 1
+      building_xml_temp = @base_xml.get_elements("#{@ns}:Buildings/#{@ns}:Building")
+
+      if building_xml_temp.nil? || building_xml_temp.empty?
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.read_xml', "Site with ID: #{xget_id} has no Building elements.  Cannot initialize Site.")
+        raise StandardError, "Site with ID: #{xget_id} has no Building elements.  Cannot initialize Site."
+      elsif building_xml_temp.size > 1
+        @building_xml = building_xml_temp.first
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.read_xml', "Site ID: #{xget_id}. There is more than one (#{building_xml_temp.size}) Building elements.  Only the first Building will be considered (ID: #{@building_xml.attributes['ID']}.")
+      else
+        @building_xml = building_xml_temp.first
       end
-      if number_of_buildings == 0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.read_xml', 'There is no building attached to this site in your BuildingSync file.')
-        raise 'Error: There is no building attached to this site in your BuildingSync file.'
-      elsif number_of_buildings > 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.read_xml', "There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file.")
-        raise "Error: There is more than one (#{number_of_buildings}) building attached to this site in your BuildingSync file."
-      end
-      # check occupancy type at the site level
-      @occupancy_type = read_occupancy_type(build_element, nil, ns)
-      # check floor areas at the site level
-      @total_floor_area = read_floor_areas(build_element, nil, ns)
-      # read in the ASHRAE climate zone
-      read_climate_zone(build_element, ns)
-      # read in the weather station name
-      read_weather_file_name(build_element, ns)
-      # read city and state name
-      read_city_and_state_name(build_element, ns)
-      # read latitude and longitude
-      read_latitude_and_longitude(build_element, ns)
-      # read site address
-      read_site_other_details(build_element, ns)
-      # code to create a building
-      build_element.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
-        @buildings.push(Building.new(buildings_element, @occupancy_type, @total_floor_area, ns))
-      end
+
+      # read other data
+      @total_floor_area = read_floor_areas(nil)
+      read_location_values
+
+      @building = BuildingSync::Building.new(@building_xml, xget_text('OccupancyClassification'), @total_floor_area, @ns)
     end
 
+    # set all function to set all parameters for each building
     def set_all
       if !@all_set
         @all_set = true
-        @buildings.each(&:set_all)
+        @building.set_all
       end
     end
 
-    def read_climate_zone(build_element, ns)
-      if build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE"]
-        @climate_zone_ashrae = build_element.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text
-      else
-        @climate_zone_ashrae = nil
-      end
-      if build_element.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24"]
-        @climate_zone_ca_t24 = build_element.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text
-      else
-        @climate_zone_ca_t24 = nil
-      end
-      if @climate_zone_ca_t24.nil? && @climate_zone_ashrae.nil?
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Site.read_climate_zone', 'Could not find a climate zone in the BuildingSync file.')
-      end
-    end
-
-    def read_weather_file_name(build_element, ns)
-      if build_element.elements["#{ns}:WeatherStationName"]
-        @weather_file_name = build_element.elements["#{ns}:WeatherStationName"].text
-      else
-        @weather_file_name = nil
-      end
-      if build_element.elements["#{ns}:WeatherDataStationID"]
-        @weather_station_id = build_element.elements["#{ns}:WeatherDataStationID"].text
-      else
-        @weather_station_id = nil
-      end
-    end
-
-    def read_city_and_state_name(build_element, ns)
-      if build_element.elements["#{ns}:Address/#{ns}:City"]
-        @city_name = build_element.elements["#{ns}:Address/#{ns}:City"].text
-      else
-        @city_name = nil
-      end
-      if build_element.elements["#{ns}:Address/#{ns}:State"]
-        @state_name = build_element.elements["#{ns}:Address/#{ns}:State"].text
-      else
-        @state_name = nil
-      end
-    end
-
-    def read_site_other_details(build_element, ns)
-      if build_element.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"]
-        @street_address = build_element.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"].text
-      else
-        @street_address = nil
-      end
-
-      if build_element.elements["#{ns}:Address/#{ns}:PostalCode"]
-        @postal_code = build_element.elements["#{ns}:Address/#{ns}:PostalCode"].text.to_i
-      else
-        @postal_code = nil
-      end
-
-      if build_element.elements["#{ns}:PremisesNotes"]
-        @premises_notes = build_element.elements["#{ns}:PremisesNotes"].text
-      else
-        @premises_notes = nil
-      end
-    end
-
-    def read_latitude_and_longitude(build_element, ns)
-      if build_element.elements["#{ns}:Latitude"]
-        @latitude = build_element.elements["#{ns}:Latitude"].text
-      else
-        @latitude = nil
-      end
-      if build_element.elements["#{ns}:Longitude"]
-        @longitude = build_element.elements["#{ns}:Longitude"].text
-      else
-        @longitude = nil
-      end
-    end
-
+    # build zone hash that stores zone lists for buildings and building sections
+    # @return [hash<string, array<OpenStudio::Model::ThermalZone>>]
     def build_zone_hash
-      return get_largest_building.build_zone_hash
+      return @building.build_zone_hash
     end
 
+    # get the model
+    # @return [OpenStudio::Model]
     def get_model
-      return get_largest_building.get_model
+      return @building.get_model
     end
 
+    # get space types
+    # @return [array<OpenStudio::Model::SpaceType>]
     def get_space_types
-      return get_largest_building.get_space_types
+      return @building.get_space_types
     end
 
+    # get peak occupancy
+    # @return [hash<string, float>]
     def get_peak_occupancy
-      return get_largest_building.get_peak_occupancy
+      return @building.get_peak_occupancy
     end
 
+    # get floor area
+    # @return [hash<string, float>]
     def get_floor_area
-      return get_largest_building.get_floor_area
+      return @building.get_floor_area
     end
 
+    # get building sections
+    # @return [array<BuildingSection>]
     def get_building_sections
-      return get_largest_building.building_sections
+      return @building.building_sections
     end
 
+    # determine the open studio standard and call the set_all function
+    # @param standard_to_be_used [String]
+    # @return [Standard]
     def determine_open_studio_standard(standard_to_be_used)
       set_all
-      return get_largest_building.determine_open_studio_standard(standard_to_be_used)
+      return @building.determine_open_studio_standard(standard_to_be_used)
     end
 
+    # determine the open studio system standard and call the set_all function
+    # @return [Standard]
     def determine_open_studio_system_standard
       set_all
-      return Standard.build(get_building_template)
+      return Standard.build(get_standard_template)
     end
 
-    def get_building_template
-      return get_largest_building.get_building_template
+    # get @standard_template
+    # @return [String]
+    def get_standard_template
+      return @building.get_standard_template
     end
 
+    # get space types from hash
+    # @param id [String]
+    # @return [hash<string, array<hash<string, string>>]
     def get_space_types_from_hash(id)
-      return get_largest_building.build_space_type_hash[id]
+      return @building.build_space_type_hash[id]
     end
 
+    # get system type
+    # @return [String]
     def get_system_type
-      return get_largest_building.get_system_type
+      return @building.get_system_type
     end
 
+    # get building type
+    # @return [String]
     def get_building_type
-      if @bldg_type.nil?
-        return get_largest_building.get_building_type
+      if @standards_building_type.nil?
+        return @building.get_building_type
       else
-        return @bldg_type
+        return @standards_building_type
       end
     end
 
+    # get climate zone
+    # @return [String]
     def get_climate_zone
-      return @climate_zone
-    end
-
-    def get_building_objects
-      return @buildings
-    end
-
-    def get_largest_building
-      if !@largest_building.nil?
-        return @largest_building
+      if @climate_zone.nil?
+        return @building.get_climate_zone
       else
-        if @buildings.count == 1
-          return @buildings[0]
-        elsif @buildings.count > 1
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Site.generate_baseline_osm', "There are more than one (#{@buildings.count}) buildings attached to this site in your BuildingSync file.")
-          @largest_building = nil
-          largest_floor_area = -Float::INFINITY
-          @buildings.each do |building|
-            if largest_floor_area < building.total_floor_area
-              largest_floor_area = building.total_floor_area
-              @largest_building = building
-            end
-          end
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Site.generate_baseline_osm', "The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) was selected.")
-          puts "BuildingSync.Site.generate_baseline_osm: The building (#{@largest_building.name}) with the largest floor area (#{largest_floor_area}) m^2 was selected."
-          return @largest_building
-        end
+        return @climate_zone
       end
     end
 
+    # get building
+    # @return [Array<BuildingSync::Building>]
+    def get_building
+      return @building
+    end
+
+    # get full path to epw file
+    # @return [String]
+    def get_epw_file_path
+      return @building.get_epw_file_path
+    end
+
+    # generate baseline model in osm file format
+    # @param epw_file_path [String]
+    # @param standard_to_be_used [String]
+    # @param ddy_file [String]
     def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
       set_all
-      building = get_largest_building
-      @climate_zone = @climate_zone_ashrae
-      # for now we use the california climate zone if it is available
-      @climate_zone = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil? && standard_to_be_used == CA_TITLE24
-      building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, @latitude, @longitude, ddy_file, @weather_file_name, @weather_station_id, @state_name, @city_name)
-      building.generate_baseline_osm(standard_to_be_used)
+      determine_climate_zone(standard_to_be_used)
+
+      # If we can't get the CZ from the site, we attempt to get from the building
+      @climate_zone = @building.get_climate_zone if @climate_zone.nil?
+
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Site.generate_baseline_osm', 'Could not find a climate zone in the BuildingSync file.') if @climate_zone.nil?
+      lat = @building.xget_text('Latitude').nil? ? xget_text('Latitude') : @building.xget_text('Latitude')
+      long = @building.xget_text('Longitude').nil? ? xget_text('Longitude') : @building.xget_text('Longitude')
+      weather_station_name = @building.xget_text('WeatherStationName').nil? ? xget_text('WeatherStationName') : @building.xget_text('WeatherStationName')
+      weather_station_id = @building.xget_text('WeatherDataStationID').nil? ? xget_text('WeatherDataStationID') : @building.xget_text('WeatherDataStationID')
+      @building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, lat, long, ddy_file, weather_station_name, weather_station_id, @state_name, @city_name)
+      @building.generate_baseline_osm
     end
 
+    # write model to osm file
+    # @param dir [String]
+    # @return [hash<string, string>]
     def write_osm(dir)
-      building = get_largest_building
-      building.write_osm(dir)
+      @building.write_osm(dir)
       scenario_types = {}
       scenario_types['system_type'] = get_system_type
       scenario_types['bldg_type'] = get_building_type
-      scenario_types['template'] = get_building_template
+      scenario_types['template'] = get_standard_template
       return scenario_types
     end
 
-    def write_parameters_to_xml(ns, site)
-      site.elements["#{ns}:ClimateZoneType/#{ns}:ASHRAE/#{ns}:ClimateZone"].text = @climate_zone_ashrae if !@climate_zone_ashrae.nil?
-      site.elements["#{ns}:ClimateZoneType/#{ns}:CaliforniaTitle24/#{ns}:ClimateZone"].text = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil?
-      site.elements["#{ns}:WeatherStationName"].text = @weather_file_name if !@weather_file_name.nil?
-      site.elements["#{ns}:WeatherDataStationID"].text = @weather_station_id if !@weather_station_id.nil?
-      site.elements["#{ns}:Address/#{ns}:City"].text = @city_name if !@city_name.nil?
-      site.elements["#{ns}:Address/#{ns}:State"].text = @state_name if !@state_name.nil?
-      site.elements["#{ns}:Address/#{ns}:StreetAddressDetail/#{ns}:Simplified/#{ns}:StreetAddress"].text = @street_address if !@street_address.nil?
-      site.elements["#{ns}:Address/#{ns}:PostalCode"].text = @postal_code if !@postal_code.nil?
-      site.elements["#{ns}:Latitude"].text = @latitude if !@latitude.nil?
-      site.elements["#{ns}:Longitude"].text = @longitude if !@longitude.nil?
+    # write parameters to xml file
+    # @param site [Site]
+    # @param ns [String]
+    def prepare_final_xml
+      @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE/#{@ns}:ClimateZone"].text = @climate_zone_ashrae if !@climate_zone_ashrae.nil?
+      @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24/#{@ns}:ClimateZone"].text = @climate_zone_ca_t24 if !@climate_zone_ca_t24.nil?
 
-      write_parameters_to_xml_for_spatial_element(ns, site)
+      @base_xml.elements["#{@ns}:Address/#{@ns}:City"].text = @city_name if !@city_name.nil?
+      @base_xml.elements["#{@ns}:Address/#{@ns}:State"].text = @state_name if !@state_name.nil?
 
-      site.elements.each("#{ns}:Buildings/#{ns}:Building") do |buildings_element|
-        @buildings[0].write_parameters_to_xml(ns, buildings_element)
-      end
+      # TODO: probably set these as UDFs from actual openstudio model
+      @base_xml.elements["#{@ns}:WeatherStationName"].text = @weather_file_name if !@weather_file_name.nil?
+      @base_xml.elements["#{@ns}:WeatherDataStationID"].text = @weather_station_id if !@weather_station_id.nil?
+
+      prepare_final_xml_for_spatial_element
+
+      @building.prepare_final_xml
     end
   end
 end

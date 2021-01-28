@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -37,40 +39,79 @@
 
 require 'fileutils'
 require 'json'
-require_relative 'model_maker_base'
 
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
-  class WorkflowMakerBase < ModelMakerBase
-    def write_osws(facility, dir)
-      FileUtils.mkdir_p(dir)
+  class WorkflowMakerBase
+    # initialize
+    # @param doc [REXML::Document]
+    # @param ns [String]
+    def initialize(doc, ns)
+      if !doc.is_a?(REXML::Document)
+        raise StandardError, "doc must be an REXML::Document.  Passed object of class: #{doc.class}"
+      end
+
+      if !ns.is_a?(String)
+        raise StandardError, "ns must be String.  Passed object of class: #{ns.class}"
+      end
+
+      @doc = doc
+      @ns = ns
+      @workflow = nil
     end
 
-    def gather_results(dir, year_val, baseline_only = false); end
-
-    def failed_scenarios
-      return []
-    end
-
-    def save_xml(filename)
-      File.open(filename, 'w') do |file|
-        @doc.write(file)
+    def get_prefix
+      if @ns == ''
+        return ''
+      else
+        return "#{@ns}:"
       end
     end
 
-    def set_measure_path(osw, measures_dir)
-      osw['measure_paths'] = [measures_dir]
+    # TODO: add a schema validation and re-ordering mechanism for XML elements
+    # Format, add declaration, and write xml to disk
+    # @param filename [String] full path including filename, i.e. output/path/results.xml
+    def save_xml(filename)
+      # first we make sure all directories exist
+      FileUtils.mkdir_p(File.dirname(filename))
+
+      # Setup formatting
+      formatter = REXML::Formatters::Pretty.new
+      formatter.compact = true
+
+      # Setup document declaration
+      decl = REXML::XMLDecl.new
+      decl.encoding = REXML::XMLDecl::DEFAULT_ENCODING # UTF-8
+      @doc << decl
+
+      # Write file
+      File.open(filename, 'w') do |file|
+        formatter.write(@doc, file)
+      end
     end
 
-    def set_measure_paths(osw, measures_dir_array)
-      osw['measure_paths'] = measures_dir_array
+    # set only one measure path
+    # @param workflow [Hash] a hash of the openstudio workflow
+    # @param measures_dir [String]
+    def set_measure_path(workflow, measures_dir)
+      workflow['measure_paths'] = [measures_dir]
     end
 
+    # set multiple measure paths
+    # @param measures_dir_array [Array]
+    def set_measure_paths(measures_dir_array)
+      @workflow['measure_paths'] = measures_dir_array
+    end
+
+    # clear all measures from the list in the workflow
     def clear_all_measures
       @workflow.delete('steps')
       @workflow['steps'] = []
     end
 
+    # add measure path
+    # @param measures_dir [String]
+    # @return [Boolean]
     def add_measure_path(measures_dir)
       @workflow['measure_paths'].each do |dir|
         if dir == measures_dir
@@ -81,9 +122,16 @@ module BuildingSync
       return true
     end
 
-    def set_measure_argument(osw, measure_dir_name, argument_name, argument_value)
+    # set measure argument
+    # @param workflow [Hash] a hash of the openstudio workflow
+    # @param measure_dir_name [String] the directory name for the measure, as it appears
+    #   in any of the gems, i.e. openstudio-common-measures-gem/lib/measures/[measure_dir_name]
+    # @param argument_name [String]
+    # @param argument_value [String]
+    # @return [Boolean]
+    def set_measure_argument(workflow, measure_dir_name, argument_name, argument_value)
       result = false
-      osw['steps'].each do |step|
+      workflow['steps'].each do |step|
         if step['measure_dir_name'] == measure_dir_name
           step['arguments'][argument_name] = argument_value
           result = true
@@ -97,9 +145,14 @@ module BuildingSync
       return result
     end
 
-    def add_new_measure(osw, measure_dir_name)
+    # Adds a new measure to the workflow ONLY if it doesn't already exist
+    # @param workflow [Hash] a hash of the openstudio workflow
+    # @param measure_dir_name [String] the directory name for the measure, as it appears
+    #   in any of the gems, i.e. openstudio-common-measures-gem/lib/measures/[measure_dir_name]
+    # @return [Boolean] whether or not a new measure was added
+    def add_new_measure(workflow, measure_dir_name)
       # first we check if the measure already exists
-      osw['steps'].each do |step|
+      workflow['steps'].each do |step|
         if step['measure_dir_name'] == measure_dir_name
           return false
         end
@@ -107,7 +160,7 @@ module BuildingSync
       # if it does not exist we add it
       new_step = {}
       new_step['measure_dir_name'] = measure_dir_name
-      osw['steps'].unshift(new_step)
+      workflow['steps'].unshift(new_step)
       return true
     end
   end

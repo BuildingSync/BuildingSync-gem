@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -35,9 +37,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 
+# BuildingSync module
+# provides features for reading BldgSync XML files, generating baseline models, creating scenario workflows, running simulations and adding simulation results to the BldgSync file
 module BuildingSync
-  VERSION = '0.2.0'.freeze
-
-  BASELINE = 'Baseline'.freeze
-  MEASURED = 'Measured'.freeze
+  # version of the BuildingSync gem
+  VERSION = '0.2.0'
 end

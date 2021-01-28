@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -38,25 +40,54 @@ require_relative './../spec_helper'
 
 require 'fileutils'
 require 'parallel'
+require 'rspec/expectations'
 
 RSpec.describe 'BuildingSync' do
-  it 'should parse the building_151.xml (phase zero) with auc namespace for CA Title 24 and generate baseline and scenarios' do
-    test_baseline_and_scenario_creation_with_simulation('building_151.xml', 30, ASHRAE90_1, nil, false)
+  describe 'Generate All Scenarios' do
+    tests = get_tests
+    tests.each do |test|
+      xit "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}. Expected Scenarios: #{test[4]}" do
+        xml_path, output_path = create_xml_path_and_output_path(test[0], test[1], __FILE__, test[3])
+        translator = translator_sizing_run_and_check(xml_path, output_path, test[2], test[1])
+        translator.write_osws
+
+        osw_files = []
+        osw_sr_files = []
+        Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
+        Dir.glob("#{output_path}/SR/in.osw") { |osw| osw_sr_files << osw }
+
+        # We always expect there to only be one
+        # sizing run file
+        expect(osw_sr_files.size).to eq 1
+
+        # Here we test the actual number of additional scenarios that got created
+        non_sr_osws = osw_files - osw_sr_files
+        expect(non_sr_osws.size).to eq test[4]
+      end
+    end
   end
 
-  it 'should parse the DC GSA Headquarters.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
-    test_baseline_and_scenario_creation_with_simulation('DC GSA Headquarters.xml', 2, ASHRAE90_1, 'CZ01RV2.epw', false)
-  end
+  describe 'Generate Only CB Modeled Scenario' do
+    tests = get_tests
+    tests.each do |test|
+      it "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}. Expected Scenarios: 1" do
+        xml_path, output_path = create_xml_path_and_output_path(test[0], test[1], __FILE__, test[3])
+        translator = translator_sizing_run_and_check(xml_path, output_path, test[2], test[1])
+        translator.write_osws(only_cb_modeled = true)
 
-  it 'should parse and write BuildingSync Website Valid Schema.xml (phase zero) with CA Title 24 and generate baseline and scenarios' do
-    test_baseline_and_scenario_creation_with_simulation('BuildingSync Website Valid Schema.xml', 30, CA_TITLE24, 'CZ01RV2.epw', false)
-  end
+        osw_files = []
+        osw_sr_files = []
+        Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
+        Dir.glob("#{output_path}/SR/in.osw") { |osw| osw_sr_files << osw }
 
-  it 'should parse the Golden Test File.xml (phase zero) with ASHRAE 90.1 and generate baseline and scenarios' do
-    begin
-      test_baseline_and_scenario_creation_with_simulation('Golden Test File.xml', 1, ASHRAE90_1, 'CZ01RV2.epw', false)
-    rescue StandardError => e
-      expect(e.message.include?('Error: There is more than one (2) building attached to this site in your BuildingSync file.')).to be true
+        # We always expect there to only be one
+        # sizing run file
+        expect(osw_sr_files.size).to eq 1
+
+        # Here we test the actual number of additional scenarios that got created
+        non_sr_osws = osw_files - osw_sr_files
+        expect(non_sr_osws.size).to eq 1
+      end
     end
   end
 end

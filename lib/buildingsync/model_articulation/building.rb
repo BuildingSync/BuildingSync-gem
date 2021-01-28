@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -34,28 +36,40 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require_relative 'building_section'
-require_relative '../../../lib/buildingsync/get_bcl_weather_file'
 require 'date'
+
 require 'openstudio/extension/core/os_lib_helper_methods'
 require 'openstudio/extension/core/os_lib_model_generation'
 
+require 'buildingsync/model_articulation/building_section'
+require 'buildingsync/model_articulation/location_element'
+require 'buildingsync/get_bcl_weather_file'
+
 module BuildingSync
-  class Building < SpatialElement
+  # Building class
+  class Building < LocationElement
     include OsLib_HelperMethods
     include EnergyPlus
     include OsLib_ModelGeneration
 
     # initialize
-    def initialize(build_element, site_occupancy_type, site_total_floor_area, ns)
+    # @param building_element [REXML::Element] an element corresponding to a single auc:Building
+    # @param site_occupancy_classification [String]
+    # @param site_total_floor_area [String]
+    # @param ns [String] namespace, likely 'auc'
+    def initialize(base_xml, site_occupancy_classification, site_total_floor_area, ns)
+      super(base_xml, ns)
+      @base_xml = base_xml
+      @ns = ns
+
+      help_element_class_type_check(base_xml, 'Building')
       @building_sections = []
       @building_sections_whole_building = []
       @model = nil
-      @primary_contact_id = nil
-      @id = nil
       @all_set = false
 
       # parameter to read and write.
+      @epw_file_path = nil
       @standard_template = nil
       @building_rotation = 0.0
       @floor_height = 0.0
@@ -71,45 +85,38 @@ module BuildingSync
       @party_wall_fraction = 0
       @built_year = 0
       @open_studio_standard = nil
-      @ownership = nil
-      @occupancy_classification = nil
-      @year_major_remodel = nil
-      @year_of_last_energy_audit = nil
-      @year_last_commissioning = nil
-      @building_automation_system = nil
-      @historical_landmark = nil
-      @percent_occupied_by_owner = nil
       @occupant_quantity = nil
       @number_of_units = nil
       @fraction_area = 1.0
       # code to initialize
-      read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
+      read_xml(site_occupancy_classification, site_total_floor_area)
     end
 
+    # returns number of stories
+    # @return [Integer]
     def num_stories
       return @num_stories_above_grade + @num_stories_below_grade
     end
 
-    def read_xml(build_element, site_occupancy_type, site_total_floor_area, ns)
-      # building ID
-      if build_element.attributes['ID']
-        @id = build_element.attributes['ID']
-      end
-      # city and state
-      read_city_and_state_name(build_element, ns)
+    # read xml
+    # @param site_occupancy_classification [String]
+    # @param site_total_floor_area [String]
+    def read_xml(site_occupancy_classification, site_total_floor_area)
       # floor areas
-      read_floor_areas(build_element, site_total_floor_area, ns)
-      # standard template
-      read_built_remodel_year(build_element, ns)
-      # deal with stories above and below grade
-      read_stories_above_and_below_grade(build_element, ns)
-      # aspect ratio
-      read_aspect_ratio(build_element, ns)
-      # read occupancy
-      @occupancy_type = read_occupancy_type(build_element, site_occupancy_type, ns)
+      @total_floor_area = read_floor_areas(site_total_floor_area)
+      # read location specific values
+      read_location_values
+      check_occupancy_classification(site_occupancy_classification)
+      set_built_year
 
-      build_element.elements.each("#{ns}:Sections/#{ns}:Section") do |section_element|
-        section = BuildingSection.new(section_element, @occupancy_type, @total_floor_area, ns)
+      # deal with stories above and below grade
+      read_stories_above_and_below_grade
+      # aspect ratio
+      set_ns_to_ew_ratio
+
+      # Create the BuildingSections
+      @base_xml.elements.each("#{@ns}:Sections/#{@ns}:Section") do |section_element|
+        section = BuildingSection.new(section_element, xget_text('OccupancyClassification'), @total_floor_area, num_stories, @ns)
         if section.section_type == 'Whole building'
           @building_sections_whole_building.push(section)
         elsif section.section_type == 'Space function' || section.section_type.nil?
@@ -119,16 +126,11 @@ module BuildingSync
         end
       end
 
-      # floor areas
-      @total_floor_area = read_floor_areas(build_element, site_total_floor_area, ns)
-
       # generate building name
-      read_building_name(build_element, ns)
-
-      read_ownership(build_element, ns)
-      read_other_building_details(build_element, ns)
+      read_other_building_details
     end
 
+    # set all function to set all parameters for this building
     def set_all
       if !@all_set
         @all_set = true
@@ -138,116 +140,117 @@ module BuildingSync
       end
     end
 
+    # set width and length of the building footprint
     def set_width_and_length
       footprint = @total_floor_area / num_stories.to_f
       @width = Math.sqrt(footprint / @ns_to_ew_ratio)
       @length = footprint / @width
     end
 
-    def read_built_remodel_year(build_element, ns)
-      if !build_element.elements["#{ns}:YearOfConstruction"]
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_standard_template_based_on_year', 'Year of Construction is blank in your BuildingSync file.')
-        raise 'Error : Year of Construction is blank in your BuildingSync file.'
+    def check_occupancy_classification(site_occupancy_classification)
+      # Set the OccupancyClassification text as that defined by the Site
+      # ONLY if it is not already defined
+      if !site_occupancy_classification.nil?
+        xset_or_create('OccupancyClassification', site_occupancy_classification, false)
       end
-
-      @built_year = build_element.elements["#{ns}:YearOfConstruction"].text.to_i
-
-      if build_element.elements["#{ns}:YearOfLastMajorRemodel"]
-        @year_major_remodel = build_element.elements["#{ns}:YearOfLastMajorRemodel"].text.to_i
-        @built_year = @year_major_remodel if @year_major_remodel > @built_year
-      end
-
-      if build_element.elements["#{ns}:YearOfLastEnergyAudit"]
-        @year_of_last_energy_audit = build_element.elements["#{ns}:YearOfLastEnergyAudit"].text.to_i
-      end
-
-      if build_element.elements["#{ns}:RetrocommissioningDate"]
-        @year_last_commissioning = Date.parse build_element.elements["#{ns}:RetrocommissioningDate"].text
-      else
-        @year_last_commissioning = nil
+      if xget_text('OccupancyClassification').nil?
+        raise StandardError, "Building ID: #{xget_id}. OccupancyClassification must be defined at either the Site or Building level."
       end
     end
 
-    def read_stories_above_and_below_grade(build_element, ns)
-      if build_element.elements["#{ns}:FloorsAboveGrade"]
-        @num_stories_above_grade = build_element.elements["#{ns}:FloorsAboveGrade"].text.to_f
-      elsif build_element.elements["#{ns}:ConditionedFloorsAboveGrade"]
-        @num_stories_above_grade = build_element.elements["#{ns}:ConditionedFloorsAboveGrade"].text.to_f
+    # Set the @built_year based on YearOfConstruction / YearOfLastMajorRemodel
+    def set_built_year
+      if !@base_xml.elements["#{@ns}:YearOfConstruction"]
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_standard_template_based_on_year', 'Year of Construction is blank in your BuildingSync file.')
+        raise StandardError, "Building ID: #{xget_id}. Year of Construction is blank in your BuildingSync file, but is required."
+      end
+
+      @built_year = xget_text_as_integer('YearOfConstruction')
+      remodel_year = xget_text_as_integer('YearOfLastMajorRemodel')
+      if !remodel_year.nil? && remodel_year > @built_year
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_built_year', "built_year for Standards reset from #{@built_year} (YearOfConstruction) to #{remodel_year} (YearOfLastMajorRemodel).")
+        @built_year = remodel_year
+      else
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_built_year', "built_year for Standards set to #{@built_year} (YearOfConstruction).")
+      end
+    end
+
+    # read stories above and below grade
+    def read_stories_above_and_below_grade
+      if @base_xml.elements["#{@ns}:FloorsAboveGrade"]
+        @num_stories_above_grade = @base_xml.elements["#{@ns}:FloorsAboveGrade"].text.to_f
+      elsif @base_xml.elements["#{@ns}:ConditionedFloorsAboveGrade"]
+        @num_stories_above_grade = @base_xml.elements["#{@ns}:ConditionedFloorsAboveGrade"].text.to_f
       else
         @num_stories_above_grade = 1.0 # setDefaultValue
       end
 
-      if @num_stories_above_grade == 0
-        @num_stories_above_grade = 1.0
-      end
-
-      if build_element.elements["#{ns}:FloorsBelowGrade"]
-        @num_stories_below_grade = build_element.elements["#{ns}:FloorsBelowGrade"].text.to_f
-      elsif build_element.elements["#{ns}:ConditionedFloorsBelowGrade"]
-        @num_stories_below_grade = build_element.elements["#{ns}:ConditionedFloorsBelowGrade"].text.to_f
+      if @base_xml.elements["#{@ns}:FloorsBelowGrade"]
+        @num_stories_below_grade = @base_xml.elements["#{@ns}:FloorsBelowGrade"].text.to_f
+      elsif @base_xml.elements["#{@ns}:ConditionedFloorsBelowGrade"]
+        @num_stories_below_grade = @base_xml.elements["#{@ns}:ConditionedFloorsBelowGrade"].text.to_f
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
       end
+
       if @num_stories_below_grade > 1.0
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_stories_above_and_below_grade', "Number of stories below grade is larger than 1: #{@num_stories_below_grade}, currently only one basement story is supported.")
-        raise "Error : Number of stories below grade is larger than 1: #{@num_stories_below_grade}, currently only one basement story is supported."
+        raise StandardError, "Building ID: #{xget_id}. Number of stories below grade is > 1 (#{num_stories_below_grade}).  Currently, only one story below grade is supported."
       end
     end
 
-    def read_aspect_ratio(build_element, ns)
-      if build_element.elements["#{ns}:AspectRatio"]
-        @ns_to_ew_ratio = build_element.elements["#{ns}:AspectRatio"].text.to_f
+    # Set the @ns_to_ew_ratio parameter using the AspectRatio element if present
+    def set_ns_to_ew_ratio
+      if @base_xml.elements["#{@ns}:AspectRatio"]
+        @ns_to_ew_ratio = xget_text_as_float('AspectRatio')
       else
         @ns_to_ew_ratio = 0.0 # setDefaultValue
       end
     end
 
-    def read_city_and_state_name(build_element, ns)
-      if build_element.elements["#{ns}:Address/#{ns}:City"]
-        @city_name = build_element.elements["#{ns}:Address/#{ns}:City"].text
-      else
-        @city_name = nil
-      end
-      if build_element.elements["#{ns}:Address/#{ns}:State"]
-        @state_name = build_element.elements["#{ns}:Address/#{ns}:State"].text
-      else
-        @state_name = nil
-      end
-    end
-
+    # get building type
+    # @return [String]
     def get_building_type
       set_all
       # try to get the bldg type at the building level, if it is nil then look at the first section
-      if !@bldg_type.nil?
-        return @bldg_type
+      if !@standards_building_type.nil?
+        return @standards_building_type
       else
         if @building_sections.count == 0
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_building_type', 'There is no occupancy type attached to this building in your BuildingSync file.')
           raise 'Error: There is no occupancy type attached to this building in your BuildingSync file.'
         else
-          return @building_sections[0].bldg_type
+          return @building_sections[0].standards_building_type
         end
       end
     end
 
+    # get full path to epw file
+    # return [String]
+    def get_epw_file_path
+      return @epw_file_path
+    end
+
+    # set aspect ratio, floor height, and WWR
     def set_building_form_defaults
       # if aspect ratio, story height or wwr have argument value of 0 then use smart building type defaults
       building_form_defaults = building_form_defaults(get_building_type)
       if @ns_to_ew_ratio == 0.0 && !building_form_defaults.nil?
         @ns_to_ew_ratio = building_form_defaults[:aspect_ratio]
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for aspect ratio will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:aspect_ratio]}.")
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_building_form_defaults', "0.0 value for aspect ratio will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:aspect_ratio]}.")
       end
       if @floor_height == 0.0 && !building_form_defaults.nil?
         @floor_height = OpenStudio.convert(building_form_defaults[:typical_story], 'ft', 'm').get
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for floor height will be replaced with smart default for #{get_building_type}of #{building_form_defaults[:typical_story]}.")
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_building_form_defaults', "0.0 value for floor height will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:typical_story]}.")
       end
       # because of this can't set wwr to 0.0. If that is desired then we can change this to check for 1.0 instead of 0.0
       if @wwr == 0.0 && !building_form_defaults.nil?
         @wwr = building_form_defaults[:wwr]
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.read_building_form_defaults', "0.0 value for window to wall ratio will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:wwr]}.")
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_building_form_defaults', "0.0 value for window to wall ratio will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:wwr]}.")
       end
     end
 
+    # check building fraction
     def check_building_fraction
       # check that sum of fractions for b,c, and d is less than 1.0 (so something is left for primary building type)
       building_fraction = 1.0
@@ -272,132 +275,85 @@ module BuildingSync
           @building_sections[0].fraction_area = building_fraction
         end
         @building_sections.each do |section|
-          puts "section with ID: #{section.id} and type: '#{section.section_type}' has fraction: #{section.fraction_area}"
+          puts "section with ID: #{section.xget_id} and type: '#{section.xget_text('SectionType')}' has fraction: #{section.fraction_area}"
           next if section.fraction_area.nil?
           building_fraction -= section.fraction_area
         end
         if building_fraction.round(3) < 0.0
           puts "building fraction is #{building_fraction}"
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_faction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_fraction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
           raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
         end
       end
     end
 
-    def read_ownership(building_element, ns)
-      if building_element.elements["#{ns}:Ownership"]
-        @ownership = building_element.elements["#{ns}:Ownership"].text
-      else
-        @ownership = nil
-      end
-
-      if building_element.elements["#{ns}:OccupancyClassification"]
-        @occupancy_classification = building_element.elements["#{ns}:OccupancyClassification"].text
-      else
-        @occupancy_classification = nil
-      end
-    end
-
-    def read_other_building_details(building_element, ns)
-      if building_element.elements["#{ns}:PrimaryContactID"]
-        @primary_contact_id = building_element.elements["#{ns}:PrimaryContactID"].text
-      else
-        @primary_contact_id = nil
-      end
-
-      if building_element.elements["#{ns}:BuildingAutomationSystem"]
-        @building_automation_system = building_element.elements["#{ns}:BuildingAutomationSystem"].text.to_bool
-      else
-        @building_automation_system = nil
-      end
-
-      if building_element.elements["#{ns}:HistoricalLandmark"]
-        @historical_landmark = building_element.elements["#{ns}:HistoricalLandmark"].text.to_bool
-      else
-        @historical_landmark = nil
-      end
-
-      if building_element.elements["#{ns}:PercentOccupiedByOwner"]
-        @percent_occupied_by_owner = building_element.elements["#{ns}:PercentOccupiedByOwner"].text
-      else
-        @percent_occupied_by_owner = nil
-      end
-
-      if building_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"]
-        @occupant_quantity = building_element.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text
+    # read other building details
+    def read_other_building_details
+      if @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"]
+        @occupant_quantity = @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"].text
       else
         @occupant_quantity = nil
       end
 
-      if building_element.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"]
-        @number_of_units = building_element.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text
+      if @base_xml.elements["#{@ns}:SpatialUnits/#{@ns}:SpatialUnit/#{@ns}:NumberOfUnits"]
+        @number_of_units = @base_xml.elements["#{@ns}:SpatialUnits/#{@ns}:SpatialUnit/#{@ns}:NumberOfUnits"].text
       else
         @number_of_units = nil
       end
     end
 
-    def read_building_name(building_element, ns)
-      name_array = []
-      name_element = building_element.elements["#{ns}:PremisesName"]
-      if !name_element.nil?
-        name_array << name_element.text
-      end
-      @name = name_array.join('|').to_s
-    end
-
+    # create building space types
+    # @param model [OpenStudio::Model]
     def create_bldg_space_types(model)
       @building_sections.each do |bldg_subsec|
-        bldg_subsec.create_space_types(model, @total_floor_area, @standard_template, @open_studio_standard)
+        bldg_subsec.create_space_types(model, @total_floor_area, num_stories, @standard_template, @open_studio_standard)
       end
     end
 
+    # build zone hash that stores zone lists for buildings and building sections
+    # @return [[hash<string, array<Zone>>]]
     def build_zone_hash
-      zone_hash = Hash.new
+      zone_hash = {}
       if @space_types
         zone_list = []
         @space_types.each do |space_name, space_type|
           zone_list.concat(get_zones_per_space_type(space_type[:space_type]))
         end
-        zone_hash[@id] = zone_list
+        zone_hash[xget_id] = zone_list
       end
       @building_sections.each do |bldg_subsec|
         zone_list = []
         bldg_subsec.space_types_floor_area.each do |space_type, hash|
           zone_list.concat(get_zones_per_space_type(space_type))
         end
-        zone_hash[bldg_subsec.id] = zone_list
+        zone_hash[bldg_subsec.xget_id] = zone_list
       end
       return zone_hash
     end
 
+    # build space types hash
+    # @return [hash<string, array<hash<string, string>>]
     def build_space_type_hash
-      space_type_hash = Hash.new
+      space_type_hash = {}
       if @space_types
         space_type_list = []
         @space_types.each do |space_name, space_type|
           space_type_list << space_type[:space_type]
         end
-        space_type_hash[@id] = space_type_list
+        space_type_hash[xget_id] = space_type_list
       end
       @building_sections.each do |bldg_subsec|
         space_type_list = []
         bldg_subsec.space_types_floor_area.each do |space_type, hash|
           space_type_list << space_type
         end
-        space_type_hash[bldg_subsec.id] = space_type_list
+        space_type_hash[bldg_subsec.xget_id] = space_type_list
       end
       return space_type_hash
     end
 
-    def get_zones_per_space_type(space_type)
-      list_of_zones = []
-      model_space_type = @model.getSpaceTypeByName(space_type.name.get).get
-      model_space_type.spaces.each do |space|
-        list_of_zones << space.thermalZone.get
-      end
-      return list_of_zones
-    end
-
+    # generate building space types floor area hash
+    # @return [Hash]
     def bldg_space_types_floor_area_hash
       new_hash = {}
       if @building_sections.count > 0
@@ -408,9 +364,9 @@ module BuildingSync
         end
         # if we have no sections we need to do the same just for the building
       elsif @building_sections.count == 0
-        @space_types = get_space_types_from_building_type(@bldg_type, @standard_template, true)
-        puts " Space types: #{@space_types} selected for building type: #{@bldg_type} and standard template: #{@standard_template}"
-        space_types_floor_area = create_space_types(@model, @total_floor_area, @standard_template, @open_studio_standard)
+        @space_types = get_space_types_from_building_type(@standards_building_type, @standard_template, true)
+        puts " Space types: #{@space_types} selected for building type: #{@standards_building_type} and standard template: #{@standard_template}"
+        space_types_floor_area = create_space_types(@model, @total_floor_area, num_stories, @standard_template, @open_studio_standard)
         space_types_floor_area.each do |space_type, hash|
           new_hash[space_type] = hash
         end
@@ -418,23 +374,22 @@ module BuildingSync
       return new_hash
     end
 
+    # in initialize an empty model
     def initialize_model
       # let's create our new empty model
       @model = OpenStudio::Model::Model.new if @model.nil?
     end
 
-    def get_model
-      # in case the model was not initialized before we create a new model if it is nil
-      initialize_model
-      return @model
-    end
-
+    # set building and system type for building and sections
     def set_bldg_and_system_type_for_building_and_section
       @building_sections.each(&:set_bldg_and_system_type)
 
-      set_bldg_and_system_type(@occupancy_type, @total_floor_area, false)
+      set_bldg_and_system_type(xget_text('OccupancyClassification'), @total_floor_area, num_stories, true)
     end
 
+    # determine the open studio standard and call the set_all function
+    # @param standard_to_be_used [String]
+    # @return [Standard]
     def determine_open_studio_standard(standard_to_be_used)
       set_all
       begin
@@ -443,23 +398,28 @@ module BuildingSync
         @open_studio_standard = Standard.build("#{@standard_template}_#{building_type}")
         update_name
       rescue StandardError => e
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.BuildingSection.read_xml', e.message)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.determine_open_studio_standard', e.message[0..20])
+        raise StandardError, "BuildingSync.Building.determine_open_studio_standard: #{e.message[0..20]}"
       end
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.BuildingSection.read_xml', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.determine_open_studio_standard', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
       return @open_studio_standard
     end
 
+    # update the name of the building
     def update_name
       # update the name so it includes the standard_template string
       name_array = [@standard_template]
       name_array << get_building_type
       @building_sections.each do |bld_tp|
-        name_array << bld_tp.bldg_type
+        name_array << bld_tp.standards_building_type
       end
       name_array << @name if !@name.nil? && !@name == ''
       @name = name_array.join('|').to_s
     end
 
+    # set standard template
+    # @param standard_to_be_used [String]
+    # @param built_year [Integer]
     def set_standard_template(standard_to_be_used, built_year)
       if standard_to_be_used == CA_TITLE24
         if built_year < 1978
@@ -491,19 +451,46 @@ module BuildingSync
         end
         # TODO: add ASHRAE 2016 once it is available
       else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.get_standard_template', "Unknown standard_to_be_used #{standard_to_be_used}.")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_standard_template', "Unknown standard_to_be_used #{standard_to_be_used}.")
+        raise StandardError, "BuildingSync.Building.get_standard_template: Unknown standard_to_be_used #{standard_to_be_used}."
       end
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.get_standard_template', "Using the following standard for default values #{@standard_template}.")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.get_standard_template', "Using the following standard for default values #{@standard_template}.")
     end
 
+    # get zones per space type
+    # @param space_type [OpenStudio::Model::SpaceType]
+    # @return [array<OpenStudio::Model::ThermalZone>]
+    def get_zones_per_space_type(space_type)
+      list_of_zones = []
+      model_space_type = @model.getSpaceTypeByName(space_type.name.get).get
+      model_space_type.spaces.each do |space|
+        list_of_zones << space.thermalZone.get
+      end
+      return list_of_zones
+    end
+
+    # get model
+    # @return [OpenStudio::Model]
+    def get_model
+      # in case the model was not initialized before we create a new model if it is nil
+      initialize_model
+      return @model
+    end
+
+    # get year building was built
+    # @return [Integer]
     def get_built_year
       return @built_year
     end
 
-    def get_building_template
+    # get @standard_template
+    # @return [String]
+    def get_standard_template
       return @standard_template
     end
 
+    # get system type
+    # @return [String]
     def get_system_type
       set_all
       if !@system_type.nil?
@@ -513,42 +500,91 @@ module BuildingSync
       end
     end
 
+    # get stat file path
+    # @param epw_file [String]
+    # @return [String]
+    def get_stat_file(epw_file)
+      # Add SiteWaterMainsTemperature -- via parsing of STAT file.
+      stat_file = "#{File.join(File.dirname(epw_file.path.to_s), File.basename(epw_file.path.to_s, '.*'))}.stat"
+      unless File.exist? stat_file
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.get_stat_file', 'Could not find STAT file by filename, looking in the directory')
+        stat_files = Dir["#{File.dirname(epw_file.path.to_s)}/*.stat"]
+        if stat_files.size > 1
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_stat_file', 'More than one stat file in the EPW directory')
+          return nil
+        end
+        if stat_files.empty?
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_stat_file', 'Cound not find the stat file in the EPW directory')
+          return nil
+        end
+
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.get_stat_file', "Using STAT file: #{stat_files.first}")
+        stat_file = stat_files.first
+      end
+      unless stat_file
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_stat_file', 'Could not find stat file')
+        return nil
+      end
+      return stat_file
+    end
+
+    # set weather file and climate zone
+    # @param climate_zone [String]
+    # @param epw_file_path [String]
+    # @param standard_to_be_used [String]
+    # @param latitude [String]
+    # @param longitude [String]
+    # @param ddy_file [String]
+    # @param weather_argb [array]
     def set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file, *weather_argb)
       initialize_model
 
+      determine_climate_zone(standard_to_be_used) if climate_zone.nil?
+
       # here we check if there is an valid EPW file, if there is we use that file otherwise everything will be generated from climate zone
       if !epw_file_path.nil? && File.exist?(epw_file_path)
+        @epw_file_path = epw_file_path
         puts "case 1: epw file exists #{epw_file_path} and climate_zone is: #{climate_zone}"
-        set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file)
-      elsif climate_zone.nil?
+        set_weather_and_climate_zone_from_epw(climate_zone, standard_to_be_used, latitude, longitude, ddy_file)
+      elsif climate_zone.nil? && @climate_zone.nil?
         weather_station_id = weather_argb[1]
         state_name = weather_argb[2]
         city_name = weather_argb[3]
-        puts "case 2: climate_zone is nil #{climate_zone}"
+        puts 'case 2: climate_zone is nil at the Site and Building level'
         if !weather_station_id.nil?
           puts "case 2.1: weather_station_id is not nil #{weather_station_id}"
-          epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
+          @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
         elsif !city_name.nil? && !state_name.nil?
           puts "case 2.2: SITE LEVEL city_name and state_name is not nil #{city_name} #{state_name}"
-          epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
+          @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
         elsif !@city_name.nil? && !@state_name.nil?
           puts "case 2.3: BUILDING LEVEL city_name and state_name is not nil #{@city_name} #{@state_name}"
-          epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(@state_name, @city_name)
+          @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(@state_name, @city_name)
         end
 
-        # Ensure a file path gets set, else raise error
-        if epw_file_path.nil?
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path is nil and no way to set from Site or Building parameters.')
-          raise 'Error : epw_file_path is nil and no way to set from Site or Building parameters.'
-        elsif !File.exist?(epw_file_path)
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path file does not exist.')
-          raise 'Error : epw_file_path file does not exist.'
-        end
-
-        set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude)
       else
-        puts "case 3: climate zone #{climate_zone} lat #{latitude} long #{longitude}"
-        set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
+        puts "case 3: SITE LEVEL climate zone #{climate_zone} BUILDING LEVEL climate zone #{@climate_zone}."
+        puts "lat #{latitude} long #{longitude}"
+        if climate_zone.nil?
+          climate_zone = @climate_zone
+          puts "Climate Zone set at the Building level: #{climate_zone}"
+        else
+          puts "Climate Zone set at the Site level: #{climate_zone}"
+        end
+        @epw_file_path = set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
+        @epw_file_path = @epw_file_path.to_s
+      end
+
+      # Ensure a file path gets set, else raise error
+      if @epw_file_path.nil?
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path is nil and no way to set from Site or Building parameters.')
+        raise StandardError, 'BuildingSync.Building.set_weather_and_climate_zone: epw_file_path is nil and no way to set from Site or Building parameters.'
+      elsif !@epw_file_path
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "epw_file_path is false: #{@epw_file_path}")
+        raise StandardError, "BuildingSync.Building.set_weather_and_climate_zone: epw_file_path is false: #{@epw_file_path}"
+      elsif !File.exist?(@epw_file_path)
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "epw_file_path does not exist: #{@epw_file_path}")
+        raise StandardError, "BuildingSync.Building.set_weather_and_climate_zone: epw_file_path does not exist: #{@epw_file_path}"
       end
 
       # setting the current year, so we do not get these annoying log messages:
@@ -557,12 +593,21 @@ module BuildingSync
       year_description.setCalendarYear(::Date.today.year)
 
       # add final condition
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone', "The path to the epw file is: #{@epw_file_path}")
     end
 
+    # set weather file and climate zone from climate zone
+    # @param climate_zone [String]
+    # @param standard_to_be_used [String]
+    # @param latitude [String]
+    # @param longitude [String]
     def set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_weather_and_climate_zone_from_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
       climate_zone_standard_string = climate_zone
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weather_and_climate_zone_from_climate_zone', "climate zone: #{climate_zone}")
+      puts climate_zone
+      puts standard_to_be_used
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_climate_zone', "climate zone: #{climate_zone}")
       if standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
         climate_zone_standard_string = "CEC T24-CEC#{climate_zone.gsub('Climate Zone', '').strip}"
       elsif standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
@@ -571,8 +616,11 @@ module BuildingSync
         climate_zone_standard_string = ''
       end
 
+      puts @open_studio_standard
+      puts @open_studio_standard.class
+      puts climate_zone_standard_string
       if !@open_studio_standard.nil? && !@open_studio_standard.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weater_and_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone_from_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
       end
 
       # overwrite latitude and longitude if available
@@ -588,11 +636,17 @@ module BuildingSync
 
       weather_file = @model.getWeatherFile
 
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{weather_file.city}. State is #{weather_file.stateProvinceRegion}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_climate_zone', "city is #{weather_file.city}. State is #{weather_file.stateProvinceRegion}")
 
       set_climate_zone(climate_zone, standard_to_be_used)
+      return weather_file.path.get
     end
 
+    # set climate zone
+    # @param climate_zone [String]
+    # @param standard_to_be_used [String]
+    # @param stat_file [String]
+    # @return [Boolean]
     def set_climate_zone(climate_zone, standard_to_be_used, stat_file = nil)
       # Set climate zone
       if climate_zone.nil?
@@ -620,7 +674,7 @@ module BuildingSync
       climate_zones.clear
       if standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
         climate_zones.setClimateZone('ASHRAE', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climate_zones.getClimateZones('ASHRAE').first.value}")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_climate_zone', "Setting Climate Zone to #{climate_zones.getClimateZones('ASHRAE').first.value}")
         puts "setting ASHRAE climate zone to: #{climate_zone}"
         return true
       elsif standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
@@ -630,17 +684,23 @@ module BuildingSync
         climate_zone = climate_zone.delete('B').strip
         climate_zone = climate_zone.delete('C').strip
         climate_zones.setClimateZone('CEC', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_climate_zone', "Setting Climate Zone to #{climate_zone}")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_climate_zone', "Setting Climate Zone to #{climate_zone}")
         puts "setting CA_TITLE24 climate zone to: #{climate_zone}"
         return true
       end
       puts "could not set climate_zone #{climate_zone}"
-      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.set_climate_zone', "Cannot set the #{climate_zone} in context of this standard #{standard_to_be_used}")
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_climate_zone', "Cannot set the #{climate_zone} in context of this standard #{standard_to_be_used}")
       return false
     end
 
-    def set_weather_and_climate_zone_from_epw(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file = nil)
-      epw_file = OpenStudio::EpwFile.new(epw_file_path)
+    # set weather file and climate zone from EPW file
+    # @param climate_zone [String]
+    # @param standard_to_be_used [String]
+    # @param latitude [String]
+    # @param longitude [String]
+    # @param ddy_file [String]
+    def set_weather_and_climate_zone_from_epw(climate_zone, standard_to_be_used, latitude, longitude, ddy_file = nil)
+      epw_file = OpenStudio::EpwFile.new(@epw_file_path)
 
       weather_lat = epw_file.latitude
       if !latitude.nil?
@@ -661,7 +721,7 @@ module BuildingSync
       weather_file.setLongitude(weather_lon)
       weather_file.setTimeZone(epw_file.timeZone)
       weather_file.setElevation(epw_file.elevation)
-      weather_file.setString(10, "file:///#{epw_file.path}")
+      weather_file.setString(10, epw_file.path.to_s)
 
       weather_name = "#{epw_file.city}_#{epw_file.stateProvinceRegion}_#{epw_file.country}"
       weather_time = epw_file.timeZone
@@ -675,7 +735,7 @@ module BuildingSync
       site.setTimeZone(weather_time)
       site.setElevation(weather_elev)
 
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "city is #{epw_file.city}. State is #{epw_file.stateProvinceRegion}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', "city is #{epw_file.city}. State is #{epw_file.stateProvinceRegion}")
 
       stat_file = get_stat_file(epw_file)
       add_site_water_mains_temperature(stat_file) if !stat_file.nil?
@@ -690,11 +750,11 @@ module BuildingSync
       unless File.exist? ddy_file
         ddy_files = Dir["#{File.dirname(epw_file.path.to_s)}/*.ddy"]
         if ddy_files.size > 1
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'More than one ddy file in the EPW directory')
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', 'More than one ddy file in the EPW directory')
           return false
         end
         if ddy_files.empty?
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'could not find the ddy file in the EPW directory')
+          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', 'could not find the ddy file in the EPW directory')
           return false
         end
 
@@ -710,8 +770,8 @@ module BuildingSync
       ddy_model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each do |d|
         # grab only the ones that matter
         ddy_list = /(Htg 99.6. Condns DB)|(Clg .4. Condns WB=>MDB)|(Clg .4% Condns DB=>MWB)/
-        if d.name.get =~ ddy_list
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Adding object #{d.name}")
+        if d.name.get.match?(ddy_list)
+          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', "Adding object #{d.name}")
 
           # add the object to the existing model
           @model.addObject(d.clone)
@@ -719,56 +779,21 @@ module BuildingSync
       end
     end
 
-    def get_stat_file(epw_file)
-      # Add SiteWaterMainsTemperature -- via parsing of STAT file.
-      stat_file = "#{File.join(File.dirname(epw_file.path.to_s), File.basename(epw_file.path.to_s, '.*'))}.stat"
-      unless File.exist? stat_file
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find STAT file by filename, looking in the directory')
-        stat_files = Dir["#{File.dirname(epw_file.path.to_s)}/*.stat"]
-        if stat_files.size > 1
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'More than one stat file in the EPW directory')
-          return nil
-        end
-        if stat_files.empty?
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Cound not find the stat file in the EPW directory')
-          return nil
-        end
-
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "Using STAT file: #{stat_files.first}")
-        stat_file = stat_files.first
-      end
-      unless stat_file
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Facility.set_weater_and_climate_zone', 'Could not find stat file')
-        return nil
-      end
-      return stat_file
-    end
-
+    # add site water mains temperature -- via parsing of STAT file.
+    # @param stat_file [String]
+    # @return [Boolean]
     def add_site_water_mains_temperature(stat_file)
-      # Add SiteWaterMainsTemperature -- via parsing of STAT file.
-
       stat_model = ::EnergyPlus::StatFile.new(stat_file)
       water_temp = @model.getSiteWaterMainsTemperature
       water_temp.setAnnualAverageOutdoorAirTemperature(stat_model.mean_dry_bulb)
       water_temp.setMaximumDifferenceInMonthlyAverageOutdoorAirTemperatures(stat_model.delta_dry_bulb)
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.set_weater_and_climate_zone', "mean dry bulb is #{stat_model.mean_dry_bulb}")
+      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.add_site_water_mains_temperature', "mean dry bulb is #{stat_model.mean_dry_bulb}")
       return true
     end
 
-    def generate_baseline_osm(standard_to_be_used)
-      # this is code refactored from the "create_bar_from_building_type_ratios" measure
-      # first we check is there is any data at all in this facility, aka if there is a site in the list
-      # TODO: the original measure contains value range checks, should we implement them here or while importing data??
-      # Fraction: 'bldg_type_b_fract_bldg_area', 'bldg_type_c_fract_bldg_area', 'bldg_type_d_fract_bldg_area', 'wwr', 'party_wall_fraction' 0 =<= 1
-      # Bigger than 0 (excluding 0): 'total_bldg_floor_area' 0 <= nil
-      # Bigger than 1 (including 1): 'num_stories_above_grade' 1 =< nil
-      # Bigger than 0 (including 0): 'bldg_type_a_num_units', 'bldg_type_c_num_units', 'bldg_type_d_num_units', 'num_stories_below_grade', 'floor_height', 'ns_to_ew_ratio', 'party_wall_stories_north',
-      # 'party_wall_stories_south', 'party_wall_stories_east', 'party_wall_stories_west', 'single_floor_area' 0 =<= nil
-
-      # TODO: we have not really defined a good logic what happens with multiple sites, versus multiple buildings, here we just take the first building on the first site
-      set_building_form_defaults
-
-      # checking that the factions add up
+    # generate baseline model in osm file format
+    def generate_baseline_osm
+      # checking that the fractions add up
       check_building_fraction
 
       # set building rotation
@@ -777,11 +802,11 @@ module BuildingSync
         @model.getBuilding.setNorthAxis(building_rotation)
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "Set Building Rotation to #{@model.getBuilding.northAxis}")
       end
-      @model.getBuilding.setName(name)
+      if !@name.nil?
+        @model.getBuilding.setName(@name)
+      end
 
       create_bldg_space_types(@model)
-      # calculate length and width of bar
-      # todo - update slicing to nicely handle aspect ratio less than 1
 
       # create envelope
       # populate bar_hash and create envelope with data from envelope_data_hash and user arguments
@@ -791,7 +816,6 @@ module BuildingSync
       bar_hash[:num_stories_below_grade] = num_stories_below_grade.to_i
       bar_hash[:num_stories_above_grade] = num_stories_above_grade.to_i
       bar_hash[:floor_height] = floor_height
-      # bar_hash[:center_of_footprint] = OpenStudio::Point3d.new(length* 0.5,width * 0.5,0.0)
       bar_hash[:center_of_footprint] = OpenStudio::Point3d.new(0, 0, 0)
       bar_hash[:bar_division_method] = 'Multiple Space Types - Individual Stories Sliced'
       # default for now 'Multiple Space Types - Individual Stories Sliced', 'Multiple Space Types - Simple Sliced', 'Single Space Type - Core and Perimeter'
@@ -802,7 +826,7 @@ module BuildingSync
       bar_hash[:building_wwr_e] = wwr
       bar_hash[:building_wwr_w] = wwr
 
-      runner = OpenStudio::Ruleset::OSRunner.new
+      runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
       # remove non-resource objects not removed by removing the building
       remove_non_resource_objects(runner, @model)
 
@@ -826,7 +850,7 @@ module BuildingSync
         end
 
         # bottom_story_ground_exposed_floor and top_story_exterior_exposed_roof already setup as bool
-        bar_hash[:stories]["key #{i}"] = {story_party_walls: party_walls, story_min_multiplier: 1, story_included_in_building_area: true, below_partial_story: below_partial_story, bottom_story_ground_exposed_floor: true, top_story_exterior_exposed_roof: true}
+        bar_hash[:stories]["key #{i}"] = { story_party_walls: party_walls, story_min_multiplier: 1, story_included_in_building_area: true, below_partial_story: below_partial_story, bottom_story_ground_exposed_floor: true, top_story_exterior_exposed_roof: true }
       end
 
       # store expected floor areas to check after bar made
@@ -872,6 +896,7 @@ module BuildingSync
       return true
     end
 
+    # generate party walls
     def generate_party_walls
       party_walls_array = []
       if @party_wall_stories_north + @party_wall_stories_south + @party_wall_stories_east + @party_wall_stories_west > 0
@@ -1012,72 +1037,83 @@ module BuildingSync
       party_walls_array
     end
 
+    # write baseline model to osm file
+    # @param dir [String]
     def write_osm(dir)
       @model.save("#{dir}/in.osm", true)
     end
 
-    def write_parameters_to_xml(ns, building)
-      building.elements["#{ns}:PremisesName"].text = @name if !@name.nil?
-      building.elements["#{ns}:YearOfConstruction"].text = @built_year if !@built_year.nil?
-      building.elements["#{ns}:Ownership"].text = @ownership if !@ownership.nil?
-      building.elements["#{ns}:OccupancyClassification"].text = @occupancy_classification if !@occupancy_classification.nil?
-      building.elements["#{ns}:YearOfLastMajorRemodel"].text = @year_major_remodel if !@year_major_remodel.nil?
-      building.elements["#{ns}:YearOfLastEnergyAudit"].text = @year_of_last_energy_audit if !@year_of_last_energy_audit.nil?
-      building.elements["#{ns}:RetrocommissioningDate"].text = @year_last_commissioning if !@year_last_commissioning.nil?
-      building.elements["#{ns}:BuildingAutomationSystem"].text = @building_automation_system if !@building_automation_system.nil?
-      building.elements["#{ns}:HistoricalLandmark"].text = @historical_landmark if !@historical_landmark.nil?
-      building.elements["#{ns}:OccupancyLevels/#{ns}:OccupancyLevel/#{ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
-      building.elements["#{ns}:SpatialUnits/#{ns}:SpatialUnit/#{ns}:NumberOfUnits"].text = @number_of_units if !@number_of_units.nil?
-      building.elements["#{ns}:PercentOccupiedByOwner"].text = @percent_occupied_by_owner if !@percent_occupied_by_owner.nil?
+    # write parameters to xml file
+    def prepare_final_xml
+      @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"].text = @occupant_quantity if !@occupant_quantity.nil?
+      @base_xml.elements["#{@ns}:SpatialUnits/#{@ns}:SpatialUnit/#{@ns}:NumberOfUnits"].text = @number_of_units if !@number_of_units.nil?
 
       # Add new element in the XML file
-      add_user_defined_field_to_xml_file(building, ns, 'StandardTemplate', @standard_template)
-      add_user_defined_field_to_xml_file(building, ns, 'BuildingRotation', @building_rotation)
-      add_user_defined_field_to_xml_file(building, ns, 'FloorHeight', @floor_height)
-      add_user_defined_field_to_xml_file(building, ns, 'WindowWallRatio', @wwr)
-      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesNorth', @party_wall_stories_north)
-      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesSouth', @party_wall_stories_south)
-      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesEast', @party_wall_stories_east)
-      add_user_defined_field_to_xml_file(building, ns, 'PartyWallStoriesWest', @party_wall_stories_west)
-      add_user_defined_field_to_xml_file(building, ns, 'Width', @width)
-      add_user_defined_field_to_xml_file(building, ns, 'Length', @length)
-      add_user_defined_field_to_xml_file(building, ns, 'PartyWallFraction', @party_wall_fraction)
-      add_user_defined_field_to_xml_file(building, ns, 'FractionArea', @fraction_area)
+      add_user_defined_field_to_xml_file('OpenStudioModelName', @name)
+      add_user_defined_field_to_xml_file('StandardTemplateYearOfConstruction', @built_year)
+      add_user_defined_field_to_xml_file('StandardTemplate', @standard_template)
+      add_user_defined_field_to_xml_file('BuildingRotation', @building_rotation)
+      add_user_defined_field_to_xml_file('FloorHeight', @floor_height)
+      add_user_defined_field_to_xml_file('WindowWallRatio', @wwr)
+      add_user_defined_field_to_xml_file('PartyWallStoriesNorth', @party_wall_stories_north)
+      add_user_defined_field_to_xml_file('PartyWallStoriesSouth', @party_wall_stories_south)
+      add_user_defined_field_to_xml_file('PartyWallStoriesEast', @party_wall_stories_east)
+      add_user_defined_field_to_xml_file('PartyWallStoriesWest', @party_wall_stories_west)
+      add_user_defined_field_to_xml_file('Width', @width)
+      add_user_defined_field_to_xml_file('Length', @length)
+      add_user_defined_field_to_xml_file('PartyWallFraction', @party_wall_fraction)
+      add_user_defined_field_to_xml_file('ModelNumberThermalZones', @model.getThermalZones.size)
+      add_user_defined_field_to_xml_file('ModelNumberSpaces', @model.getSpaces.size)
+      add_user_defined_field_to_xml_file('ModelNumberStories', @model.getBuildingStorys.size)
+      add_user_defined_field_to_xml_file('ModelNumberPeople', @model.getBuilding.numberOfPeople)
+      add_user_defined_field_to_xml_file('ModelFloorArea(m2)', @model.getBuilding.floorArea)
 
-      write_parameters_to_xml_for_spatial_element(ns, building)
+      wf = @model.weatherFile.get
+      add_user_defined_field_to_xml_file('ModelWeatherFileName', wf.nameString)
+      add_user_defined_field_to_xml_file('ModelWeatherFileDataSource', wf.dataSource)
+      add_user_defined_field_to_xml_file('ModelWeatherFileCity', wf.city)
+      add_user_defined_field_to_xml_file('ModelWeatherFileStateProvinceRegion', wf.stateProvinceRegion)
+      add_user_defined_field_to_xml_file('ModelWeatherFileLatitude', wf.latitude)
+      add_user_defined_field_to_xml_file('ModelWeatherFileLongitude', wf.longitude)
+      prepare_final_xml_for_spatial_element
     end
 
+    # get space types
+    # @return [array<OpenStudio::Model::SpaceType>]
     def get_space_types
       return @model.getSpaceTypes
     end
 
+    # get peak occupancy
+    # @return [hash<string, float>]
     def get_peak_occupancy
-      peak_occupancy = Hash.new
+      peak_occupancy = {}
       if @occupant_quantity
-        peak_occupancy[@id] = @occupant_quantity.to_f
+        peak_occupancy[xget_id] = @occupant_quantity.to_f
         return peak_occupancy
       end
       @building_sections.each do |section|
-        peak_occupancy[section.id] = section.get_peak_occupancy.to_f if section.get_peak_occupancy
+        peak_occupancy[section.xget_id] = section.get_peak_occupancy.to_f if section.get_peak_occupancy
       end
       return peak_occupancy
     end
 
+    # get floor area
+    # @return [hash<string, float>]
     def get_floor_area
-      floor_area = Hash.new
+      floor_area = {}
       if @total_floor_area
-        floor_area[@id] = @total_floor_area.to_f
+        floor_area[xget_id] = @total_floor_area.to_f
       end
       @building_sections.each do |section|
         if section.get_floor_area
-          floor_area[section.id] = section.get_floor_area
+          floor_area[section.xget_id] = section.get_floor_area
         end
       end
       return floor_area
     end
 
-    attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr, :year_of_last_energy_audit, :ownership,
-                :occupancy_classification, :primary_contact_id, :year_last_commissioning, :building_automation_system, :historical_landmark, :percent_occupied_by_owner,
+    attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr,
                 :occupant_quantity, :number_of_units, :built_year, :year_major_remodel, :building_sections
   end
 end

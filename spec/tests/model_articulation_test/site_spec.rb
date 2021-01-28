@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -37,89 +39,84 @@
 require 'rexml/document'
 require 'openstudio/workflow/util/energyplus'
 
+require 'buildingsync/generator'
+
 RSpec.describe 'SiteSpec' do
-  it 'Should generate meaningful error when passing empty XML data' do
+  it 'should raise an StandardError given a non-Site REXML Element' do
+    # -- Setup
+    ns = 'auc'
+    v = '2.2.0'
+    g = BuildingSync::Generator.new(ns, v)
+    doc_string = g.create_bsync_root_to_building
+    doc = REXML::Document.new(doc_string)
+    facility_element = doc.elements["//#{ns}:Facility"]
+
+    # -- Create Site object from Facility
     begin
-      generate_baseline('building_151_Blank', 'auc')
+      BuildingSync::Site.new(facility_element, ns)
+
+      # Should not reach this
+      expect(false).to be true
     rescue StandardError => e
-      puts "expected error message:Year of Construction is blank in your BuildingSync file. but got: #{e.message} " if !e.message.include?('Year of Construction is blank in your BuildingSync file.')
-      expect(e.message.include?('Year of Construction is blank in your BuildingSync file.')).to be true
+      puts e.message
+      expect(e.message).to eql 'Attempted to initialize Site object with Element name of: Facility'
     end
   end
 
   it 'Should create an instance of the site class with minimal XML snippet' do
-    create_minimum_site('Retail', '1954', 'Gross', '69452')
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
+    expect(site).to be_an_instance_of(BuildingSync::Site)
   end
 
   it 'Should return the correct building template' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
     site.determine_open_studio_standard(ASHRAE90_1)
-    puts "expected building template: DOE Ref Pre-1980 but got: #{site.get_building_template} " if site.get_building_template != 'DOE Ref Pre-1980'
-    expect(site.get_building_template == 'DOE Ref Pre-1980').to be true
+
+    # -- Assert
+    puts "expected building template: DOE Ref Pre-1980 but got: #{site.get_standard_template} " if site.get_standard_template != 'DOE Ref Pre-1980'
+    expect(site.get_standard_template == 'DOE Ref Pre-1980').to be true
   end
 
   it 'Should return the correct system type' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
     puts "expected system type: PSZ-AC with gas coil heat but got: #{site.get_system_type} " if site.get_system_type != 'PSZ-AC with gas coil heat'
     expect(site.get_system_type == 'PSZ-AC with gas coil heat').to be true
   end
 
   it 'Should return the correct building type' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
     puts "expected building type: RetailStandalone but got: #{site.get_building_type} " if site.get_building_type != 'RetailStandalone'
     expect(site.get_building_type == 'RetailStandalone').to be true
   end
 
   it 'Should return the correct climate zone' do
-    site = create_minimum_site('Retail', '1954', 'Gross', '69452')
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
     puts "expected climate zone: nil but got: #{site.get_climate_zone} " if !site.get_climate_zone.nil?
     expect(site.get_climate_zone.nil?).to be true
   end
 
-  it 'Should write the same OSM file as previously generated - comparing the translated IDF files' do
-    # call generate_baseline_osm
-    # call write_osm
-    # compare this osm file with a file that was previously generated.
-    @osm_file_path = File.expand_path('../../files/filecomparison', File.dirname(__FILE__))
-    @site = create_minimum_site('Retail', '1980', 'Gross', '20000')
+  it 'Should write the same IDF file as previously generated' do
+    # We don't compare OSM files because the GUIDs change
+    g = BuildingSync::Generator.new
+    @osm_file_path = File.join(SPEC_FILES_DIR, 'filecomparison')
+    @site = g.create_minimum_site('Retail', '1980', 'Gross', '20000')
     @site.determine_open_studio_standard(ASHRAE90_1)
-    @site.generate_baseline_osm(File.expand_path('../../weather/CZ01RV2.epw', File.dirname(__FILE__)), ASHRAE90_1)
+    epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
+    @site.generate_baseline_osm(epw_file_path, ASHRAE90_1)
     @site.write_osm(@osm_file_path)
 
     generate_idf_file(@site.get_model)
 
-    osm_file_full_path = "#{@osm_file_path}/in.idf"
-    to_be_comparison_path = "#{@osm_file_path}/originalfiles/in.idf"
+    new_idf = "#{@osm_file_path}/in.idf"
+    original_idf = "#{@osm_file_path}/originalfiles/in.idf"
 
-    original_file_size = File.size(to_be_comparison_path)
-    new_file_size = File.size(osm_file_full_path)
-    puts "original idf file size #{original_file_size} bytes versus new idf file size #{new_file_size} bytes"
-    expect((original_file_size - new_file_size).abs <= 1).to be true
-
-    line_not_match_counter = compare_two_idf_files("#{@osm_file_path}/in.idf", "#{@osm_file_path}/originalfiles/in.idf")
+    line_not_match_counter = compare_two_idf_files(original_idf, new_idf)
 
     expect(line_not_match_counter == 0).to be true
-  end
-
-  def generate_baseline(file_name, ns)
-    sites = []
-    @xml_path = File.expand_path("../../files/#{file_name}.xml", File.dirname(__FILE__))
-    expect(File.exist?(@xml_path)).to be true
-    @doc = create_xml_file_object(@xml_path)
-    # @doc = create_blank_xml_file(ns)
-    facility_xml = create_facility_object(@doc, ns)
-
-    facility_xml.elements.each("#{ns}:Sites/#{ns}:Site") do |site_element|
-      sites.push(BuildingSync::Site.new(site_element, ns))
-    end
-    return sites
-  end
-
-  def create_facility_object(doc, ns)
-    facilities = []
-    doc.elements.each("#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility") do |facility_xml|
-      facilities.push(facility_xml)
-    end
-    return facilities[0]
   end
 end
