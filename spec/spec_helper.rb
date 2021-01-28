@@ -416,7 +416,6 @@ RSpec.configure do |config|
   end
 
   def get_xml_object(file_name)
-
     xml_path = File.join(SPEC_FILES_DIR, 'v2.2.0', file_name)
     expect(File.exist?(xml_path)).to be true
 

@@ -84,9 +84,8 @@ RSpec.describe 'SelectionTool' do
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
 
     selection_tool = BuildingSync::SelectionTool.new(xml_path, version)
-    expect(selection_tool.validate_use_case("This use case does not exist")).to be false
+    expect(selection_tool.validate_use_case('This use case does not exist')).to be false
   end
-
 
   describe 'Use Case Validation' do
     files_to_check = [
