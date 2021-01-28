@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -35,34 +37,38 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
 require 'rexml/document'
+require 'buildingsync/constants'
 
 require_relative 'model_articulation/spatial_element'
-require_relative 'makers/model_maker'
 require_relative 'makers/workflow_maker'
 require_relative 'selection_tool'
 require_relative 'extension'
 
-ASHRAE90_1 = 'ASHRAE90.1'.freeze
-CA_TITLE24 = 'CaliforniaTitle24'.freeze
-
 module BuildingSync
-  class Translator
-    # load the building sync file and chooses the correct workflow
+  # Translator class
+  class Translator < WorkflowMaker
+    include BuildingSync::Helper
+    # load the building sync file
+    # @param xml_file_path [String]
+    # @param output_dir [String]
+    # @param epw_file_path [String] if provided, full/path/to/my.epw
+    # @param standard_to_be_used [String]
+    # @param validate_xml_file_against_schema [Boolean]
     def initialize(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1, validate_xml_file_against_schema = true)
-      @doc = nil
-      @model_maker = nil
-      @workflow_maker = nil
+      @schema_version = nil
+      @xml_file_path = xml_file_path
       @output_dir = output_dir
       @standard_to_be_used = standard_to_be_used
       @epw_path = epw_file_path
-      @osm_baseline_path = nil
-      @facilities = []
+
+      @results_gathered = false
+      @final_xml_prepared = false
 
       # to further reduce the log messages we can change the log level with this command
       # OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Error)
       # Open a log for the library
-      logFile = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
-      logFile.setLogLevel(OpenStudio::Info)
+      log_file = OpenStudio::FileLogSink.new(OpenStudio::Path.new("#{output_dir}/in.log"))
+      log_file.setLogLevel(OpenStudio::Info)
 
       # parse the xml
       if !File.exist?(xml_file_path)
@@ -70,162 +76,92 @@ module BuildingSync
         raise "File '#{xml_file_path}' does not exist" unless File.exist?(xml_file_path)
       end
 
+      doc = help_load_doc(xml_file_path)
+
+      @schema_version = doc.root.attributes['version']
+      if @schema_version.nil?
+        @schema_version = '2.0.0'
+      end
+
+      # test for the namespace
+      ns = 'auc'
+      doc.root.namespaces.each_pair do |k, v|
+        ns = k if /bedes-auc/.match(v)
+      end
+
       if validate_xml_file_against_schema
-        # we wil try to validate the file, but if it fails, we will not cancel the process, but log an error
-        begin
-          selection_tool = BuildingSync::SelectionTool.new(xml_file_path)
-          if !selection_tool.validate_schema
-            raise "File '#{xml_file_path}' does not valid against the BuildingSync schema"
-          else
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' is valid against the BuildingSync schema")
-            puts "File '#{xml_file_path}' is valid against the BuildingSync schema"
-          end
-        rescue StandardError
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' does not valid against the BuildingSync schema")
-        end
+        validate_xml
       else
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' was not validated against the BuildingSync schema")
         puts "File '#{xml_file_path}' was not validated against the BuildingSync schema"
       end
 
-      @doc = read_xml_file_document(xml_file_path)
+      super(doc, ns)
+    end
 
-      # test for the namespace
-      @ns = 'auc'
-      @doc.root.namespaces.each_pair do |k, v|
-        @ns = k if /bedes-auc/.match(v)
+    # Validate the xml file against the schema
+    # using the SelectionTool
+    def validate_xml
+      # we wil try to validate the file, but if it fails, we will not cancel the process, but log an error
+
+      selection_tool = BuildingSync::SelectionTool.new(@xml_file_path, @schema_version)
+      if !selection_tool.validate_schema
+        raise "File '#{@xml_file_path}' does not valid against the BuildingSync schema"
+      else
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' is valid against the BuildingSync schema")
+        puts "File '#{@xml_file_path}' is valid against the BuildingSync schema"
       end
+    rescue StandardError
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' does not valid against the BuildingSync schema")
+    end
 
-      # validate the doc
-      facilities_arr = []
-      @doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/") do |facility|
-        facilities_arr << facility
-        @facilities.push(Facility.new(facility, @ns))
+    # @see WorkflowMaker.setup_and_sizing_run
+    # @param ddy_file [String]
+    def setup_and_sizing_run(ddy_file = nil)
+      super(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
+    end
+
+    # write osws - write all workflows into osw files
+    def write_osws(only_cb_modeled = false)
+      super(@output_dir, only_cb_modeled)
+    end
+
+    # gather results from simulated scenarios, for all or just the baseline scenario
+    # @param year_val [Integer] year to use when processing monthly results as TimeSeries elements
+    # @param baseline_only [Boolean] whether to only process the Baseline (or current building modeled) Scenario
+    def gather_results(year_val = Date.today.year, baseline_only = false)
+      @results_gathered = true
+      return super(year_val, baseline_only)
+    end
+
+    # run osws - running all scenario simulations
+    # @param runner_options [hash]
+    def run_osws(only_cb_modeled = false, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
+      super(@output_dir, only_cb_modeled, runner_options)
+    end
+
+    # write parameters to xml file
+    def prepare_final_xml
+      if @results_gathered
+        super
+      else
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.prepare_final_xml', 'All results have not yet been gathered.')
+        super
       end
+      @final_xml_prepared = true
+    end
 
-      # raise 'BuildingSync file must have exactly 1 facility' if facilities.size != 1
-      if facilities_arr.size != 1
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', 'BuildingSync file must have exactly 1 facility')
-        raise 'BuildingSync file must have exactly 1 facility'
+    # save xml that includes the results
+    # @param file_name [String]
+    def save_xml(file_name = 'results.xml')
+      output_file = File.join(@output_dir, file_name)
+      if @final_xml_prepared
+        super(output_file)
+      else
+        puts 'Prepare final file before attempting to save (translator.prepare_final_xml)'
       end
-
-      # we use only one model maker and one workflow maker that we set init here
-      @model_maker = ModelMaker.new(@doc, @ns)
-      @workflow_maker = WorkflowMaker.new(@doc, @ns)
     end
 
-    def write_osm(ddy_file = nil)
-      @model_maker.generate_baseline(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
-    end
-
-    def read_xml_file_document(xml_file_path)
-      doc = nil
-      File.open(xml_file_path, 'r') do |file|
-        doc = REXML::Document.new(file)
-      end
-      return doc
-    end
-
-    def gather_results_and_save_xml(dir, baseline_only = false)
-      gather_results(dir, baseline_only)
-      save_xml(File.join(dir, 'results.xml'))
-    end
-
-    def gather_results(dir, baseline_only = false)
-      puts "dir: #{dir}"
-      dir_split = dir.split(File::SEPARATOR)
-      puts "dir_split: #{dir_split}"
-      puts "dir_split[]: #{dir_split[dir_split.length - 1]}"
-      if (dir_split[dir_split.length - 1] == 'Baseline')
-        dir = dir.gsub('/Baseline', '')
-      end
-      puts "dir: #{dir}"
-      @workflow_maker.gather_results(dir, baseline_only)
-    end
-
-    def save_xml(filename)
-      @workflow_maker.saveXML(filename)
-    end
-
-    def write_osws
-      @workflow_maker.write_osws(@model_maker.get_facility, @output_dir)
-    end
-
-    def clear_all_measures
-      @workflow_maker.clear_all_measures
-    end
-
-    def add_measure_path(measure_path)
-      @workflow_maker.add_measure_path(measure_path)
-    end
-
-    def insert_energyplus_measure(measure_dir, position = 0, args_hash = {})
-      @workflow_maker.insert_energyplus_measure(measure_dir, position, args_hash)
-    end
-
-    def insert_model_measure(measure_dir, position = 0, args_hash = {})
-      @workflow_maker.insert_model_measure(measure_dir, position, args_hash)
-    end
-
-    def insert_reporting_measure(measure_dir, position = 0, args_hash = {})
-      @workflow_maker.insert_reporting_measure(measure_dir, position, args_hash)
-    end
-
-    def get_workflow
-      @workflow_maker.get_workflow
-    end
-
-    def get_space_types
-      return @model_maker.get_space_types
-    end
-
-    def get_model
-      return @model_maker.get_model
-    end
-
-    def run_osm(epw_name, runner_options = { run_simulations: true, verbose: false, num_parallel: 1, max_to_run: Float::INFINITY })
-      file_name = 'in.osm'
-
-      osm_baseline_dir = File.join(@output_dir, 'Baseline')
-      if !File.exist?(osm_baseline_dir)
-        FileUtils.mkdir_p(osm_baseline_dir)
-      end
-      @osm_baseline_path = File.join(osm_baseline_dir, file_name)
-      FileUtils.cp("#{@output_dir}/in.osm", osm_baseline_dir)
-      puts "osm_baseline_path: #{@osm_baseline_path}"
-      workflow = OpenStudio::WorkflowJSON.new
-      workflow.setSeedFile(@osm_baseline_path)
-      workflow.setWeatherFile(File.join('../../../weather', epw_name))
-
-      osw_path = osm_baseline_path.gsub('.osm', '.osw')
-      workflow.saveAs(File.absolute_path(osw_path.to_s))
-
-      extension = OpenStudio::Extension::Extension.new
-      runner = OpenStudio::Extension::Runner.new(extension.root_dir, nil, runner_options)
-      return runner.run_osw(osw_path, osm_baseline_dir)
-    end
-
-    def run_osws(runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
-      osw_files = []
-      osw_sr_files = []
-      Dir.glob("#{@output_dir}/**/in.osw") { |osw| osw_files << osw }
-      Dir.glob("#{@output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
-
-      runner = OpenStudio::Extension::Runner.new(dirname=Dir.pwd, bundle_without=[], options=runner_options)
-      return runner.run_osws(osw_files - osw_sr_files)
-    end
-
-    def get_failed_scenarios
-      return @workflow_maker.get_failed_scenarios
-    end
-
-    def write_parameters_to_xml(xml_file_path = nil)
-      @model_maker.write_parameters_to_xml
-      save_xml(xml_file_path) if !xml_file_path.nil?
-    end
-
-    public
-
-    attr_reader :osm_baseline_path
+    attr_accessor :doc, :results_gathered, :final_xml_prepared, :ns
   end
 end

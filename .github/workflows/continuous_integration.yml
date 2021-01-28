@@ -1,0 +1,146 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  model_articulation_tests:
+    name: Model Articulation Tests
+    container: nrel/openstudio:3.0.1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+    - name: Setup
+      run: |
+        gem install bundler
+        bundle install
+    - name: Building Section Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb
+      if: always()
+    - name: Building Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/building_spec.rb
+      if: always()
+    - name: Envelope System Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb
+      if: always()
+    - name: Facility Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb
+      if: always()
+    - name: HVAC System Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/hvac_system_spec.rb
+      if: always()
+    - name: Loads System Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/loads_system_spec.rb
+      if: always()
+    - name: Lighting System Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/lighting_system_type_spec.rb
+      if: always()
+    - name: SHW System Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/service_hot_water_system_spec.rb
+      if: always()
+    - name: Site Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/site_spec.rb
+      if: always()
+    - name: Hospital Occupancy Type Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/hospital_occupancy_type_spec.rb
+      if: always()
+    - name: Occupancy Types Spec
+      run: bundle exec rspec spec/tests/model_articulation_test/occupancy_types_spec.rb
+      if: always()
+#    Fails sometimes due to connection issues, so we exclude it here
+#    - name: Weather File Download
+#      run: bundle exec rspec spec/tests/model_articulation_test/weather_file_download_spec.rb
+#      if: always()
+
+  translator_tests:
+    name: Translator Tests
+    container: nrel/openstudio:3.0.1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+    - name: Setup
+      run: |
+        gem install bundler
+        bundle install
+    - name: Translator Example Spec
+      run: bundle exec rspec spec/tests/translator_spec.rb
+      if: always()
+    - name: Translator Sizing Run Spec
+      run: bundle exec rspec spec/tests/translator_sizing_run_spec.rb
+      if: always()
+    - name: Translator Scenario Generation Specs
+      run: bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
+      if: always()
+    - name: Translator Scenario Simulation Spec
+      run: bundle exec rspec spec/tests/translator_scenario_simulations_spec.rb
+      if: always()
+
+  report_and_scenario_tests:
+    name: Report and Scenario Tests
+    container: nrel/openstudio:3.0.1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+    - name: Setup
+      run: |
+        gem install bundler
+        bundle install
+    - name: Report Spec
+      run: bundle exec rspec spec/tests/report_spec.rb
+      if: always()
+    - name: Utility Spec
+      run: bundle exec rspec spec/tests/utility_spec.rb
+      if: always()
+    - name: Scenario Spec
+      run: bundle exec rspec spec/tests/scenario_spec.rb
+      if: always()
+    - name: TimeSeries Spec
+      run: bundle exec rspec spec/tests/time_series_spec.rb
+      if: always()
+    - name: ResourceUse Spec
+      run: bundle exec rspec spec/tests/resource_use_spec.rb
+      if: always()
+    - name: AllResourceTotal Spec
+      run: bundle exec rspec spec/tests/all_resource_total_spec.rb
+      if: always()
+    - name: WorkflowMaker Spec
+      run: bundle exec rspec spec/tests/workflow_maker_spec.rb
+      if: always()
+
+  other_specs:
+    name: Other Tests
+    container: nrel/openstudio:3.0.1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+    - name: Setup
+      run: |
+        gem install bundler
+        bundle install
+    - name: BuildingSync Spec
+      run: bundle exec rspec spec/tests/building_sync_spec.rb
+      if: always()
+    - name: EPW Test Spec
+      run: bundle exec rspec spec/tests/epw_test_spec.rb
+      if: always()
+    - name: Constants Spec
+      run: bundle exec rspec spec/tests/constants_spec.rb
+      if: always()
+    - name: Generator Spec
+      run: bundle exec rspec spec/tests/generator_spec.rb
+      if: always()
+    - name: Helper Spec
+      run: bundle exec rspec spec/tests/helper_spec.rb
+      if: always()
+    - name: XMLGetSet Spec
+      run: bundle exec rspec spec/tests/xml_get_set_spec.rb
+      if: always()
+#     selection tool is not working with ASHRAE level 1.5 yet
+#    - name: Selection Tool Spec
+#      run: bundle exec rspec spec/tests/selection_tool_spec.rb
+#      if: always()

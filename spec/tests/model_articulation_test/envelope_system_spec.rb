@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -40,7 +42,7 @@ RSpec.describe 'EnvelopeSystemSpec' do
     standard = Standard.build('DOE Ref 1980-2004')
 
     model = OpenStudio::Model::Model.new
-    envelopeSystem = BuildingSync::EnvelopeSystem.new
-    envelopeSystem.create(model, standard, 'Retail', 'Retail', false)
+    envelope_system = BuildingSync::EnvelopeSystem.new
+    envelope_system.create(model, standard, 'Retail', 'Retail', false)
   end
 end

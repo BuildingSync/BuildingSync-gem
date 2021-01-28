@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -34,48 +36,67 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'buildingsync/helpers/helper'
+require 'buildingsync/helpers/xml_get_set'
 
 module BuildingSync
+  # LightingSystemType class
   class LightingSystemType
+    include BuildingSync::Helper
+    include BuildingSync::XmlGetSet
+    # initialize
+    # @param doc [REXML::Document]
+    # @param ns [String]
+    def initialize(base_xml, ns)
+      @base_xml = base_xml
+      @ns = ns
 
-    def initialize(doc, ns)
-      @lighting_type = Hash.new
-      @ballast_type = Hash.new
-      @primary_lighting_system_type = Hash.new
+      help_element_class_type_check(@base_xml, 'LightingSystem')
 
-      doc.elements.each("#{ns}:Systems/#{ns}:LightingSystems/#{ns}:LightingSystem") do |lighting_system|
-          read(lighting_system, ns)
-        end
+      read_xml
     end
 
-    def read(section_element, ns)
-      primary_lighting_type = nil
-      if section_element.elements["#{ns}:PrimaryLightingSystemType"]
-        primary_lighting_type = section_element.elements["#{ns}:PrimaryLightingSystemType"].text
+    # read
+    def read_xml; end
+
+    # add exterior lights
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param onsite_parking_fraction [Float]
+    # @param exterior_lighting_zone [String]
+    # @param remove_objects [Boolean]
+    # @return boolean
+    def add_exterior_lights(model, standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
+      if remove_objects
+        model.getExteriorLightss.each do |ext_light|
+          next if ext_light.name.to_s.include?('Fuel equipment') # some prototype building types model exterior elevators by this name
+
+          ext_light.remove
+        end
       end
-      if section_element.elements["#{ns}:LampType/#{ns}:SolidStateLighting/#{ns}:LampLabel"]
-        lighting_type = section_element.elements["#{ns}:LampType/#{ns}:SolidStateLighting/#{ns}:LampLabel"].text
+
+      exterior_lights = standard.model_add_typical_exterior_lights(model, exterior_lighting_zone.chars[0].to_i, onsite_parking_fraction)
+      exterior_lights.each do |k, v|
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LightingSystem.add_exterior_lights', "Adding Exterior Lights named #{v.exteriorLightsDefinition.name} with design level of #{v.exteriorLightsDefinition.designLevel} * #{OpenStudio.toNeatString(v.multiplier, 0, true)}.")
       end
-      if section_element.elements["#{ns}:BallastType"]
-        ballast_type = section_element.elements["#{ns}:BallastType"].text
+      return true
+    end
+
+    # add daylighting controls
+    # @param model [OpenStudio::Model]
+    # @param standard [Standard]
+    # @param template [String]
+    # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
+    # @return boolean
+    def add_daylighting_controls(model, standard, template, main_output_dir)
+      # add daylight controls, need to perform a sizing run for 2010
+      if template == '90.1-2010'
+        if standard.model_run_sizing_run(model, "#{main_output_dir}/SRvt") == false
+          return false
+        end
       end
-      if section_element.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"]
-         linked_building = section_element.elements["#{ns}:LinkedPremises/#{ns}:Building/#{ns}:LinkedBuildingID"].attributes['IDref']
-         puts "found primary lighting type: #{primary_lighting_type} for linked building: #{linked_building}"
-         @primary_lighting_system_type[linked_building] = primary_lighting_type
-         @lighting_type[linked_building] = lighting_type
-         @ballast_type[linked_building] = ballast_type
-      elsif section_element.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"]
-         linked_section = section_element.elements["#{ns}:LinkedPremises/#{ns}:Section/#{ns}:LinkedSectionID"].attributes['IDref']
-         puts "found primary lighting type: #{primary_lighting_type} for linked section: #{linked_section}"
-         @primary_lighting_system_type[linked_section] = primary_lighting_type
-         @lighting_type[linked_section] = lighting_type
-         @ballast_type[linked_section] = ballast_type
-      elsif primary_lighting_type
-         puts "primary_lighting_system_type: #{primary_lighting_type} is not linked to a building or section "
-      end
+      standard.model_add_daylighting_controls(model)
+      return true
     end
   end
 end
-
-

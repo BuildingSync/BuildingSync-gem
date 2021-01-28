@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
 # BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
@@ -34,72 +36,22 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
+require 'buildingsync/helpers/helper'
+require 'buildingsync/helpers/xml_get_set'
 
 module BuildingSync
+  # Measure class
   class Measure
+    include BuildingSync::Helper
+    include BuildingSync::XmlGetSet
     # initialize
-    def initialize(measure_element, ns)
-      @field_value = nil
-      @system_category_affected = nil
-      @measure_total_first_cost = nil
-      @annual_savings_cost = nil
-      @simple_payback = nil
-      @measure_rank = nil
-      @field_value = nil
-      @annual_savings_native_units = nil
+    # @param @base_xml [REXML::Element]
+    # @param ns [String]
+    def initialize(base_xml, ns)
+      @base_xml = base_xml
+      @ns = ns
 
-      read_xml(measure_element, ns)
-    end
-
-    # adding a measures to the facility
-    def read_xml(measure_element, ns)
-      read_measure_other_detail(measure_element, ns)
-    end
-
-    def read_measure_other_detail(measure_element, ns)
-      if measure_element.elements["#{ns}:AnnualSavingsCost"]
-        @annual_savings_cost = measure_element.elements["#{ns}:AnnualSavingsCost"].text
-      else
-        @annual_savings_cost = nil
-      end
-
-      if measure_element.elements["#{ns}:SystemCategoryAffected"]
-        @system_category_affected = measure_element.elements["#{ns}:SystemCategoryAffected"].text
-      else
-        @system_category_affected = nil
-      end
-
-      if measure_element.elements["#{ns}:AnnualSavingsByFuels"]
-        if measure_element.elements["#{ns}:AnnualSavingsByFuels/#{ns}:SimplePayback"]
-          @simple_payback = measure_element.elements["#{ns}:AnnualSavingsByFuels/#{ns}:SimplePayback"].text
-        else
-          @simple_payback = nil
-        end
-
-        if measure_element.elements["#{ns}:AnnualSavingsByFuels/#{ns}:MeasureRank"]
-          @measure_rank = measure_element.elements["#{ns}:AnnualSavingsByFuels/#{ns}:MeasureRank"].text
-        else
-          @measure_rank = nil
-        end
-      end
-
-      if measure_element.elements["#{ns}:MeasureTotalFirstCost"]
-        @measure_total_first_cost = measure_element.elements["#{ns}:MeasureTotalFirstCost"].text
-      else
-        @measure_total_first_cost = nil
-      end
-
-      if measure_element.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"]
-        @field_value = measure_element.elements["#{ns}:UserDefinedFields/#{ns}:UserDefinedField/#{ns}:FieldValue"].text
-      else
-        @field_value = nil
-      end
-
-      if measure_element.elements["#{ns}:MeasureSavingsAnalysis/#{ns}:AnnualSavingsByFuels/#{ns}:AnnualSavingsByFuel/#{ns}:AnnualSavingsNativeUnits"]
-        @annual_savings_native_units = measure_element.elements["#{ns}:MeasureSavingsAnalysis/#{ns}:AnnualSavingsByFuels/#{ns}:AnnualSavingsByFuel/#{ns}:AnnualSavingsNativeUnits"].text
-      else
-        @annual_savings_native_units = nil
-      end
+      help_element_class_type_check(base_xml, 'Measure')
     end
   end
 end
