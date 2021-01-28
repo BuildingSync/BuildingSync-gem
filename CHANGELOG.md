@@ -43,8 +43,6 @@ This is released as a minor version since we are so early stage, even though it 
 - Updated files to comply with specific BSync versions (v2.1.0, v2.2.0)
 - Significantly more testing
 
-    
-
 ## Version 0.1.0
 
 * Initial release

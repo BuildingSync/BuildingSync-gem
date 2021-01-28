@@ -91,15 +91,15 @@ Publish documentation for each release:
 1. Tag release on GitHub
 1. Go to [rubydoc.info](https://www.rubydoc.info) and click `Add Project` in the upper right
 1. Input the git address: `git://github/BuildingSync/BuildingSync-gem.git`
-1. Input the release tag for the desired version, eg: `v0.1.0`
+1. Input the release tag for the desired version, eg: `v0.2.0`
 1. Click `Go`
 1. Profit
     
 # Releasing
 
-* Update CHANGELOG.md
-* Run `rake rubocop:auto_correct`
-* Update version in `/lib/buildingsync/version.rb`
-* Create PR to master, after tests and reviews complete, then merge
-* Locally - from the master branch, run `rake release`
-* On GitHub, go to the releases page and update the latest release tag. Name it “Version x.y.z” and copy the CHANGELOG entry into the description box.
+1. Update CHANGELOG.md
+1. Run `bundle exec rake rubocop:auto_correct`
+1. Update version in `/lib/buildingsync/version.rb`
+1. Create PR to main, after tests and reviews complete, then merge
+1. Locally - from the main branch, run `bundle exec rake release`
+1. On GitHub, go to the releases page and update the latest release tag. Name it “Version x.y.z” and copy the CHANGELOG entry into the description box.
