@@ -35,6 +35,8 @@ Or install it yourself as:
 All of the features described above are provided by the translator class, as shown in the following sample code: 
 
 ```ruby
+require 'buildingsync/translator'
+
 building_sync_xml_file_path = 'path/to/bsync.xml'
 out_path = 'path/to/output_dir'
 
