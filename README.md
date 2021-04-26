@@ -1,19 +1,20 @@
 # BuildingSync
 
-The BuildingSync-Gem is a repository of helpers for reading and writing BuildingSync XML files, and for using that data to drive energy simulations of the subject building. See full documentation on [RubyDoc](https://www.rubydoc.info/github/BuildingSync/BuildingSync-gem).
+The BuildingSync-Gem is a repository of helpers for reading and writing BuildingSync XML files, and for using that data 
+to drive energy simulations of the subject building. See full documentation on [RubyDoc](https://www.rubydoc.info/github/BuildingSync/BuildingSync-gem).
 
 All of the following are supported: 
 
-* convert BuildingSync XML file into: 
+  * convert BuildingSync XML file into: 
+      * an OpenStudio Baseline model 
+      * an OpenStudio workflow for each scenario defined in the XML file 
+  * enables simulation of the baseline model and all workflows and 
+  * insert simulation results back into the Building XML file. 
 
-    * an OpenStudio Baseline model 
-
-    * an OpenStudio workflow for each scenario defined in the XML file 
-
-* enables simulation of the baseline model and all workflows and 
-
-* insert simulation results back into the Building XML file. 
 ## Installation
+
+The BuildingSync Gem requires installation of OpenStudio, specifically [OpenStudio v3.0.1](https://openstudio-builds.s3.amazonaws.com/index.html?prefix=3.0.1/).
+The newer versions of OpenStudio have minor breaking changes that have not been addressed in this repository yet. 
 
 Add this line to your application's Gemfile:
 
@@ -22,7 +23,6 @@ gem 'buildingsync'
 ```
 
 And then execute:
-
 
     $ bundle
 
@@ -86,6 +86,7 @@ To generate the documentation locally do the following:
      $ yardoc - README.md 
      
 ## Updating published documentation
+
 Publish documentation for each release:
 
 1. Tag release on GitHub
@@ -99,7 +100,13 @@ Publish documentation for each release:
 
 1. Update CHANGELOG.md
 1. Run `bundle exec rake rubocop:auto_correct`
-1. Update version in `/lib/buildingsync/version.rb`
+1. Update version in `lib/buildingsync/version.rb`
 1. Create PR to main, after tests and reviews complete, then merge
 1. Locally - from the main branch, run `bundle exec rake release`
 1. On GitHub, go to the releases page and update the latest release tag. Name it “Version x.y.z” and copy the CHANGELOG entry into the description box.
+
+# TODO
+
+* [ ] Remove jenkins
+* [ ] Support BuildingSync 2.3.0
+* [ ] Update to OpenStudio version 3.2.0

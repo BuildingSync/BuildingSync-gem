@@ -7,8 +7,8 @@ require 'buildingsync/version'
 Gem::Specification.new do |spec|
   spec.name          = 'buildingsync'
   spec.version       = BuildingSync::VERSION
-  spec.authors       = ['Nicholas Long', 'Dan Macumber', 'Katherine Fleming']
-  spec.email         = ['nicholas.long@nrel.gov', 'daniel.macumber@nrel.gov', 'katherine.fleming@nrel.gov']
+  spec.authors       = ['Nicholas Long', 'Cory Mosiman', 'Dan Macumber', 'Katherine Fleming']
+  spec.email         = ['nicholas.long@nrel.gov', 'cory.mosiman@nrel.gov', 'daniel.macumber@nrel.gov', 'katherine.fleming@nrel.gov']
 
   spec.summary       = 'BuildingSync library for reading, writing, and exporting BuildingSync to OpenStudio'
   spec.description   = 'BuildingSync library for reading, writing, and exporting BuildingSync to OpenStudio'
