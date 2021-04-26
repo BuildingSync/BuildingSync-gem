@@ -14,25 +14,29 @@ All of the following are supported:
 ## Installation
 
 The BuildingSync Gem requires installation of OpenStudio, specifically [OpenStudio v3.0.1](https://openstudio-builds.s3.amazonaws.com/index.html?prefix=3.0.1/).
-The newer versions of OpenStudio have minor breaking changes that have not been addressed in this repository yet. 
+The newer versions of OpenStudio have minor breaking changes that have not been addressed in this repository yet. After OpenStudio is 
+installed, then export the path of the folder that contains the openstudio.rb file to RUBYLIB environment variable
+(e.g., `export RUBYLIB=/Applications/OpenStudio-3.0.1/Ruby`)
 
-Add this line to your application's Gemfile:
-
+After installing OpenStudio and setting the environment variable, then add this line to your application's Gemfile:
 ```ruby
-gem 'buildingsync'
+gem 'buildingsync', '0.2.0'
 ```
 
 And then execute:
-
-    $ bundle
+```bash
+bundle install
+```
 
 Or install it yourself as:
-
-    $ gem install 'buildingsync'
+```bash
+gem install 'buildingsync'
+```
 
 ## Usage
 
-All of the features described above are provided by the translator class, as shown in the following sample code: 
+All of the features described above are provided by the translator class, as shown in the following sample code. There
+are also BuildingSync Gem example files in [this repository](https://github.com/BuildingSync/BuildingSync-gem-examples).
 
 ```ruby
 building_sync_xml_file_path = 'path/to/bsync.xml'
@@ -49,7 +53,6 @@ translator.setup_and_sizing_run
 # auc:Scenario elements with measures are turned into new simulation dirs
 # path/to/output_dir/scenario_name
 translator.write_osws
-
 
 # run all simulations
 translator.run_osws
@@ -68,23 +71,26 @@ translator.prepare_final_xml
 file_name = 'abc-123.xml' 
 translator.save_xml(file_name)
 ```
+
 ## Testing
 
 Check out the repository and then execute:
 
-    $ bundle install
- 
-    $ bundle exec rake
+```bash
+bundle install
+bundle exec rake
+```
     
 ## Documentation
 
 The documentation of the BuildingSync-Gem is done with Yard (https://yardoc.org)
 To generate the documentation locally do the following:
 
-     $ gem install yard
-     
-     $ yardoc - README.md 
-     
+```bash
+gem install yard
+yarddoc - README.md
+```
+
 ## Updating published documentation
 
 Publish documentation for each release:
