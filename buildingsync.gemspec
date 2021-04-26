@@ -34,4 +34,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.9'
+  # Nokogiri is used only for pretty formatting of XML files. The REXML adds white space around
+  # string elements and I can't figure out how to not have it to that.
+  spec.add_development_dependency 'nokogiri', '~> 1.11.3'
 end
