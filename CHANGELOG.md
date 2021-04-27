@@ -1,5 +1,9 @@
 # BuildingSync Gem
 
+## Version 0.2.1 (Unreleased)
+
+- Update copyright dates
+
 ## Version 0.2.0
 
 This is released as a minor version since we are so early stage, even though it has many breaking changes.  Most of the 'high-level API' (translator) remains.
