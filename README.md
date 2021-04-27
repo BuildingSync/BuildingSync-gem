@@ -8,7 +8,7 @@ All of the following are supported:
   * convert BuildingSync XML file into: 
       * an OpenStudio Baseline model 
       * an OpenStudio workflow for each scenario defined in the XML file 
-  * enables simulation of the baseline model and all workflows and 
+  * enable simulation of the baseline model and all workflows and 
   * insert simulation results back into the Building XML file. 
 
 ## Installation
