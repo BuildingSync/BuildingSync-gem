@@ -1,25 +1,26 @@
-/.bundle/
-/.yardoc
-/.ruby-version
-/.python-version
-/Gemfile.lock
-/gems
-/_yardoc/
-/coverage/
-/doc/
-/pkg/
-/spec/reports/
-/tmp/
-/spec/output/
-/SR1
-/SRvt
+.bundle
+.yardoc
+.ruby-version
+.python-version
+Gemfile.lock
+gems
+_yardoc
+coverage
+doc
+pkg
+spec/reports
+tmp
+spec/output
+SR1
+SRvt
 .DS_Store
-
+lib/data
+schedules-*.csv
 # rspec failure tracking
 .rspec_status
 
 # Ignore IDE files
-/.idea
+.idea
 *.rubocop-http*
 
 # measures tests
@@ -30,4 +31,3 @@ spec/files/filecomparison/in.idf
 spec/files/filecomparison/in.osm
 spec/weather/weather_file.json
 
-.DS_Store
