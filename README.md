@@ -39,6 +39,8 @@ All of the features described above are provided by the translator class, as sho
 are also BuildingSync Gem example files in [this repository](https://github.com/BuildingSync/BuildingSync-gem-examples).
 
 ```ruby
+require 'buildingsync/translator'
+
 building_sync_xml_file_path = 'path/to/bsync.xml'
 out_path = 'path/to/output_dir'
 
