@@ -3,7 +3,7 @@
 ![BuildingSync-gem](https://github.com/BuildingSync/BuildingSync-gem/actions/workflows/continuous_integration.yml/badge.svg?branch=develop)
 
 The BuildingSync-Gem is a repository of helpers for reading and writing BuildingSync XML files, and for using that data 
-to drive energy simulations of the subject building. See full documentation on [RubyDoc](https://www.rubydoc.info/github/BuildingSync/BuildingSync-gem).
+to drive energy simulations of the subject building. See full documentation [here](https://buildingsync-gem.buildingsync.net).
 
 All of the following are supported: 
 
@@ -92,20 +92,11 @@ To generate the documentation locally do the following:
 
 ```bash
 gem install yard
-yarddoc - README.md
+SITEMAP_BASEURL=https://buildingsync-gem.buildingsync.net bundle exec yard doc --plugin sitemap
 ```
 
-## Updating published documentation
+Documentation for the develop branch is automatically released when code is merged into the branch.
 
-Publish documentation for each release:
-
-1. Tag release on GitHub
-1. Go to [rubydoc.info](https://www.rubydoc.info) and click `Add Project` in the upper right
-1. Input the git address: `git://github/BuildingSync/BuildingSync-gem.git`
-1. Input the release tag for the desired version, eg: `v0.2.0`
-1. Click `Go`
-1. Profit
-    
 # Releasing
 
 1. Update CHANGELOG.md
