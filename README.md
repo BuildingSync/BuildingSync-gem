@@ -1,7 +1,7 @@
 # BuildingSync
 
 The BuildingSync-Gem is a repository of helpers for reading and writing BuildingSync XML files, and for using that data 
-to drive energy simulations of the subject building. See full documentation on [RubyDoc](http://buildingsync-gem.buildingsync.net).
+to drive energy simulations of the subject building. See full documentation [here](https://buildingsync-gem.buildingsync.net).
 
 All of the following are supported: 
 
@@ -90,7 +90,7 @@ To generate the documentation locally do the following:
 
 ```bash
 gem install yard
-yard - README.md
+SITEMAP_BASEURL=https://buildingsync-gem.buildingsync.net bundle exec yard doc --plugin sitemap
 ```
 
 Documentation for the develop branch is automatically released when code is merged into the branch.

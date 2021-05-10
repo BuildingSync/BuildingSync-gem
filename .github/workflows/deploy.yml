@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - feat/build-push-docs
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -22,6 +21,7 @@ jobs:
           gem install bundler
           bundle install
           bundle exec yard - README.md
+          SITEMAP_BASEURL=https://buildingsync-gem.buildingsync.net bundle exec yard doc --plugin sitemap
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.1
