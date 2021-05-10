@@ -117,6 +117,5 @@ Publish documentation for each release:
 
 # TODO
 
-* [ ] Remove jenkins
 * [ ] Support BuildingSync 2.3.0
 * [ ] Update to OpenStudio version 3.2.0
