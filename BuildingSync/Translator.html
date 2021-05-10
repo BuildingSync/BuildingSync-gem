@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: BuildingSync::Translator
+  
+    &mdash; Documentation by YARD 0.9.26
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "BuildingSync::Translator";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (T)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../BuildingSync.html" title="BuildingSync (module)">BuildingSync</a></span></span>
+     &raquo; 
+    <span class="title">Translator</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: BuildingSync::Translator
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="WorkflowMaker.html" title="BuildingSync::WorkflowMaker (class)">WorkflowMaker</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="WorkflowMakerBase.html" title="BuildingSync::WorkflowMakerBase (class)">WorkflowMakerBase</a></span></li>
+          
+            <li class="next"><span class='object_link'><a href="WorkflowMaker.html" title="BuildingSync::WorkflowMaker (class)">WorkflowMaker</a></span></li>
+          
+            <li class="next">BuildingSync::Translator</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="Helper.html" title="BuildingSync::Helper (module)">Helper</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/buildingsync/translator.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Translator class</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#doc-instance_method" title="#doc (instance method)">#<strong>doc</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute doc.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#final_xml_prepared-instance_method" title="#final_xml_prepared (instance method)">#<strong>final_xml_prepared</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute final_xml_prepared.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ns-instance_method" title="#ns (instance method)">#<strong>ns</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute ns.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#results_gathered-instance_method" title="#results_gathered (instance method)">#<strong>results_gathered</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute results_gathered.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#gather_results-instance_method" title="#gather_results (instance method)">#<strong>gather_results</strong>(year_val = Date.today.year, baseline_only = false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>gather results from simulated scenarios, for all or just the baseline
+scenario.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1, validate_xml_file_against_schema = true)  &#x21d2; Translator </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>load the building sync file.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#prepare_final_xml-instance_method" title="#prepare_final_xml (instance method)">#<strong>prepare_final_xml</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>write parameters to xml file.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run_osws-instance_method" title="#run_osws (instance method)">#<strong>run_osws</strong>(only_cb_modeled = false, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>run osws - running all scenario simulations.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#save_xml-instance_method" title="#save_xml (instance method)">#<strong>save_xml</strong>(file_name = &#39;results.xml&#39;)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>save xml that includes the results.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#setup_and_sizing_run-instance_method" title="#setup_and_sizing_run (instance method)">#<strong>setup_and_sizing_run</strong>(ddy_file = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#validate_xml-instance_method" title="#validate_xml (instance method)">#<strong>validate_xml</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Validate the xml file against the schema using the SelectionTool.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#write_osws-instance_method" title="#write_osws (instance method)">#<strong>write_osws</strong>(only_cb_modeled = false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>write osws - write all workflows into osw files.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Helper.html" title="BuildingSync::Helper (module)">Helper</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Helper.html#help_calculate_hours-instance_method" title="BuildingSync::Helper#help_calculate_hours (method)">#help_calculate_hours</a></span>, <span class='object_link'><a href="Helper.html#help_convert-instance_method" title="BuildingSync::Helper#help_convert (method)">#help_convert</a></span>, <span class='object_link'><a href="Helper.html#help_count_number_of_days-instance_method" title="BuildingSync::Helper#help_count_number_of_days (method)">#help_count_number_of_days</a></span>, <span class='object_link'><a href="Helper.html#help_element_class_type_check-instance_method" title="BuildingSync::Helper#help_element_class_type_check (method)">#help_element_class_type_check</a></span>, <span class='object_link'><a href="Helper.html#help_get_attribute_value-instance_method" title="BuildingSync::Helper#help_get_attribute_value (method)">#help_get_attribute_value</a></span>, <span class='object_link'><a href="Helper.html#help_get_default_schedule_set-instance_method" title="BuildingSync::Helper#help_get_default_schedule_set (method)">#help_get_default_schedule_set</a></span>, <span class='object_link'><a href="Helper.html#help_get_duration-instance_method" title="BuildingSync::Helper#help_get_duration (method)">#help_get_duration</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time-instance_method" title="BuildingSync::Helper#help_get_end_time (method)">#help_get_end_time</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_sat-instance_method" title="BuildingSync::Helper#help_get_end_time_sat (method)">#help_get_end_time_sat</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_sun-instance_method" title="BuildingSync::Helper#help_get_end_time_sun (method)">#help_get_end_time_sun</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_weekday-instance_method" title="BuildingSync::Helper#help_get_end_time_weekday (method)">#help_get_end_time_weekday</a></span>, <span class='object_link'><a href="Helper.html#help_get_or_create-instance_method" title="BuildingSync::Helper#help_get_or_create (method)">#help_get_or_create</a></span>, <span class='object_link'><a href="Helper.html#help_get_schedule_rule_set_from_schedule-instance_method" title="BuildingSync::Helper#help_get_schedule_rule_set_from_schedule (method)">#help_get_schedule_rule_set_from_schedule</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time-instance_method" title="BuildingSync::Helper#help_get_start_time (method)">#help_get_start_time</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_sat-instance_method" title="BuildingSync::Helper#help_get_start_time_sat (method)">#help_get_start_time_sat</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_sun-instance_method" title="BuildingSync::Helper#help_get_start_time_sun (method)">#help_get_start_time_sun</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_weekday-instance_method" title="BuildingSync::Helper#help_get_start_time_weekday (method)">#help_get_start_time_weekday</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value-instance_method" title="BuildingSync::Helper#help_get_text_value (method)">#help_get_text_value</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_bool-instance_method" title="BuildingSync::Helper#help_get_text_value_as_bool (method)">#help_get_text_value_as_bool</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_date-instance_method" title="BuildingSync::Helper#help_get_text_value_as_date (method)">#help_get_text_value_as_date</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_datetime-instance_method" title="BuildingSync::Helper#help_get_text_value_as_datetime (method)">#help_get_text_value_as_datetime</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_float-instance_method" title="BuildingSync::Helper#help_get_text_value_as_float (method)">#help_get_text_value_as_float</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_integer-instance_method" title="BuildingSync::Helper#help_get_text_value_as_integer (method)">#help_get_text_value_as_integer</a></span>, <span class='object_link'><a href="Helper.html#help_get_zone_name_list-instance_method" title="BuildingSync::Helper#help_get_zone_name_list (method)">#help_get_zone_name_list</a></span>, <span class='object_link'><a href="Helper.html#help_load_doc-instance_method" title="BuildingSync::Helper#help_load_doc (method)">#help_load_doc</a></span>, <span class='object_link'><a href="Helper.html#help_print_all_schedules-instance_method" title="BuildingSync::Helper#help_print_all_schedules (method)">#help_print_all_schedules</a></span>, <span class='object_link'><a href="Helper.html#help_print_schedule-instance_method" title="BuildingSync::Helper#help_print_schedule (method)">#help_print_schedule</a></span>, <span class='object_link'><a href="Helper.html#help_write_profile-instance_method" title="BuildingSync::Helper#help_write_profile (method)">#help_write_profile</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="WorkflowMaker.html" title="BuildingSync::WorkflowMaker (class)">WorkflowMaker</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="WorkflowMaker.html#cleanup_larger_files-instance_method" title="BuildingSync::WorkflowMaker#cleanup_larger_files (method)">#cleanup_larger_files</a></span>, <span class='object_link'><a href="WorkflowMaker.html#configure_workflow_for_scenario-instance_method" title="BuildingSync::WorkflowMaker#configure_workflow_for_scenario (method)">#configure_workflow_for_scenario</a></span>, <span class='object_link'><a href="WorkflowMaker.html#deep_copy_workflow-instance_method" title="BuildingSync::WorkflowMaker#deep_copy_workflow (method)">#deep_copy_workflow</a></span>, <span class='object_link'><a href="WorkflowMaker.html#get_available_measures_hash-instance_method" title="BuildingSync::WorkflowMaker#get_available_measures_hash (method)">#get_available_measures_hash</a></span>, <span class='object_link'><a href="WorkflowMaker.html#get_facility-instance_method" title="BuildingSync::WorkflowMaker#get_facility (method)">#get_facility</a></span>, <span class='object_link'><a href="WorkflowMaker.html#get_failed_scenarios-instance_method" title="BuildingSync::WorkflowMaker#get_failed_scenarios (method)">#get_failed_scenarios</a></span>, <span class='object_link'><a href="WorkflowMaker.html#get_measure_directories_array-instance_method" title="BuildingSync::WorkflowMaker#get_measure_directories_array (method)">#get_measure_directories_array</a></span>, <span class='object_link'><a href="WorkflowMaker.html#get_measure_type-instance_method" title="BuildingSync::WorkflowMaker#get_measure_type (method)">#get_measure_type</a></span>, <span class='object_link'><a href="WorkflowMaker.html#get_model-instance_method" title="BuildingSync::WorkflowMaker#get_model (method)">#get_model</a></span>, <span class='object_link'><a href="WorkflowMaker.html#get_scenarios-instance_method" title="BuildingSync::WorkflowMaker#get_scenarios (method)">#get_scenarios</a></span>, <span class='object_link'><a href="WorkflowMaker.html#get_space_types-instance_method" title="BuildingSync::WorkflowMaker#get_space_types (method)">#get_space_types</a></span>, <span class='object_link'><a href="WorkflowMaker.html#get_workflow-instance_method" title="BuildingSync::WorkflowMaker#get_workflow (method)">#get_workflow</a></span>, <span class='object_link'><a href="WorkflowMaker.html#insert_measure_into_workflow-instance_method" title="BuildingSync::WorkflowMaker#insert_measure_into_workflow (method)">#insert_measure_into_workflow</a></span>, <span class='object_link'><a href="WorkflowMaker.html#measures_exist%3F-instance_method" title="BuildingSync::WorkflowMaker#measures_exist? (method)">#measures_exist?</a></span>, <span class='object_link'><a href="WorkflowMaker.html#purge_skipped_from_workflow-instance_method" title="BuildingSync::WorkflowMaker#purge_skipped_from_workflow (method)">#purge_skipped_from_workflow</a></span>, <span class='object_link'><a href="WorkflowMaker.html#read_xml-instance_method" title="BuildingSync::WorkflowMaker#read_xml (method)">#read_xml</a></span>, <span class='object_link'><a href="WorkflowMaker.html#set_argument_detail-instance_method" title="BuildingSync::WorkflowMaker#set_argument_detail (method)">#set_argument_detail</a></span>, <span class='object_link'><a href="WorkflowMaker.html#write_osw-instance_method" title="BuildingSync::WorkflowMaker#write_osw (method)">#write_osw</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="WorkflowMakerBase.html" title="BuildingSync::WorkflowMakerBase (class)">WorkflowMakerBase</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="WorkflowMakerBase.html#add_measure_path-instance_method" title="BuildingSync::WorkflowMakerBase#add_measure_path (method)">#add_measure_path</a></span>, <span class='object_link'><a href="WorkflowMakerBase.html#add_new_measure-instance_method" title="BuildingSync::WorkflowMakerBase#add_new_measure (method)">#add_new_measure</a></span>, <span class='object_link'><a href="WorkflowMakerBase.html#clear_all_measures-instance_method" title="BuildingSync::WorkflowMakerBase#clear_all_measures (method)">#clear_all_measures</a></span>, <span class='object_link'><a href="WorkflowMakerBase.html#get_prefix-instance_method" title="BuildingSync::WorkflowMakerBase#get_prefix (method)">#get_prefix</a></span>, <span class='object_link'><a href="WorkflowMakerBase.html#set_measure_argument-instance_method" title="BuildingSync::WorkflowMakerBase#set_measure_argument (method)">#set_measure_argument</a></span>, <span class='object_link'><a href="WorkflowMakerBase.html#set_measure_path-instance_method" title="BuildingSync::WorkflowMakerBase#set_measure_path (method)">#set_measure_path</a></span>, <span class='object_link'><a href="WorkflowMakerBase.html#set_measure_paths-instance_method" title="BuildingSync::WorkflowMakerBase#set_measure_paths (method)">#set_measure_paths</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(xml_file_path, output_dir, epw_file_path = nil, standard_to_be_used = ASHRAE90_1, validate_xml_file_against_schema = true)  &#x21d2; <tt><span class='object_link'><a href="" title="BuildingSync::Translator (class)">Translator</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>load the building sync file</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>xml_file_path</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>output_dir</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>epw_file_path</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if provided, full/path/to/my.epw</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>standard_to_be_used</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>ASHRAE90_1</tt>)</em>
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>validate_xml_file_against_schema</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 58</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='comma'>,</span> <span class='id identifier rubyid_output_dir'>output_dir</span><span class='comma'>,</span> <span class='id identifier rubyid_epw_file_path'>epw_file_path</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_standard_to_be_used'>standard_to_be_used</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../top-level-namespace.html#ASHRAE90_1-constant" title="ASHRAE90_1 (constant)">ASHRAE90_1</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_validate_xml_file_against_schema'>validate_xml_file_against_schema</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='ivar'>@schema_version</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='ivar'>@xml_file_path</span> <span class='op'>=</span> <span class='id identifier rubyid_xml_file_path'>xml_file_path</span>
+  <span class='ivar'>@output_dir</span> <span class='op'>=</span> <span class='id identifier rubyid_output_dir'>output_dir</span>
+  <span class='ivar'>@standard_to_be_used</span> <span class='op'>=</span> <span class='id identifier rubyid_standard_to_be_used'>standard_to_be_used</span>
+  <span class='ivar'>@epw_path</span> <span class='op'>=</span> <span class='id identifier rubyid_epw_file_path'>epw_file_path</span>
+
+  <span class='ivar'>@results_gathered</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='ivar'>@final_xml_prepared</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+  <span class='comment'># to further reduce the log messages we can change the log level with this command
+</span>  <span class='comment'># OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Error)
+</span>  <span class='comment'># Open a log for the library
+</span>  <span class='id identifier rubyid_log_file'>log_file</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>FileLogSink</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Path</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_output_dir'>output_dir</span><span class='embexpr_end'>}</span><span class='tstring_content'>/in.log</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_log_file'>log_file</span><span class='period'>.</span><span class='id identifier rubyid_setLogLevel'>setLogLevel</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='rparen'>)</span>
+
+  <span class='comment'># parse the xml
+</span>  <span class='kw'>if</span> <span class='op'>!</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='rparen'>)</span>
+    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; does not exist</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; does not exist</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_doc'>doc</span> <span class='op'>=</span> <span class='id identifier rubyid_help_load_doc'>help_load_doc</span><span class='lparen'>(</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='rparen'>)</span>
+
+  <span class='ivar'>@schema_version</span> <span class='op'>=</span> <span class='id identifier rubyid_doc'>doc</span><span class='period'>.</span><span class='id identifier rubyid_root'>root</span><span class='period'>.</span><span class='id identifier rubyid_attributes'>attributes</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>version</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+  <span class='kw'>if</span> <span class='ivar'>@schema_version</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='ivar'>@schema_version</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2.2.0</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># test for the namespace
+</span>  <span class='id identifier rubyid_ns'>ns</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>auc</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_doc'>doc</span><span class='period'>.</span><span class='id identifier rubyid_root'>root</span><span class='period'>.</span><span class='id identifier rubyid_namespaces'>namespaces</span><span class='period'>.</span><span class='id identifier rubyid_each_pair'>each_pair</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
+    <span class='id identifier rubyid_ns'>ns</span> <span class='op'>=</span> <span class='id identifier rubyid_k'>k</span> <span class='kw'>if</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>bedes-auc</span><span class='regexp_end'>/</span></span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='id identifier rubyid_v'>v</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_validate_xml_file_against_schema'>validate_xml_file_against_schema</span>
+    <span class='id identifier rubyid_validate_xml'>validate_xml</span>
+  <span class='kw'>else</span>
+    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; was not validated against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; was not validated against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_doc'>doc</span><span class='comma'>,</span> <span class='id identifier rubyid_ns'>ns</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id="doc=-instance_method"></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="doc-instance_method">
+  
+    #<strong>doc</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute doc.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+166
+167
+168</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 166</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_doc'>doc</span>
+  <span class='ivar'>@doc</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="final_xml_prepared=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="final_xml_prepared-instance_method">
+  
+    #<strong>final_xml_prepared</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute final_xml_prepared.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+166
+167
+168</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 166</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_final_xml_prepared'>final_xml_prepared</span>
+  <span class='ivar'>@final_xml_prepared</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="ns=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="ns-instance_method">
+  
+    #<strong>ns</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute ns.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+166
+167
+168</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 166</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ns'>ns</span>
+  <span class='ivar'>@ns</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="results_gathered=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="results_gathered-instance_method">
+  
+    #<strong>results_gathered</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute results_gathered.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+166
+167
+168</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 166</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_results_gathered'>results_gathered</span>
+  <span class='ivar'>@results_gathered</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="gather_results-instance_method">
+  
+    #<strong>gather_results</strong>(year_val = Date.today.year, baseline_only = false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>gather results from simulated scenarios, for all or just the baseline
+scenario</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>year_val</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>Date.today.year</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>year to use when processing monthly results as TimeSeries elements</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>baseline_only</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether to only process the Baseline (or current building modeled) Scenario</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+133
+134
+135
+136</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 133</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_gather_results'>gather_results</span><span class='lparen'>(</span><span class='id identifier rubyid_year_val'>year_val</span> <span class='op'>=</span> <span class='const'>Date</span><span class='period'>.</span><span class='id identifier rubyid_today'>today</span><span class='period'>.</span><span class='id identifier rubyid_year'>year</span><span class='comma'>,</span> <span class='id identifier rubyid_baseline_only'>baseline_only</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='ivar'>@results_gathered</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='kw'>return</span> <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_year_val'>year_val</span><span class='comma'>,</span> <span class='id identifier rubyid_baseline_only'>baseline_only</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="prepare_final_xml-instance_method">
+  
+    #<strong>prepare_final_xml</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>write parameters to xml file</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+145
+146
+147
+148
+149
+150
+151
+152
+153</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 145</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_prepare_final_xml'>prepare_final_xml</span>
+  <span class='kw'>if</span> <span class='ivar'>@results_gathered</span>
+    <span class='kw'>super</span>
+  <span class='kw'>else</span>
+    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.prepare_final_xml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>All results have not yet been gathered.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>super</span>
+  <span class='kw'>end</span>
+  <span class='ivar'>@final_xml_prepared</span> <span class='op'>=</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="run_osws-instance_method">
+  
+    #<strong>run_osws</strong>(only_cb_modeled = false, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>run osws - running all scenario simulations</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>runner_options</span>
+      
+      
+        <span class='type'>(<tt>hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{ run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY }</tt>)</em>
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+140
+141
+142</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 140</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_run_osws'>run_osws</span><span class='lparen'>(</span><span class='id identifier rubyid_only_cb_modeled'>only_cb_modeled</span> <span class='op'>=</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='id identifier rubyid_runner_options'>runner_options</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>run_simulations:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>verbose:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>num_parallel:</span> <span class='int'>7</span><span class='comma'>,</span> <span class='label'>max_to_run:</span> <span class='const'>Float</span><span class='op'>::</span><span class='const'>INFINITY</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='ivar'>@output_dir</span><span class='comma'>,</span> <span class='id identifier rubyid_only_cb_modeled'>only_cb_modeled</span><span class='comma'>,</span> <span class='id identifier rubyid_runner_options'>runner_options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="save_xml-instance_method">
+  
+    #<strong>save_xml</strong>(file_name = &#39;results.xml&#39;)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>save xml that includes the results</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>file_name</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;results.xml&#39;</tt>)</em>
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+157
+158
+159
+160
+161
+162
+163
+164</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 157</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_save_xml'>save_xml</span><span class='lparen'>(</span><span class='id identifier rubyid_file_name'>file_name</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>results.xml</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_output_file'>output_file</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='ivar'>@output_dir</span><span class='comma'>,</span> <span class='id identifier rubyid_file_name'>file_name</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='ivar'>@final_xml_prepared</span>
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_output_file'>output_file</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Prepare final file before attempting to save (translator.prepare_final_xml)</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="setup_and_sizing_run-instance_method">
+  
+    #<strong>setup_and_sizing_run</strong>(ddy_file = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>ddy_file</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+    </li>
+  
+</ul>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="WorkflowMaker.html#setup_and_sizing_run-instance_method" title="BuildingSync::WorkflowMaker#setup_and_sizing_run (method)">WorkflowMaker#setup_and_sizing_run</a></span></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+121
+122
+123</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 121</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_setup_and_sizing_run'>setup_and_sizing_run</span><span class='lparen'>(</span><span class='id identifier rubyid_ddy_file'>ddy_file</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='ivar'>@output_dir</span><span class='comma'>,</span> <span class='ivar'>@epw_path</span><span class='comma'>,</span> <span class='ivar'>@standard_to_be_used</span><span class='comma'>,</span> <span class='id identifier rubyid_ddy_file'>ddy_file</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="validate_xml-instance_method">
+  
+    #<strong>validate_xml</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Validate the xml file against the schema using the SelectionTool</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 105</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_validate_xml'>validate_xml</span>
+  <span class='comment'># we wil try to validate the file, but if it fails, we will not cancel the process, but log an error
+</span>
+  <span class='id identifier rubyid_selection_tool'>selection_tool</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../BuildingSync.html" title="BuildingSync (module)">BuildingSync</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="SelectionTool.html" title="BuildingSync::SelectionTool (class)">SelectionTool</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="SelectionTool.html#initialize-instance_method" title="BuildingSync::SelectionTool#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@xml_file_path</span><span class='comma'>,</span> <span class='ivar'>@schema_version</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_selection_tool'>selection_tool</span><span class='period'>.</span><span class='id identifier rubyid_validate_schema'>validate_schema</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; does not valid against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>else</span>
+    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; is valid against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; is valid against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>rescue</span> <span class='const'>StandardError</span>
+  <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; does not valid against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="write_osws-instance_method">
+  
+    #<strong>write_osws</strong>(only_cb_modeled = false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>write osws - write all workflows into osw files</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+126
+127
+128</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 126</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_write_osws'>write_osws</span><span class='lparen'>(</span><span class='id identifier rubyid_only_cb_modeled'>only_cb_modeled</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='ivar'>@output_dir</span><span class='comma'>,</span> <span class='id identifier rubyid_only_cb_modeled'>only_cb_modeled</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon May 10 18:35:48 2021 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.26 (ruby-2.5.9).
+</div>
+
+    </div>
+  </body>
+</html>

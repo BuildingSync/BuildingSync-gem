@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: BuildingSync::Site
+  
+    &mdash; Documentation by YARD 0.9.26
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "BuildingSync::Site";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../BuildingSync.html" title="BuildingSync (module)">BuildingSync</a></span></span>
+     &raquo; 
+    <span class="title">Site</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: BuildingSync::Site
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="LocationElement.html" title="BuildingSync::LocationElement (class)">LocationElement</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="SpatialElement.html" title="BuildingSync::SpatialElement (class)">SpatialElement</a></span></li>
+          
+            <li class="next"><span class='object_link'><a href="LocationElement.html" title="BuildingSync::LocationElement (class)">LocationElement</a></span></li>
+          
+            <li class="next">BuildingSync::Site</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/buildingsync/model_articulation/site.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Site class</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+  <h2>Instance Attribute Summary</h2>
+  
+  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="SpatialElement.html" title="BuildingSync::SpatialElement (class)">SpatialElement</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="SpatialElement.html#space_types-instance_method" title="BuildingSync::SpatialElement#space_types (method)">#space_types</a></span>, <span class='object_link'><a href="SpatialElement.html#standards_building_type-instance_method" title="BuildingSync::SpatialElement#standards_building_type (method)">#standards_building_type</a></span>, <span class='object_link'><a href="SpatialElement.html#system_type-instance_method" title="BuildingSync::SpatialElement#system_type (method)">#system_type</a></span>, <span class='object_link'><a href="SpatialElement.html#total_floor_area-instance_method" title="BuildingSync::SpatialElement#total_floor_area (method)">#total_floor_area</a></span></p>
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#build_zone_hash-instance_method" title="#build_zone_hash (instance method)">#<strong>build_zone_hash</strong>  &#x21d2; hash&lt;string, array&lt;OpenStudio::Model::ThermalZone&gt;&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>build zone hash that stores zone lists for buildings and building sections.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#determine_open_studio_standard-instance_method" title="#determine_open_studio_standard (instance method)">#<strong>determine_open_studio_standard</strong>(standard_to_be_used)  &#x21d2; Standard </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>determine the open studio standard and call the set_all function.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#determine_open_studio_system_standard-instance_method" title="#determine_open_studio_system_standard (instance method)">#<strong>determine_open_studio_system_standard</strong>  &#x21d2; Standard </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>determine the open studio system standard and call the set_all function.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#generate_baseline_osm-instance_method" title="#generate_baseline_osm (instance method)">#<strong>generate_baseline_osm</strong>(epw_file_path, standard_to_be_used, ddy_file = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>generate baseline model in osm file format.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_building-instance_method" title="#get_building (instance method)">#<strong>get_building</strong>  &#x21d2; Array&lt;BuildingSync::Building&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get building.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_building_sections-instance_method" title="#get_building_sections (instance method)">#<strong>get_building_sections</strong>  &#x21d2; array&lt;BuildingSection&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get building sections.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_building_type-instance_method" title="#get_building_type (instance method)">#<strong>get_building_type</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get building type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_climate_zone-instance_method" title="#get_climate_zone (instance method)">#<strong>get_climate_zone</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get climate zone.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_epw_file_path-instance_method" title="#get_epw_file_path (instance method)">#<strong>get_epw_file_path</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get full path to epw file.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_floor_area-instance_method" title="#get_floor_area (instance method)">#<strong>get_floor_area</strong>  &#x21d2; hash&lt;string, float&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get floor area.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_model-instance_method" title="#get_model (instance method)">#<strong>get_model</strong>  &#x21d2; OpenStudio::Model </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get the model.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_peak_occupancy-instance_method" title="#get_peak_occupancy (instance method)">#<strong>get_peak_occupancy</strong>  &#x21d2; hash&lt;string, float&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get peak occupancy.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_space_types-instance_method" title="#get_space_types (instance method)">#<strong>get_space_types</strong>  &#x21d2; array&lt;OpenStudio::Model::SpaceType&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get space types.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_space_types_from_hash-instance_method" title="#get_space_types_from_hash (instance method)">#<strong>get_space_types_from_hash</strong>(id)  &#x21d2; hash&lt;string, array&lt;hash&lt;string, string&gt;&gt;] </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get space types from hash.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_standard_template-instance_method" title="#get_standard_template (instance method)">#<strong>get_standard_template</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get @standard_template.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_system_type-instance_method" title="#get_system_type (instance method)">#<strong>get_system_type</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get system type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(base_xml, ns)  &#x21d2; Site </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>initialize.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#prepare_final_xml-instance_method" title="#prepare_final_xml (instance method)">#<strong>prepare_final_xml</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>write parameters to xml file.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#read_xml-instance_method" title="#read_xml (instance method)">#<strong>read_xml</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>read xml.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_all-instance_method" title="#set_all (instance method)">#<strong>set_all</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>set all function to set all parameters for each building.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#write_osm-instance_method" title="#write_osm (instance method)">#<strong>write_osm</strong>(dir)  &#x21d2; hash&lt;string, string&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>write model to osm file.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="LocationElement.html" title="BuildingSync::LocationElement (class)">LocationElement</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="LocationElement.html#determine_climate_zone-instance_method" title="BuildingSync::LocationElement#determine_climate_zone (method)">#determine_climate_zone</a></span>, <span class='object_link'><a href="LocationElement.html#read_city_and_state_name-instance_method" title="BuildingSync::LocationElement#read_city_and_state_name (method)">#read_city_and_state_name</a></span>, <span class='object_link'><a href="LocationElement.html#read_climate_zone-instance_method" title="BuildingSync::LocationElement#read_climate_zone (method)">#read_climate_zone</a></span>, <span class='object_link'><a href="LocationElement.html#read_location_values-instance_method" title="BuildingSync::LocationElement#read_location_values (method)">#read_location_values</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="SpatialElement.html" title="BuildingSync::SpatialElement (class)">SpatialElement</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="SpatialElement.html#add_user_defined_field_to_xml_file-instance_method" title="BuildingSync::SpatialElement#add_user_defined_field_to_xml_file (method)">#add_user_defined_field_to_xml_file</a></span>, <span class='object_link'><a href="SpatialElement.html#create_space_types-instance_method" title="BuildingSync::SpatialElement#create_space_types (method)">#create_space_types</a></span>, <span class='object_link'><a href="SpatialElement.html#prepare_final_xml_for_spatial_element-instance_method" title="BuildingSync::SpatialElement#prepare_final_xml_for_spatial_element (method)">#prepare_final_xml_for_spatial_element</a></span>, <span class='object_link'><a href="SpatialElement.html#process_bldg_and_system_type-instance_method" title="BuildingSync::SpatialElement#process_bldg_and_system_type (method)">#process_bldg_and_system_type</a></span>, <span class='object_link'><a href="SpatialElement.html#read_floor_areas-instance_method" title="BuildingSync::SpatialElement#read_floor_areas (method)">#read_floor_areas</a></span>, <span class='object_link'><a href="SpatialElement.html#set_bldg_and_system_type-instance_method" title="BuildingSync::SpatialElement#set_bldg_and_system_type (method)">#set_bldg_and_system_type</a></span>, <span class='object_link'><a href="SpatialElement.html#sets_occupancy_bldg_system_types-instance_method" title="BuildingSync::SpatialElement#sets_occupancy_bldg_system_types (method)">#sets_occupancy_bldg_system_types</a></span>, <span class='object_link'><a href="SpatialElement.html#validate_positive_number_excluding_zero-instance_method" title="BuildingSync::SpatialElement#validate_positive_number_excluding_zero (method)">#validate_positive_number_excluding_zero</a></span>, <span class='object_link'><a href="SpatialElement.html#validate_positive_number_including_zero-instance_method" title="BuildingSync::SpatialElement#validate_positive_number_including_zero (method)">#validate_positive_number_including_zero</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="XmlGetSet.html" title="BuildingSync::XmlGetSet (module)">XmlGetSet</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="XmlGetSet.html#get_prefix-instance_method" title="BuildingSync::XmlGetSet#get_prefix (method)">#get_prefix</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_attribute_for_element-instance_method" title="BuildingSync::XmlGetSet#xget_attribute_for_element (method)">#xget_attribute_for_element</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_element-instance_method" title="BuildingSync::XmlGetSet#xget_element (method)">#xget_element</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_id-instance_method" title="BuildingSync::XmlGetSet#xget_id (method)">#xget_id</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_idrefs-instance_method" title="BuildingSync::XmlGetSet#xget_idrefs (method)">#xget_idrefs</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_linked_premises-instance_method" title="BuildingSync::XmlGetSet#xget_linked_premises (method)">#xget_linked_premises</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_name-instance_method" title="BuildingSync::XmlGetSet#xget_name (method)">#xget_name</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_or_create-instance_method" title="BuildingSync::XmlGetSet#xget_or_create (method)">#xget_or_create</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_plurals_text_value-instance_method" title="BuildingSync::XmlGetSet#xget_plurals_text_value (method)">#xget_plurals_text_value</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text-instance_method" title="BuildingSync::XmlGetSet#xget_text (method)">#xget_text</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_bool-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_bool (method)">#xget_text_as_bool</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_date-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_date (method)">#xget_text_as_date</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_dt-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_dt (method)">#xget_text_as_dt</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_float-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_float (method)">#xget_text_as_float</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_integer-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_integer (method)">#xget_text_as_integer</a></span>, <span class='object_link'><a href="XmlGetSet.html#xset_or_create-instance_method" title="BuildingSync::XmlGetSet#xset_or_create (method)">#xset_or_create</a></span>, <span class='object_link'><a href="XmlGetSet.html#xset_text-instance_method" title="BuildingSync::XmlGetSet#xset_text (method)">#xset_text</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Helper.html" title="BuildingSync::Helper (module)">Helper</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Helper.html#help_calculate_hours-instance_method" title="BuildingSync::Helper#help_calculate_hours (method)">#help_calculate_hours</a></span>, <span class='object_link'><a href="Helper.html#help_convert-instance_method" title="BuildingSync::Helper#help_convert (method)">#help_convert</a></span>, <span class='object_link'><a href="Helper.html#help_count_number_of_days-instance_method" title="BuildingSync::Helper#help_count_number_of_days (method)">#help_count_number_of_days</a></span>, <span class='object_link'><a href="Helper.html#help_element_class_type_check-instance_method" title="BuildingSync::Helper#help_element_class_type_check (method)">#help_element_class_type_check</a></span>, <span class='object_link'><a href="Helper.html#help_get_attribute_value-instance_method" title="BuildingSync::Helper#help_get_attribute_value (method)">#help_get_attribute_value</a></span>, <span class='object_link'><a href="Helper.html#help_get_default_schedule_set-instance_method" title="BuildingSync::Helper#help_get_default_schedule_set (method)">#help_get_default_schedule_set</a></span>, <span class='object_link'><a href="Helper.html#help_get_duration-instance_method" title="BuildingSync::Helper#help_get_duration (method)">#help_get_duration</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time-instance_method" title="BuildingSync::Helper#help_get_end_time (method)">#help_get_end_time</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_sat-instance_method" title="BuildingSync::Helper#help_get_end_time_sat (method)">#help_get_end_time_sat</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_sun-instance_method" title="BuildingSync::Helper#help_get_end_time_sun (method)">#help_get_end_time_sun</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_weekday-instance_method" title="BuildingSync::Helper#help_get_end_time_weekday (method)">#help_get_end_time_weekday</a></span>, <span class='object_link'><a href="Helper.html#help_get_or_create-instance_method" title="BuildingSync::Helper#help_get_or_create (method)">#help_get_or_create</a></span>, <span class='object_link'><a href="Helper.html#help_get_schedule_rule_set_from_schedule-instance_method" title="BuildingSync::Helper#help_get_schedule_rule_set_from_schedule (method)">#help_get_schedule_rule_set_from_schedule</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time-instance_method" title="BuildingSync::Helper#help_get_start_time (method)">#help_get_start_time</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_sat-instance_method" title="BuildingSync::Helper#help_get_start_time_sat (method)">#help_get_start_time_sat</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_sun-instance_method" title="BuildingSync::Helper#help_get_start_time_sun (method)">#help_get_start_time_sun</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_weekday-instance_method" title="BuildingSync::Helper#help_get_start_time_weekday (method)">#help_get_start_time_weekday</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value-instance_method" title="BuildingSync::Helper#help_get_text_value (method)">#help_get_text_value</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_bool-instance_method" title="BuildingSync::Helper#help_get_text_value_as_bool (method)">#help_get_text_value_as_bool</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_date-instance_method" title="BuildingSync::Helper#help_get_text_value_as_date (method)">#help_get_text_value_as_date</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_datetime-instance_method" title="BuildingSync::Helper#help_get_text_value_as_datetime (method)">#help_get_text_value_as_datetime</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_float-instance_method" title="BuildingSync::Helper#help_get_text_value_as_float (method)">#help_get_text_value_as_float</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_integer-instance_method" title="BuildingSync::Helper#help_get_text_value_as_integer (method)">#help_get_text_value_as_integer</a></span>, <span class='object_link'><a href="Helper.html#help_get_zone_name_list-instance_method" title="BuildingSync::Helper#help_get_zone_name_list (method)">#help_get_zone_name_list</a></span>, <span class='object_link'><a href="Helper.html#help_load_doc-instance_method" title="BuildingSync::Helper#help_load_doc (method)">#help_load_doc</a></span>, <span class='object_link'><a href="Helper.html#help_print_all_schedules-instance_method" title="BuildingSync::Helper#help_print_all_schedules (method)">#help_print_all_schedules</a></span>, <span class='object_link'><a href="Helper.html#help_print_schedule-instance_method" title="BuildingSync::Helper#help_print_schedule (method)">#help_print_schedule</a></span>, <span class='object_link'><a href="Helper.html#help_write_profile-instance_method" title="BuildingSync::Helper#help_write_profile (method)">#help_write_profile</a></span></p>
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(base_xml, ns)  &#x21d2; <tt><span class='object_link'><a href="" title="BuildingSync::Site (class)">Site</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>initialize</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>base_xml</span>
+      
+      
+        <span class='type'>(<tt>REXML::Element</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>an element corresponding to a single auc:Site</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>ns</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>namespace, likely &#39;auc&#39;</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 46</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_base_xml'>base_xml</span><span class='comma'>,</span> <span class='id identifier rubyid_ns'>ns</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_base_xml'>base_xml</span><span class='comma'>,</span> <span class='id identifier rubyid_ns'>ns</span><span class='rparen'>)</span>
+  <span class='ivar'>@base_xml</span> <span class='op'>=</span> <span class='id identifier rubyid_base_xml'>base_xml</span>
+  <span class='ivar'>@ns</span> <span class='op'>=</span> <span class='id identifier rubyid_ns'>ns</span>
+  <span class='id identifier rubyid_help_element_class_type_check'>help_element_class_type_check</span><span class='lparen'>(</span><span class='id identifier rubyid_base_xml'>base_xml</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Site</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+  <span class='ivar'>@building</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='ivar'>@all_set</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+  <span class='comment'># using the XML snippet to search for the buildings on the site
+</span>  <span class='id identifier rubyid_read_xml'>read_xml</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="build_zone_hash-instance_method">
+  
+    #<strong>build_zone_hash</strong>  &#x21d2; <tt>hash&lt;string, array&lt;OpenStudio::Model::ThermalZone&gt;&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>build zone hash that stores zone lists for buildings and building sections</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>hash&lt;string, array&lt;OpenStudio::Model::ThermalZone&gt;&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+91
+92
+93</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 91</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_build_zone_hash'>build_zone_hash</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_build_zone_hash'>build_zone_hash</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="determine_open_studio_standard-instance_method">
+  
+    #<strong>determine_open_studio_standard</strong>(standard_to_be_used)  &#x21d2; <tt>Standard</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>determine the open studio standard and call the set_all function</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>standard_to_be_used</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Standard</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+128
+129
+130
+131</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 128</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_determine_open_studio_standard'>determine_open_studio_standard</span><span class='lparen'>(</span><span class='id identifier rubyid_standard_to_be_used'>standard_to_be_used</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_set_all'>set_all</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_determine_open_studio_standard'>determine_open_studio_standard</span><span class='lparen'>(</span><span class='id identifier rubyid_standard_to_be_used'>standard_to_be_used</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="determine_open_studio_system_standard-instance_method">
+  
+    #<strong>determine_open_studio_system_standard</strong>  &#x21d2; <tt>Standard</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>determine the open studio system standard and call the set_all function</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Standard</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+135
+136
+137
+138</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 135</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_determine_open_studio_system_standard'>determine_open_studio_system_standard</span>
+  <span class='id identifier rubyid_set_all'>set_all</span>
+  <span class='kw'>return</span> <span class='const'>Standard</span><span class='period'>.</span><span class='id identifier rubyid_build'>build</span><span class='lparen'>(</span><span class='id identifier rubyid_get_standard_template'>get_standard_template</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="generate_baseline_osm-instance_method">
+  
+    #<strong>generate_baseline_osm</strong>(epw_file_path, standard_to_be_used, ddy_file = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>generate baseline model in osm file format</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>epw_file_path</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>standard_to_be_used</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>ddy_file</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 195</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_generate_baseline_osm'>generate_baseline_osm</span><span class='lparen'>(</span><span class='id identifier rubyid_epw_file_path'>epw_file_path</span><span class='comma'>,</span> <span class='id identifier rubyid_standard_to_be_used'>standard_to_be_used</span><span class='comma'>,</span> <span class='id identifier rubyid_ddy_file'>ddy_file</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_set_all'>set_all</span>
+  <span class='id identifier rubyid_determine_climate_zone'>determine_climate_zone</span><span class='lparen'>(</span><span class='id identifier rubyid_standard_to_be_used'>standard_to_be_used</span><span class='rparen'>)</span>
+
+  <span class='comment'># If we can&#39;t get the CZ from the site, we attempt to get from the building
+</span>  <span class='ivar'>@climate_zone</span> <span class='op'>=</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_get_climate_zone'>get_climate_zone</span> <span class='kw'>if</span> <span class='ivar'>@climate_zone</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Site.generate_baseline_osm</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Could not find a climate zone in the BuildingSync file.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@climate_zone</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_lat'>lat</span> <span class='op'>=</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Latitude</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Latitude</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>:</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Latitude</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_long'>long</span> <span class='op'>=</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Longitude</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Longitude</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>:</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Longitude</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_weather_station_name'>weather_station_name</span> <span class='op'>=</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>WeatherStationName</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>WeatherStationName</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>:</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>WeatherStationName</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_weather_station_id'>weather_station_id</span> <span class='op'>=</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>WeatherDataStationID</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>WeatherDataStationID</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>:</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>WeatherDataStationID</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_set_weather_and_climate_zone'>set_weather_and_climate_zone</span><span class='lparen'>(</span><span class='ivar'>@climate_zone</span><span class='comma'>,</span> <span class='id identifier rubyid_epw_file_path'>epw_file_path</span><span class='comma'>,</span> <span class='id identifier rubyid_standard_to_be_used'>standard_to_be_used</span><span class='comma'>,</span> <span class='id identifier rubyid_lat'>lat</span><span class='comma'>,</span> <span class='id identifier rubyid_long'>long</span><span class='comma'>,</span> <span class='id identifier rubyid_ddy_file'>ddy_file</span><span class='comma'>,</span> <span class='id identifier rubyid_weather_station_name'>weather_station_name</span><span class='comma'>,</span> <span class='id identifier rubyid_weather_station_id'>weather_station_id</span><span class='comma'>,</span> <span class='ivar'>@state_name</span><span class='comma'>,</span> <span class='ivar'>@city_name</span><span class='rparen'>)</span>
+  <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_generate_baseline_osm'>generate_baseline_osm</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_building-instance_method">
+  
+    #<strong>get_building</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="Building.html" title="BuildingSync::Building (class)">BuildingSync::Building</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get building</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Building.html" title="BuildingSync::Building (class)">BuildingSync::Building</a></span>&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+181
+182
+183</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 181</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_building'>get_building</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_building_sections-instance_method">
+  
+    #<strong>get_building_sections</strong>  &#x21d2; <tt>array&lt;<span class='object_link'><a href="BuildingSection.html" title="BuildingSync::BuildingSection (class)">BuildingSection</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get building sections</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>array&lt;<span class='object_link'><a href="BuildingSection.html" title="BuildingSync::BuildingSection (class)">BuildingSection</a></span>&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+121
+122
+123</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 121</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_building_sections'>get_building_sections</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_building_sections'>building_sections</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_building_type-instance_method">
+  
+    #<strong>get_building_type</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get building type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+161
+162
+163
+164
+165
+166
+167</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 161</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_building_type'>get_building_type</span>
+  <span class='kw'>if</span> <span class='ivar'>@standards_building_type</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_get_building_type'>get_building_type</span>
+  <span class='kw'>else</span>
+    <span class='kw'>return</span> <span class='ivar'>@standards_building_type</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_climate_zone-instance_method">
+  
+    #<strong>get_climate_zone</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get climate zone</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+171
+172
+173
+174
+175
+176
+177</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 171</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_climate_zone'>get_climate_zone</span>
+  <span class='kw'>if</span> <span class='ivar'>@climate_zone</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_get_climate_zone'>get_climate_zone</span>
+  <span class='kw'>else</span>
+    <span class='kw'>return</span> <span class='ivar'>@climate_zone</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_epw_file_path-instance_method">
+  
+    #<strong>get_epw_file_path</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get full path to epw file</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+187
+188
+189</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 187</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_epw_file_path'>get_epw_file_path</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_get_epw_file_path'>get_epw_file_path</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_floor_area-instance_method">
+  
+    #<strong>get_floor_area</strong>  &#x21d2; <tt>hash&lt;string, float&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get floor area</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>hash&lt;string, float&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+115
+116
+117</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 115</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_floor_area'>get_floor_area</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_get_floor_area'>get_floor_area</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_model-instance_method">
+  
+    #<strong>get_model</strong>  &#x21d2; <tt>OpenStudio::Model</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get the model</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>OpenStudio::Model</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+97
+98
+99</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 97</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_model'>get_model</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_get_model'>get_model</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_peak_occupancy-instance_method">
+  
+    #<strong>get_peak_occupancy</strong>  &#x21d2; <tt>hash&lt;string, float&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get peak occupancy</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>hash&lt;string, float&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+109
+110
+111</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 109</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_peak_occupancy'>get_peak_occupancy</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_get_peak_occupancy'>get_peak_occupancy</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_space_types-instance_method">
+  
+    #<strong>get_space_types</strong>  &#x21d2; <tt>array&lt;OpenStudio::Model::SpaceType&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get space types</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>array&lt;OpenStudio::Model::SpaceType&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+103
+104
+105</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 103</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_space_types'>get_space_types</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_get_space_types'>get_space_types</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_space_types_from_hash-instance_method">
+  
+    #<strong>get_space_types_from_hash</strong>(id)  &#x21d2; <tt>hash&lt;string, array&lt;hash&lt;string, string&gt;&gt;]</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get space types from hash</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>id</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>hash&lt;string, array&lt;hash&lt;string, string&gt;&gt;]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>hash&lt;string, array&lt;hash&lt;string, string&gt;&gt;]</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+149
+150
+151</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 149</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_space_types_from_hash'>get_space_types_from_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_build_space_type_hash'>build_space_type_hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_id'>id</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_standard_template-instance_method">
+  
+    #<strong>get_standard_template</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get @standard_template</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+142
+143
+144</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 142</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_standard_template'>get_standard_template</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_get_standard_template'>get_standard_template</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_system_type-instance_method">
+  
+    #<strong>get_system_type</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get system type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+155
+156
+157</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 155</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_system_type'>get_system_type</span>
+  <span class='kw'>return</span> <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_get_system_type'>get_system_type</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="prepare_final_xml-instance_method">
+  
+    #<strong>prepare_final_xml</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>write parameters to xml file</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>site</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="BuildingSync::Site (class)">Site</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>ns</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 226</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_prepare_final_xml'>prepare_final_xml</span>
+  <span class='ivar'>@base_xml</span><span class='period'>.</span><span class='id identifier rubyid_elements'>elements</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:ClimateZoneType/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:ASHRAE/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:ClimateZone</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='ivar'>@climate_zone_ashrae</span> <span class='kw'>if</span> <span class='op'>!</span><span class='ivar'>@climate_zone_ashrae</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='ivar'>@base_xml</span><span class='period'>.</span><span class='id identifier rubyid_elements'>elements</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:ClimateZoneType/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:CaliforniaTitle24/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:ClimateZone</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='ivar'>@climate_zone_ca_t24</span> <span class='kw'>if</span> <span class='op'>!</span><span class='ivar'>@climate_zone_ca_t24</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='ivar'>@base_xml</span><span class='period'>.</span><span class='id identifier rubyid_elements'>elements</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:Address/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:City</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='ivar'>@city_name</span> <span class='kw'>if</span> <span class='op'>!</span><span class='ivar'>@city_name</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='ivar'>@base_xml</span><span class='period'>.</span><span class='id identifier rubyid_elements'>elements</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:Address/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:State</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='ivar'>@state_name</span> <span class='kw'>if</span> <span class='op'>!</span><span class='ivar'>@state_name</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='comment'># TODO: probably set these as UDFs from actual openstudio model
+</span>  <span class='ivar'>@base_xml</span><span class='period'>.</span><span class='id identifier rubyid_elements'>elements</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:WeatherStationName</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='ivar'>@weather_file_name</span> <span class='kw'>if</span> <span class='op'>!</span><span class='ivar'>@weather_file_name</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='ivar'>@base_xml</span><span class='period'>.</span><span class='id identifier rubyid_elements'>elements</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:WeatherDataStationID</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='ivar'>@weather_station_id</span> <span class='kw'>if</span> <span class='op'>!</span><span class='ivar'>@weather_station_id</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='id identifier rubyid_prepare_final_xml_for_spatial_element'>prepare_final_xml_for_spatial_element</span>
+
+  <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_prepare_final_xml'>prepare_final_xml</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="read_xml-instance_method">
+  
+    #<strong>read_xml</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>read xml</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 60</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_read_xml'>read_xml</span>
+  <span class='comment'># first we check if the number of buildings is ok
+</span>  <span class='id identifier rubyid_building_xml_temp'>building_xml_temp</span> <span class='op'>=</span> <span class='ivar'>@base_xml</span><span class='period'>.</span><span class='id identifier rubyid_get_elements'>get_elements</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:Buildings/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:Building</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_building_xml_temp'>building_xml_temp</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_building_xml_temp'>building_xml_temp</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Site.read_xml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Site with ID: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xget_id'>xget_id</span><span class='embexpr_end'>}</span><span class='tstring_content'> has no Building elements.  Cannot initialize Site.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>StandardError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Site with ID: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xget_id'>xget_id</span><span class='embexpr_end'>}</span><span class='tstring_content'> has no Building elements.  Cannot initialize Site.</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_building_xml_temp'>building_xml_temp</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>&gt;</span> <span class='int'>1</span>
+    <span class='ivar'>@building_xml</span> <span class='op'>=</span> <span class='id identifier rubyid_building_xml_temp'>building_xml_temp</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
+    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Site.read_xml</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Site ID: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xget_id'>xget_id</span><span class='embexpr_end'>}</span><span class='tstring_content'>. There is more than one (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_building_xml_temp'>building_xml_temp</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'>) Building elements.  Only the first Building will be considered (ID: </span><span class='embexpr_beg'>#{</span><span class='ivar'>@building_xml</span><span class='period'>.</span><span class='id identifier rubyid_attributes'>attributes</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ID</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='ivar'>@building_xml</span> <span class='op'>=</span> <span class='id identifier rubyid_building_xml_temp'>building_xml_temp</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># read other data
+</span>  <span class='ivar'>@total_floor_area</span> <span class='op'>=</span> <span class='id identifier rubyid_read_floor_areas'>read_floor_areas</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_read_location_values'>read_location_values</span>
+
+  <span class='ivar'>@building</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../BuildingSync.html" title="BuildingSync (module)">BuildingSync</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Building.html" title="BuildingSync::Building (class)">Building</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Building.html#initialize-instance_method" title="BuildingSync::Building#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@building_xml</span><span class='comma'>,</span> <span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>OccupancyClassification</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='ivar'>@total_floor_area</span><span class='comma'>,</span> <span class='ivar'>@ns</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_all-instance_method">
+  
+    #<strong>set_all</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>set all function to set all parameters for each building</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+82
+83
+84
+85
+86
+87</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 82</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_all'>set_all</span>
+  <span class='kw'>if</span> <span class='op'>!</span><span class='ivar'>@all_set</span>
+    <span class='ivar'>@all_set</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_set_all'>set_all</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="write_osm-instance_method">
+  
+    #<strong>write_osm</strong>(dir)  &#x21d2; <tt>hash&lt;string, string&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>write model to osm file</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>dir</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>hash&lt;string, string&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+214
+215
+216
+217
+218
+219
+220
+221</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/site.rb', line 214</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_write_osm'>write_osm</span><span class='lparen'>(</span><span class='id identifier rubyid_dir'>dir</span><span class='rparen'>)</span>
+  <span class='ivar'>@building</span><span class='period'>.</span><span class='id identifier rubyid_write_osm'>write_osm</span><span class='lparen'>(</span><span class='id identifier rubyid_dir'>dir</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_scenario_types'>scenario_types</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_scenario_types'>scenario_types</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>system_type</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_get_system_type'>get_system_type</span>
+  <span class='id identifier rubyid_scenario_types'>scenario_types</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bldg_type</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_get_building_type'>get_building_type</span>
+  <span class='id identifier rubyid_scenario_types'>scenario_types</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>template</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_get_standard_template'>get_standard_template</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_scenario_types'>scenario_types</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon May 10 18:35:48 2021 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.26 (ruby-2.5.9).
+</div>
+
+    </div>
+  </body>
+</html>

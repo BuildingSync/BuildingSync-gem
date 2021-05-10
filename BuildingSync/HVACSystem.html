@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: BuildingSync::HVACSystem
+  
+    &mdash; Documentation by YARD 0.9.26
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "BuildingSync::HVACSystem";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (H)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../BuildingSync.html" title="BuildingSync (module)">BuildingSync</a></span></span>
+     &raquo; 
+    <span class="title">HVACSystem</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: BuildingSync::HVACSystem
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="BuildingSystem.html" title="BuildingSync::BuildingSystem (class)">BuildingSystem</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="BuildingSystem.html" title="BuildingSync::BuildingSystem (class)">BuildingSystem</a></span></li>
+          
+            <li class="next">BuildingSync::HVACSystem</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="Helper.html" title="BuildingSync::Helper (module)">Helper</a></span>, <span class='object_link'><a href="XmlGetSet.html" title="BuildingSync::XmlGetSet (module)">XmlGetSet</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/buildingsync/model_articulation/hvac_system.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>HVACSystem class</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#principal_hvac_system_type-instance_method" title="#principal_hvac_system_type (instance method)">#<strong>principal_hvac_system_type</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>principal hvac system type.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_exhaust-instance_method" title="#add_exhaust (instance method)">#<strong>add_exhaust</strong>(model, standard, kitchen_makeup, remove_objects)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>add exhaust.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_hvac-instance_method" title="#add_hvac (instance method)">#<strong>add_hvac</strong>(model, zone_hash, standard, system_type, hvac_delivery_type = &#39;Forced Air&#39;, htg_src = &#39;NaturalGas&#39;, clg_src = &#39;Electricity&#39;, remove_objects = false)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>add hvac.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_setpoints_to_thermostats_if_none-instance_method" title="#add_setpoints_to_thermostats_if_none (instance method)">#<strong>add_setpoints_to_thermostats_if_none</strong>(model)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>True if ALL thermostats have heating and cooling setpoints.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_thermostats-instance_method" title="#add_thermostats (instance method)">#<strong>add_thermostats</strong>(model, standard, remove_objects)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>add thermostats.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#apply_sizing_and_assumptions-instance_method" title="#apply_sizing_and_assumptions (instance method)">#<strong>apply_sizing_and_assumptions</strong>(model, output_path, standard, primary_bldg_type, system_type, climate_zone)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>apply sizing and assumptions.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#create_schedule_ruleset-instance_method" title="#create_schedule_ruleset (instance method)">#<strong>create_schedule_ruleset</strong>(model, values, name)  &#x21d2; OpenStudio::Model::ScheduleRuleset </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A new schedule ruleset with values added to the default day.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_linked_ids-instance_method" title="#get_linked_ids (instance method)">#<strong>get_linked_ids</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_principal_hvac_system_type-instance_method" title="#get_principal_hvac_system_type (instance method)">#<strong>get_principal_hvac_system_type</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get principal hvac system type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_system_type_from_zone-instance_method" title="#get_system_type_from_zone (instance method)">#<strong>get_system_type_from_zone</strong>(zone_hash, zones, system_type)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get system type from zone.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(base_xml, ns = &#39;auc&#39;)  &#x21d2; HVACSystem </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>initialize.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#map_to_cbecs-instance_method" title="#map_to_cbecs (instance method)">#<strong>map_to_cbecs</strong>(principal_hvac_system_type, fallback_system_type)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>map principal hvac system type to cbecs system type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#read_xml-instance_method" title="#read_xml (instance method)">#<strong>read_xml</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>read xml.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_principal_hvac_system_type-instance_method" title="#set_principal_hvac_system_type (instance method)">#<strong>set_principal_hvac_system_type</strong>(principal_hvac_type)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>adding the principal hvac system type to the hvac systems, overwrite
+existing values or create new elements if none are present.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="XmlGetSet.html" title="BuildingSync::XmlGetSet (module)">XmlGetSet</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="XmlGetSet.html#get_prefix-instance_method" title="BuildingSync::XmlGetSet#get_prefix (method)">#get_prefix</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_attribute_for_element-instance_method" title="BuildingSync::XmlGetSet#xget_attribute_for_element (method)">#xget_attribute_for_element</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_element-instance_method" title="BuildingSync::XmlGetSet#xget_element (method)">#xget_element</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_id-instance_method" title="BuildingSync::XmlGetSet#xget_id (method)">#xget_id</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_idrefs-instance_method" title="BuildingSync::XmlGetSet#xget_idrefs (method)">#xget_idrefs</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_linked_premises-instance_method" title="BuildingSync::XmlGetSet#xget_linked_premises (method)">#xget_linked_premises</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_name-instance_method" title="BuildingSync::XmlGetSet#xget_name (method)">#xget_name</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_or_create-instance_method" title="BuildingSync::XmlGetSet#xget_or_create (method)">#xget_or_create</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_plurals_text_value-instance_method" title="BuildingSync::XmlGetSet#xget_plurals_text_value (method)">#xget_plurals_text_value</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text-instance_method" title="BuildingSync::XmlGetSet#xget_text (method)">#xget_text</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_bool-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_bool (method)">#xget_text_as_bool</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_date-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_date (method)">#xget_text_as_date</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_dt-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_dt (method)">#xget_text_as_dt</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_float-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_float (method)">#xget_text_as_float</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_integer-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_integer (method)">#xget_text_as_integer</a></span>, <span class='object_link'><a href="XmlGetSet.html#xset_or_create-instance_method" title="BuildingSync::XmlGetSet#xset_or_create (method)">#xset_or_create</a></span>, <span class='object_link'><a href="XmlGetSet.html#xset_text-instance_method" title="BuildingSync::XmlGetSet#xset_text (method)">#xset_text</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Helper.html" title="BuildingSync::Helper (module)">Helper</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Helper.html#help_calculate_hours-instance_method" title="BuildingSync::Helper#help_calculate_hours (method)">#help_calculate_hours</a></span>, <span class='object_link'><a href="Helper.html#help_convert-instance_method" title="BuildingSync::Helper#help_convert (method)">#help_convert</a></span>, <span class='object_link'><a href="Helper.html#help_count_number_of_days-instance_method" title="BuildingSync::Helper#help_count_number_of_days (method)">#help_count_number_of_days</a></span>, <span class='object_link'><a href="Helper.html#help_element_class_type_check-instance_method" title="BuildingSync::Helper#help_element_class_type_check (method)">#help_element_class_type_check</a></span>, <span class='object_link'><a href="Helper.html#help_get_attribute_value-instance_method" title="BuildingSync::Helper#help_get_attribute_value (method)">#help_get_attribute_value</a></span>, <span class='object_link'><a href="Helper.html#help_get_default_schedule_set-instance_method" title="BuildingSync::Helper#help_get_default_schedule_set (method)">#help_get_default_schedule_set</a></span>, <span class='object_link'><a href="Helper.html#help_get_duration-instance_method" title="BuildingSync::Helper#help_get_duration (method)">#help_get_duration</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time-instance_method" title="BuildingSync::Helper#help_get_end_time (method)">#help_get_end_time</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_sat-instance_method" title="BuildingSync::Helper#help_get_end_time_sat (method)">#help_get_end_time_sat</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_sun-instance_method" title="BuildingSync::Helper#help_get_end_time_sun (method)">#help_get_end_time_sun</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_weekday-instance_method" title="BuildingSync::Helper#help_get_end_time_weekday (method)">#help_get_end_time_weekday</a></span>, <span class='object_link'><a href="Helper.html#help_get_or_create-instance_method" title="BuildingSync::Helper#help_get_or_create (method)">#help_get_or_create</a></span>, <span class='object_link'><a href="Helper.html#help_get_schedule_rule_set_from_schedule-instance_method" title="BuildingSync::Helper#help_get_schedule_rule_set_from_schedule (method)">#help_get_schedule_rule_set_from_schedule</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time-instance_method" title="BuildingSync::Helper#help_get_start_time (method)">#help_get_start_time</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_sat-instance_method" title="BuildingSync::Helper#help_get_start_time_sat (method)">#help_get_start_time_sat</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_sun-instance_method" title="BuildingSync::Helper#help_get_start_time_sun (method)">#help_get_start_time_sun</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_weekday-instance_method" title="BuildingSync::Helper#help_get_start_time_weekday (method)">#help_get_start_time_weekday</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value-instance_method" title="BuildingSync::Helper#help_get_text_value (method)">#help_get_text_value</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_bool-instance_method" title="BuildingSync::Helper#help_get_text_value_as_bool (method)">#help_get_text_value_as_bool</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_date-instance_method" title="BuildingSync::Helper#help_get_text_value_as_date (method)">#help_get_text_value_as_date</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_datetime-instance_method" title="BuildingSync::Helper#help_get_text_value_as_datetime (method)">#help_get_text_value_as_datetime</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_float-instance_method" title="BuildingSync::Helper#help_get_text_value_as_float (method)">#help_get_text_value_as_float</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_integer-instance_method" title="BuildingSync::Helper#help_get_text_value_as_integer (method)">#help_get_text_value_as_integer</a></span>, <span class='object_link'><a href="Helper.html#help_get_zone_name_list-instance_method" title="BuildingSync::Helper#help_get_zone_name_list (method)">#help_get_zone_name_list</a></span>, <span class='object_link'><a href="Helper.html#help_load_doc-instance_method" title="BuildingSync::Helper#help_load_doc (method)">#help_load_doc</a></span>, <span class='object_link'><a href="Helper.html#help_print_all_schedules-instance_method" title="BuildingSync::Helper#help_print_all_schedules (method)">#help_print_all_schedules</a></span>, <span class='object_link'><a href="Helper.html#help_print_schedule-instance_method" title="BuildingSync::Helper#help_print_schedule (method)">#help_print_schedule</a></span>, <span class='object_link'><a href="Helper.html#help_write_profile-instance_method" title="BuildingSync::Helper#help_write_profile (method)">#help_write_profile</a></span></p>
+
+  
+  
+  
+  
+  
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(base_xml, ns = &#39;auc&#39;)  &#x21d2; <tt><span class='object_link'><a href="" title="BuildingSync::HVACSystem (class)">HVACSystem</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>initialize</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>system_element</span>
+      
+      
+        <span class='type'>(<tt>REXML::Element</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>ns</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;auc&#39;</tt>)</em>
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+50
+51
+52
+53
+54
+55
+56
+57
+58</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 50</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_base_xml'>base_xml</span><span class='comma'>,</span> <span class='id identifier rubyid_ns'>ns</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>auc</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='ivar'>@base_xml</span> <span class='op'>=</span> <span class='id identifier rubyid_base_xml'>base_xml</span>
+  <span class='ivar'>@ns</span> <span class='op'>=</span> <span class='id identifier rubyid_ns'>ns</span>
+
+  <span class='id identifier rubyid_help_element_class_type_check'>help_element_class_type_check</span><span class='lparen'>(</span><span class='id identifier rubyid_base_xml'>base_xml</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>HVACSystem</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+  <span class='comment'># code to initialize
+</span>  <span class='id identifier rubyid_read_xml'>read_xml</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="principal_hvac_system_type-instance_method">
+  
+    #<strong>principal_hvac_system_type</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>principal hvac system type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+393
+394
+395</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 393</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_principal_hvac_system_type'>principal_hvac_system_type</span>
+  <span class='ivar'>@principal_hvac_system_type</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="add_exhaust-instance_method">
+  
+    #<strong>add_exhaust</strong>(model, standard, kitchen_makeup, remove_objects)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>add exhaust</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>model</span>
+      
+      
+        <span class='type'>(<tt>OpenStudio::Model</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>standard</span>
+      
+      
+        <span class='type'>(<tt>Standard</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>kitchen_makeup</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remove_objects</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 83</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_exhaust'>add_exhaust</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_standard'>standard</span><span class='comma'>,</span> <span class='id identifier rubyid_kitchen_makeup'>kitchen_makeup</span><span class='comma'>,</span> <span class='id identifier rubyid_remove_objects'>remove_objects</span><span class='rparen'>)</span>
+  <span class='comment'># remove exhaust objects
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_remove_objects'>remove_objects</span>
+    <span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_getFanZoneExhausts'>getFanZoneExhausts</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:remove</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_zone_exhaust_fans'>zone_exhaust_fans</span> <span class='op'>=</span> <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_add_exhaust'>model_add_exhaust</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_kitchen_makeup'>kitchen_makeup</span><span class='rparen'>)</span> <span class='comment'># second argument is strategy for finding makeup zones for exhaust zones
+</span>  <span class='id identifier rubyid_zone_exhaust_fans'>zone_exhaust_fans</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
+    <span class='id identifier rubyid_max_flow_rate_ip'>max_flow_rate_ip</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_convert'>convert</span><span class='lparen'>(</span><span class='id identifier rubyid_k'>k</span><span class='period'>.</span><span class='id identifier rubyid_maximumFlowRate'>maximumFlowRate</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>m^3/s</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>cfm</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_v'>v</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:zone_mixing</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_zone_mixing'>zone_mixing</span> <span class='op'>=</span> <span class='id identifier rubyid_v'>v</span><span class='lbracket'>[</span><span class='symbol'>:zone_mixing</span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_mixing_source_zone_name'>mixing_source_zone_name</span> <span class='op'>=</span> <span class='id identifier rubyid_zone_mixing'>zone_mixing</span><span class='period'>.</span><span class='id identifier rubyid_sourceZone'>sourceZone</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+      <span class='id identifier rubyid_mixing_design_flow_rate_ip'>mixing_design_flow_rate_ip</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_convert'>convert</span><span class='lparen'>(</span><span class='id identifier rubyid_zone_mixing'>zone_mixing</span><span class='period'>.</span><span class='id identifier rubyid_designFlowRate'>designFlowRate</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>m^3/s</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>cfm</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
+      <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_exhaust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Adding </span><span class='embexpr_beg'>#{</span><span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_toNeatString'>toNeatString</span><span class='lparen'>(</span><span class='id identifier rubyid_max_flow_rate_ip'>max_flow_rate_ip</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'> (cfm) of exhaust to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_k'>k</span><span class='period'>.</span><span class='id identifier rubyid_thermalZone'>thermalZone</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>, with </span><span class='embexpr_beg'>#{</span><span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_toNeatString'>toNeatString</span><span class='lparen'>(</span><span class='id identifier rubyid_mixing_design_flow_rate_ip'>mixing_design_flow_rate_ip</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'> (cfm) of makeup air from </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_mixing_source_zone_name'>mixing_source_zone_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_exhaust</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Adding </span><span class='embexpr_beg'>#{</span><span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_toNeatString'>toNeatString</span><span class='lparen'>(</span><span class='id identifier rubyid_max_flow_rate_ip'>max_flow_rate_ip</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'> (cfm) of exhaust to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_k'>k</span><span class='period'>.</span><span class='id identifier rubyid_thermalZone'>thermalZone</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="add_hvac-instance_method">
+  
+    #<strong>add_hvac</strong>(model, zone_hash, standard, system_type, hvac_delivery_type = &#39;Forced Air&#39;, htg_src = &#39;NaturalGas&#39;, clg_src = &#39;Electricity&#39;, remove_objects = false)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>add hvac</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>model</span>
+      
+      
+        <span class='type'>(<tt>OpenStudio::Model</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>zone_hash</span>
+      
+      
+        <span class='type'>(<tt>hash</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>standard</span>
+      
+      
+        <span class='type'>(<tt>Standard</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>system_type</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>hvac_delivery_type</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;Forced Air&#39;</tt>)</em>
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>htg_src</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;NaturalGas&#39;</tt>)</em>
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>clg_src</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;Electricity&#39;</tt>)</em>
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remove_objects</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 256</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_hvac'>add_hvac</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_zone_hash'>zone_hash</span><span class='comma'>,</span> <span class='id identifier rubyid_standard'>standard</span><span class='comma'>,</span> <span class='id identifier rubyid_system_type'>system_type</span><span class='comma'>,</span> <span class='id identifier rubyid_hvac_delivery_type'>hvac_delivery_type</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Forced Air</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_htg_src'>htg_src</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>NaturalGas</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_clg_src'>clg_src</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Electricity</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_remove_objects'>remove_objects</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='comment'># remove HVAC objects
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_remove_objects'>remove_objects</span>
+    <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_remove_prm_hvac'>model_remove_prm_hvac</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HVAC System ID: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xget_id'>xget_id</span><span class='embexpr_end'>}</span><span class='tstring_content'>. System_type derived from standards: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_system_type'>system_type</span><span class='embexpr_end'>}</span><span class='tstring_content'> and principal hvac system type override is: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_get_principal_hvac_system_type'>get_principal_hvac_system_type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_temp'>temp</span> <span class='op'>=</span> <span class='id identifier rubyid_get_principal_hvac_system_type'>get_principal_hvac_system_type</span>
+  <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_temp'>temp</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_temp'>temp</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='id identifier rubyid_previous_system_type'>previous_system_type</span> <span class='op'>=</span> <span class='id identifier rubyid_system_type'>system_type</span>
+    <span class='id identifier rubyid_system_type'>system_type</span> <span class='op'>=</span> <span class='id identifier rubyid_map_to_cbecs'>map_to_cbecs</span><span class='lparen'>(</span><span class='id identifier rubyid_get_principal_hvac_system_type'>get_principal_hvac_system_type</span><span class='comma'>,</span> <span class='id identifier rubyid_previous_system_type'>previous_system_type</span><span class='rparen'>)</span>
+    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_hvac</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HVAC System ID: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xget_id'>xget_id</span><span class='embexpr_end'>}</span><span class='tstring_content'>. System type derived from standards: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_previous_system_type'>previous_system_type</span><span class='embexpr_end'>}</span><span class='tstring_content'>, overriden to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_system_type'>system_type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>case</span> <span class='id identifier rubyid_system_type'>system_type</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Inferred</span><span class='tstring_end'>&#39;</span></span>
+
+    <span class='comment'># Get the hvac delivery type enum
+</span>    <span class='id identifier rubyid_hvac_delivery'>hvac_delivery</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_hvac_delivery_type'>hvac_delivery_type</span>
+                    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Forced Air</span><span class='tstring_end'>&#39;</span></span>
+                      <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>air</span><span class='tstring_end'>&#39;</span></span>
+                    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Hydronic</span><span class='tstring_end'>&#39;</span></span>
+                      <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>hydronic</span><span class='tstring_end'>&#39;</span></span>
+                    <span class='kw'>end</span>
+
+    <span class='comment'># Group the zones by occupancy type.  Only split out
+</span>    <span class='comment'># non-dominant groups if their total area exceeds the limit.
+</span>    <span class='id identifier rubyid_sys_groups'>sys_groups</span> <span class='op'>=</span> <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_group_zones_by_type'>model_group_zones_by_type</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_convert'>convert</span><span class='lparen'>(</span><span class='int'>20_000</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ft^2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>m^2</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='rparen'>)</span>
+
+    <span class='comment'># For each group, infer the HVAC system type.
+</span>    <span class='id identifier rubyid_sys_groups'>sys_groups</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_sys_group'>sys_group</span><span class='op'>|</span>
+      <span class='comment'># Infer the principal system type
+</span>      <span class='comment'># OpenStudio.logFree(OpenStudio::Info, &#39;BuildingSync.Facility.create_building_system&#39;, &quot;template = #{template}, climate_zone = #{climate_zone}, occ_type = #{sys_group[&#39;type&#39;]}, hvac_delivery = #{hvac_delivery}, htg_src = #{htg_src}, clg_src = #{clg_src}, area_ft2 = #{sys_group[&#39;area_ft2&#39;]}, num_stories = #{sys_group[&#39;stories&#39;]}&quot;)
+</span>      <span class='id identifier rubyid_sys_type'>sys_type</span><span class='comma'>,</span> <span class='id identifier rubyid_central_htg_fuel'>central_htg_fuel</span><span class='comma'>,</span> <span class='id identifier rubyid_zone_htg_fuel'>zone_htg_fuel</span><span class='comma'>,</span> <span class='id identifier rubyid_clg_fuel'>clg_fuel</span> <span class='op'>=</span> <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_typical_hvac_system_type'>model_typical_hvac_system_type</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span>
+                                                                                                    <span class='id identifier rubyid_climate_zone'>climate_zone</span><span class='comma'>,</span>
+                                                                                                    <span class='id identifier rubyid_sys_group'>sys_group</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>type</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+                                                                                                    <span class='id identifier rubyid_hvac_delivery'>hvac_delivery</span><span class='comma'>,</span>
+                                                                                                    <span class='id identifier rubyid_htg_src'>htg_src</span><span class='comma'>,</span>
+                                                                                                    <span class='id identifier rubyid_clg_src'>clg_src</span><span class='comma'>,</span>
+                                                                                                    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_convert'>convert</span><span class='lparen'>(</span><span class='id identifier rubyid_sys_group'>sys_group</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>area_ft2</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ft^2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>m^2</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='comma'>,</span>
+                                                                                                    <span class='id identifier rubyid_sys_group'>sys_group</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>stories</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+      <span class='comment'># Infer the secondary system type for multizone systems
+</span>      <span class='id identifier rubyid_sec_sys_type'>sec_sys_type</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_sys_type'>sys_type</span>
+                     <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PVAV Reheat</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>VAV Reheat</span><span class='tstring_end'>&#39;</span></span>
+                       <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PSZ-AC</span><span class='tstring_end'>&#39;</span></span>
+                     <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PVAV PFP Boxes</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>VAV PFP Boxes</span><span class='tstring_end'>&#39;</span></span>
+                       <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PSZ-HP</span><span class='tstring_end'>&#39;</span></span>
+                     <span class='kw'>else</span>
+                       <span class='id identifier rubyid_sys_type'>sys_type</span> <span class='comment'># same as primary system type
+</span>                     <span class='kw'>end</span>
+
+      <span class='comment'># Group zones by story
+</span>      <span class='id identifier rubyid_story_zone_lists'>story_zone_lists</span> <span class='op'>=</span> <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_group_zones_by_story'>model_group_zones_by_story</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_sys_group'>sys_group</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>zones</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+      <span class='comment'># On each story, add the primary system to the primary zones
+</span>      <span class='comment'># and add the secondary system to any zones that are different.
+</span>      <span class='id identifier rubyid_story_zone_lists'>story_zone_lists</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_story_group'>story_group</span><span class='op'>|</span>
+        <span class='comment'># Differentiate primary and secondary zones, based on
+</span>        <span class='comment'># operating hours and internal loads (same as 90.1 PRM)
+</span>        <span class='id identifier rubyid_pri_sec_zone_lists'>pri_sec_zone_lists</span> <span class='op'>=</span> <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_differentiate_primary_secondary_thermal_zones'>model_differentiate_primary_secondary_thermal_zones</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_story_group'>story_group</span><span class='rparen'>)</span>
+        <span class='comment'># Add the primary system to the primary zones
+</span>        <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_add_hvac_system'>model_add_hvac_system</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_sys_type'>sys_type</span><span class='comma'>,</span> <span class='id identifier rubyid_central_htg_fuel'>central_htg_fuel</span><span class='comma'>,</span> <span class='id identifier rubyid_zone_htg_fuel'>zone_htg_fuel</span><span class='comma'>,</span> <span class='id identifier rubyid_clg_fuel'>clg_fuel</span><span class='comma'>,</span> <span class='id identifier rubyid_pri_sec_zone_lists'>pri_sec_zone_lists</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>primary</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='comment'># Add the secondary system to the secondary zones (if any)
+</span>        <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_pri_sec_zone_lists'>pri_sec_zone_lists</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>secondary</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+          <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_add_hvac_system'>model_add_hvac_system</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_sec_sys_type'>sec_sys_type</span><span class='comma'>,</span> <span class='id identifier rubyid_central_htg_fuel'>central_htg_fuel</span><span class='comma'>,</span> <span class='id identifier rubyid_zone_htg_fuel'>zone_htg_fuel</span><span class='comma'>,</span> <span class='id identifier rubyid_clg_fuel'>clg_fuel</span><span class='comma'>,</span> <span class='id identifier rubyid_pri_sec_zone_lists'>pri_sec_zone_lists</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>secondary</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>else</span>
+    <span class='comment'># Group the zones by story
+</span>    <span class='id identifier rubyid_story_groups'>story_groups</span> <span class='op'>=</span> <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_group_zones_by_story'>model_group_zones_by_story</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_getThermalZones'>getThermalZones</span><span class='rparen'>)</span>
+
+    <span class='comment'># Add the user specified HVAC system for each story.
+</span>    <span class='comment'># Single-zone systems will get one per zone.
+</span>    <span class='id identifier rubyid_story_groups'>story_groups</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_zones'>zones</span><span class='op'>|</span>
+      <span class='id identifier rubyid_new_system_type'>new_system_type</span> <span class='op'>=</span> <span class='id identifier rubyid_get_system_type_from_zone'>get_system_type_from_zone</span><span class='lparen'>(</span><span class='id identifier rubyid_zone_hash'>zone_hash</span><span class='comma'>,</span> <span class='id identifier rubyid_zones'>zones</span><span class='comma'>,</span> <span class='id identifier rubyid_system_type'>system_type</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>setting system: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_new_system_type'>new_system_type</span><span class='embexpr_end'>}</span><span class='tstring_content'> for zone names: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_help_get_zone_name_list'>help_get_zone_name_list</span><span class='lparen'>(</span><span class='id identifier rubyid_zones'>zones</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_add_cbecs_hvac_system'>add_cbecs_hvac_system</span><span class='lparen'>(</span><span class='id identifier rubyid_standard'>standard</span><span class='comma'>,</span> <span class='id identifier rubyid_new_system_type'>new_system_type</span><span class='comma'>,</span> <span class='id identifier rubyid_zones'>zones</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="add_setpoints_to_thermostats_if_none-instance_method">
+  
+    #<strong>add_setpoints_to_thermostats_if_none</strong>(model)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns true if ALL thermostats have heating and cooling setpoints.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>true if ALL thermostats have heating and cooling setpoints</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 146</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_setpoints_to_thermostats_if_none'>add_setpoints_to_thermostats_if_none</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_successful'>successful</span> <span class='op'>=</span> <span class='kw'>true</span>
+
+  <span class='comment'># seperate out thermostats that need heating vs. cooling schedules
+</span>  <span class='id identifier rubyid_tstats_cooling'>tstats_cooling</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_tstats_heating'>tstats_heating</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_getThermalZones'>getThermalZones</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_tz'>tz</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_tz'>tz</span><span class='period'>.</span><span class='id identifier rubyid_thermostatSetpointDualSetpoint'>thermostatSetpointDualSetpoint</span><span class='period'>.</span><span class='id identifier rubyid_is_initialized'>is_initialized</span>
+      <span class='id identifier rubyid_tstat'>tstat</span> <span class='op'>=</span> <span class='id identifier rubyid_tz'>tz</span><span class='period'>.</span><span class='id identifier rubyid_thermostatSetpointDualSetpoint'>thermostatSetpointDualSetpoint</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
+      <span class='id identifier rubyid_tstats_cooling'>tstats_cooling</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_tstat'>tstat</span> <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_tstat'>tstat</span><span class='period'>.</span><span class='id identifier rubyid_coolingSetpointTemperatureSchedule'>coolingSetpointTemperatureSchedule</span><span class='period'>.</span><span class='id identifier rubyid_is_initialized'>is_initialized</span>
+      <span class='id identifier rubyid_tstats_heating'>tstats_heating</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_tstat'>tstat</span> <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_tstat'>tstat</span><span class='period'>.</span><span class='id identifier rubyid_heatingSetpointTemperatureSchedule'>heatingSetpointTemperatureSchedule</span><span class='period'>.</span><span class='id identifier rubyid_is_initialized'>is_initialized</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tstats_cooling'>tstats_cooling</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'>) thermostats needing cooling schedule</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tstats_heating'>tstats_heating</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'>) thermostats needing heating schedule</span><span class='tstring_end'>&quot;</span></span>
+
+  <span class='id identifier rubyid_htg_setpoints'>htg_setpoints</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+    <span class='comment'># [Time.new(days, hours, mins seconds), temp_value_celsius]
+</span>    <span class='lbracket'>[</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='int'>9</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='int'>17</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='lbracket'>[</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='int'>17</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='int'>20</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='lbracket'>[</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='int'>24</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='int'>17</span><span class='rbracket'>]</span>
+  <span class='rbracket'>]</span>
+  <span class='id identifier rubyid_clg_setpoints'>clg_setpoints</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+    <span class='comment'># [Time.new(days, hours, mins seconds), temp_value_celsius]
+</span>    <span class='lbracket'>[</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='int'>9</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='int'>23</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='lbracket'>[</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='int'>17</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='int'>20</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='lbracket'>[</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='int'>24</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='int'>23</span><span class='rbracket'>]</span>
+  <span class='rbracket'>]</span>
+
+  <span class='id identifier rubyid_heating_sp_schedule'>heating_sp_schedule</span> <span class='op'>=</span> <span class='id identifier rubyid_create_schedule_ruleset'>create_schedule_ruleset</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_htg_setpoints'>htg_setpoints</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Thermostat Heating SP</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_cooling_sp_schedule'>cooling_sp_schedule</span> <span class='op'>=</span> <span class='id identifier rubyid_create_schedule_ruleset'>create_schedule_ruleset</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_clg_setpoints'>clg_setpoints</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Thermostat Cooling SP</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_tstats_cooling'>tstats_cooling</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='op'>|</span>
+    <span class='id identifier rubyid_success'>success</span> <span class='op'>=</span> <span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_setCoolingSetpointTemperatureSchedule'>setCoolingSetpointTemperatureSchedule</span><span class='lparen'>(</span><span class='id identifier rubyid_cooling_sp_schedule'>cooling_sp_schedule</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_success'>success</span>
+      <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Cooling Schedule (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_cooling_sp_schedule'>cooling_sp_schedule</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_content'>) added to Thermostat: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - Cooling Schedule (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_cooling_sp_schedule'>cooling_sp_schedule</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_content'>) added to Thermostat: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_successful'>successful</span> <span class='op'>=</span> <span class='kw'>false</span>
+      <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No Cooling Schedule for Thermostat: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - No Cooling Schedule for Thermostat: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_tstats_heating'>tstats_heating</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='op'>|</span>
+    <span class='id identifier rubyid_success'>success</span> <span class='op'>=</span> <span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_setHeatingSetpointTemperatureSchedule'>setHeatingSetpointTemperatureSchedule</span><span class='lparen'>(</span><span class='id identifier rubyid_heating_sp_schedule'>heating_sp_schedule</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_success'>success</span>
+      <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Heating Schedule (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_heating_sp_schedule'>heating_sp_schedule</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_content'>) added to Thermostat: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - Heating Schedule (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_heating_sp_schedule'>heating_sp_schedule</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_content'>) added to Thermostat: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_successful'>successful</span> <span class='op'>=</span> <span class='kw'>false</span>
+      <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No Heating Schedule for Thermostat: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_setpoints_to_thermostats_if_none - No Heating Schedule for Thermostat: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_nameString'>nameString</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_successful'>successful</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="add_thermostats-instance_method">
+  
+    #<strong>add_thermostats</strong>(model, standard, remove_objects)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>add thermostats</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>model</span>
+      
+      
+        <span class='type'>(<tt>OpenStudio::Model</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>standard</span>
+      
+      
+        <span class='type'>(<tt>Standard</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remove_objects</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 108</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_thermostats'>add_thermostats</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_standard'>standard</span><span class='comma'>,</span> <span class='id identifier rubyid_remove_objects'>remove_objects</span><span class='rparen'>)</span>
+  <span class='comment'># remove thermostats
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_remove_objects'>remove_objects</span>
+    <span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_getThermostatSetpointDualSetpoints'>getThermostatSetpointDualSetpoints</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:remove</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_getSpaceTypes'>getSpaceTypes</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_space_type'>space_type</span><span class='op'>|</span>
+    <span class='comment'># create thermostat schedules
+</span>    <span class='comment'># apply internal load schedules
+</span>    <span class='comment'># the last bool test it to make thermostat schedules. They are added to the model but not assigned
+</span>    <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_space_type_apply_internal_load_schedules'>space_type_apply_internal_load_schedules</span><span class='lparen'>(</span><span class='id identifier rubyid_space_type'>space_type</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span>
+
+    <span class='comment'># identify thermal thermostat and apply to zones (apply_internal_load_schedules names )
+</span>    <span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_getThermostatSetpointDualSetpoints'>getThermostatSetpointDualSetpoints</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='op'>|</span>
+      <span class='kw'>next</span> <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_space_type'>space_type</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+      <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_coolingSetpointTemperatureSchedule'>coolingSetpointTemperatureSchedule</span><span class='period'>.</span><span class='id identifier rubyid_is_initialized'>is_initialized</span>
+        <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_thermostats</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> has no cooling setpoint.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+      <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_heatingSetpointTemperatureSchedule'>heatingSetpointTemperatureSchedule</span><span class='period'>.</span><span class='id identifier rubyid_is_initialized'>is_initialized</span>
+        <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Warn</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_thermostats</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> has no heating setpoint.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+
+      <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_thermostats</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Assigning </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> to thermal zones with </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_space_type'>space_type</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> assigned.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>BuildingSync.HVACSystem.add_thermostats - Assigning </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> to thermal zones with </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_space_type'>space_type</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> assigned.</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_space_type'>space_type</span><span class='period'>.</span><span class='id identifier rubyid_spaces'>spaces</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_space'>space</span><span class='op'>|</span>
+        <span class='kw'>next</span> <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_space'>space</span><span class='period'>.</span><span class='id identifier rubyid_thermalZone'>thermalZone</span><span class='period'>.</span><span class='id identifier rubyid_is_initialized'>is_initialized</span>
+
+        <span class='id identifier rubyid_space'>space</span><span class='period'>.</span><span class='id identifier rubyid_thermalZone'>thermalZone</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='period'>.</span><span class='id identifier rubyid_setThermostatSetpointDualSetpoint'>setThermostatSetpointDualSetpoint</span><span class='lparen'>(</span><span class='id identifier rubyid_thermostat'>thermostat</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ThermalZones: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_getThermalZones'>getThermalZones</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ThermostatDSPs: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_getThermostatSetpointDualSetpoints'>getThermostatSetpointDualSetpoints</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_add_setpoints_to_thermostats_if_none'>add_setpoints_to_thermostats_if_none</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="apply_sizing_and_assumptions-instance_method">
+  
+    #<strong>apply_sizing_and_assumptions</strong>(model, output_path, standard, primary_bldg_type, system_type, climate_zone)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>apply sizing and assumptions</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>model</span>
+      
+      
+        <span class='type'>(<tt>OpenStudio::Model</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>output_path</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>standard</span>
+      
+      
+        <span class='type'>(<tt>Standard</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>primary_bldg_type</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>system_type</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>climate_zone</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 365</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_apply_sizing_and_assumptions'>apply_sizing_and_assumptions</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_output_path'>output_path</span><span class='comma'>,</span> <span class='id identifier rubyid_standard'>standard</span><span class='comma'>,</span> <span class='id identifier rubyid_primary_bldg_type'>primary_bldg_type</span><span class='comma'>,</span> <span class='id identifier rubyid_system_type'>system_type</span><span class='comma'>,</span> <span class='id identifier rubyid_climate_zone'>climate_zone</span><span class='rparen'>)</span>
+  <span class='kw'>case</span> <span class='id identifier rubyid_system_type'>system_type</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Ideal Air Loads</span><span class='tstring_end'>&#39;</span></span>
+
+  <span class='kw'>else</span>
+    <span class='comment'># Set the heating and cooling sizing parameters
+</span>    <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_apply_prm_sizing_parameters'>model_apply_prm_sizing_parameters</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='rparen'>)</span>
+
+    <span class='comment'># Perform a sizing run
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_run_sizing_run'>model_run_sizing_run</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_output_path'>output_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>/SR</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>==</span> <span class='kw'>false</span>
+      <span class='kw'>return</span> <span class='kw'>false</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># If there are any multizone systems, reset damper positions
+</span>    <span class='comment'># to achieve a 60% ventilation effectiveness minimum for the system
+</span>    <span class='comment'># following the ventilation rate procedure from 62.1
+</span>    <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_apply_multizone_vav_outdoor_air_sizing'>model_apply_multizone_vav_outdoor_air_sizing</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='rparen'>)</span>
+
+    <span class='comment'># Apply the prototype HVAC assumptions
+</span>    <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_apply_prototype_hvac_assumptions'>model_apply_prototype_hvac_assumptions</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_primary_bldg_type'>primary_bldg_type</span><span class='comma'>,</span> <span class='id identifier rubyid_climate_zone'>climate_zone</span><span class='rparen'>)</span>
+
+    <span class='comment'># Apply the HVAC efficiency standard
+</span>    <span class='id identifier rubyid_standard'>standard</span><span class='period'>.</span><span class='id identifier rubyid_model_apply_hvac_efficiency_standard'>model_apply_hvac_efficiency_standard</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_climate_zone'>climate_zone</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="create_schedule_ruleset-instance_method">
+  
+    #<strong>create_schedule_ruleset</strong>(model, values, name)  &#x21d2; <tt>OpenStudio::Model::ScheduleRuleset</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new schedule ruleset with values added to the default day.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>model</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../OpenStudio/Model/Model.html" title="OpenStudio::Model::Model (class)">OpenStudio::Model::Model</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>values</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Array&lt;OpenStudio::Time, Float&gt;&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><dl class="rdoc-list label-list"><dt>[cutoff_time, value_until_cutoff]
+<dd></dd></dl>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>OpenStudio::Model::ScheduleRuleset</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>a new schedule ruleset with values added to the default day</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+208
+209
+210
+211
+212
+213
+214
+215
+216</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 208</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_create_schedule_ruleset'>create_schedule_ruleset</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_values'>values</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_ruleset'>ruleset</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Model</span><span class='op'>::</span><span class='const'>ScheduleRuleset</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_ruleset'>ruleset</span><span class='period'>.</span><span class='id identifier rubyid_setName'>setName</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_dd'>dd</span> <span class='op'>=</span> <span class='id identifier rubyid_ruleset'>ruleset</span><span class='period'>.</span><span class='id identifier rubyid_defaultDaySchedule'>defaultDaySchedule</span>
+  <span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_v'>v</span><span class='op'>|</span>
+    <span class='id identifier rubyid_dd'>dd</span><span class='period'>.</span><span class='id identifier rubyid_addValue'>addValue</span><span class='lparen'>(</span><span class='id identifier rubyid_v'>v</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_ruleset'>ruleset</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_linked_ids-instance_method">
+  
+    #<strong>get_linked_ids</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_linked_ids'>get_linked_ids</span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_principal_hvac_system_type-instance_method">
+  
+    #<strong>get_principal_hvac_system_type</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get principal hvac system type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+67
+68
+69</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 67</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_principal_hvac_system_type'>get_principal_hvac_system_type</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_xget_text'>xget_text</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PrincipalHVACSystemType</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_system_type_from_zone-instance_method">
+  
+    #<strong>get_system_type_from_zone</strong>(zone_hash, zones, system_type)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get system type from zone</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>zone_hash</span>
+      
+      
+        <span class='type'>(<tt>hash</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>zones</span>
+      
+      
+        <span class='type'>(<tt>array&lt;OpenStudio::Model::ThermalZone&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>system_type</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 345</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_system_type_from_zone'>get_system_type_from_zone</span><span class='lparen'>(</span><span class='id identifier rubyid_zone_hash'>zone_hash</span><span class='comma'>,</span> <span class='id identifier rubyid_zones'>zones</span><span class='comma'>,</span> <span class='id identifier rubyid_system_type'>system_type</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_zone_hash'>zone_hash</span><span class='op'>&amp;.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_zone_list'>zone_list</span><span class='op'>|</span>
+    <span class='id identifier rubyid_zone_name_list'>zone_name_list</span> <span class='op'>=</span> <span class='id identifier rubyid_help_get_zone_name_list'>help_get_zone_name_list</span><span class='lparen'>(</span><span class='id identifier rubyid_zone_list'>zone_list</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_zones'>zones</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_zone'>zone</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_zone_name_list'>zone_name_list</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span> <span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
+        <span class='kw'>return</span> <span class='id identifier rubyid_map_to_cbecs'>map_to_cbecs</span><span class='lparen'>(</span><span class='id identifier rubyid_get_principal_hvac_system_type'>get_principal_hvac_system_type</span><span class='comma'>,</span> <span class='id identifier rubyid_system_type'>system_type</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_system_type'>system_type</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="map_to_cbecs-instance_method">
+  
+    #<strong>map_to_cbecs</strong>(principal_hvac_system_type, fallback_system_type)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>map principal hvac system type to cbecs system type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>principal_hvac_system_type</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>fallback_system_type</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the default system_type to use if the other is not found</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 222</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_map_to_cbecs'>map_to_cbecs</span><span class='lparen'>(</span><span class='id identifier rubyid_principal_hvac_system_type'>principal_hvac_system_type</span><span class='comma'>,</span> <span class='id identifier rubyid_fallback_system_type'>fallback_system_type</span><span class='rparen'>)</span>
+  <span class='kw'>case</span> <span class='id identifier rubyid_principal_hvac_system_type'>principal_hvac_system_type</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Packaged Terminal Air Conditioner</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PTAC with hot water heat</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Packaged Terminal Heat Pump</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PTHP</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Packaged Rooftop Air Conditioner</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PSZ-AC with gas coil heat</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Packaged Rooftop Heat Pump</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PSZ-HP</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Packaged Rooftop VAV with Hot Water Reheat</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PVAV with reheat</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Packaged Rooftop VAV with Electric Reheat</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PVAV with PFP boxes</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>VAV with Hot Water Reheat</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>VAV with reheat</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>VAV with Electric Reheat</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>VAV with PFP boxes</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>else</span>
+    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.HVACSystem.map_to_cbecs</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HVACSystem ID: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xget_id'>xget_id</span><span class='embexpr_end'>}</span><span class='tstring_content'>: No mapping for </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_principal_hvac_system_type'>principal_hvac_system_type</span><span class='embexpr_end'>}</span><span class='tstring_content'> to CBECS. Using the system type from standards: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_fallback_system_type'>fallback_system_type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_fallback_system_type'>fallback_system_type</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="read_xml-instance_method">
+  
+    #<strong>read_xml</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>read xml</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 61</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_read_xml'>read_xml</span><span class='semicolon'>;</span> <span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_principal_hvac_system_type-instance_method">
+  
+    #<strong>set_principal_hvac_system_type</strong>(principal_hvac_type)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>adding the principal hvac system type to the hvac systems, overwrite
+existing values or create new elements if none are present</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>id</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>principal_hvac_type</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+74
+75
+76</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/hvac_system.rb', line 74</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_principal_hvac_system_type'>set_principal_hvac_system_type</span><span class='lparen'>(</span><span class='id identifier rubyid_principal_hvac_type'>principal_hvac_type</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_xset_or_create'>xset_or_create</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PrincipalHVACSystemType</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_principal_hvac_type'>principal_hvac_type</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon May 10 18:35:50 2021 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.26 (ruby-2.5.9).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: BuildingSync::TimeSeries
+  
+    &mdash; Documentation by YARD 0.9.26
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "BuildingSync::TimeSeries";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (T)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../BuildingSync.html" title="BuildingSync (module)">BuildingSync</a></span></span>
+     &raquo; 
+    <span class="title">TimeSeries</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: BuildingSync::TimeSeries
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">BuildingSync::TimeSeries</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="Helper.html" title="BuildingSync::Helper (module)">Helper</a></span>, <span class='object_link'><a href="XmlGetSet.html" title="BuildingSync::XmlGetSet (module)">XmlGetSet</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/buildingsync/time_series.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>TimeSeries class</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(base_xml, ns)  &#x21d2; TimeSeries </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>initialize.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_monthly_energy_reading-instance_method" title="#set_monthly_energy_reading (instance method)">#<strong>set_monthly_energy_reading</strong>(start_date_time, interval_reading_value, resource_use_id)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_start_and_end_timestamps_monthly-instance_method" title="#set_start_and_end_timestamps_monthly (instance method)">#<strong>set_start_and_end_timestamps_monthly</strong>(start_date_time)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Creates monthly start and end times for the element.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="XmlGetSet.html" title="BuildingSync::XmlGetSet (module)">XmlGetSet</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="XmlGetSet.html#get_prefix-instance_method" title="BuildingSync::XmlGetSet#get_prefix (method)">#get_prefix</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_attribute_for_element-instance_method" title="BuildingSync::XmlGetSet#xget_attribute_for_element (method)">#xget_attribute_for_element</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_element-instance_method" title="BuildingSync::XmlGetSet#xget_element (method)">#xget_element</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_id-instance_method" title="BuildingSync::XmlGetSet#xget_id (method)">#xget_id</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_idrefs-instance_method" title="BuildingSync::XmlGetSet#xget_idrefs (method)">#xget_idrefs</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_linked_premises-instance_method" title="BuildingSync::XmlGetSet#xget_linked_premises (method)">#xget_linked_premises</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_name-instance_method" title="BuildingSync::XmlGetSet#xget_name (method)">#xget_name</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_or_create-instance_method" title="BuildingSync::XmlGetSet#xget_or_create (method)">#xget_or_create</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_plurals_text_value-instance_method" title="BuildingSync::XmlGetSet#xget_plurals_text_value (method)">#xget_plurals_text_value</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text-instance_method" title="BuildingSync::XmlGetSet#xget_text (method)">#xget_text</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_bool-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_bool (method)">#xget_text_as_bool</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_date-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_date (method)">#xget_text_as_date</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_dt-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_dt (method)">#xget_text_as_dt</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_float-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_float (method)">#xget_text_as_float</a></span>, <span class='object_link'><a href="XmlGetSet.html#xget_text_as_integer-instance_method" title="BuildingSync::XmlGetSet#xget_text_as_integer (method)">#xget_text_as_integer</a></span>, <span class='object_link'><a href="XmlGetSet.html#xset_or_create-instance_method" title="BuildingSync::XmlGetSet#xset_or_create (method)">#xset_or_create</a></span>, <span class='object_link'><a href="XmlGetSet.html#xset_text-instance_method" title="BuildingSync::XmlGetSet#xset_text (method)">#xset_text</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Helper.html" title="BuildingSync::Helper (module)">Helper</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Helper.html#help_calculate_hours-instance_method" title="BuildingSync::Helper#help_calculate_hours (method)">#help_calculate_hours</a></span>, <span class='object_link'><a href="Helper.html#help_convert-instance_method" title="BuildingSync::Helper#help_convert (method)">#help_convert</a></span>, <span class='object_link'><a href="Helper.html#help_count_number_of_days-instance_method" title="BuildingSync::Helper#help_count_number_of_days (method)">#help_count_number_of_days</a></span>, <span class='object_link'><a href="Helper.html#help_element_class_type_check-instance_method" title="BuildingSync::Helper#help_element_class_type_check (method)">#help_element_class_type_check</a></span>, <span class='object_link'><a href="Helper.html#help_get_attribute_value-instance_method" title="BuildingSync::Helper#help_get_attribute_value (method)">#help_get_attribute_value</a></span>, <span class='object_link'><a href="Helper.html#help_get_default_schedule_set-instance_method" title="BuildingSync::Helper#help_get_default_schedule_set (method)">#help_get_default_schedule_set</a></span>, <span class='object_link'><a href="Helper.html#help_get_duration-instance_method" title="BuildingSync::Helper#help_get_duration (method)">#help_get_duration</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time-instance_method" title="BuildingSync::Helper#help_get_end_time (method)">#help_get_end_time</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_sat-instance_method" title="BuildingSync::Helper#help_get_end_time_sat (method)">#help_get_end_time_sat</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_sun-instance_method" title="BuildingSync::Helper#help_get_end_time_sun (method)">#help_get_end_time_sun</a></span>, <span class='object_link'><a href="Helper.html#help_get_end_time_weekday-instance_method" title="BuildingSync::Helper#help_get_end_time_weekday (method)">#help_get_end_time_weekday</a></span>, <span class='object_link'><a href="Helper.html#help_get_or_create-instance_method" title="BuildingSync::Helper#help_get_or_create (method)">#help_get_or_create</a></span>, <span class='object_link'><a href="Helper.html#help_get_schedule_rule_set_from_schedule-instance_method" title="BuildingSync::Helper#help_get_schedule_rule_set_from_schedule (method)">#help_get_schedule_rule_set_from_schedule</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time-instance_method" title="BuildingSync::Helper#help_get_start_time (method)">#help_get_start_time</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_sat-instance_method" title="BuildingSync::Helper#help_get_start_time_sat (method)">#help_get_start_time_sat</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_sun-instance_method" title="BuildingSync::Helper#help_get_start_time_sun (method)">#help_get_start_time_sun</a></span>, <span class='object_link'><a href="Helper.html#help_get_start_time_weekday-instance_method" title="BuildingSync::Helper#help_get_start_time_weekday (method)">#help_get_start_time_weekday</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value-instance_method" title="BuildingSync::Helper#help_get_text_value (method)">#help_get_text_value</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_bool-instance_method" title="BuildingSync::Helper#help_get_text_value_as_bool (method)">#help_get_text_value_as_bool</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_date-instance_method" title="BuildingSync::Helper#help_get_text_value_as_date (method)">#help_get_text_value_as_date</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_datetime-instance_method" title="BuildingSync::Helper#help_get_text_value_as_datetime (method)">#help_get_text_value_as_datetime</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_float-instance_method" title="BuildingSync::Helper#help_get_text_value_as_float (method)">#help_get_text_value_as_float</a></span>, <span class='object_link'><a href="Helper.html#help_get_text_value_as_integer-instance_method" title="BuildingSync::Helper#help_get_text_value_as_integer (method)">#help_get_text_value_as_integer</a></span>, <span class='object_link'><a href="Helper.html#help_get_zone_name_list-instance_method" title="BuildingSync::Helper#help_get_zone_name_list (method)">#help_get_zone_name_list</a></span>, <span class='object_link'><a href="Helper.html#help_load_doc-instance_method" title="BuildingSync::Helper#help_load_doc (method)">#help_load_doc</a></span>, <span class='object_link'><a href="Helper.html#help_print_all_schedules-instance_method" title="BuildingSync::Helper#help_print_all_schedules (method)">#help_print_all_schedules</a></span>, <span class='object_link'><a href="Helper.html#help_print_schedule-instance_method" title="BuildingSync::Helper#help_print_schedule (method)">#help_print_schedule</a></span>, <span class='object_link'><a href="Helper.html#help_write_profile-instance_method" title="BuildingSync::Helper#help_write_profile (method)">#help_write_profile</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(base_xml, ns)  &#x21d2; <tt><span class='object_link'><a href="" title="BuildingSync::TimeSeries (class)">TimeSeries</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>initialize</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>@base_xml</span>
+      
+      
+        <span class='type'>(<tt>REXML::Element</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>ns</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49
+50
+51
+52
+53
+54</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/time_series.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_base_xml'>base_xml</span><span class='comma'>,</span> <span class='id identifier rubyid_ns'>ns</span><span class='rparen'>)</span>
+  <span class='ivar'>@base_xml</span> <span class='op'>=</span> <span class='id identifier rubyid_base_xml'>base_xml</span>
+  <span class='ivar'>@ns</span> <span class='op'>=</span> <span class='id identifier rubyid_ns'>ns</span>
+  <span class='id identifier rubyid_help_element_class_type_check'>help_element_class_type_check</span><span class='lparen'>(</span><span class='id identifier rubyid_base_xml'>base_xml</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TimeSeries</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+  <span class='comment'># translates to: 2020-01-01T00:00:00
+</span>  <span class='ivar'>@timestamp_format</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%FT%T</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="set_monthly_energy_reading-instance_method">
+  
+    #<strong>set_monthly_energy_reading</strong>(start_date_time, interval_reading_value, resource_use_id)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>start_date_time</span>
+      
+      
+        <span class='type'>(<tt>DateTime</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>should be the zeroth second of the month, i.e. 2020-01-01T00:00:00</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>interval_reading_value</span>
+      
+      
+        <span class='type'>(<tt>Numeric</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the value to use for IntervalReading</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>resource_use_id</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the ID of the ResourceUse to point to</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+75
+76
+77
+78
+79
+80
+81
+82
+83</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/time_series.rb', line 75</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_monthly_energy_reading'>set_monthly_energy_reading</span><span class='lparen'>(</span><span class='id identifier rubyid_start_date_time'>start_date_time</span><span class='comma'>,</span> <span class='id identifier rubyid_interval_reading_value'>interval_reading_value</span><span class='comma'>,</span> <span class='id identifier rubyid_resource_use_id'>resource_use_id</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_xset_or_create'>xset_or_create</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ReadingType</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Total</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_xset_or_create'>xset_or_create</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>TimeSeriesReadingQuantity</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Energy</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_set_start_and_end_timestamps_monthly'>set_start_and_end_timestamps_monthly</span><span class='lparen'>(</span><span class='id identifier rubyid_start_date_time'>start_date_time</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_xset_or_create'>xset_or_create</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>IntervalFrequency</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Month</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_xset_or_create'>xset_or_create</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>IntervalReading</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_interval_reading_value'>interval_reading_value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_ru_id_element'>ru_id_element</span> <span class='op'>=</span> <span class='id identifier rubyid_xget_or_create'>xget_or_create</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ResourceUseID</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_ru_id_element'>ru_id_element</span><span class='period'>.</span><span class='id identifier rubyid_add_attribute'>add_attribute</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>IDref</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_resource_use_id'>resource_use_id</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_start_and_end_timestamps_monthly-instance_method">
+  
+    #<strong>set_start_and_end_timestamps_monthly</strong>(start_date_time)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Creates monthly start and end times for the element.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>start_date_time</span>
+      
+      
+        <span class='type'>(<tt>DateTime</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>should be the zeroth second of the month, i.e. 2020-01-01T00:00:00</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/time_series.rb', line 58</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_start_and_end_timestamps_monthly'>set_start_and_end_timestamps_monthly</span><span class='lparen'>(</span><span class='id identifier rubyid_start_date_time'>start_date_time</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_xset_or_create'>xset_or_create</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>StartTimestamp</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_start_date_time'>start_date_time</span><span class='period'>.</span><span class='id identifier rubyid_strftime'>strftime</span><span class='lparen'>(</span><span class='ivar'>@timestamp_format</span><span class='rparen'>)</span><span class='rparen'>)</span>
+
+  <span class='comment'># &gt;&gt;= shifts a datetime by 1 month
+</span>  <span class='id identifier rubyid_end_date'>end_date</span> <span class='op'>=</span> <span class='id identifier rubyid_start_date_time'>start_date_time</span> <span class='op'>&gt;&gt;=</span> <span class='int'>1</span>
+
+  <span class='comment'># += shifts a datetime by 1 day.  the following shifts it by negative 1 minute
+</span>  <span class='id identifier rubyid_end_date'>end_date</span> <span class='op'>+=</span> <span class='op'>-</span> <span class='const'>Rational</span><span class='lparen'>(</span><span class='int'>1</span><span class='comma'>,</span> <span class='float'>24.0</span> <span class='op'>*</span> <span class='int'>60</span><span class='rparen'>)</span>
+
+  <span class='comment'># Always sets to last minute of the month:
+</span>  <span class='comment'># 2020-01-31T23:59:00
+</span>  <span class='id identifier rubyid_xset_or_create'>xset_or_create</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>EndTimestamp</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_end_date'>end_date</span><span class='period'>.</span><span class='id identifier rubyid_strftime'>strftime</span><span class='lparen'>(</span><span class='ivar'>@timestamp_format</span><span class='rparen'>)</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon May 10 18:35:48 2021 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.26 (ruby-2.5.9).
+</div>
+
+    </div>
+  </body>
+</html>
