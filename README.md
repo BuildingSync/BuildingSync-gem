@@ -90,20 +90,11 @@ To generate the documentation locally do the following:
 
 ```bash
 gem install yard
-yarddoc - README.md
+yard - README.md
 ```
 
-## Updating published documentation
+Documentation for the develop branch is automatically released when code is merged into the branch.
 
-Publish documentation for each release:
-
-1. Tag release on GitHub
-1. Go to [rubydoc.info](https://www.rubydoc.info) and click `Add Project` in the upper right
-1. Input the git address: `git://github/BuildingSync/BuildingSync-gem.git`
-1. Input the release tag for the desired version, eg: `v0.2.0`
-1. Click `Go`
-1. Profit
-    
 # Releasing
 
 1. Update CHANGELOG.md
