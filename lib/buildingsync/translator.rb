@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2020, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2021, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2021, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@
 # *******************************************************************************
 require 'rexml/document'
 require 'buildingsync/constants'
+require 'buildingsync/generator'
 
 require_relative 'model_articulation/spatial_element'
 require_relative 'makers/workflow_maker'
@@ -80,7 +81,7 @@ module BuildingSync
 
       @schema_version = doc.root.attributes['version']
       if @schema_version.nil?
-        @schema_version = '2.0.0'
+        @schema_version = '2.2.0'
       end
 
       # test for the namespace
