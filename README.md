@@ -1,5 +1,7 @@
 # BuildingSync
 
+![BuildingSync-gem](https://github.com/BuildingSync/BuildingSync-gem/actions/workflows/continuous_integration.yml/badge.svg?branch=develop)
+
 The BuildingSync-Gem is a repository of helpers for reading and writing BuildingSync XML files, and for using that data 
 to drive energy simulations of the subject building. See full documentation [here](https://buildingsync-gem.buildingsync.net).
 
@@ -106,6 +108,5 @@ Documentation for the develop branch is automatically released when code is merg
 
 # TODO
 
-* [ ] Remove jenkins
 * [ ] Support BuildingSync 2.3.0
 * [ ] Update to OpenStudio version 3.2.0
