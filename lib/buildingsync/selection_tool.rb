@@ -50,7 +50,7 @@ module BuildingSync
     def initialize(xml_path, version = '2.2.0')
       @hash_response = nil
       version = '2.2.0' if version.nil?
-      url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
+      url = URI.parse('https://buildingsync.net/api/validate')
 
       params = { 'schema_version' => version }
       params[:file] = UploadIO.new(xml_path, 'text/xml', File.basename(xml_path))
