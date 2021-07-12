@@ -49,28 +49,22 @@ require 'openstudio/model_articulation'
 rake_task = OpenStudio::Extension::RakeTask.new
 rake_task.set_extension_class(OpenStudio::ModelArticulation::Extension)
 
+require 'nokogiri'
 desc 'Convert tabs to spaces'
 task :remove_tabs do
-  Dir['examples/**/*.xml', 'BuildingSync.xsd'].each do |file|
+  Dir['spec/**/*.xml'].each do |file|
     puts " Cleaning #{file}"
     doc = Nokogiri.XML(File.read(file)) do |config|
       config.default_xml.noblanks
     end
 
-    doc.xpath('//comment()').each do |node|
-      if node.text.match?(/XMLSpy/)
-        node.remove
-      end
-    end
+    # doc.xpath('//comment()').each do |node|
+    #   if node.text.match?(/XMLSpy/)
+    #     node.remove
+    #   end
+    # end
 
     File.open(file, 'w') { |f| f << doc.to_xml(indent: 2) }
-  end
-
-  if File.exist? 'BuildingSync.json'
-    f = JSON.parse(File.read('BuildingSync.json'))
-    File.open('BuildingSync.json', 'w') do |file|
-      file << JSON.pretty_generate(f)
-    end
   end
 end
 
