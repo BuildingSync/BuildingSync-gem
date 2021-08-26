@@ -1,8 +1,12 @@
 # BuildingSync Gem
 
-## Version 0.2.1 (Unreleased)
+## Version 0.2.1
 
 - Update copyright dates
+- Update URL for BuildingSync selection tool
+- Include buildingsync/generators when including gem by default
+- BuildingSync to OpenStudio Translation for MLOD 200
+- Add action for building the documentation
 
 ## Version 0.2.0
 
