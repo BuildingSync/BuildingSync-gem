@@ -93,8 +93,8 @@ module BuildingSync
       if validate_xml_file_against_schema
         validate_xml
       else
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' was not validated against the BuildingSync schema")
-        puts "File '#{xml_file_path}' was not validated against the BuildingSync schema"
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{xml_file_path}' was not validated against the BuildingSync schema version #{@schema_version}")
+        puts "File '#{xml_file_path}' was not validated against the BuildingSync schema version #{@schema_version}"
       end
 
       super(doc, ns)
@@ -109,11 +109,12 @@ module BuildingSync
       if !selection_tool.validate_schema
         raise "File '#{@xml_file_path}' does not valid against the BuildingSync schema"
       else
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' is valid against the BuildingSync schema")
+        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' is valid against the BuildingSync schema version #{@schema_version}")
         puts "File '#{@xml_file_path}' is valid against the BuildingSync schema"
       end
-    rescue StandardError
-      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' does not valid against the BuildingSync schema")
+    rescue StandardError => error
+      puts "ERROR: #{error}"
+      OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' does not validate against the BuildingSync schema version #{@schema_version}")
     end
 
     # @see WorkflowMaker.setup_and_sizing_run
