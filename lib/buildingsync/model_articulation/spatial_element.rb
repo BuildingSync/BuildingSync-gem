@@ -67,7 +67,7 @@ module BuildingSync
       @space_types_floor_area = nil
       @conditioned_floor_area_heated_only = nil
       @conditioned_floor_area_cooled_only = nil
-      @conditioned_floor_area_heated_cooled = nil
+      @conditioned_floor_area_heated_cooled = 0
       @custom_conditioned_above_grade_floor_area = nil
       @custom_conditioned_below_grade_floor_area = nil
 
@@ -85,12 +85,10 @@ module BuildingSync
         floor_area_type = floor_area_element.elements["#{@ns}:FloorAreaType"].text
         if floor_area_type == 'Gross'
           @total_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('gross_floor_area', floor_area), 'ft^2', 'm^2').get
-        elsif floor_area_type == 'Heated and Cooled'
-          @conditioned_floor_area_heated_cooled = OpenStudio.convert(validate_positive_number_excluding_zero('@heated_and_cooled_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Footprint'
           @footprint_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@footprint_floor_area', floor_area), 'ft^2', 'm^2').get
-        elsif floor_area_type == 'Conditioned' || floor_area_type == 'Common'
-          @conditioned_floor_area_heated_cooled = OpenStudio.convert(validate_positive_number_excluding_zero('@conditioned_floor_area_heated_cooled', floor_area), 'ft^2', 'm^2').get
+        elsif floor_area_type == 'Conditioned' || floor_area_type == 'Common' || floor_area_type == 'Heated and Cooled'
+          @conditioned_floor_area_heated_cooled += OpenStudio.convert(validate_positive_number_excluding_zero('@conditioned_floor_area_heated_cooled', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Heated Only'
           @conditioned_floor_area_heated_only = OpenStudio.convert(validate_positive_number_excluding_zero('@heated_only_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Cooled Only'
