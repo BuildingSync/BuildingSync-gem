@@ -661,8 +661,8 @@ scenario.</p>
   <span class='kw'>if</span> <span class='id identifier rubyid_validate_xml_file_against_schema'>validate_xml_file_against_schema</span>
     <span class='id identifier rubyid_validate_xml'>validate_xml</span>
   <span class='kw'>else</span>
-    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; was not validated against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; was not validated against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; was not validated against the BuildingSync schema version </span><span class='embexpr_beg'>#{</span><span class='ivar'>@schema_version</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xml_file_path'>xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; was not validated against the BuildingSync schema version </span><span class='embexpr_beg'>#{</span><span class='ivar'>@schema_version</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
 
   <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_doc'>doc</span><span class='comma'>,</span> <span class='id identifier rubyid_ns'>ns</span><span class='rparen'>)</span>
@@ -705,12 +705,12 @@ scenario.</p>
       <pre class="lines">
 
 
-166
 167
-168</pre>
+168
+169</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 166</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 167</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_doc'>doc</span>
   <span class='ivar'>@doc</span>
@@ -748,12 +748,12 @@ scenario.</p>
       <pre class="lines">
 
 
-166
 167
-168</pre>
+168
+169</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 166</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 167</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_final_xml_prepared'>final_xml_prepared</span>
   <span class='ivar'>@final_xml_prepared</span>
@@ -791,12 +791,12 @@ scenario.</p>
       <pre class="lines">
 
 
-166
 167
-168</pre>
+168
+169</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 166</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 167</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ns'>ns</span>
   <span class='ivar'>@ns</span>
@@ -834,12 +834,12 @@ scenario.</p>
       <pre class="lines">
 
 
-166
 167
-168</pre>
+168
+169</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 166</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 167</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_results_gathered'>results_gathered</span>
   <span class='ivar'>@results_gathered</span>
@@ -923,13 +923,13 @@ scenario</p>
       <pre class="lines">
 
 
-133
 134
 135
-136</pre>
+136
+137</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 133</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 134</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_gather_results'>gather_results</span><span class='lparen'>(</span><span class='id identifier rubyid_year_val'>year_val</span> <span class='op'>=</span> <span class='const'>Date</span><span class='period'>.</span><span class='id identifier rubyid_today'>today</span><span class='period'>.</span><span class='id identifier rubyid_year'>year</span><span class='comma'>,</span> <span class='id identifier rubyid_baseline_only'>baseline_only</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='ivar'>@results_gathered</span> <span class='op'>=</span> <span class='kw'>true</span>
@@ -966,7 +966,6 @@ scenario</p>
       <pre class="lines">
 
 
-145
 146
 147
 148
@@ -974,10 +973,11 @@ scenario</p>
 150
 151
 152
-153</pre>
+153
+154</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 145</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 146</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prepare_final_xml'>prepare_final_xml</span>
   <span class='kw'>if</span> <span class='ivar'>@results_gathered</span>
@@ -1036,12 +1036,12 @@ scenario</p>
       <pre class="lines">
 
 
-140
 141
-142</pre>
+142
+143</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 140</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 141</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run_osws'>run_osws</span><span class='lparen'>(</span><span class='id identifier rubyid_only_cb_modeled'>only_cb_modeled</span> <span class='op'>=</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='id identifier rubyid_runner_options'>runner_options</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>run_simulations:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>verbose:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>num_parallel:</span> <span class='int'>7</span><span class='comma'>,</span> <span class='label'>max_to_run:</span> <span class='const'>Float</span><span class='op'>::</span><span class='const'>INFINITY</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='ivar'>@output_dir</span><span class='comma'>,</span> <span class='id identifier rubyid_only_cb_modeled'>only_cb_modeled</span><span class='comma'>,</span> <span class='id identifier rubyid_runner_options'>runner_options</span><span class='rparen'>)</span>
@@ -1094,17 +1094,17 @@ scenario</p>
       <pre class="lines">
 
 
-157
 158
 159
 160
 161
 162
 163
-164</pre>
+164
+165</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 157</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 158</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_save_xml'>save_xml</span><span class='lparen'>(</span><span class='id identifier rubyid_file_name'>file_name</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>results.xml</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_output_file'>output_file</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='ivar'>@output_dir</span><span class='comma'>,</span> <span class='id identifier rubyid_file_name'>file_name</span><span class='rparen'>)</span>
@@ -1167,12 +1167,12 @@ scenario</p>
       <pre class="lines">
 
 
-121
 122
-123</pre>
+123
+124</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 121</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 122</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_setup_and_sizing_run'>setup_and_sizing_run</span><span class='lparen'>(</span><span class='id identifier rubyid_ddy_file'>ddy_file</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='ivar'>@output_dir</span><span class='comma'>,</span> <span class='ivar'>@epw_path</span><span class='comma'>,</span> <span class='ivar'>@standard_to_be_used</span><span class='comma'>,</span> <span class='id identifier rubyid_ddy_file'>ddy_file</span><span class='rparen'>)</span>
@@ -1220,7 +1220,8 @@ scenario</p>
 114
 115
 116
-117</pre>
+117
+118</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 105</span>
@@ -1232,11 +1233,12 @@ scenario</p>
   <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_selection_tool'>selection_tool</span><span class='period'>.</span><span class='id identifier rubyid_validate_schema'>validate_schema</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; does not valid against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>else</span>
-    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; is valid against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; is valid against the BuildingSync schema version </span><span class='embexpr_beg'>#{</span><span class='ivar'>@schema_version</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
     <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; is valid against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span>
   <span class='kw'>end</span>
-<span class='kw'>rescue</span> <span class='const'>StandardError</span>
-  <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; does not valid against the BuildingSync schema</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_error'>error</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ERROR: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_error'>error</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Translator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File &#39;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@xml_file_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; does not validate against the BuildingSync schema version </span><span class='embexpr_beg'>#{</span><span class='ivar'>@schema_version</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1269,12 +1271,12 @@ scenario</p>
       <pre class="lines">
 
 
-126
 127
-128</pre>
+128
+129</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 126</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/translator.rb', line 127</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_write_osws'>write_osws</span><span class='lparen'>(</span><span class='id identifier rubyid_only_cb_modeled'>only_cb_modeled</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='ivar'>@output_dir</span><span class='comma'>,</span> <span class='id identifier rubyid_only_cb_modeled'>only_cb_modeled</span><span class='rparen'>)</span>
@@ -1289,7 +1291,7 @@ scenario</p>
 </div>
 
       <div id="footer">
-  Generated on Mon Jul 12 20:11:06 2021 by
+  Generated on Fri Sep 10 17:22:50 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-2.5.9).
 </div>
