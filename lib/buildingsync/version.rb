@@ -41,5 +41,5 @@
 # provides features for reading BldgSync XML files, generating baseline models, creating scenario workflows, running simulations and adding simulation results to the BldgSync file
 module BuildingSync
   # version of the BuildingSync gem
-  VERSION = '0.2.0'
+  VERSION = '0.2.1'
 end
