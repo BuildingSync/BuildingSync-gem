@@ -628,7 +628,7 @@ auc:Building, auc:Section</p>
   <span class='ivar'>@space_types_floor_area</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='ivar'>@conditioned_floor_area_heated_only</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='ivar'>@conditioned_floor_area_cooled_only</span> <span class='op'>=</span> <span class='kw'>nil</span>
-  <span class='ivar'>@conditioned_floor_area_heated_cooled</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='ivar'>@conditioned_floor_area_heated_cooled</span> <span class='op'>=</span> <span class='int'>0</span>
   <span class='ivar'>@custom_conditioned_above_grade_floor_area</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='ivar'>@custom_conditioned_below_grade_floor_area</span> <span class='op'>=</span> <span class='kw'>nil</span>
 
@@ -672,12 +672,12 @@ auc:Building, auc:Section</p>
       <pre class="lines">
 
 
-341
-342
-343</pre>
+339
+340
+341</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 341</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 339</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_space_types'>space_types</span>
   <span class='ivar'>@space_types</span>
@@ -715,12 +715,12 @@ auc:Building, auc:Section</p>
       <pre class="lines">
 
 
-341
-342
-343</pre>
+339
+340
+341</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 341</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 339</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_standards_building_type'>standards_building_type</span>
   <span class='ivar'>@standards_building_type</span>
@@ -758,12 +758,12 @@ auc:Building, auc:Section</p>
       <pre class="lines">
 
 
-341
-342
-343</pre>
+339
+340
+341</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 341</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 339</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_system_type'>system_type</span>
   <span class='ivar'>@system_type</span>
@@ -801,12 +801,12 @@ auc:Building, auc:Section</p>
       <pre class="lines">
 
 
-341
-342
-343</pre>
+339
+340
+341</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 341</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 339</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_total_floor_area'>total_floor_area</span>
   <span class='ivar'>@total_floor_area</span>
@@ -875,6 +875,8 @@ auc:Building, auc:Section</p>
       <pre class="lines">
 
 
+307
+308
 309
 310
 311
@@ -886,12 +888,10 @@ auc:Building, auc:Section</p>
 317
 318
 319
-320
-321
-322</pre>
+320</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 309</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 307</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_add_user_defined_field_to_xml_file'>add_user_defined_field_to_xml_file</span><span class='lparen'>(</span><span class='id identifier rubyid_field_name'>field_name</span><span class='comma'>,</span> <span class='id identifier rubyid_field_value'>field_value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_user_defined_field'>user_defined_field</span> <span class='op'>=</span> <span class='const'>REXML</span><span class='op'>::</span><span class='const'>Element</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:UserDefinedField</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -1015,6 +1015,8 @@ auc:Building, auc:Section</p>
       <pre class="lines">
 
 
+254
+255
 256
 257
 258
@@ -1061,12 +1063,10 @@ auc:Building, auc:Section</p>
 299
 300
 301
-302
-303
-304</pre>
+302</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 256</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 254</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create_space_types'>create_space_types</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_total_bldg_floor_area'>total_bldg_floor_area</span><span class='comma'>,</span> <span class='id identifier rubyid_total_number_floors'>total_number_floors</span><span class='comma'>,</span> <span class='id identifier rubyid_standard_template'>standard_template</span><span class='comma'>,</span> <span class='id identifier rubyid_open_studio_standard'>open_studio_standard</span><span class='rparen'>)</span>
   <span class='comment'># create space types from section type
@@ -1148,6 +1148,8 @@ auc:Building, auc:Section</p>
       <pre class="lines">
 
 
+323
+324
 325
 326
 327
@@ -1160,12 +1162,10 @@ auc:Building, auc:Section</p>
 334
 335
 336
-337
-338
-339</pre>
+337</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 325</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 323</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prepare_final_xml_for_spatial_element'>prepare_final_xml_for_spatial_element</span>
   <span class='id identifier rubyid_add_user_defined_field_to_xml_file'>add_user_defined_field_to_xml_file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>StandardsBuildingType</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='ivar'>@standards_building_type</span><span class='rparen'>)</span>
@@ -1288,6 +1288,8 @@ given:</p>
       <pre class="lines">
 
 
+189
+190
 191
 192
 193
@@ -1324,12 +1326,10 @@ given:</p>
 224
 225
 226
-227
-228
-229</pre>
+227</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 191</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 189</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_process_bldg_and_system_type'>process_bldg_and_system_type</span><span class='lparen'>(</span><span class='id identifier rubyid_building_and_system_types'>building_and_system_types</span><span class='comma'>,</span> <span class='id identifier rubyid_occupancy_classification'>occupancy_classification</span><span class='comma'>,</span> <span class='id identifier rubyid_total_floor_area'>total_floor_area</span><span class='comma'>,</span> <span class='id identifier rubyid_total_number_floors'>total_number_floors</span><span class='rparen'>)</span>
   <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Info</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.SpatialElement.process_bldg_and_system_type</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Element ID: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_xget_id'>xget_id</span><span class='embexpr_end'>}</span><span class='tstring_content'> started with occupancy_classification </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_occupancy_classification'>occupancy_classification</span><span class='embexpr_end'>}</span><span class='tstring_content'> and total floor area: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_total_floor_area'>total_floor_area</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -1478,9 +1478,7 @@ given:</p>
 138
 139
 140
-141
-142
-143</pre>
+141</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 79</span>
@@ -1494,12 +1492,10 @@ given:</p>
     <span class='id identifier rubyid_floor_area_type'>floor_area_type</span> <span class='op'>=</span> <span class='id identifier rubyid_floor_area_element'>floor_area_element</span><span class='period'>.</span><span class='id identifier rubyid_elements'>elements</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@ns</span><span class='embexpr_end'>}</span><span class='tstring_content'>:FloorAreaType</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span>
     <span class='kw'>if</span> <span class='id identifier rubyid_floor_area_type'>floor_area_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Gross</span><span class='tstring_end'>&#39;</span></span>
       <span class='ivar'>@total_floor_area</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_convert'>convert</span><span class='lparen'>(</span><span class='id identifier rubyid_validate_positive_number_excluding_zero'>validate_positive_number_excluding_zero</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>gross_floor_area</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_floor_area'>floor_area</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ft^2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>m^2</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_floor_area_type'>floor_area_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Heated and Cooled</span><span class='tstring_end'>&#39;</span></span>
-      <span class='ivar'>@conditioned_floor_area_heated_cooled</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_convert'>convert</span><span class='lparen'>(</span><span class='id identifier rubyid_validate_positive_number_excluding_zero'>validate_positive_number_excluding_zero</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>@heated_and_cooled_floor_area</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_floor_area'>floor_area</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ft^2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>m^2</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
     <span class='kw'>elsif</span> <span class='id identifier rubyid_floor_area_type'>floor_area_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Footprint</span><span class='tstring_end'>&#39;</span></span>
       <span class='ivar'>@footprint_floor_area</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_convert'>convert</span><span class='lparen'>(</span><span class='id identifier rubyid_validate_positive_number_excluding_zero'>validate_positive_number_excluding_zero</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>@footprint_floor_area</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_floor_area'>floor_area</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ft^2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>m^2</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
-    <span class='kw'>elsif</span> <span class='id identifier rubyid_floor_area_type'>floor_area_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Conditioned</span><span class='tstring_end'>&#39;</span></span>
-      <span class='ivar'>@conditioned_floor_area_heated_cooled</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_convert'>convert</span><span class='lparen'>(</span><span class='id identifier rubyid_validate_positive_number_excluding_zero'>validate_positive_number_excluding_zero</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>@conditioned_floor_area_heated_cooled</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_floor_area'>floor_area</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ft^2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>m^2</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_floor_area_type'>floor_area_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Conditioned</span><span class='tstring_end'>&#39;</span></span> <span class='op'>||</span> <span class='id identifier rubyid_floor_area_type'>floor_area_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Common</span><span class='tstring_end'>&#39;</span></span> <span class='op'>||</span> <span class='id identifier rubyid_floor_area_type'>floor_area_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Heated and Cooled</span><span class='tstring_end'>&#39;</span></span>
+      <span class='ivar'>@conditioned_floor_area_heated_cooled</span> <span class='op'>+=</span> <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_convert'>convert</span><span class='lparen'>(</span><span class='id identifier rubyid_validate_positive_number_excluding_zero'>validate_positive_number_excluding_zero</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>@conditioned_floor_area_heated_cooled</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_floor_area'>floor_area</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ft^2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>m^2</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
     <span class='kw'>elsif</span> <span class='id identifier rubyid_floor_area_type'>floor_area_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Heated Only</span><span class='tstring_end'>&#39;</span></span>
       <span class='ivar'>@conditioned_floor_area_heated_only</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_convert'>convert</span><span class='lparen'>(</span><span class='id identifier rubyid_validate_positive_number_excluding_zero'>validate_positive_number_excluding_zero</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>@heated_only_floor_area</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_floor_area'>floor_area</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ft^2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>m^2</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
     <span class='kw'>elsif</span> <span class='id identifier rubyid_floor_area_type'>floor_area_type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Cooled Only</span><span class='tstring_end'>&#39;</span></span>
@@ -1629,6 +1625,8 @@ given:</p>
       <pre class="lines">
 
 
+148
+149
 150
 151
 152
@@ -1648,12 +1646,10 @@ given:</p>
 166
 167
 168
-169
-170
-171</pre>
+169</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 150</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 148</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_set_bldg_and_system_type'>set_bldg_and_system_type</span><span class='lparen'>(</span><span class='id identifier rubyid_occupancy_classification'>occupancy_classification</span><span class='comma'>,</span> <span class='id identifier rubyid_total_floor_area'>total_floor_area</span><span class='comma'>,</span> <span class='id identifier rubyid_total_number_floors'>total_number_floors</span><span class='comma'>,</span> <span class='id identifier rubyid_raise_exception'>raise_exception</span><span class='rparen'>)</span>
   <span class='comment'># DOE Prototype building types:from openstudio-standards/lib/openstudio-standards/prototypes/common/prototype_metaprogramming.rb
@@ -1737,16 +1733,16 @@ overwrite occupancy type</p>
       <pre class="lines">
 
 
+174
+175
 176
 177
 178
 179
-180
-181
-182</pre>
+180</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 176</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 174</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sets_occupancy_bldg_system_types'>sets_occupancy_bldg_system_types</span><span class='lparen'>(</span><span class='id identifier rubyid_occ_type'>occ_type</span><span class='rparen'>)</span>
   <span class='ivar'>@standards_building_type</span> <span class='op'>=</span> <span class='id identifier rubyid_occ_type'>occ_type</span><span class='lbracket'>[</span><span class='symbol'>:standards_building_type</span><span class='rbracket'>]</span>
@@ -1830,13 +1826,13 @@ overwrite occupancy type</p>
       <pre class="lines">
 
 
+233
+234
 235
-236
-237
-238</pre>
+236</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 235</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 233</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate_positive_number_excluding_zero'>validate_positive_number_excluding_zero</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Error: parameter </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> must be positive and not zero.</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>&lt;=</span> <span class='int'>0</span>
@@ -1917,13 +1913,13 @@ overwrite occupancy type</p>
       <pre class="lines">
 
 
+242
+243
 244
-245
-246
-247</pre>
+245</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 244</span>
+      <pre class="code"><span class="info file"># File 'lib/buildingsync/model_articulation/spatial_element.rb', line 242</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate_positive_number_including_zero'>validate_positive_number_including_zero</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Error: parameter </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> must be positive or zero.</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>&lt;</span> <span class='int'>0</span>
@@ -1939,7 +1935,7 @@ overwrite occupancy type</p>
 </div>
 
       <div id="footer">
-  Generated on Fri Sep 10 17:22:53 2021 by
+  Generated on Sat Sep 11 20:02:59 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-2.5.9).
 </div>
