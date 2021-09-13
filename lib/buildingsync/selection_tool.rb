@@ -41,10 +41,10 @@ require 'net/http'
 require 'net/http/post/multipart'
 
 module BuildingSync
-  # Class for communicating with SelectionTool
+  # Class for communicating with SelectionTool on the BuildingSync website
   class SelectionTool
     # initialize the selection tools class
-    # @note See documentation here: https://github.com/buildingsync/selection-tool#validator
+    # @note See documentation here: https://github.com/buildingsync/buildingsync-website#validator
     # @note Use core Net::HTTPS
     # @param xml_path [String]
     def initialize(xml_path, version = '2.2.0')
