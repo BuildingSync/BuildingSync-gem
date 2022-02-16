@@ -2478,7 +2478,7 @@ RunPeriod,
   2022,                                   !- Begin Year
   12,                                     !- End Month
   31,                                     !- End Day of Month
-  2021,                                   !- End Year
+  2022,                                   !- End Year
   Saturday,                                 !- Day of Week for Start Day
   No,                                     !- Use Weather File Holidays and Special Days
   No,                                     !- Use Weather File Daylight Saving Period
