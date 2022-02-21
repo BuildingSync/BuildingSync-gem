@@ -44,7 +44,7 @@ RSpec.describe 'TimeSeries' do
   it 'should raise an error given a non-TimeSeries REXML Element' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)

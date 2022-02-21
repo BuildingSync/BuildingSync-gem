@@ -42,11 +42,11 @@ require 'fileutils'
 require 'parallel'
 
 RSpec.describe 'SelectionTool' do
-  it 'building_151.xml should be valid for version: 2.2.0' do
+  it 'building_151.xml should be valid for version: 2.4.0' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
-    version = '2.2.0'
+    version = '2.4.0'
     xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, "v#{version}")
 
     selection_tool = BuildingSync::SelectionTool.new(xml_path, version)
@@ -58,7 +58,7 @@ RSpec.describe 'SelectionTool' do
     file_name = 'building_151.xml'
     std = ASHRAE90_1
     version = '2.1.0'
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
 
     selection_tool = BuildingSync::SelectionTool.new(xml_path, version)
     expect(selection_tool.validate_schema).to be false
@@ -80,8 +80,8 @@ RSpec.describe 'SelectionTool' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
-    version = '2.2.0'
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    version = '2.4.0'
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
 
     selection_tool = BuildingSync::SelectionTool.new(xml_path, version)
     expect(selection_tool.validate_use_case('This use case does not exist')).to be false
@@ -102,7 +102,7 @@ RSpec.describe 'SelectionTool' do
           # -- Setup
           file_name = file
           std = ASHRAE90_1
-          version = '2.2.0'
+          version = '2.4.0'
           xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, "v#{version}")
 
           @selection_tool = BuildingSync::SelectionTool.new(xml_path, version)

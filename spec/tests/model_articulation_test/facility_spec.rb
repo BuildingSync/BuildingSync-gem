@@ -45,7 +45,7 @@ RSpec.describe 'FacilitySpec' do
     it 'should raise an StandardError given a non-Facility REXML Element' do
       # -- Setup
       ns = 'auc'
-      v = '2.2.0'
+      v = '2.4.0'
       g = BuildingSync::Generator.new(ns, v)
       doc_string = g.create_bsync_root_to_building
       doc = REXML::Document.new(doc_string)
@@ -73,7 +73,7 @@ RSpec.describe 'FacilitySpec' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
     epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     expect(File.exist?(epw_path)).to be true
 
@@ -90,7 +90,7 @@ RSpec.describe 'FacilitySpec' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
     doc = nil
     File.open(xml_path, 'r') do |file|
       doc = REXML::Document.new(file)
@@ -110,7 +110,7 @@ RSpec.describe 'FacilitySpec' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
     doc = nil
     File.open(xml_path, 'r') do |file|
       doc = REXML::Document.new(file)
@@ -141,7 +141,7 @@ RSpec.describe 'Facility Scenario Parsing' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
 
     facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
 
@@ -236,7 +236,7 @@ RSpec.describe 'Facility Methods' do
     # -- Setup
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
 
     @facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
   end

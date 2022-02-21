@@ -44,7 +44,7 @@ RSpec.describe 'Utility Spec' do
       # -- Setup
       file_name = 'building_151_level1.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
 
       @utility = BuildingSync::Generator.new.get_utility_from_file(xml_path)
     end

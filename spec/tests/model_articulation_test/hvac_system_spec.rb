@@ -41,7 +41,7 @@ RSpec.describe 'HVACSystemSpec' do
   it 'should raise an error given a non-HVACSystem REXML Element' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -120,7 +120,7 @@ RSpec.describe 'HVACSystemSpec' do
     # -- Setup
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
     g = BuildingSync::Generator.new
 
     hvac_system = g.get_hvac_system_from_file(xml_path)

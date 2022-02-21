@@ -81,7 +81,7 @@ module BuildingSync
 
       @schema_version = doc.root.attributes['version']
       if @schema_version.nil?
-        @schema_version = '2.2.0'
+        @schema_version = '2.4.0'
       end
 
       # test for the namespace

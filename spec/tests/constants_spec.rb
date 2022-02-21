@@ -46,6 +46,9 @@ RSpec.describe 'BuildingSync constants' do
   it 'should have a SCHEMA_2_2_0_URL' do
     expect(SCHEMA_2_2_0_URL).to eq('https://raw.githubusercontent.com/BuildingSync/schema/v2.2.0/BuildingSync.xsd')
   end
+  it 'should have a SCHEMA_2_4_0_URL' do
+    expect(SCHEMA_2_4_0_URL).to eq('https://raw.githubusercontent.com/BuildingSync/schema/v2.4.0/BuildingSync.xsd')
+  end
   it 'should have a PHASE_0_BASE_OSW_FILE_PATH and the file should exist' do
     expect(File.exist?(PHASE_0_BASE_OSW_FILE_PATH)).to be true
   end
