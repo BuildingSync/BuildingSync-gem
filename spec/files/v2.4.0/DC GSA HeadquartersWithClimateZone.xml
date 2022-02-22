@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BuildingSync xmlns="http://buildingsync.net/schemas/bedes-auc/2019"
+              xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.4.0/BuildingSync.xsd"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.4.0">
+  <Facilities>
+    <Facility ID="FirstFuel">
+      <Sites>
+        <Site ID="DC0021ZZ">
+          <PremisesName>DC0021ZZ GSA Headquarters</PremisesName>
+          <OccupancyClassification>Office</OccupancyClassification>
+          <Address>
+            <City>Washington</City>
+            <State>DC</State>
+            <PostalCode>20006</PostalCode>
+          </Address>
+          <ClimateZoneType>
+            <ASHRAE>
+              <ClimateZone>2B</ClimateZone>
+            </ASHRAE>
+          </ClimateZoneType>
+          <FloorAreas>
+            <FloorArea>
+              <FloorAreaType>Gross</FloorAreaType>
+              <FloorAreaValue>827564</FloorAreaValue>
+            </FloorArea>
+          </FloorAreas>
+          <Buildings>
+            <Building ID="Building1">
+              <BuildingClassification>Commercial</BuildingClassification>
+              <TypicalOccupantUsages>
+                <TypicalOccupantUsage>
+                  <TypicalOccupantUsageValue>5</TypicalOccupantUsageValue>
+                  <TypicalOccupantUsageUnits>Days per week</TypicalOccupantUsageUnits>
+                </TypicalOccupantUsage>
+                <TypicalOccupantUsage>
+                  <TypicalOccupantUsageValue>12</TypicalOccupantUsageValue>
+                  <TypicalOccupantUsageUnits>Months per year</TypicalOccupantUsageUnits>
+                </TypicalOccupantUsage>
+              </TypicalOccupantUsages>
+              <FederalBuilding>
+                <Agency>GSA</Agency>
+                <DepartmentRegion>Region 3</DepartmentRegion>
+              </FederalBuilding>
+              <Assessments>
+                <Assessment>
+                  <AssessmentYear>2015</AssessmentYear>
+                </Assessment>
+              </Assessments>
+              <YearOfConstruction>1917</YearOfConstruction>
+              <YearOfLatestRetrofit>2013</YearOfLatestRetrofit>
+              <PercentOccupiedByOwner>78</PercentOccupiedByOwner>
+            </Building>
+          </Buildings>
+        </Site>
+      </Sites>
+      <Measures>
+        <Measure ID="Measure3">
+          <TypeOfMeasure>
+            <ModificationRetrocommissions/>
+          </TypeOfMeasure>
+          <SystemCategoryAffected>Lighting</SystemCategoryAffected>
+          <LinkedPremises>
+            <Site>
+              <LinkedSiteID IDref="DC0021ZZ"/>
+            </Site>
+          </LinkedPremises>
+          <TechnologyCategories>
+            <TechnologyCategory>
+              <LightingImprovements>
+                <MeasureName>Add occupancy sensors</MeasureName>
+              </LightingImprovements>
+            </TechnologyCategory>
+            <TechnologyCategory>
+              <LightingImprovements>
+                <MeasureName>Add daylight controls</MeasureName>
+              </LightingImprovements>
+            </TechnologyCategory>
+          </TechnologyCategories>
+          <LongDescription>Lighting Controls</LongDescription>
+          <MeasureSavingsAnalysis>
+            <AnnualSavingsSiteEnergy>341852</AnnualSavingsSiteEnergy>
+            <AnnualSavingsCost>18500</AnnualSavingsCost>
+            <AnnualSavingsByFuels>
+              <AnnualSavingsByFuel>
+                <EnergyResource>Electricity</EnergyResource>
+                <ResourceUnits>kWh</ResourceUnits>
+              </AnnualSavingsByFuel>
+            </AnnualSavingsByFuels>
+          </MeasureSavingsAnalysis>
+        </Measure>
+      </Measures>
+      <Reports>
+        <Report ID="Report1">
+          <Scenarios>
+            <Scenario ID="Base">
+              <ScenarioType>
+                <CurrentBuilding>
+                  <CalculationMethod>
+                    <Modeled/>
+                  </CalculationMethod>
+                </CurrentBuilding>
+              </ScenarioType>
+            </Scenario>
+            <Scenario ID="Package1">
+              <ScenarioName>AERG Package</ScenarioName>
+              <ScenarioType>
+                <PackageOfMeasures ID="POM1">
+                  <MeasureIDs>
+                    <MeasureID IDref="Measure3"/>
+                  </MeasureIDs>
+                  <AnnualSavingsSiteEnergy>6830</AnnualSavingsSiteEnergy>
+                  <AnnualSavingsCost>285400</AnnualSavingsCost>
+                  <AnnualWaterSavings>500</AnnualWaterSavings>
+                  <PackageFirstCost>1089271</PackageFirstCost>
+                  <OMCostAnnualSavings>3544</OMCostAnnualSavings>
+                  <EquipmentDisposalAndSalvageCosts>0</EquipmentDisposalAndSalvageCosts>
+                  <FundingFromIncentives>0</FundingFromIncentives>
+                  <FundingFromTaxCredits>0</FundingFromTaxCredits>
+                </PackageOfMeasures>
+              </ScenarioType>
+              <LinkedPremises>
+                <Building>
+                  <LinkedBuildingID IDref="Building1"/>
+                </Building>
+              </LinkedPremises>
+            </Scenario>
+          </Scenarios>
+        </Report>
+      </Reports>
+    </Facility>
+  </Facilities>
+</BuildingSync>

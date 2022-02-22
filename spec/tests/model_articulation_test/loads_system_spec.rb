@@ -59,7 +59,7 @@ RSpec.describe 'LoadSystemSpec' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
     epw_path = nil
     translator = translator_sizing_run_and_check(xml_path, output_path, epw_path, std)
     model = translator.get_model

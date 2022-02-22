@@ -47,9 +47,9 @@ module BuildingSync
     # @note See documentation here: https://github.com/buildingsync/buildingsync-website#validator
     # @note Use core Net::HTTPS
     # @param xml_path [String]
-    def initialize(xml_path, version = '2.2.0')
+    def initialize(xml_path, version = '2.4.0')
       @hash_response = nil
-      version = '2.2.0' if version.nil?
+      version = '2.4.0' if version.nil?
       url = URI.parse('https://buildingsync.net/api/validate')
 
       params = { 'schema_version' => version }
