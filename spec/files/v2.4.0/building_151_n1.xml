@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<n1:BuildingSync xmlns:n1="http://buildingsync.net/schemas/bedes-auc/2019"
-  xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.4.0/BuildingSync.xsd"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.4.0">
+<n1:BuildingSync xmlns:n1="http://buildingsync.net/schemas/bedes-auc/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.4.0/BuildingSync.xsd" version="2.4.0">
   <n1:Facilities>
     <n1:Facility ID="Facility1">
       <n1:Sites>
@@ -953,7 +951,7 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario  ID="Scenario6">
+            <n1:Scenario ID="Scenario6">
               <n1:ScenarioName>Add daylight controls Only</n1:ScenarioName>
               <n1:ScenarioType>
                 <n1:PackageOfMeasures ID="PackageOfMeasures6">
@@ -975,7 +973,7 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario  ID="Scenario7">
+            <n1:Scenario ID="Scenario7">
               <n1:ScenarioName>Add occupancy sensors Only</n1:ScenarioName>
               <n1:ScenarioType>
                 <n1:PackageOfMeasures ID="PackageOfMeasures7">
@@ -997,7 +995,7 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario  ID="Scenario8">
+            <n1:Scenario ID="Scenario8">
               <n1:ScenarioName>Install plug load controls Only</n1:ScenarioName>
               <n1:ScenarioType>
                 <n1:PackageOfMeasures ID="PackageOfMeasures8">
@@ -1195,7 +1193,7 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario  ID="Scenario17">
+            <n1:Scenario ID="Scenario17">
               <n1:ScenarioName>Replace windows Only</n1:ScenarioName>
               <n1:ScenarioType>
                 <n1:PackageOfMeasures ID="PackageOfMeasures17">
@@ -1261,7 +1259,7 @@
                 </n1:UserDefinedField>
               </n1:UserDefinedFields>
             </n1:Scenario>
-            <n1:Scenario  ID="Scenario20">
+            <n1:Scenario ID="Scenario20">
               <n1:ScenarioName>VRF with DOAS Only</n1:ScenarioName>
               <n1:ScenarioType>
                 <n1:PackageOfMeasures ID="PackageOfMeasures20">
