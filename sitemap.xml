@@ -3,178 +3,178 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/OpenStudio/Model/Model.html</loc>
-    <lastmod>2022-02-22T18:25:27+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:48+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Helper.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/XmlGetSet.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Facility.html</loc>
-    <lastmod>2022-02-22T18:25:28+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:49+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/WallSystemType.html</loc>
-    <lastmod>2022-02-22T18:25:29+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:50+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Contact.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/LightingSystemType.html</loc>
-    <lastmod>2022-02-22T18:25:28+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:49+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Scenario.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/TimeSeries.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/RoofSystemType.html</loc>
-    <lastmod>2022-02-22T18:25:29+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:50+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/LocationElement.html</loc>
-    <lastmod>2022-02-22T18:25:29+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:50+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/ResourceUse.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/ServiceHotWaterSystem.html</loc>
-    <lastmod>2022-02-22T18:25:29+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:50+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Utility.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Measure.html</loc>
-    <lastmod>2022-02-22T18:25:27+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:48+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Site.html</loc>
-    <lastmod>2022-02-22T18:25:27+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:48+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/SelectionTool.html</loc>
-    <lastmod>2022-02-22T18:25:27+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/FoundationSystemType.html</loc>
-    <lastmod>2022-02-22T18:25:29+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:50+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Building.html</loc>
-    <lastmod>2022-02-22T18:25:28+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:49+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/EnvelopeSystem.html</loc>
-    <lastmod>2022-02-22T18:25:28+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:49+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/ExteriorFloorSystemType.html</loc>
-    <lastmod>2022-02-22T18:25:29+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:50+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/HVACSystem.html</loc>
-    <lastmod>2022-02-22T18:25:28+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:49+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/WorkflowMaker.html</loc>
-    <lastmod>2022-02-22T18:25:27+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:48+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Translator.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/AllResourceTotal.html</loc>
-    <lastmod>2022-02-22T18:25:27+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/WorkflowMakerBase.html</loc>
-    <lastmod>2022-02-22T18:25:27+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:48+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Extension.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Generator.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/SpatialElement.html</loc>
-    <lastmod>2022-02-22T18:25:28+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:50+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/LoadsSystem.html</loc>
-    <lastmod>2022-02-22T18:25:28+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:49+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/BuildingSection.html</loc>
-    <lastmod>2022-02-22T18:25:29+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:50+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/GetBCLWeatherFile.html</loc>
-    <lastmod>2022-02-22T18:25:27+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:48+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/AuditDate.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/BuildingSystem.html</loc>
-    <lastmod>2022-02-22T18:25:28+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:49+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/BuildingSync/Report.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/method_list.html</loc>
-    <lastmod>2022-02-22T18:25:25+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:46+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/frames.html</loc>
-    <lastmod>2022-02-22T18:25:25+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:46+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/index.html</loc>
-    <lastmod>2022-02-22T18:25:25+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:46+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/top-level-namespace.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/class_list.html</loc>
-    <lastmod>2022-02-22T18:25:25+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:46+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/_index.html</loc>
-    <lastmod>2022-02-22T18:25:25+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:46+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/file.README.html</loc>
-    <lastmod>2022-02-22T18:25:26+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:47+00:00</lastmod>
   </url>
   <url>
     <loc>https://buildingsync-gem.buildingsync.net/file_list.html</loc>
-    <lastmod>2022-02-22T18:25:25+00:00</lastmod>
+    <lastmod>2022-02-22T21:19:46+00:00</lastmod>
   </url>
 </urlset>

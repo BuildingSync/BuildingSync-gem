@@ -1236,7 +1236,7 @@ auc:SoftwareProgramUsed = OpenStudio     auc:SoftwareProgramVersion = …</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(ns = &#39;auc&#39;, version = &#39;2.2.0&#39;)  &#x21d2; Generator </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(ns = &#39;auc&#39;, version = &#39;2.4.0&#39;)  &#x21d2; Generator </a>
     
 
     
@@ -1279,7 +1279,7 @@ auc:SoftwareProgramUsed = OpenStudio     auc:SoftwareProgramVersion = …</p>
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(ns = &#39;auc&#39;, version = &#39;2.2.0&#39;)  &#x21d2; <tt><span class='object_link'><a href="" title="BuildingSync::Generator (class)">Generator</a></span></tt> 
+    #<strong>initialize</strong>(ns = &#39;auc&#39;, version = &#39;2.4.0&#39;)  &#x21d2; <tt><span class='object_link'><a href="" title="BuildingSync::Generator (class)">Generator</a></span></tt> 
   
 
   
@@ -1305,7 +1305,7 @@ auc:SoftwareProgramUsed = OpenStudio     auc:SoftwareProgramVersion = …</p>
         <span class='type'>(<tt>String</tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>&#39;2.2.0&#39;</tt>)</em>
+        <em class="default">(defaults to: <tt>&#39;2.4.0&#39;</tt>)</em>
       
       
         &mdash;
@@ -1338,8 +1338,8 @@ auc:SoftwareProgramUsed = OpenStudio     auc:SoftwareProgramVersion = …</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/buildingsync/generator.rb', line 49</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_ns'>ns</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>auc</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_version'>version</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2.2.0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_supported_versions'>supported_versions</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2.0</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2.2.0</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_ns'>ns</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>auc</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_version'>version</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2.4.0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_supported_versions'>supported_versions</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2.0</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2.2.0</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2.4.0</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
   <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_supported_versions'>supported_versions</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span> <span class='id identifier rubyid_version'>version</span>
     <span class='ivar'>@version</span> <span class='op'>=</span> <span class='kw'>nil</span>
     <span class='const'>OpenStudio</span><span class='period'>.</span><span class='id identifier rubyid_logFree'>logFree</span><span class='lparen'>(</span><span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BuildingSync.Generator.initialize</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>The version: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_version'>version</span><span class='embexpr_end'>}</span><span class='tstring_content'> is not one of the supported versions: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_supported_versions'>supported_versions</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -4267,7 +4267,7 @@ returns &lt;auc:System&gt;&lt;auc:HVACSystems&gt;&lt;auc:HVACSystem/&gt;&lt;/..&
 </div>
 
       <div id="footer">
-  Generated on Tue Feb 22 18:25:26 2022 by
+  Generated on Tue Feb 22 21:19:47 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-2.5.9).
 </div>
