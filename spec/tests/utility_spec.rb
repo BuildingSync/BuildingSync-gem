@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2021, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2021, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ RSpec.describe 'Utility Spec' do
       # -- Setup
       file_name = 'building_151_level1.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
 
       @utility = BuildingSync::Generator.new.get_utility_from_file(xml_path)
     end

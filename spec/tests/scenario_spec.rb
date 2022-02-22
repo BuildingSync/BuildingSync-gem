@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2021, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2021, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ RSpec.describe 'Scenario' do
   it 'should raise an error given a non-Scenario REXML Element' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -65,7 +65,7 @@ RSpec.describe 'Scenario' do
   it 'should populate a Scenario object given Scenario REXML Element' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -88,7 +88,7 @@ RSpec.describe 'Scenario Measures' do
     # -- Setup
     file_name = 'building_151_one_scenario.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
     ns = 'auc'
     doc = help_load_doc(xml_path)
 
@@ -123,7 +123,7 @@ RSpec.describe 'Scenario Type Discovery Methods' do
     it 'cb_measured?, cb_modeled?, pom?, benchmark?, target? methods should evaluate as expected' do
       # -- Setup
       ns = 'auc'
-      v = '2.2.0'
+      v = '2.4.0'
       g = BuildingSync::Generator.new(ns, v)
       doc_string = g.create_bsync_root_to_building
       doc = REXML::Document.new(doc_string)
@@ -150,7 +150,7 @@ RSpec.describe 'Scenario data creation' do
   it 'should remove ResourceUses, AllResourceTotals, and TimeSeriesData from cb_modeled and pom, but not benchmark, target, or cb_measured' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -183,7 +183,7 @@ RSpec.describe 'Scenario data creation' do
   it 'should have attributes (all_resource_totals, resource_uses, time_series_data) with the correct types' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -212,7 +212,7 @@ RSpec.describe 'Scenario workflow configuration' do
   it 'set_workflow should set the correct attribute given a Hash' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -234,7 +234,7 @@ RSpec.describe 'Scenario workflow configuration' do
   it 'set_workflow should raise a StandardError given a non-hash object' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -260,7 +260,7 @@ RSpec.describe 'Scenario workflow configuration' do
   it 'set_main_output_dir should set the @main_output_dir attribute' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -279,7 +279,7 @@ RSpec.describe 'Scenario workflow configuration' do
   it 'set_osw_dir should set the @osw_dir attribute using the Scenario ID' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -299,7 +299,7 @@ RSpec.describe 'Scenario workflow configuration' do
   it 'set_osw_dir should set the @osw_dir attribute using the ScenarioName when provided' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -323,7 +323,7 @@ RSpec.describe 'Scenario workflow configuration' do
   it 'osw_mkdir_p make the specified directory only when @osw_dir is set, else it raises an error' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)
@@ -357,7 +357,7 @@ RSpec.describe 'Scenario workflow configuration' do
   it 'write_osw should work regardless of the data in the @workflow' do
     # -- Setup
     ns = 'auc'
-    v = '2.2.0'
+    v = '2.4.0'
     g = BuildingSync::Generator.new(ns, v)
     doc_string = g.create_bsync_root_to_building
     doc = REXML::Document.new(doc_string)

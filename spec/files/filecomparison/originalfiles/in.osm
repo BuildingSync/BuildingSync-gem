@@ -116,7 +116,7 @@ OS:SizingPeriod:DesignDay,
 
 OS:YearDescription,
   {d0fcec5a-533c-4ae5-96ad-48cf821a3afd}, !- Handle
-  2021,                                   !- Calendar Year
+  2022,                                   !- Calendar Year
   ,                                       !- Day of Week for Start Day
   ;                                       !- Is Leap Year
 

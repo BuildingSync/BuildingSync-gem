@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2021, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2021, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -518,15 +518,24 @@ module BuildingSync
     # Removes unused measures from a workflow, where __SKIP__ == true
     # @param workflow [Hash] a hash of the openstudio workflow, typically after a deep
     # copy is made and the measures are configured for the specific scenario
+    # KAF: reworked to only delete measures with an explicit __SKIP__ == true 
+    # (sometimes measure don't have a skip at all, assume we want to keep those)
     def purge_skipped_from_workflow(workflow)
       non_skipped = []
       if !workflow.nil? && !workflow['steps'].nil? && workflow.key?('steps')
         workflow['steps'].each do |step|
-          if !step.nil? && step.key?('arguments') && !step['arguments'].nil?
-            if step['arguments'].key?('__SKIP__') && step['arguments']['__SKIP__'] == false
+          if !step.nil? && step.key?('arguments')
+            if step['arguments'].nil?
+              # no arguments, keep anyway
+              non_skipped << step
+            elsif step['arguments'].key?('__SKIP__') && step['arguments']['__SKIP__'] == false
+              # skip is set to false, keep
+              non_skipped << step
+            elsif !step['arguments'].key?('__SKIP__')
+              # no "SKIP" argument, keep anyway
               non_skipped << step
             end
-          end
+          end 
         end
         workflow['steps'] = non_skipped
       end

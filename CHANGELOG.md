@@ -1,8 +1,14 @@
 # BuildingSync Gem
 
-## Version 0.2.1 (Unreleased)
+## Version 0.2.1
 
 - Update copyright dates
+- Update URL for BuildingSync selection tool
+- Include buildingsync/generators when including gem by default
+- BuildingSync to OpenStudio Translation for MLOD 200
+- Add action for building the documentation
+- Fix purge measures method to only remove measures with SKIP argument set to True
+- Map "Common" BuildingSync floor area type
 
 ## Version 0.2.0
 

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2021, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2021, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -46,8 +46,8 @@ module BuildingSync
   class Generator
     include BuildingSync::Helper
     # @param version [String] version of BuildingSync
-    def initialize(ns = 'auc', version = '2.2.0')
-      supported_versions = ['2.0', '2.2.0']
+    def initialize(ns = 'auc', version = '2.4.0')
+      supported_versions = ['2.0', '2.2.0', '2.4.0']
       if !supported_versions.include? version
         @version = nil
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Generator.initialize', "The version: #{version} is not one of the supported versions: #{supported_versions}")

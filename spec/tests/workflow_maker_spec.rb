@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2021, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2021, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -171,7 +171,7 @@ RSpec.describe 'WorkflowMaker' do
       # -- Setup
       file_name = 'building_151_one_scenario.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
       ns = 'auc'
       doc = help_load_doc(xml_path)
 
@@ -200,7 +200,7 @@ RSpec.describe 'WorkflowMaker' do
       # -- Setup
       file_name = 'building_151_one_scenario.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
       ns = 'auc'
       doc = help_load_doc(xml_path)
       workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
@@ -230,7 +230,7 @@ RSpec.describe 'WorkflowMaker' do
       # -- Setup
       file_name = 'building_151_no_measures.xml'
       @std = ASHRAE90_1
-      xml_path, @output_path = create_xml_path_and_output_path(file_name, @std, __FILE__, 'v2.2.0')
+      xml_path, @output_path = create_xml_path_and_output_path(file_name, @std, __FILE__, 'v2.4.0')
       @doc = help_load_doc(xml_path)
 
       @ns = 'auc'
@@ -349,7 +349,7 @@ RSpec.describe 'WorkflowMaker' do
         # -- Setup
         file_name = 'building_151_one_scenario.xml'
         std = standard[0]
-        xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+        xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
         doc = help_load_doc(xml_path)
         ns = 'auc'
 

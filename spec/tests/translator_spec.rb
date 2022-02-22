@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2021, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2021, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ RSpec.describe 'Translator' do
   describe 'Example Full Workflow' do
     tests = [
       # file_name, standard, epw_path, schema_version
-      ['building_151.xml', CA_TITLE24, nil, 'v2.2.0']
+      ['building_151.xml', CA_TITLE24, nil, 'v2.4.0']
     ]
     tests.each do |test|
       it 'Should Run the Prototypical Workflow' do

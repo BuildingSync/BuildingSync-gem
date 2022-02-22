@@ -22,7 +22,7 @@ installed, then export the path of the folder that contains the openstudio.rb fi
 
 After installing OpenStudio and setting the environment variable, then add this line to your application's Gemfile:
 ```ruby
-gem 'buildingsync', '0.2.0'
+gem 'buildingsync', '0.2.1'
 ```
 
 And then execute:

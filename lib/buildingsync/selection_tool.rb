@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2021, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2021, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -41,16 +41,16 @@ require 'net/http'
 require 'net/http/post/multipart'
 
 module BuildingSync
-  # Class for communicating with SelectionTool
+  # Class for communicating with SelectionTool on the BuildingSync website
   class SelectionTool
     # initialize the selection tools class
-    # @note See documentation here: https://github.com/buildingsync/selection-tool#validator
+    # @note See documentation here: https://github.com/buildingsync/buildingsync-website#validator
     # @note Use core Net::HTTPS
     # @param xml_path [String]
-    def initialize(xml_path, version = '2.2.0')
+    def initialize(xml_path, version = '2.4.0')
       @hash_response = nil
-      version = '2.2.0' if version.nil?
-      url = URI.parse('https://selectiontool.buildingsync.net/api/validate')
+      version = '2.4.0' if version.nil?
+      url = URI.parse('https://buildingsync.net/api/validate')
 
       params = { 'schema_version' => version }
       params[:file] = UploadIO.new(xml_path, 'text/xml', File.basename(xml_path))

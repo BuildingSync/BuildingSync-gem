@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2021, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2021, Alliance for Sustainable Energy, LLC.
+# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
+# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ RSpec.describe 'BuildingSpec' do
     it 'should raise an StandardError given a non-Building REXML Element' do
       # -- Setup
       ns = 'auc'
-      v = '2.2.0'
+      v = '2.4.0'
       g = BuildingSync::Generator.new(ns, v)
       doc_string = g.create_bsync_root_to_building
       doc = REXML::Document.new(doc_string)
@@ -194,7 +194,7 @@ RSpec.describe 'BuildingSpec' do
       # -- Setup
       file_name = 'building_151_level1.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
       @building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     end
 
@@ -224,7 +224,7 @@ RSpec.describe 'BuildingSpec' do
       # -- Setup
       file_name = 'building_151_level1.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.2.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
       @building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     end
     it 'Should return OccupantQuantity' do

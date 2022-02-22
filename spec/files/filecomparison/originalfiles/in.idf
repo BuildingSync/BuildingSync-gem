@@ -2475,11 +2475,11 @@ RunPeriod,
   Run Period 1,                           !- Name
   1,                                      !- Begin Month
   1,                                      !- Begin Day of Month
-  2021,                                   !- Begin Year
+  2022,                                   !- Begin Year
   12,                                     !- End Month
   31,                                     !- End Day of Month
-  2021,                                   !- End Year
-  Friday,                                 !- Day of Week for Start Day
+  2022,                                   !- End Year
+  Saturday,                               !- Day of Week for Start Day
   No,                                     !- Use Weather File Holidays and Special Days
   No,                                     !- Use Weather File Daylight Saving Period
   No,                                     !- Apply Weekend Holiday Rule
