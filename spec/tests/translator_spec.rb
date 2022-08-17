@@ -81,8 +81,10 @@ RSpec.describe 'Translator' do
         # expect(failures.empty?).to be true # want to get here
         # 2021-01-21 Building 151 experiences failures in 5 scenarios.
         # See: https://github.com/BuildingSync/BuildingSync-gem/issues/107
-        expect(failures.size).to eql(5)
-        expected_failure_ids = Set.new(['Scenario6', 'Scenario19', 'Scenario20', 'Scenario21', 'Scenario26'])
+        # Update 2022-08-15: lowered tolerance to 1 since 4 scenarios were removed
+        # due to updates to the EE-measures-gem.
+        expect(failures.size).to eql(1)
+        expected_failure_ids = Set.new(['Scenario6'])
         failed = translator.get_failed_scenarios
         failed_ids = []
         failed.each do |scenario|

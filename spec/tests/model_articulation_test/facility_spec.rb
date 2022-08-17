@@ -146,7 +146,7 @@ RSpec.describe 'Facility Scenario Parsing' do
     facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
 
     # -- Assert
-    expect(facility.report.scenarios.size).to eq 30
+    expect(facility.report.scenarios.size).to eq 17
     facility.report.scenarios.each do |scenario|
       expect(scenario).to be_an_instance_of(BuildingSync::Scenario)
     end
