@@ -7,7 +7,7 @@ on:
 jobs:
   model_articulation_tests:
     name: Model Articulation Tests
-    container: nrel/openstudio:3.0.1
+    container: nrel/openstudio:3.3.0
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
@@ -56,7 +56,7 @@ jobs:
 
   translator_tests:
     name: Translator Tests
-    container: nrel/openstudio:3.0.1
+    container: nrel/openstudio:3.3.0
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
@@ -80,7 +80,7 @@ jobs:
 
   report_and_scenario_tests:
     name: Report and Scenario Tests
-    container: nrel/openstudio:3.0.1
+    container: nrel/openstudio:3.3.0
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
@@ -113,7 +113,7 @@ jobs:
 
   other_specs:
     name: Other Tests
-    container: nrel/openstudio:3.0.1
+    container: nrel/openstudio:3.3.0
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
