@@ -1,7 +1,7 @@
 
 OS:Version,
-  {f380b6b7-3db5-45f5-87d3-4e72ec85d5e7}, !- Handle
-  3.3.0;                                  !- Version Identifier
+  {ae89bb93-c8a0-4f84-9bf8-429a0f5673d9}, !- Handle
+  3.4.0;                                  !- Version Identifier
 
 OS:WeatherFile,
   {8137136e-6c50-4031-bf0f-f1ce77ba10e4}, !- Handle
@@ -14,8 +14,8 @@ OS:WeatherFile,
   -124.2,                                 !- Longitude {deg}
   -8,                                     !- Time Zone {hr}
   13,                                     !- Elevation {m}
-/Users/tmarzull/Documents/BuildingSync/working/BuildingSync-gem/spec/weather/CZ01RV2.epw; !- Url
-
+  /Users/tmarzull/Documents/BuildingSync/working/BuildingSync-gem/spec/weather/CZ01RV2.epw, !- Url
+  ;                                       !- Checksum
 
 OS:Site,
   {7d08219e-4828-4407-9521-40b68f92e096}, !- Handle
