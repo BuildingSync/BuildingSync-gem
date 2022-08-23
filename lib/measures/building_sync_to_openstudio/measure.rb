@@ -70,7 +70,7 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
     # gather the results for all scenarios found in out_path,
     # such as annual and monthly data for different energy
     # sources (electricity, natural gas, etc.)
-    translator.gather_results(out_path)
+    translator.gather_results("#{File.dirname(__FILE__)}/tests/output")
 
     # Add in UserDefinedFields, which contain information about the
     # OpenStudio model run 
@@ -82,7 +82,7 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
     translator.save_xml(file_name)
     
     # echo the new space's name back to the user
-    runner.registerInfo("Space #{new_space.name} was added.")
+    runner.registerInfo("File has been saved as #{file_name}")
 
     # report final condition of model
     runner.registerFinalCondition("The building finished with #{model.getSpaces.size} spaces.")
