@@ -4,6 +4,8 @@
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
 # start the measure
+require 'buildingsync/translator'
+
 class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
   # human readable name
   def name
@@ -24,13 +26,11 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
   # define the arguments that the user will input
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
-
     # the name of the space to add to the model
-    space_name = OpenStudio::Measure::OSArgument.makeStringArgument('space_name', true)
-    space_name.setDisplayName('New space name')
-    space_name.setDescription('This name will be used as the name of the new space.')
-    args << space_name
-
+    building_sync_xml_file_path = OpenStudio::Measure::OSArgument.makeStringArgument('building_sync_xml_file_path', true)
+    building_sync_xml_file_path.setDisplayName('BSync XML path')
+    building_sync_xml_file_path.setDescription('This name will be used as the name of the new space.')
+    args << building_sync_xml_file_path
     return args
   end
 
@@ -44,10 +44,10 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
     end
 
     # assign the user inputs to variables
-    space_name = runner.getStringArgumentValue('space_name', user_arguments)
+    building_sync_xml_file_path = runner.getStringArgumentValue('building_sync_xml_file_path', user_arguments)
 
     # check the space_name for reasonableness
-    if space_name.empty?
+    if building_sync_xml_file_path.empty?
       runner.registerError('Empty space name was entered.')
       return false
     end
@@ -56,9 +56,31 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
     runner.registerInitialCondition("The building started with #{model.getSpaces.size} spaces.")
 
     # add a new space to the model
-    new_space = OpenStudio::Model::Space.new(model)
-    new_space.setName(space_name)
+    translator = BuildingSync::Translator.new(building_sync_xml_file_path, "#{File.dirname(__FILE__)}/tests/output")
+    translator.setup_and_sizing_run
 
+    # generating the OpenStudio workflows and writing the osw files
+    # auc:Scenario elements with measures are turned into new simulation dirs
+    # path/to/output_dir/scenario_name
+    translator.write_osws
+
+    # run all simulations
+    translator.run_osws
+
+    # gather the results for all scenarios found in out_path,
+    # such as annual and monthly data for different energy
+    # sources (electricity, natural gas, etc.)
+    translator.gather_results(out_path)
+
+    # Add in UserDefinedFields, which contain information about the
+    # OpenStudio model run 
+    translator.prepare_final_xml
+
+    # write results to xml
+    # default file name is 'results.xml' 
+    file_name = 'abc-123.xml' 
+    translator.save_xml(file_name)
+    
     # echo the new space's name back to the user
     runner.registerInfo("Space #{new_space.name} was added.")
 

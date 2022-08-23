@@ -26,6 +26,7 @@ schedules-*.csv
 # measures tests
 lib/measures/.rubocop.yml
 lib/measures/test_results/*
+lib/measures/tests/output/*
 
 spec/files/filecomparison/in.idf
 spec/files/filecomparison/in.osm
