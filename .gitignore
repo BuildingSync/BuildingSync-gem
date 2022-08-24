@@ -25,7 +25,6 @@ schedules-*.csv
 
 # measures tests
 lib/measures/.rubocop.yml
-lib/measures/test_results/*
 lib/measures/building_sync_to_openstudio/tests/output/*
 
 spec/files/filecomparison/in.idf

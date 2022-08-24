@@ -29,8 +29,13 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
     # the name of the space to add to the model
     building_sync_xml_file_path = OpenStudio::Measure::OSArgument.makeStringArgument('building_sync_xml_file_path', true)
     building_sync_xml_file_path.setDisplayName('BSync XML path')
-    building_sync_xml_file_path.setDescription('This name will be used as the name of the new space.')
+    building_sync_xml_file_path.setDescription('The path to the XML file that should be translated.')
     args << building_sync_xml_file_path
+
+    out_path = OpenStudio::Measure::OSArgument.makeStringArgument('out_path', true)
+    out_path.setDisplayName('BSync output path')
+    out_path.setDescription('The output directory where all workflows and results will be written.')
+    args << out_path
     return args
   end
 
@@ -45,6 +50,8 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
 
     # assign the user inputs to variables
     building_sync_xml_file_path = runner.getStringArgumentValue('building_sync_xml_file_path', user_arguments)
+    out_path = runner.getStringArgumentValue('out_path', user_arguments)
+
 
     # check the space_name for reasonableness
     if building_sync_xml_file_path.empty?
@@ -56,36 +63,41 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
     runner.registerInitialCondition("The building started with #{model.getSpaces.size} spaces.")
 
     # add a new space to the model
-    translator = BuildingSync::Translator.new(building_sync_xml_file_path, "#{File.dirname(__FILE__)}/tests/output")
+    translator = BuildingSync::Translator.new(building_sync_xml_file_path, out_path)
     translator.setup_and_sizing_run
+
+    # fetch the model from the output directory
+    ostranslator = OpenStudio::OSVersion::VersionTranslator.new
+    path = "#{out_path}/in.osm"
+    model = ostranslator.loadModel(path)
+    model = model.get
+    runner.registerFinalCondition("The building finished with #{model.getSpaces.size} spaces.")
+
 
     # generating the OpenStudio workflows and writing the osw files
     # auc:Scenario elements with measures are turned into new simulation dirs
     # path/to/output_dir/scenario_name
-    translator.write_osws
+    #translator.write_osws
 
     # run all simulations
-    translator.run_osws
+    #translator.run_osws
 
     # gather the results for all scenarios found in out_path,
     # such as annual and monthly data for different energy
     # sources (electricity, natural gas, etc.)
-    translator.gather_results("#{File.dirname(__FILE__)}/tests/output")
+    #translator.gather_results("#{File.dirname(__FILE__)}/tests/output")
 
     # Add in UserDefinedFields, which contain information about the
     # OpenStudio model run 
-    translator.prepare_final_xml
+    #translator.prepare_final_xml
 
     # write results to xml
     # default file name is 'results.xml' 
-    file_name = 'abc-123.xml' 
-    translator.save_xml(file_name)
-    
-    # echo the new space's name back to the user
-    runner.registerInfo("File has been saved as #{file_name}")
+    #file_name = 'abc-123.xml' 
+    #translator.save_xml(file_name)
 
     # report final condition of model
-    runner.registerFinalCondition("The building finished with #{model.getSpaces.size} spaces.")
+    #runner.registerFinalCondition("File has been saved as #{file_name}")
 
     return true
   end
