@@ -1,0 +1,30 @@
+{
+  "file_paths": [
+    "../lib/measures/building_sync_to_openstudio/tests"
+  ],
+  "measure_paths": [
+    "../lib/measures/",
+    "../../openstudio-common-measures-gem/lib/measures"
+  ],
+  "steps": [
+    {
+      "arguments": {
+        "building_sync_xml_file_path": "/Users/tmarzull/Documents/BuildingSync/working/BuildingSync-gem/lib/measures/building_sync_to_openstudio/tests/building_151.xml",
+        "out_path": "/Users/tmarzull/Documents/BuildingSync/working/BuildingSync-gem/lib/measures/building_sync_to_openstudio/tests/output"
+      },
+      "measure_dir_name": "building_sync_to_openstudio"
+    },
+    {
+      "arguments": {
+        "__SKIP__": false
+      },
+      "measure_dir_name": "view_model"
+    },
+    {
+      "arguments": {
+        "zone_condition_section": false
+      },
+      "measure_dir_name": "openstudio_results"
+    }
+  ]
+}
