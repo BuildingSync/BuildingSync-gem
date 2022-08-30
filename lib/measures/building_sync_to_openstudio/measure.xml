@@ -1,44 +1,11 @@
 <?xml version="1.0"?>
 <measure>
   <schema_version>3.0</schema_version>
-  <error>/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:16: syntax error, unexpected local variable or method, expecting `end'
-...uded by default in OpenStudio's Ruby interpreter. To run thi...
-...                              ^
-/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:16: syntax error, unexpected local variable or method, expecting `do' or '{' or '('
-...udio CLI using an OSW, you need to pass in additional gems t...
-...                           ^~~~
-/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:16: syntax error, unexpected `in', expecting `end'
-...ing an OSW, you need to pass in additional gems to the CLI a...
-...                             ^~
-/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:16: syntax error, unexpected string literal
-...l gems to the CLI at run time.'
-...                              ^
-/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:21: syntax error, unexpected constant, expecting `end'
-    return 'BuildingSync to OSM translation used to h...
-            ^~~~~~~~~~~~
-/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:21: syntax error, unexpected local variable or method, expecting `do' or '{' or '('
-... of the measure structure, as a result it couldn't easily be...
-...                              ^
-/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:21: syntax error, unexpected local variable or method, expecting `end'
-...ools that support running OSW's through the OpenStudio CLI. ...
-...                              ^
-/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:21: syntax error, unexpected local variable or method, expecting `do' or '{' or '('
-...pport OpenStudio 3.4, this code was wrapped into a measure. ...
-...                           ^~~~
-/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:21: syntax error, unexpected local variable or method, expecting `do' or '{' or '('
-.... Additionally, where libraries exist in the OpenStudio Exte...
-...                      ^~~~~~~~~
-/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:21: syntax error, unexpected local variable or method, expecting `do' or '{' or '('
-...udio Standars Gem, those should be used vs. custom code with...
-...                         ^~~~~~
-/Users/dgoldwas/OpenStudio/Measures/building_sync_to_openstudio/measure.rb:21: syntax error, unexpected local variable or method, expecting `end'
-...onal gems. As a result it isn't currently on the Building Co...
-...                              ^
-</error>
+  <error>cannot load such file -- buildingsync/translator</error>
   <name>building_sync_to_openstudio</name>
   <uid>a1332e7f-c99d-48a1-83f5-956947cc3d9d</uid>
-  <version_id>cb8a9c55-490c-40a2-8cab-79bb66aa498d</version_id>
-  <version_modified>20220823T205535Z</version_modified>
+  <version_id>1bcce96e-f8c2-4de8-80c6-aa56fd05ada3</version_id>
+  <version_modified>20220830T184451Z</version_modified>
   <xml_checksum>BABEA42F</xml_checksum>
   <class_name>BuildingSyncToOpenStudio</class_name>
   <display_name>Building Sync to OpenStudio</display_name>
@@ -87,17 +54,6 @@
   </attributes>
   <files>
     <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>3.4.0</identifier>
-        <min_compatible>3.4.0</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>6ACAA349</checksum>
-    </file>
-    <file>
       <filename>LICENSE.md</filename>
       <filetype>md</filetype>
       <usage_type>license</usage_type>
@@ -110,18 +66,6 @@
       <checksum>F1C26127</checksum>
     </file>
     <file>
-      <filename>.gitkeep</filename>
-      <filetype>gitkeep</filetype>
-      <usage_type>doc</usage_type>
-      <checksum>00000000</checksum>
-    </file>
-    <file>
-      <filename>building_sync_to_openstudio_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>2949A9D6</checksum>
-    </file>
-    <file>
       <filename>example_model.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -132,6 +76,29 @@
       <filetype>md</filetype>
       <usage_type>readme</usage_type>
       <checksum>01DF739F</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>3.4.0</identifier>
+        <min_compatible>3.4.0</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>9D932F3E</checksum>
+    </file>
+    <file>
+      <filename>building_sync_to_openstudio_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>4C2BDDFA</checksum>
+    </file>
+    <file>
+      <filename>building_151.xml</filename>
+      <filetype>xml</filetype>
+      <usage_type>test</usage_type>
+      <checksum>473F7333</checksum>
     </file>
   </files>
 </measure>
