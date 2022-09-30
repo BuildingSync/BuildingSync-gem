@@ -28,9 +28,6 @@ class BuildingSyncToOpenStudioTest < Minitest::Test
     assert(!model.empty?)
     model = model.get
 
-    # store the number of spaces in the seed model
-    #num_spaces_seed = model.getSpaces.size
-
     # get arguments
     arguments = measure.arguments(model)
     argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
