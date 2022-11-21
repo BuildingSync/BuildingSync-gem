@@ -91,7 +91,7 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
       # gather the results for all scenarios found in out_path,
       # such as annual and monthly data for different energy
       # sources (electricity, natural gas, etc.)
-      translator.gather_results()
+      translator.gather_results
 
       # Add in UserDefinedFields, which contain information about the
       # OpenStudio model run 
