@@ -244,14 +244,6 @@ RSpec.describe 'WorkflowMaker' do
     end
 
     measure_inserts_to_check = [
-      #['EnergyPlusMeasure', 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects', 0, 15, {
-      #  'ratedTotalCoolingCapacity' => 999.9,
-      #  'ratedCOP' => 0.99,
-      #  'ratedAirFlowRate' => 0.999,
-      #  'condensateRemovalStart' => 9.999,
-      #  'evapLatentRatio' => 0.0999,
-      #  'latentCapTimeConstant' => 4.0
-      #}],
       ['EnergyPlusMeasure', 'AddSimplePvToShadingSurfacesByType', 0, 15, {}],
       ['ReportingMeasure', 'openstudio_results', 0, 17 , nil],
       ['ModelMeasure', 'scale_geometry', 3, 3, nil]
