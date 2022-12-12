@@ -15,18 +15,20 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "This measure takes a BuildingSync XML as an input and translates it to an OpenStudio Model. This measure requires non-standard Ruby Gems that do are not included by default in OpenStudio's Ruby interpreter. To run this measure with the OpenStudio CLI using an OSW, you need to pass in additional gems to the CLI at run time."
+    return "This measure-gem converts a BuildingSync XML file into a series of OSWs. Each OSW corresponds to an energy efficiency package of measures defined in the BuildingSync XML file. The OSWs can then be simulated and the results are written back into the BuildingSync XML file."
   end
 
   # human readable description of modeling approach
   def modeler_description
-    return "BuildingSync to OSM translation used to happen outside of the measure structure, as a result it couldn't easily be used in tools that support running OSW's through the OpenStudio CLI. When upgrading to support OpenStudio 3.4, this code was wrapped into a measure. Additionally, where libraries exist in the OpenStudio Extension Gem and OOpenStudio Standars Gem, those should be used vs. custom code within BuildingSync. This will provide consistency with other workflows and minimize upgrade maintenance. This measure doesn't work with an off the shelf OpenStudio install because it requires additional gems. As a result it isn't currently on the Building Component Library (BCL). It's also possible that at some point this measure may need to run other OpenStudio measures. If that happens it does result in extra planning on setting up a project to assure that the necessary measures are available, possibly through bundle and gem files for projects using this."
+    return "The measure will use a BuildingSync XML file as an input. The XML can be created using tools such as [bsyncpy](https://pypi.org/project/bsync/).
+    The XML will be parsed and a new OpenStudio model will be created. A new OSW will be created for each energy efficiency package of measures defined in the XML, using the measures defined in the ./lib/buildingsync/makers/phase_zero_base.osw file.
+    The user has a choice for just generating OSWs or generating and simulating them. If the OSWs are simulated, then the results are collected and reports are generated. These reports will be written in the original BuildingSync XML file, and that XML file will be saved."
   end
 
   # define the arguments that the user will input
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new
-    # the name of the space to add to the model
+
     building_sync_xml_file_path = OpenStudio::Measure::OSArgument.makeStringArgument('building_sync_xml_file_path', true)
     building_sync_xml_file_path.setDisplayName('BSync XML path')
     building_sync_xml_file_path.setDescription('The path to the XML file that should be translated.')
