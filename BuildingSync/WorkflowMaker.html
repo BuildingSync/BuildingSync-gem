@@ -6,7 +6,7 @@
 <title>
   Class: BuildingSync::WorkflowMaker
   
-    &mdash; Documentation by YARD 0.9.27
+    &mdash; Documentation by YARD 0.9.28
   
 </title>
 
@@ -104,8 +104,7 @@
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
     
-<p>base class for objects that will configure workflows based on building sync
-files</p>
+<p>base class for objects that will configure workflows based on building sync files</p>
 
 
   </div>
@@ -174,9 +173,7 @@ files</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Based on the MeasureIDs defined by the Scenario, configure the workflow
-provided using the default measure arguments defined by the
-lib/buildingsync/makers/workflow_maker.json.</p>
+<p>Based on the MeasureIDs defined by the Scenario, configure the workflow provided using the default measure arguments defined by the lib/buildingsync/makers/workflow_maker.json.</p>
 </div></span>
   
 </li>
@@ -200,8 +197,7 @@ lib/buildingsync/makers/workflow_maker.json.</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Creates a deep copy of the @workflow be serializing and reloading with
-JSON.</p>
+<p>Creates a deep copy of the @workflow be serializing and reloading with JSON.</p>
 </div></span>
   
 </li>
@@ -225,12 +221,7 @@ JSON.</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>gather results for all CB Modeled and POM Scenarios, including both annual
-and monthly results - ResourceUse and AllResourceTotal elements are added
-to the Scenario as part of this process - ResourceUse - holds consumption
-information about a specific resource / fuel (Electricity, Natural gas,
-etc.) - AllResourceTotal - holds total site and source energy consumption
-information.</p>
+<p>gather results for all CB Modeled and POM Scenarios, including both annual and monthly results - ResourceUse and AllResourceTotal elements are added to the Scenario as part of this process - ResourceUse - holds consumption information about a specific resource / fuel (Electricity, Natural gas, etc.) - AllResourceTotal - holds total site and source energy consumption information.</p>
 </div></span>
   
 </li>
@@ -350,8 +341,7 @@ information.</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>gets the measure type of a measure given its directory - looking up the
-measure type in the measure.xml file.</p>
+<p>gets the measure type of a measure given its directory - looking up the measure type in the measure.xml file.</p>
 </div></span>
   
 </li>
@@ -521,8 +511,7 @@ measure type in the measure.xml file.</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>iterate over the current measure list in the workflow and check if they are
-available at the referenced measure directories.</p>
+<p>iterate over the current measure list in the workflow and check if they are available at the referenced measure directories.</p>
 </div></span>
   
 </li>
@@ -546,8 +535,7 @@ available at the referenced measure directories.</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>writes the parameters determined during processing back to the BldgSync XML
-file.</p>
+<p>writes the parameters determined during processing back to the BldgSync XML file.</p>
 </div></span>
   
 </li>
@@ -571,11 +559,7 @@ file.</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Removes unused measures from a workflow, where __SKIP__ == true copy is
-made and the measures are configured for the specific scenario KAF:
-reworked to only delete measures with an explicit __SKIP__ == true 
-(sometimes measure don&#39;t have a skip at all, assume we want to keep
-those).</p>
+<p>Removes unused measures from a workflow, where __SKIP__ == true copy is made and the measures are configured for the specific scenario KAF: reworked to only delete measures with an explicit __SKIP__ == true  (sometimes measure don&#39;t have a skip at all, assume we want to keep those).</p>
 </div></span>
   
 </li>
@@ -645,9 +629,7 @@ those).</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>TODO: Update this as I believe no longer will work as expected, keys being
-searched for       by the @<a href="'key'">facility_xml</a> don&#39;t make
-sense.</p>
+<p>TODO: Update this as I believe no longer will work as expected, keys being searched for       by the @<a href="'key'">facility_xml</a> don&#39;t make sense.</p>
 </div></span>
   
 </li>
@@ -942,9 +924,7 @@ sense.</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Based on the MeasureIDs defined by the Scenario, configure the workflow
-provided using the default measure arguments defined by the
-lib/buildingsync/makers/workflow_maker.json</p>
+<p>Based on the MeasureIDs defined by the Scenario, configure the workflow provided using the default measure arguments defined by the lib/buildingsync/makers/workflow_maker.json</p>
 
 
   </div>
@@ -964,8 +944,7 @@ lib/buildingsync/makers/workflow_maker.json</p>
       
         &mdash;
         <div class='inline'>
-<p>a Hash map of the @workflow.  DO NOT  use @workflow directly, should be a
-deep clone</p>
+<p>a Hash map of the @workflow.  DO NOT  use @workflow directly, should be a deep clone</p>
 </div>
       
     </li>
@@ -1227,17 +1206,13 @@ deep clone</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>gather results for all CB Modeled and POM Scenarios, including both annual
-and monthly results</p>
+<p>gather results for all CB Modeled and POM Scenarios, including both annual and monthly results</p>
 <ul><li>
-<p>ResourceUse and AllResourceTotal elements are added to the Scenario as part
-of this process</p>
+<p>ResourceUse and AllResourceTotal elements are added to the Scenario as part of this process</p>
 </li><li>
-<p>ResourceUse - holds consumption information about a specific resource /
-fuel (Electricity, Natural gas, etc.)</p>
+<p>ResourceUse - holds consumption information about a specific resource / fuel (Electricity, Natural gas, etc.)</p>
 </li><li>
-<p>AllResourceTotal - holds total site and source energy consumption
-information</p>
+<p>AllResourceTotal - holds total site and source energy consumption information</p>
 </li></ul>
 
 
@@ -1357,8 +1332,7 @@ information</p>
       
         &mdash;
         <div class='inline'>
-<p>Looks as follows [measure_name1, mn2, etc.],
-path_to_measure_dir_2: […]</p>
+<p>Looks as follows [measure_name1, mn2, etc.], path_to_measure_dir_2: […]</p>
 </div>
       
     </li>
@@ -1598,8 +1572,7 @@ path_to_measure_dir_2: […]</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>gets the measure type of a measure given its directory - looking up the
-measure type in the measure.xml file</p>
+<p>gets the measure type of a measure given its directory - looking up the measure type in the measure.xml file</p>
 
 
   </div>
@@ -1619,8 +1592,7 @@ measure type in the measure.xml file</p>
       
         &mdash;
         <div class='inline'>
-<p>the directory name for the measure, as it appears in any of the gems, i.e.
-<a href="measure_dir_name">openstudio-common-measures-gem/lib/measures/</a></p>
+<p>the directory name for the measure, as it appears in any of the gems, i.e. <a href="measure_dir_name">openstudio-common-measures-gem/lib/measures/</a></p>
 </div>
       
     </li>
@@ -1932,10 +1904,7 @@ measure type in the measure.xml file</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>inserts any measure.  traverses through the measures available in the
-included extensions (common measures, model articulation, etc.) to find the
-<a href="measure_dir">lib/measures/</a> specified. It is inserted at the
-relative position according to its type</p>
+<p>inserts any measure.  traverses through the measures available in the included extensions (common measures, model articulation, etc.) to find the <a href="measure_dir">lib/measures/</a> specified. It is inserted at the relative position according to its type</p>
 
 
   </div>
@@ -1955,8 +1924,7 @@ relative position according to its type</p>
       
         &mdash;
         <div class='inline'>
-<p>one of: &#39;EnergyPlusMeasure&#39;, &#39;ReportingMeasure&#39;, or
-&#39;ModelMeasure&#39;</p>
+<p>one of: &#39;EnergyPlusMeasure&#39;, &#39;ReportingMeasure&#39;, or &#39;ModelMeasure&#39;</p>
 </div>
       
     </li>
@@ -1972,8 +1940,7 @@ relative position according to its type</p>
       
         &mdash;
         <div class='inline'>
-<p>the directory name for the measure, as it appears in any of the gems, i.e.
-<a href="measure_dir_name">openstudio-common-measures-gem/lib/measures/</a></p>
+<p>the directory name for the measure, as it appears in any of the gems, i.e. <a href="measure_dir_name">openstudio-common-measures-gem/lib/measures/</a></p>
 </div>
       
     </li>
@@ -1991,8 +1958,7 @@ relative position according to its type</p>
       
         &mdash;
         <div class='inline'>
-<p>the position where the measure should be inserted with respect to the
-measure_goal_type</p>
+<p>the position where the measure should be inserted with respect to the measure_goal_type</p>
 </div>
       
     </li>
@@ -2124,8 +2090,7 @@ measure_goal_type</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>iterate over the current measure list in the workflow and check if they are
-available at the referenced measure directories</p>
+<p>iterate over the current measure list in the workflow and check if they are available at the referenced measure directories</p>
 
 
   </div>
@@ -2225,8 +2190,7 @@ available at the referenced measure directories</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>writes the parameters determined during processing back to the BldgSync XML
-file</p>
+<p>writes the parameters determined during processing back to the BldgSync XML file</p>
 
 
   </div>
@@ -2267,11 +2231,7 @@ file</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Removes unused measures from a workflow, where __SKIP__ == true copy is
-made and the measures are configured for the specific scenario KAF:
-reworked to only delete measures with an explicit __SKIP__ == true 
-(sometimes measure don&#39;t have a skip at all, assume we want to keep
-those)</p>
+<p>Removes unused measures from a workflow, where __SKIP__ == true copy is made and the measures are configured for the specific scenario KAF: reworked to only delete measures with an explicit __SKIP__ == true  (sometimes measure don&#39;t have a skip at all, assume we want to keep those)</p>
 
 
   </div>
@@ -2528,8 +2488,7 @@ those)</p>
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>TODO: Update this as I believe no longer will work as expected, keys being
-searched for</p>
+<p>TODO: Update this as I believe no longer will work as expected, keys being searched for</p>
 
 <pre class="code ruby"><code class="ruby">by the @facility_xml[&#39;key&#39;] don&#39;t make sense.
 </code></pre>
@@ -2581,8 +2540,7 @@ searched for</p>
       
         &mdash;
         <div class='inline'>
-<p>the directory name for the measure, as it appears in any of the gems, i.e.
-<a href="measure_dir_name">openstudio-common-measures-gem/lib/measures/</a></p>
+<p>the directory name for the measure, as it appears in any of the gems, i.e. <a href="measure_dir_name">openstudio-common-measures-gem/lib/measures/</a></p>
 </div>
       
     </li>
@@ -3133,9 +3091,9 @@ searched for</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Feb 22 21:19:48 2022 by
-  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.27 (ruby-2.5.9).
+  Generated on Mon Dec 12 16:44:54 2022 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.28 (ruby-2.7.7).
 </div>
 
     </div>
