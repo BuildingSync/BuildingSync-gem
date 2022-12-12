@@ -1,7 +1,7 @@
 
 OS:Version,
-  {4d5148b9-e4ff-4b20-85eb-fd8953e4e252}, !- Handle
-  3.0.1;                                  !- Version Identifier
+  {ae89bb93-c8a0-4f84-9bf8-429a0f5673d9}, !- Handle
+  3.4.0;                                  !- Version Identifier
 
 OS:WeatherFile,
   {8137136e-6c50-4031-bf0f-f1ce77ba10e4}, !- Handle
@@ -14,7 +14,7 @@ OS:WeatherFile,
   -124.2,                                 !- Longitude {deg}
   -8,                                     !- Time Zone {hr}
   13,                                     !- Elevation {m}
-  /Users/cmosiman/Github/BuildingSync/BuildingSync-gem/spec/weather/CZ01RV2.epw, !- Url
+  /Users/tmarzull/Documents/BuildingSync/working/BuildingSync-gem/spec/weather/CZ01RV2.epw, !- Url
   ;                                       !- Checksum
 
 OS:Site,
@@ -45,73 +45,79 @@ OS:SizingPeriod:DesignDay,
   Climate Zone 1 Ann Clg .4% Condns DB=>MWB, !- Name
   21.6,                                   !- Maximum Dry-Bulb Temperature {C}
   6.5,                                    !- Daily Dry-Bulb Temperature Range {deltaC}
-  15.2,                                   !- Humidity Indicating Conditions at Maximum Dry-Bulb
   101169,                                 !- Barometric Pressure {Pa}
   4.3,                                    !- Wind Speed {m/s}
   320,                                    !- Wind Direction {deg}
   0,                                      !- Sky Clearness
-  0,                                      !- Rain Indicator
-  0,                                      !- Snow Indicator
+  No,                                     !- Rain Indicator
+  No,                                     !- Snow Indicator
   21,                                     !- Day of Month
   8,                                      !- Month
   SummerDesignDay,                        !- Day Type
-  0,                                      !- Daylight Saving Time Indicator
-  Wetbulb,                                !- Humidity Indicating Type
-  ,                                       !- Humidity Indicating Day Schedule Name
+  No,                                     !- Daylight Saving Time Indicator
+  Wetbulb,                                !- Humidity Condition Type
+  ,                                       !- Humidity Condition Day Schedule Name
+  15.2,                                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+  ,                                       !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+  ,                                       !- Enthalpy at Maximum Dry-Bulb {J/kg}
   DefaultMultipliers,                     !- Dry-Bulb Temperature Range Modifier Type
-  ,                                       !- Dry-Bulb Temperature Range Modifier Schedule Name
+  ,                                       !- Dry-Bulb Temperature Range Modifier Day Schedule Name
   ASHRAETau,                              !- Solar Model Indicator
   ,                                       !- Beam Solar Day Schedule Name
   ,                                       !- Diffuse Solar Day Schedule Name
-  0.365,                                  !- ASHRAE Taub {dimensionless}
-  2.513;                                  !- ASHRAE Taud {dimensionless}
+  0.365,                                  !- ASHRAE Clear Sky Optical Depth for Beam Irradiance {dimensionless}
+  2.513;                                  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance {dimensionless}
 
 OS:SizingPeriod:DesignDay,
   {80c13d6e-881d-477f-99da-9999c557ce7b}, !- Handle
   Climate Zone 1 Ann Clg .4% Condns WB=>MDB, !- Name
   19.5,                                   !- Maximum Dry-Bulb Temperature {C}
   6.5,                                    !- Daily Dry-Bulb Temperature Range {deltaC}
-  16.8,                                   !- Humidity Indicating Conditions at Maximum Dry-Bulb
   101169,                                 !- Barometric Pressure {Pa}
   4.3,                                    !- Wind Speed {m/s}
   320,                                    !- Wind Direction {deg}
   0,                                      !- Sky Clearness
-  0,                                      !- Rain Indicator
-  0,                                      !- Snow Indicator
+  No,                                     !- Rain Indicator
+  No,                                     !- Snow Indicator
   21,                                     !- Day of Month
   8,                                      !- Month
   SummerDesignDay,                        !- Day Type
-  0,                                      !- Daylight Saving Time Indicator
-  Wetbulb,                                !- Humidity Indicating Type
-  ,                                       !- Humidity Indicating Day Schedule Name
+  No,                                     !- Daylight Saving Time Indicator
+  Wetbulb,                                !- Humidity Condition Type
+  ,                                       !- Humidity Condition Day Schedule Name
+  16.8,                                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+  ,                                       !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+  ,                                       !- Enthalpy at Maximum Dry-Bulb {J/kg}
   DefaultMultipliers,                     !- Dry-Bulb Temperature Range Modifier Type
-  ,                                       !- Dry-Bulb Temperature Range Modifier Schedule Name
+  ,                                       !- Dry-Bulb Temperature Range Modifier Day Schedule Name
   ASHRAETau,                              !- Solar Model Indicator
   ,                                       !- Beam Solar Day Schedule Name
   ,                                       !- Diffuse Solar Day Schedule Name
-  0.365,                                  !- ASHRAE Taub {dimensionless}
-  2.513;                                  !- ASHRAE Taud {dimensionless}
+  0.365,                                  !- ASHRAE Clear Sky Optical Depth for Beam Irradiance {dimensionless}
+  2.513;                                  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance {dimensionless}
 
 OS:SizingPeriod:DesignDay,
   {c0e9a6d6-ccb0-4128-8452-146d84957ed1}, !- Handle
   Climate Zone 1 Ann Htg 99.6% Condns DB, !- Name
   -0.6,                                   !- Maximum Dry-Bulb Temperature {C}
   0,                                      !- Daily Dry-Bulb Temperature Range {deltaC}
-  -0.6,                                   !- Humidity Indicating Conditions at Maximum Dry-Bulb
   101169,                                 !- Barometric Pressure {Pa}
   2,                                      !- Wind Speed {m/s}
   90,                                     !- Wind Direction {deg}
   0,                                      !- Sky Clearness
-  0,                                      !- Rain Indicator
-  0,                                      !- Snow Indicator
+  No,                                     !- Rain Indicator
+  No,                                     !- Snow Indicator
   21,                                     !- Day of Month
   12,                                     !- Month
   WinterDesignDay,                        !- Day Type
-  0,                                      !- Daylight Saving Time Indicator
-  Wetbulb,                                !- Humidity Indicating Type
-  ,                                       !- Humidity Indicating Day Schedule Name
+  No,                                     !- Daylight Saving Time Indicator
+  Wetbulb,                                !- Humidity Condition Type
+  ,                                       !- Humidity Condition Day Schedule Name
+  -0.6,                                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+  ,                                       !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+  ,                                       !- Enthalpy at Maximum Dry-Bulb {J/kg}
   DefaultMultipliers,                     !- Dry-Bulb Temperature Range Modifier Type
-  ,                                       !- Dry-Bulb Temperature Range Modifier Schedule Name
+  ,                                       !- Dry-Bulb Temperature Range Modifier Day Schedule Name
   ASHRAEClearSky;                         !- Solar Model Indicator
 
 OS:YearDescription,
@@ -329,7 +335,6 @@ OS:Node,
 
 OS:Connection,
   {da8b454e-d987-4602-85ae-e1f6eea69af5}, !- Handle
-  {57b00ebf-bd91-4b21-a96a-0e8e887e415f}, !- Name
   {02084d08-7ece-4c60-8c61-506037f30d73}, !- Source Object
   11,                                     !- Outlet Port
   {5927b91c-424c-44e9-9553-dc4eea529320}, !- Target Object
@@ -337,17 +342,14 @@ OS:Connection,
 
 OS:PortList,
   {9cbcd749-c864-4705-bac1-1384044abf75}, !- Handle
-  {349ef003-fd9a-478e-a541-9e19d39e3e8f}, !- Name
   {02084d08-7ece-4c60-8c61-506037f30d73}; !- HVAC Component
 
 OS:PortList,
   {1f71990a-0442-48a5-9803-c39579cc6adb}, !- Handle
-  {ccae4b09-e291-4242-9e6a-14102746efb4}, !- Name
   {02084d08-7ece-4c60-8c61-506037f30d73}; !- HVAC Component
 
 OS:PortList,
   {56881eca-45b1-4984-be09-d88e86ab0635}, !- Handle
-  {f2e46e8b-034c-4201-a6b2-d70996d56584}, !- Name
   {02084d08-7ece-4c60-8c61-506037f30d73}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -529,7 +531,6 @@ OS:Node,
 
 OS:Connection,
   {d4b17cbb-a6c2-4d35-8ad8-145fb2361d5d}, !- Handle
-  {1c6b77c0-4465-446c-bf92-56660cbe5865}, !- Name
   {ad1b5a0e-982c-41a0-994a-8e241ae7f637}, !- Source Object
   11,                                     !- Outlet Port
   {37db127f-2415-4fd7-a609-3657f8237125}, !- Target Object
@@ -537,17 +538,14 @@ OS:Connection,
 
 OS:PortList,
   {afa7ea09-279e-4e12-9876-28fbcd464208}, !- Handle
-  {f589af4a-0e12-40fc-bb2c-deecc275fabd}, !- Name
   {ad1b5a0e-982c-41a0-994a-8e241ae7f637}; !- HVAC Component
 
 OS:PortList,
   {19e1139c-a804-465c-a1b8-6134da4ee3d9}, !- Handle
-  {4d26d21d-aa0a-4f92-8e81-6de832dc0044}, !- Name
   {ad1b5a0e-982c-41a0-994a-8e241ae7f637}; !- HVAC Component
 
 OS:PortList,
   {71fe7305-d857-4c6f-86a3-6912cea60948}, !- Handle
-  {39d8acd9-213e-41d4-bce7-3d4c61b48110}, !- Name
   {ad1b5a0e-982c-41a0-994a-8e241ae7f637}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -729,7 +727,6 @@ OS:Node,
 
 OS:Connection,
   {3d61a961-3c03-4d78-a13e-0b5ced504379}, !- Handle
-  {4ae3f070-384f-4390-95d7-a9a1a5bead5a}, !- Name
   {bc452bdb-8864-4a15-9931-ffd4a7af424c}, !- Source Object
   11,                                     !- Outlet Port
   {4959d665-86f1-4330-a16a-a362918b9904}, !- Target Object
@@ -737,17 +734,14 @@ OS:Connection,
 
 OS:PortList,
   {47534da1-62f4-433a-bc40-a79f8b6066f8}, !- Handle
-  {8410ef4a-1c2b-4c24-99b6-87e1db35cdb2}, !- Name
   {bc452bdb-8864-4a15-9931-ffd4a7af424c}; !- HVAC Component
 
 OS:PortList,
   {4693782d-a446-4e6e-99a2-fb3352ef7e7d}, !- Handle
-  {b9bbce93-9ebe-4d36-927b-afaf21e8c237}, !- Name
   {bc452bdb-8864-4a15-9931-ffd4a7af424c}; !- HVAC Component
 
 OS:PortList,
   {daf21706-b65a-499f-9759-30ce7dd89358}, !- Handle
-  {e5689008-32d6-49df-a487-d836ba71040d}, !- Name
   {bc452bdb-8864-4a15-9931-ffd4a7af424c}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -929,7 +923,6 @@ OS:Node,
 
 OS:Connection,
   {81df9c06-843a-42bf-9e3c-b54ccf9bb490}, !- Handle
-  {55cf2642-dd1c-4920-9ef9-56f4bf799cc2}, !- Name
   {a09ef826-7ee2-4723-aca0-308cc5abd4dc}, !- Source Object
   11,                                     !- Outlet Port
   {c2c56aa2-7425-45c7-bc5f-7ede4ca1fed3}, !- Target Object
@@ -937,17 +930,14 @@ OS:Connection,
 
 OS:PortList,
   {a6e15eb9-9a58-41d8-b228-0c0a2f5e31e0}, !- Handle
-  {aa85f96f-cc9a-4707-9162-9ba496630ee9}, !- Name
   {a09ef826-7ee2-4723-aca0-308cc5abd4dc}; !- HVAC Component
 
 OS:PortList,
   {414e4d40-8af5-4b26-be9c-cdb7ad82e5f6}, !- Handle
-  {12a6da5d-fee3-41e9-8337-b1e44f586b95}, !- Name
   {a09ef826-7ee2-4723-aca0-308cc5abd4dc}; !- HVAC Component
 
 OS:PortList,
   {88130af8-14e6-4b42-94d2-a61d61890db1}, !- Handle
-  {2b447851-09a2-4ee8-b73e-b6a9d50bfc23}, !- Name
   {a09ef826-7ee2-4723-aca0-308cc5abd4dc}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -1129,7 +1119,6 @@ OS:Node,
 
 OS:Connection,
   {781a9e65-4a0b-47c8-a9a7-037b3eb35869}, !- Handle
-  {3401a28d-8786-4e57-a479-c0a52190674a}, !- Name
   {85ee46e5-45f0-45c3-863d-42866835ee6b}, !- Source Object
   11,                                     !- Outlet Port
   {9ec07b0a-a455-425f-a662-d4ae6b6566ae}, !- Target Object
@@ -1137,17 +1126,14 @@ OS:Connection,
 
 OS:PortList,
   {eeaa50aa-4d48-46a1-a5a2-1824ba668b9a}, !- Handle
-  {7368a146-0130-4df5-a96b-f4fc59c938ea}, !- Name
   {85ee46e5-45f0-45c3-863d-42866835ee6b}; !- HVAC Component
 
 OS:PortList,
   {f558be6b-7fe2-4307-b59a-3befe54b35ec}, !- Handle
-  {52b9888a-add9-4300-94fe-61f87d439cc1}, !- Name
   {85ee46e5-45f0-45c3-863d-42866835ee6b}; !- HVAC Component
 
 OS:PortList,
   {7aba8e3e-e381-4988-b795-3b2508d3c1b2}, !- Handle
-  {225830f7-f1aa-4945-a82f-169be9220a58}, !- Name
   {85ee46e5-45f0-45c3-863d-42866835ee6b}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -1329,7 +1315,6 @@ OS:Node,
 
 OS:Connection,
   {004cb576-fe96-484a-adbc-b3d9c0bc23f2}, !- Handle
-  {ae2bb870-e157-422c-9fb9-c9f053aa6487}, !- Name
   {2c4d1c43-f4ff-4a90-88f1-5d340905cab8}, !- Source Object
   11,                                     !- Outlet Port
   {07fa3dfb-c38f-4c31-8163-2be11e4e8fb7}, !- Target Object
@@ -1337,17 +1322,14 @@ OS:Connection,
 
 OS:PortList,
   {0795312d-91a6-4408-b805-1de8e594b080}, !- Handle
-  {13ad9f1f-21a3-4a12-a869-7e00524e0eba}, !- Name
   {2c4d1c43-f4ff-4a90-88f1-5d340905cab8}; !- HVAC Component
 
 OS:PortList,
   {48981aa8-95d4-4953-8fb4-14334bbb6f9e}, !- Handle
-  {0892f4d2-566d-4606-9ebb-c3f95725718f}, !- Name
   {2c4d1c43-f4ff-4a90-88f1-5d340905cab8}; !- HVAC Component
 
 OS:PortList,
   {dc7be36a-4280-4538-8666-c0beb91e78b5}, !- Handle
-  {32fbe050-00b3-4682-8afd-3b4d1b4a0132}, !- Name
   {2c4d1c43-f4ff-4a90-88f1-5d340905cab8}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -1529,7 +1511,6 @@ OS:Node,
 
 OS:Connection,
   {92f034c1-1242-4c85-b66c-0cfe6e50af40}, !- Handle
-  {94927a05-0cab-40cd-900f-3bd5eec82993}, !- Name
   {a68a7e2f-0774-46aa-bd99-6d03063a5453}, !- Source Object
   11,                                     !- Outlet Port
   {a64e3327-7c3d-4c28-bfb4-297d1518a9ef}, !- Target Object
@@ -1537,17 +1518,14 @@ OS:Connection,
 
 OS:PortList,
   {16eaacbb-2352-4980-892f-c9c96ef7e477}, !- Handle
-  {51d5bb06-1568-42c7-92a5-5a5c63f36147}, !- Name
   {a68a7e2f-0774-46aa-bd99-6d03063a5453}; !- HVAC Component
 
 OS:PortList,
   {6b37ce84-7f6c-4663-9b34-aecb3afb7816}, !- Handle
-  {8f41cfdf-cfe4-4c0f-b9f5-896adc7e476d}, !- Name
   {a68a7e2f-0774-46aa-bd99-6d03063a5453}; !- HVAC Component
 
 OS:PortList,
   {f8f1d90a-439a-412b-ab56-d1ee9d6cd397}, !- Handle
-  {b3f3adea-51a8-4848-8f36-4409dc8e3209}, !- Name
   {a68a7e2f-0774-46aa-bd99-6d03063a5453}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -1729,7 +1707,6 @@ OS:Node,
 
 OS:Connection,
   {db68a5e9-0042-4083-95b7-de7e64730538}, !- Handle
-  {97bf6726-a2fe-42fd-9d6e-622721466d24}, !- Name
   {384ec289-a74b-4480-b11c-44dd68484ae2}, !- Source Object
   11,                                     !- Outlet Port
   {20963e3a-4e0a-4f68-99ba-3938a8880781}, !- Target Object
@@ -1737,17 +1714,14 @@ OS:Connection,
 
 OS:PortList,
   {f737c273-41ba-46ca-a68a-d6cd0264c113}, !- Handle
-  {84c66117-3b89-4378-9cd4-3af4eb9be1aa}, !- Name
   {384ec289-a74b-4480-b11c-44dd68484ae2}; !- HVAC Component
 
 OS:PortList,
   {406e04e7-ccb9-422c-8927-64b078bb8e22}, !- Handle
-  {3ba66b2b-a514-46bd-834e-017ea8fc75aa}, !- Name
   {384ec289-a74b-4480-b11c-44dd68484ae2}; !- HVAC Component
 
 OS:PortList,
   {c0487f6f-0217-4437-b03b-9c248c2e841c}, !- Handle
-  {49dc5854-1850-43cb-b195-539638b13af0}, !- Name
   {384ec289-a74b-4480-b11c-44dd68484ae2}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -1929,7 +1903,6 @@ OS:Node,
 
 OS:Connection,
   {2dca4528-a658-41b3-a85f-6bff80a37ad7}, !- Handle
-  {4ae389d2-f470-4e84-80d7-516b962c01f6}, !- Name
   {a57caf9b-2f13-4187-9bca-74aae4bdcf13}, !- Source Object
   11,                                     !- Outlet Port
   {9df1895e-7caf-4b7a-b910-a6fc92ca08ce}, !- Target Object
@@ -1937,17 +1910,14 @@ OS:Connection,
 
 OS:PortList,
   {a20e8d3e-2b68-4aa4-9a7b-40a44f91a8b1}, !- Handle
-  {2a59b0bc-c2ec-4b09-bc36-d2262a4adbed}, !- Name
   {a57caf9b-2f13-4187-9bca-74aae4bdcf13}; !- HVAC Component
 
 OS:PortList,
   {c7f17c80-a438-415e-8451-1e17ac14d79d}, !- Handle
-  {89c967e0-f2ad-46d0-8c2e-a2764cb90a2d}, !- Name
   {a57caf9b-2f13-4187-9bca-74aae4bdcf13}; !- HVAC Component
 
 OS:PortList,
   {d91c0e1d-de33-4c5f-8e37-1c54c160678c}, !- Handle
-  {00cf897f-f1e5-4dad-a13f-dc0dd01e96dd}, !- Name
   {a57caf9b-2f13-4187-9bca-74aae4bdcf13}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -2129,7 +2099,6 @@ OS:Node,
 
 OS:Connection,
   {0c064cc8-3153-417b-b898-0241363cc81f}, !- Handle
-  {978fe78b-be0a-4d68-aa74-5b2fa2dbcabd}, !- Name
   {8ac3734a-0cc2-488a-a1db-cb66fdbe5d0b}, !- Source Object
   11,                                     !- Outlet Port
   {24507b1a-eb0a-4962-8edb-02fb3c7c7e48}, !- Target Object
@@ -2137,17 +2106,14 @@ OS:Connection,
 
 OS:PortList,
   {c91e5cad-71bc-4e88-b215-9806b69e0e7e}, !- Handle
-  {431eee8e-c3cb-43e8-b79c-51073613ca1a}, !- Name
   {8ac3734a-0cc2-488a-a1db-cb66fdbe5d0b}; !- HVAC Component
 
 OS:PortList,
   {b72653bf-080c-4dbd-a7ff-ce40bc535087}, !- Handle
-  {fe3006a4-bcc3-42fd-b972-b5a460c91aec}, !- Name
   {8ac3734a-0cc2-488a-a1db-cb66fdbe5d0b}; !- HVAC Component
 
 OS:PortList,
   {1d846ee0-439f-44fd-80ef-888232bb3757}, !- Handle
-  {1b92c27e-2e59-4eff-b263-f37c2489dda7}, !- Name
   {8ac3734a-0cc2-488a-a1db-cb66fdbe5d0b}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -2329,7 +2295,6 @@ OS:Node,
 
 OS:Connection,
   {ce578ee7-f3cc-4b15-88be-6261997f0bcf}, !- Handle
-  {971e6a92-75eb-49d9-aa4f-7266270051c7}, !- Name
   {c2f1a78b-e50f-4881-a7bb-37151e3e1f96}, !- Source Object
   11,                                     !- Outlet Port
   {c2db3ca5-7cfa-468f-a8bb-0017f5436dfd}, !- Target Object
@@ -2337,17 +2302,14 @@ OS:Connection,
 
 OS:PortList,
   {3e7a4287-fa03-4921-bc0a-0c558e0766dc}, !- Handle
-  {b57ae838-581d-4aab-9c85-df0dc9cb6709}, !- Name
   {c2f1a78b-e50f-4881-a7bb-37151e3e1f96}; !- HVAC Component
 
 OS:PortList,
   {e922d869-29b2-4b47-97d2-5ee9265bdbfc}, !- Handle
-  {1d2309a1-7381-4155-9149-68086a8429e3}, !- Name
   {c2f1a78b-e50f-4881-a7bb-37151e3e1f96}; !- HVAC Component
 
 OS:PortList,
   {68d8ffd8-b79b-41f4-be81-d7d73af0034b}, !- Handle
-  {30d4b97f-ba6c-427a-aa01-4a58e7dafa02}, !- Name
   {c2f1a78b-e50f-4881-a7bb-37151e3e1f96}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -2529,7 +2491,6 @@ OS:Node,
 
 OS:Connection,
   {844a0d8d-06e6-473f-b80b-6c662a9ac75e}, !- Handle
-  {f7532c08-260b-470d-8f78-9c9cef0153a5}, !- Name
   {f3354d12-e726-4147-8e46-ec51a0c3fbf9}, !- Source Object
   11,                                     !- Outlet Port
   {9c041925-e99b-4549-b13e-ca20d22a1b9f}, !- Target Object
@@ -2537,17 +2498,14 @@ OS:Connection,
 
 OS:PortList,
   {6dd826ec-d5ea-496d-b61e-900364ebed57}, !- Handle
-  {791baf9b-9e2d-4a56-848b-fd7c6cb0acc1}, !- Name
   {f3354d12-e726-4147-8e46-ec51a0c3fbf9}; !- HVAC Component
 
 OS:PortList,
   {38f364b7-9dc3-46b0-8949-77766913779e}, !- Handle
-  {c4f61ecf-4b92-43a1-b9f8-cb62c4301b37}, !- Name
   {f3354d12-e726-4147-8e46-ec51a0c3fbf9}; !- HVAC Component
 
 OS:PortList,
   {7947cae2-c972-4cd0-93ab-eb86933ffb0f}, !- Handle
-  {b7a2dd29-e848-4f13-8d39-3b99c7694b8e}, !- Name
   {f3354d12-e726-4147-8e46-ec51a0c3fbf9}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -2729,7 +2687,6 @@ OS:Node,
 
 OS:Connection,
   {9f6bc993-1518-47d6-994c-24e0d762d02f}, !- Handle
-  {91394c12-97f5-41a5-b37a-819972ded13c}, !- Name
   {2979861b-cd15-46e0-a1bf-6744826812ce}, !- Source Object
   11,                                     !- Outlet Port
   {24c735a6-19f5-4375-97d7-8857b14241b3}, !- Target Object
@@ -2737,17 +2694,14 @@ OS:Connection,
 
 OS:PortList,
   {b201a52a-e2f6-450b-b1ac-1309054125e0}, !- Handle
-  {4520f0ba-b9a5-414b-9142-d30dda809aaa}, !- Name
   {2979861b-cd15-46e0-a1bf-6744826812ce}; !- HVAC Component
 
 OS:PortList,
   {123cafe1-1c95-4a67-aa6b-7667e78a175d}, !- Handle
-  {65c53e19-cae6-49c1-924f-9e390036d3ef}, !- Name
   {2979861b-cd15-46e0-a1bf-6744826812ce}; !- HVAC Component
 
 OS:PortList,
   {3cd14f07-9a90-4089-9bea-89ffb2a39e13}, !- Handle
-  {cff98ef5-c871-42ab-98a7-533d2fbededf}, !- Name
   {2979861b-cd15-46e0-a1bf-6744826812ce}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -2929,7 +2883,6 @@ OS:Node,
 
 OS:Connection,
   {3fe288bb-b445-4e5b-8ee4-764f9b5bc000}, !- Handle
-  {4f7a80c5-5b41-4d3a-9699-4e57aba724ed}, !- Name
   {9fc94c23-4a7d-4b82-bb43-22ffd7ebeb38}, !- Source Object
   11,                                     !- Outlet Port
   {84953bfc-26be-45b6-beeb-ecdd67865024}, !- Target Object
@@ -2937,17 +2890,14 @@ OS:Connection,
 
 OS:PortList,
   {1a041d9c-8715-477c-bc98-38f7577e2fde}, !- Handle
-  {837379c8-3124-4794-81f4-43fd8a82b350}, !- Name
   {9fc94c23-4a7d-4b82-bb43-22ffd7ebeb38}; !- HVAC Component
 
 OS:PortList,
   {31da0ca0-6b2e-47a8-9a82-45139bd37b31}, !- Handle
-  {5cacb6e1-7182-4b37-925a-55222365bdb3}, !- Name
   {9fc94c23-4a7d-4b82-bb43-22ffd7ebeb38}; !- HVAC Component
 
 OS:PortList,
   {e2e59065-a88a-4b34-a900-4aaa217b550e}, !- Handle
-  {befecd80-5717-4771-975c-bf59e4f1594b}, !- Name
   {9fc94c23-4a7d-4b82-bb43-22ffd7ebeb38}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -3129,7 +3079,6 @@ OS:Node,
 
 OS:Connection,
   {f2546b3f-55e0-47f1-ae55-3a2d708f453b}, !- Handle
-  {4b7833d9-dfe7-43fc-9ca1-c3da158d222e}, !- Name
   {5ebae4c6-d8e1-4d1d-a034-a9abfb07dbbc}, !- Source Object
   11,                                     !- Outlet Port
   {e56a6da5-8d68-4d4d-87a1-690e730630bf}, !- Target Object
@@ -3137,17 +3086,14 @@ OS:Connection,
 
 OS:PortList,
   {fdb6e083-5f64-4999-a588-e6cf5a3caa2a}, !- Handle
-  {347f5c7d-74ea-4290-84d4-aa7409a63732}, !- Name
   {5ebae4c6-d8e1-4d1d-a034-a9abfb07dbbc}; !- HVAC Component
 
 OS:PortList,
   {b72dd2fa-0192-47ef-9168-8a681db92fa7}, !- Handle
-  {8bd1edb6-0e54-4f91-ae79-3f2240ae3a8c}, !- Name
   {5ebae4c6-d8e1-4d1d-a034-a9abfb07dbbc}; !- HVAC Component
 
 OS:PortList,
   {bb0aa524-478e-4d9a-b488-adca1371f35d}, !- Handle
-  {9391cc66-d2ef-4a52-bdd6-1cdfbccaca9b}, !- Name
   {5ebae4c6-d8e1-4d1d-a034-a9abfb07dbbc}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -3329,7 +3275,6 @@ OS:Node,
 
 OS:Connection,
   {f8ef2b46-ed20-4164-bed1-e826654790ce}, !- Handle
-  {fe9820fb-bf62-4e46-8fe5-0fce615e75cf}, !- Name
   {1e011730-2b1c-4bc1-a3ba-755f2e5da466}, !- Source Object
   11,                                     !- Outlet Port
   {e31d1e78-8e15-4a2c-a226-b78216d9e9e9}, !- Target Object
@@ -3337,17 +3282,14 @@ OS:Connection,
 
 OS:PortList,
   {14c09bfd-630b-4fd0-a08b-aad36825b0c4}, !- Handle
-  {5c7182dd-ed97-49dc-99fe-b4d4781feab0}, !- Name
   {1e011730-2b1c-4bc1-a3ba-755f2e5da466}; !- HVAC Component
 
 OS:PortList,
   {a63d7139-f0d1-446d-9fcb-09e4f3ae8cff}, !- Handle
-  {e6506235-c2b5-41f8-a7df-cdeee1c978c3}, !- Name
   {1e011730-2b1c-4bc1-a3ba-755f2e5da466}; !- HVAC Component
 
 OS:PortList,
   {1bec4a58-613f-4ccb-9b77-cfc3b38e590d}, !- Handle
-  {d9c2c554-813a-4458-b004-4e4a9ffb0fd1}, !- Name
   {1e011730-2b1c-4bc1-a3ba-755f2e5da466}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -3529,7 +3471,6 @@ OS:Node,
 
 OS:Connection,
   {9d998bb0-1801-47eb-bc06-5c5a74b64f33}, !- Handle
-  {0eb66bf4-482c-4004-9eff-b149549e20b2}, !- Name
   {658f18fd-d140-4463-b98f-3e03ae7b4924}, !- Source Object
   11,                                     !- Outlet Port
   {9f8dd1d7-d7f1-4d3c-aa74-59c5e4103d5d}, !- Target Object
@@ -3537,17 +3478,14 @@ OS:Connection,
 
 OS:PortList,
   {3e89b7f5-dcc7-4456-a690-1c29bddcb58d}, !- Handle
-  {12d53ae7-31a8-44e5-9950-f90e9fe1a4c3}, !- Name
   {658f18fd-d140-4463-b98f-3e03ae7b4924}; !- HVAC Component
 
 OS:PortList,
   {b884a3bc-c77c-4068-9166-c95cd9c9c381}, !- Handle
-  {5b079cc4-28e6-4364-9f3c-565ac2375400}, !- Name
   {658f18fd-d140-4463-b98f-3e03ae7b4924}; !- HVAC Component
 
 OS:PortList,
   {186044e7-9905-4c04-92ce-7b2ff1bb47e3}, !- Handle
-  {4a2a54ff-f29a-444f-80fc-b825778674e4}, !- Name
   {658f18fd-d140-4463-b98f-3e03ae7b4924}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -3729,7 +3667,6 @@ OS:Node,
 
 OS:Connection,
   {94380de0-4f52-47f9-8815-9b32114cb3cb}, !- Handle
-  {cdbf20f3-5197-4c93-b958-69012d6ef598}, !- Name
   {5f7335a8-81cd-4945-8e76-1b67b20c6723}, !- Source Object
   11,                                     !- Outlet Port
   {8eb920b9-01c1-484e-946c-0e647377e2ab}, !- Target Object
@@ -3737,17 +3674,14 @@ OS:Connection,
 
 OS:PortList,
   {ff3eb426-834c-4414-9d12-ffbc55149e94}, !- Handle
-  {0e9d32bb-ac21-4d7c-b0c7-0e9c3d81a283}, !- Name
   {5f7335a8-81cd-4945-8e76-1b67b20c6723}; !- HVAC Component
 
 OS:PortList,
   {396d2aa7-8bc2-48a2-b1a2-14c32e2f0160}, !- Handle
-  {c0205ba5-44f0-4491-a830-dca9e4629d07}, !- Name
   {5f7335a8-81cd-4945-8e76-1b67b20c6723}; !- HVAC Component
 
 OS:PortList,
   {62671a42-67ff-4bc7-a6e7-26503ddc0800}, !- Handle
-  {070018b4-090d-4f37-b369-3aa66e74bf42}, !- Name
   {5f7335a8-81cd-4945-8e76-1b67b20c6723}; !- HVAC Component
 
 OS:Sizing:Zone,
@@ -3791,7 +3725,6 @@ OS:SubSurface,
   {b85e44bd-d010-40c4-b083-129e7f40f844}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3808,7 +3741,6 @@ OS:SubSurface,
   {f31b12b7-25a7-4ba1-aff3-9d95fb22109d}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3825,7 +3757,6 @@ OS:SubSurface,
   {555a1450-233a-4289-8b2e-d491228c0949}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3842,7 +3773,6 @@ OS:SubSurface,
   {957ee6c0-acd7-47d5-ac11-470eea347d95}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3859,7 +3789,6 @@ OS:SubSurface,
   {1546a62d-c94b-4a39-abe3-ca6b436e3c13}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3876,7 +3805,6 @@ OS:SubSurface,
   {7e2681bd-7f70-4a66-97f1-385b73c62d5e}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3893,7 +3821,6 @@ OS:SubSurface,
   {ed1dc8c7-14ed-4da1-b1d5-a113875d9523}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3910,7 +3837,6 @@ OS:SubSurface,
   {5267efec-b9c9-4b22-9765-4e0646a5680d}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3927,7 +3853,6 @@ OS:SubSurface,
   {14a5ce7a-d667-40dc-a8fb-a98a5b20a4b1}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3944,7 +3869,6 @@ OS:SubSurface,
   {8d3fed8f-1ec4-4eec-868b-dd88856f0b1a}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3961,7 +3885,6 @@ OS:SubSurface,
   {c0ff6739-633a-4abf-ac59-13fba643a18e}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3978,7 +3901,6 @@ OS:SubSurface,
   {fb2b80fa-5515-4c15-8630-9717c1b465c4}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -3995,7 +3917,6 @@ OS:SubSurface,
   {372a38ba-12e6-456a-9b03-fcc46436d78c}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -4012,7 +3933,6 @@ OS:SubSurface,
   {c18bc13e-a946-48cc-88ba-de32ab937acc}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -4029,7 +3949,6 @@ OS:SubSurface,
   {64d61bc2-4229-44b0-8263-a92acdc2aaf0}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -4046,7 +3965,6 @@ OS:SubSurface,
   {c9f7f484-f118-404d-b5f8-0d5587028bea}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -4063,7 +3981,6 @@ OS:SubSurface,
   {a03145ab-ae4c-4ea3-bfb0-53c81a83a877}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices
@@ -4080,7 +3997,6 @@ OS:SubSurface,
   {792f0ed8-790e-4ce4-9dca-b40893fc81ef}, !- Surface Name
   ,                                       !- Outside Boundary Condition Object
   ,                                       !- View Factor to Ground
-  ,                                       !- Shading Control Name
   ,                                       !- Frame and Divider Name
   ,                                       !- Multiplier
   ,                                       !- Number of Vertices

@@ -244,15 +244,16 @@ RSpec.describe 'WorkflowMaker' do
     end
 
     measure_inserts_to_check = [
-      ['EnergyPlusMeasure', 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects', 1, 27, {
-        'ratedTotalCoolingCapacity' => 999.9,
-        'ratedCOP' => 0.99,
-        'ratedAirFlowRate' => 0.999,
-        'condensateRemovalStart' => 9.999,
-        'evapLatentRatio' => 0.0999,
-        'latentCapTimeConstant' => 4.0
-      }],
-      ['ReportingMeasure', 'openstudio_results', 0, 29, nil],
+      #['EnergyPlusMeasure', 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects', 0, 15, {
+      #  'ratedTotalCoolingCapacity' => 999.9,
+      #  'ratedCOP' => 0.99,
+      #  'ratedAirFlowRate' => 0.999,
+      #  'condensateRemovalStart' => 9.999,
+      #  'evapLatentRatio' => 0.0999,
+      #  'latentCapTimeConstant' => 4.0
+      #}],
+      ['EnergyPlusMeasure', 'AddSimplePvToShadingSurfacesByType', 0, 15, {}],
+      ['ReportingMeasure', 'openstudio_results', 0, 17 , nil],
       ['ModelMeasure', 'scale_geometry', 3, 3, nil]
     ]
     measure_inserts_to_check.each do |to_check|
@@ -260,13 +261,13 @@ RSpec.describe 'WorkflowMaker' do
         # -- Setup
         # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
         # -- Assert
-        expect(@workflow_maker.get_workflow['steps'].size).to eq(29)
+        expect(@workflow_maker.get_workflow['steps'].size).to eq(17)
 
         # -- Setup - insert new measure
         @workflow_maker.insert_measure_into_workflow(to_check[0], to_check[1], to_check[2], to_check[4])
 
         # -- Assert
-        expect(@workflow_maker.get_workflow['steps'].size).to eq(30)
+        expect(@workflow_maker.get_workflow['steps'].size).to eq(18)
         expect(@workflow_maker.get_workflow['steps'][to_check[3]]['measure_dir_name']).to eq(to_check[1])
 
         # -- Setup
@@ -289,23 +290,18 @@ RSpec.describe 'WorkflowMaker' do
         # modified, and a deep copy of this is made in workflow_maker.write_osws.write_osw,
         # the measure will get run in the cb_modeled scenario.
         expect(@workflow_maker.get_facility.report.cb_modeled.simulation_success?).to be true
+        
       end
     end
 
-    it 'remove measures then insert_measure_into_workflow: EnergyPlusMeasure (ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects) at the expected position and still simulate' do
+    it 'remove measures then insert_measure_into_workflow: EnergyPlusMeasure (AddSimplePvToShadingSurfacesByType) at the expected position and still simulate' do
       # -- Setup
       # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
       measure_type = 'EnergyPlusMeasure'
-      measure_dir_name = 'ModifyEnergyPlusCoilCoolingDXSingleSpeedObjects'
+      measure_dir_name = 'AddSimplePvToShadingSurfacesByType'
       item = 1
       final_expected_position = 0
       args = {
-        'ratedTotalCoolingCapacity' => 999.9,
-        'ratedCOP' => 0.99,
-        'ratedAirFlowRate' => 0.999,
-        'condensateRemovalStart' => 9.999,
-        'evapLatentRatio' => 0.0999,
-        'latentCapTimeConstant' => 4.0
       }
 
       @workflow_maker.clear_all_measures

@@ -1,6 +1,6 @@
 
 Version,
-  9.3;                                    !- Version Identifier
+  9.6;                                    !- Version Identifier
 
 Timestep,
   6;                                      !- Number of Timesteps per Hour
@@ -222,13 +222,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 73,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -245,6 +247,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 58,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -261,6 +264,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 83,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -277,6 +281,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 92,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -293,6 +298,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -324,6 +330,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -347,13 +354,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 91,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -370,6 +379,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 76,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -386,6 +396,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 101,                            !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -402,6 +413,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -433,6 +445,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -464,6 +477,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space A end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -487,13 +501,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 79,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -510,6 +526,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 64,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -526,6 +543,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 89,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -542,6 +560,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 98,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -558,6 +577,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 75,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -574,6 +594,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -597,13 +618,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 100,                            !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -635,6 +658,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 93,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -651,6 +675,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -667,6 +692,7 @@ BuildingSurface:Detailed,
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -683,6 +709,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 82,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -699,6 +726,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space B end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 107,                            !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -722,13 +750,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 85,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -745,6 +775,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 70,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -761,6 +792,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -792,6 +824,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 104,                            !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -808,6 +841,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 81,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -824,6 +858,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -847,13 +882,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 103,                            !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -870,6 +907,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 88,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -886,6 +924,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -917,6 +956,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -948,6 +988,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 99,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -964,6 +1005,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Back_Space C end_b - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -987,13 +1029,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 37,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1010,6 +1054,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 22,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1026,6 +1071,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 47,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1042,6 +1088,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 56,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1058,6 +1105,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1089,6 +1137,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1112,13 +1161,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 43,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1135,6 +1186,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 28,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1151,6 +1203,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 53,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1167,6 +1220,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 62,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1183,6 +1237,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 39,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1199,6 +1254,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1222,13 +1278,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 49,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1245,6 +1303,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 34,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1261,6 +1320,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1292,6 +1352,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 68,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1308,6 +1369,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 45,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1324,6 +1386,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Entry C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1347,13 +1410,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 55,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1370,6 +1435,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 40,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1386,6 +1452,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 65,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1402,6 +1469,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 74,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1418,6 +1486,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1449,6 +1518,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1472,13 +1542,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 61,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1495,6 +1567,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 46,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1511,6 +1584,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 71,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1527,6 +1601,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 80,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1543,6 +1618,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 57,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1559,6 +1635,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1582,13 +1659,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 67,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1605,6 +1684,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 52,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1621,6 +1701,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1652,6 +1733,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 86,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1668,6 +1750,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 63,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1684,6 +1767,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Point_of_Sale C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1707,13 +1791,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 19,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1730,6 +1816,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 4,                              !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1746,6 +1833,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 29,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1762,6 +1850,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 38,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1778,6 +1867,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1809,6 +1899,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1832,13 +1923,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 1,                              !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1855,6 +1948,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1886,6 +1980,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 11,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1902,6 +1997,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 20,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1918,6 +2014,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1949,6 +2046,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail A end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -1972,13 +2070,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 25,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -1995,6 +2095,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 10,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2011,6 +2112,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 35,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2027,6 +2129,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 44,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2043,6 +2146,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 21,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2059,6 +2163,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -2082,13 +2187,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 10,                             !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 26,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2105,6 +2212,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 3,                              !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2121,6 +2229,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -2137,6 +2246,7 @@ BuildingSurface:Detailed,
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2153,6 +2263,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -2184,6 +2295,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail B end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 17,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2207,13 +2319,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 31,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2230,6 +2344,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 16,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2246,6 +2361,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -2277,6 +2393,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 50,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2293,6 +2410,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 27,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2309,6 +2427,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C  - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -2332,13 +2451,15 @@ Zone,
   ,                                       !- Volume {m3}
   ,                                       !- Floor Area {m2}
   ,                                       !- Zone Inside Convection Algorithm
-  ;                                       !- Zone Outside Convection Algorithm
+  ,                                       !- Zone Outside Convection Algorithm
+  Yes;                                    !- Part of Total Floor Area
 
 BuildingSurface:Detailed,
   Surface 13,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2355,6 +2476,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -2386,6 +2508,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -2417,6 +2540,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 32,                             !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2433,6 +2557,7 @@ BuildingSurface:Detailed,
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Surface,                                !- Outside Boundary Condition
   Surface 9,                              !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -2449,6 +2574,7 @@ BuildingSurface:Detailed,
   Roof,                                   !- Surface Type
   ,                                       !- Construction Name
   Zone RetailStandalone Retail C end_a - Story Ground, !- Zone Name
+  ,                                       !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -2465,7 +2591,9 @@ SimulationControl,
   No,                                     !- Do System Sizing Calculation
   No,                                     !- Do Plant Sizing Calculation
   Yes,                                    !- Run Simulation for Sizing Periods
-  Yes;                                    !- Run Simulation for Weather File Run Periods
+  Yes,                                    !- Run Simulation for Weather File Run Periods
+  ,                                       !- Do HVAC Sizing Simulation for Sizing Periods
+  ;                                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 Sizing:Parameters,
   1.25,                                   !- Heating Sizing Factor
@@ -2552,7 +2680,10 @@ SizingPeriod:DesignDay,
   ,                                       !- Beam Solar Day Schedule Name
   ,                                       !- Diffuse Solar Day Schedule Name
   0.365,                                  !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
-  2.513;                                  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+  2.513,                                  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+  ,                                       !- Sky Clearness
+  ,                                       !- Maximum Number Warmup Days
+  FullResetAtBeginEnvironment;            !- Begin Environment Reset Mode
 
 SizingPeriod:DesignDay,
   Climate Zone 1 Ann Clg .4% Condns WB=>MDB, !- Name
@@ -2579,7 +2710,10 @@ SizingPeriod:DesignDay,
   ,                                       !- Beam Solar Day Schedule Name
   ,                                       !- Diffuse Solar Day Schedule Name
   0.365,                                  !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
-  2.513;                                  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+  2.513,                                  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+  ,                                       !- Sky Clearness
+  ,                                       !- Maximum Number Warmup Days
+  FullResetAtBeginEnvironment;            !- Begin Environment Reset Mode
 
 SizingPeriod:DesignDay,
   Climate Zone 1 Ann Htg 99.6% Condns DB, !- Name
@@ -2607,7 +2741,9 @@ SizingPeriod:DesignDay,
   ,                                       !- Diffuse Solar Day Schedule Name
   ,                                       !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
   ,                                       !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-  0;                                      !- Sky Clearness
+  0,                                      !- Sky Clearness
+  ,                                       !- Maximum Number Warmup Days
+  FullResetAtBeginEnvironment;            !- Begin Environment Reset Mode
 
 OutputControl:Table:Style,
   HTML;                                   !- Column Separator
