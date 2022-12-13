@@ -74,4 +74,11 @@ task :remove_tabs do
   end
 end
 
+desc 'Run measure test'
+task :measure_test do
+  puts Dir.getwd
+  require_relative './lib/measures/building_sync_to_openstudio/tests/building_sync_to_openstudio_test'
+
+end
+
 task default: :spec
