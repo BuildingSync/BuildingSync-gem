@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: BuildingSyncToOpenStudio
+  
+    &mdash; Documentation by YARD 0.9.28
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "BuildingSyncToOpenStudio";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (B)</a> &raquo;
+    
+    
+    <span class="title">BuildingSyncToOpenStudio</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: BuildingSyncToOpenStudio
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">OpenStudio::Measure::ModelMeasure</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">OpenStudio::Measure::ModelMeasure</li>
+          
+            <li class="next">BuildingSyncToOpenStudio</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/measures/building_sync_to_openstudio/measure.rb</dd>
+  </dl>
+  
+</div>
+
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#arguments-instance_method" title="#arguments (instance method)">#<strong>arguments</strong>(model)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>define the arguments that the user will input.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#description-instance_method" title="#description (instance method)">#<strong>description</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>human readable description.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#modeler_description-instance_method" title="#modeler_description (instance method)">#<strong>modeler_description</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>human readable description of modeling approach.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#name-instance_method" title="#name (instance method)">#<strong>name</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>human readable name.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>(model, runner, user_arguments)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>define what happens when the measure is run.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="arguments-instance_method">
+  
+    #<strong>arguments</strong>(model)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>define the arguments that the user will input</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/measures/building_sync_to_openstudio/measure.rb', line 29</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_arguments'>arguments</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_args'>args</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Measure</span><span class='op'>::</span><span class='const'>OSArgumentVector</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+
+  <span class='id identifier rubyid_building_sync_xml_file_path'>building_sync_xml_file_path</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Measure</span><span class='op'>::</span><span class='const'>OSArgument</span><span class='period'>.</span><span class='id identifier rubyid_makeStringArgument'>makeStringArgument</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>building_sync_xml_file_path</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_building_sync_xml_file_path'>building_sync_xml_file_path</span><span class='period'>.</span><span class='id identifier rubyid_setDisplayName'>setDisplayName</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BSync XML path</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_building_sync_xml_file_path'>building_sync_xml_file_path</span><span class='period'>.</span><span class='id identifier rubyid_setDescription'>setDescription</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>The path to the XML file that should be translated.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_args'>args</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_building_sync_xml_file_path'>building_sync_xml_file_path</span>
+
+  <span class='id identifier rubyid_out_path'>out_path</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Measure</span><span class='op'>::</span><span class='const'>OSArgument</span><span class='period'>.</span><span class='id identifier rubyid_makeStringArgument'>makeStringArgument</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>out_path</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_out_path'>out_path</span><span class='period'>.</span><span class='id identifier rubyid_setDisplayName'>setDisplayName</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>BSync output path</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_out_path'>out_path</span><span class='period'>.</span><span class='id identifier rubyid_setDescription'>setDescription</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>The output directory where all workflows and results will be written.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_args'>args</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_out_path'>out_path</span>
+
+  <span class='id identifier rubyid_simulate_flag'>simulate_flag</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>Measure</span><span class='op'>::</span><span class='const'>OSArgument</span><span class='period'>.</span><span class='id identifier rubyid_makeBoolArgument'>makeBoolArgument</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>simulate_flag</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_simulate_flag'>simulate_flag</span><span class='period'>.</span><span class='id identifier rubyid_setDisplayName'>setDisplayName</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Simulate and record results?</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_simulate_flag'>simulate_flag</span><span class='period'>.</span><span class='id identifier rubyid_setDescription'>setDescription</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>The generated OSWs will be simulated and the results recorded into the original XML file.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_simulate_flag'>simulate_flag</span><span class='period'>.</span><span class='id identifier rubyid_setDefaultValue'>setDefaultValue</span><span class='lparen'>(</span><span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_args'>args</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_simulate_flag'>simulate_flag</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_args'>args</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="description-instance_method">
+  
+    #<strong>description</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>human readable description</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+17
+18
+19</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/measures/building_sync_to_openstudio/measure.rb', line 17</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_description'>description</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>This measure-gem converts a BuildingSync XML file into a series of OSWs. Each OSW corresponds to an energy efficiency package of measures defined in the BuildingSync XML file. The OSWs can then be simulated and the results are written back into the BuildingSync XML file.</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="modeler_description-instance_method">
+  
+    #<strong>modeler_description</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>human readable description of modeling approach</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+22
+23
+24
+25
+26</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/measures/building_sync_to_openstudio/measure.rb', line 22</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_modeler_description'>modeler_description</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>The measure will use a BuildingSync XML file as an input. The XML can be created using tools such as [bsyncpy](https://pypi.org/project/bsync/).
+  The XML will be parsed and a new OpenStudio model will be created. A new OSW will be created for each energy efficiency package of measures defined in the XML, using the measures defined in the ./lib/buildingsync/makers/phase_zero_base.osw file.
+  The user has a choice for just generating OSWs or generating and simulating them. If the OSWs are simulated, then the results are collected and reports are generated. These reports will be written in the original BuildingSync XML file, and that XML file will be saved.</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="name-instance_method">
+  
+    #<strong>name</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>human readable name</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+11
+12
+13
+14</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/measures/building_sync_to_openstudio/measure.rb', line 11</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='comment'># Measure name should be the title case of the class name.
+</span>  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Building Sync to OpenStudio</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="run-instance_method">
+  
+    #<strong>run</strong>(model, runner, user_arguments)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>define what happens when the measure is run</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/measures/building_sync_to_openstudio/measure.rb', line 51</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_runner'>runner</span><span class='comma'>,</span> <span class='id identifier rubyid_user_arguments'>user_arguments</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_runner'>runner</span><span class='comma'>,</span> <span class='id identifier rubyid_user_arguments'>user_arguments</span><span class='rparen'>)</span>
+
+  <span class='comment'># use the built-in error checking
+</span>  <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_runner'>runner</span><span class='period'>.</span><span class='id identifier rubyid_validateUserArguments'>validateUserArguments</span><span class='lparen'>(</span><span class='id identifier rubyid_arguments'>arguments</span><span class='lparen'>(</span><span class='id identifier rubyid_model'>model</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_user_arguments'>user_arguments</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='kw'>false</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># assign the user inputs to variables
+</span>  <span class='id identifier rubyid_building_sync_xml_file_path'>building_sync_xml_file_path</span> <span class='op'>=</span> <span class='id identifier rubyid_runner'>runner</span><span class='period'>.</span><span class='id identifier rubyid_getStringArgumentValue'>getStringArgumentValue</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>building_sync_xml_file_path</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_user_arguments'>user_arguments</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_out_path'>out_path</span> <span class='op'>=</span> <span class='id identifier rubyid_runner'>runner</span><span class='period'>.</span><span class='id identifier rubyid_getStringArgumentValue'>getStringArgumentValue</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>out_path</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_user_arguments'>user_arguments</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_simulate_flag'>simulate_flag</span> <span class='op'>=</span> <span class='id identifier rubyid_runner'>runner</span><span class='period'>.</span><span class='id identifier rubyid_getStringArgumentValue'>getStringArgumentValue</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>simulate_flag</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_user_arguments'>user_arguments</span><span class='rparen'>)</span>
+
+
+  <span class='comment'># check the space_name for reasonableness
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_building_sync_xml_file_path'>building_sync_xml_file_path</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='id identifier rubyid_runner'>runner</span><span class='period'>.</span><span class='id identifier rubyid_registerError'>registerError</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Empty space name was entered.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='kw'>false</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># report initial condition of model
+</span>  <span class='id identifier rubyid_runner'>runner</span><span class='period'>.</span><span class='id identifier rubyid_registerInitialCondition'>registerInitialCondition</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>The building started with </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_getSpaces'>getSpaces</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> spaces.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='comment'># add a new space to the model
+</span>  <span class='id identifier rubyid_translator'>translator</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="BuildingSync.html" title="BuildingSync (module)">BuildingSync</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="BuildingSync/Translator.html" title="BuildingSync::Translator (class)">Translator</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="BuildingSync/Translator.html#initialize-instance_method" title="BuildingSync::Translator#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_building_sync_xml_file_path'>building_sync_xml_file_path</span><span class='comma'>,</span> <span class='id identifier rubyid_out_path'>out_path</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_translator'>translator</span><span class='period'>.</span><span class='id identifier rubyid_setup_and_sizing_run'>setup_and_sizing_run</span>
+  <span class='comment'># fetch the model from the output directory
+</span>  <span class='id identifier rubyid_ostranslator'>ostranslator</span> <span class='op'>=</span> <span class='const'>OpenStudio</span><span class='op'>::</span><span class='const'>OSVersion</span><span class='op'>::</span><span class='const'>VersionTranslator</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_out_path'>out_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>/in.osm</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_model'>model</span> <span class='op'>=</span> <span class='id identifier rubyid_ostranslator'>ostranslator</span><span class='period'>.</span><span class='id identifier rubyid_loadModel'>loadModel</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='comment'>#translator.output_dir)
+</span>  <span class='id identifier rubyid_model'>model</span> <span class='op'>=</span> <span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span>
+  <span class='id identifier rubyid_runner'>runner</span><span class='period'>.</span><span class='id identifier rubyid_registerFinalCondition'>registerFinalCondition</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>The building finished with </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_getSpaces'>getSpaces</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> spaces.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+
+  <span class='comment'># generating the OpenStudio workflows and writing the osw files
+</span>  <span class='comment'># auc:Scenario elements with measures are turned into new simulation dirs
+</span>  <span class='comment'># path/to/output_dir/scenario_name
+</span>  <span class='id identifier rubyid_translator'>translator</span><span class='period'>.</span><span class='id identifier rubyid_write_osws'>write_osws</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_simulate_flag'>simulate_flag</span>
+    <span class='comment'># run all simulations
+</span>    <span class='id identifier rubyid_translator'>translator</span><span class='period'>.</span><span class='id identifier rubyid_run_osws'>run_osws</span>
+
+    <span class='comment'># gather the results for all scenarios found in out_path,
+</span>    <span class='comment'># such as annual and monthly data for different energy
+</span>    <span class='comment'># sources (electricity, natural gas, etc.)
+</span>    <span class='id identifier rubyid_translator'>translator</span><span class='period'>.</span><span class='id identifier rubyid_gather_results'>gather_results</span>
+
+    <span class='comment'># Add in UserDefinedFields, which contain information about the
+</span>    <span class='comment'># OpenStudio model run 
+</span>    <span class='id identifier rubyid_translator'>translator</span><span class='period'>.</span><span class='id identifier rubyid_prepare_final_xml'>prepare_final_xml</span>
+
+    <span class='comment'># write results to xml
+</span>    <span class='comment'># default file name is &#39;results.xml&#39; 
+</span>    <span class='id identifier rubyid_file_name'>file_name</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>results.xml</span><span class='tstring_end'>&#39;</span></span> 
+    <span class='id identifier rubyid_translator'>translator</span><span class='period'>.</span><span class='id identifier rubyid_save_xml'>save_xml</span><span class='lparen'>(</span><span class='id identifier rubyid_file_name'>file_name</span><span class='rparen'>)</span>
+
+    <span class='comment'># report final condition of model
+</span>    <span class='id identifier rubyid_runner'>runner</span><span class='period'>.</span><span class='id identifier rubyid_registerFinalCondition'>registerFinalCondition</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File has been saved as </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file_name'>file_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>return</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Tue Dec 13 15:59:14 2022 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.28 (ruby-2.7.7).
+</div>
+
+    </div>
+  </body>
+</html>
