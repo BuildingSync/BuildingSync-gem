@@ -15,10 +15,10 @@ All of the following are supported:
 
 ## Installation
 
-The BuildingSync Gem requires installation of OpenStudio, specifically [OpenStudio v3.0.1](https://openstudio-builds.s3.amazonaws.com/index.html?prefix=3.0.1/).
+The BuildingSync Gem requires installation of OpenStudio, specifically [OpenStudio v3.4.0](https://openstudio-builds.s3.amazonaws.com/index.html?prefix=3.4.0/).
 The newer versions of OpenStudio have minor breaking changes that have not been addressed in this repository yet. After OpenStudio is 
 installed, then export the path of the folder that contains the openstudio.rb file to RUBYLIB environment variable
-(e.g., `export RUBYLIB=/Applications/OpenStudio-3.0.1/Ruby`)
+(e.g., `export RUBYLIB=/Applications/OpenStudio-3.4.0/Ruby`)
 
 After installing OpenStudio and setting the environment variable, then add this line to your application's Gemfile:
 ```ruby
