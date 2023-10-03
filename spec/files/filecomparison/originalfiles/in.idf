@@ -1,6 +1,6 @@
 
 Version,
-  9.6;                                    !- Version Identifier
+  22.1;                                   !- Version Identifier
 
 Timestep,
   6;                                      !- Number of Timesteps per Hour
@@ -2603,11 +2603,11 @@ RunPeriod,
   Run Period 1,                           !- Name
   1,                                      !- Begin Month
   1,                                      !- Begin Day of Month
-  2022,                                   !- Begin Year
+  2023,                                   !- Begin Year
   12,                                     !- End Month
   31,                                     !- End Day of Month
-  2022,                                   !- End Year
-  Saturday,                               !- Day of Week for Start Day
+  2023,                                   !- End Year
+  Sunday,                                 !- Day of Week for Start Day
   No,                                     !- Use Weather File Holidays and Special Days
   No,                                     !- Use Weather File Daylight Saving Period
   No,                                     !- Apply Weekend Holiday Rule

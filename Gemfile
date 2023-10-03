@@ -29,3 +29,5 @@ if allow_local && File.exist?('../openstudio-ee-gem')
 else
   gem 'openstudio-ee', github: 'NREL/openstudio-ee-gem', tag: 'v0.6.0'
 end
+
+gem 'parser', '3.2.2.2'
