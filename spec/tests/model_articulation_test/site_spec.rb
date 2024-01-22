@@ -102,19 +102,24 @@ RSpec.describe 'SiteSpec' do
 
   it 'Should write the same IDF file as previously generated' do
     # We don't compare OSM files because the GUIDs change
+    # generate site
     g = BuildingSync::Generator.new
-    @osm_file_path = File.join(SPEC_FILES_DIR, 'filecomparison')
     @site = g.create_minimum_site('Retail', '1980', 'Gross', '20000')
     @site.determine_open_studio_standard(ASHRAE90_1)
+
+    # generate osm on site
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'CZ01RV2.epw')
     @site.generate_baseline_osm(epw_file_path, ASHRAE90_1)
+
+    # write site osm and idf
+    @osm_file_path = File.join(SPEC_FILES_DIR, 'filecomparison')
     @site.write_osm(@osm_file_path)
 
     generate_idf_file(@site.get_model)
 
+    # ensure it equals ground truth
     new_idf = "#{@osm_file_path}/in.idf"
     original_idf = "#{@osm_file_path}/originalfiles/in.idf"
-
     line_not_match_counter = compare_two_idf_files(original_idf, new_idf)
 
     expect(line_not_match_counter == 0).to be true
