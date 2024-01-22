@@ -18,7 +18,7 @@ jobs:
 
       - name: Install and Build
         run: |
-          gem install bundler
+          gem install bundler -v 2.4.22
           bundle install
           bundle exec yard - README.md
           SITEMAP_BASEURL=https://buildingsync-gem.buildingsync.net bundle exec yard doc --plugin sitemap

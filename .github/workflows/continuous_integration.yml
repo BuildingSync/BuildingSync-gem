@@ -14,7 +14,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Setup
       run: |
-        gem install bundler
+        gem install bundler -v 2.4.22
         bundle install
     - name: Building Section Spec
       run: bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb
@@ -63,7 +63,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Setup
       run: |
-        gem install bundler
+        gem install bundler -v 2.4.22
         bundle install
     - name: Translator Example Spec
       run: bundle exec rspec spec/tests/translator_spec.rb
@@ -87,7 +87,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Setup
       run: |
-        gem install bundler
+        gem install bundler -v 2.4.22
         bundle install
     - name: Report Spec
       run: bundle exec rspec spec/tests/report_spec.rb
@@ -120,7 +120,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Setup
       run: |
-        gem install bundler
+        gem install bundler -v 2.4.22
         bundle install
     - name: BuildingSync Spec
       run: bundle exec rspec spec/tests/building_sync_spec.rb
