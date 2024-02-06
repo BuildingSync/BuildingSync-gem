@@ -78,11 +78,11 @@ RSpec.describe 'LoadSystemSpec' do
       # 1. Before the schedule is adjusted
       # 2. After the schedule is adjusted
       # And why we expect the new values
-      expect(help_calculate_hours(default_schedule_set.numberofPeopleSchedule, cut_off_value).round(1)).to eql 33.3
+      expect(help_calculate_hours(default_schedule_set.numberofPeopleSchedule, cut_off_value).round(1)).to eql 47.9
       expect(help_calculate_hours(default_schedule_set.hoursofOperationSchedule, cut_off_value).round(1)). to eql 40.0
       expect(help_calculate_hours(default_schedule_set.peopleActivityLevelSchedule, cut_off_value).round(1)). to eql 168.0
-      expect(help_calculate_hours(default_schedule_set.lightingSchedule, cut_off_value).round(1)). to eql 41.2
-      expect(help_calculate_hours(default_schedule_set.electricEquipmentSchedule, cut_off_value).round(1)).to eql 52.7
+      expect(help_calculate_hours(default_schedule_set.lightingSchedule, cut_off_value).round(1)). to eql 67.4
+      expect(help_calculate_hours(default_schedule_set.electricEquipmentSchedule, cut_off_value).round(1)).to eql 78.0
       expect(help_calculate_hours(default_schedule_set.gasEquipmentSchedule, cut_off_value).round(1)).to eql 0.0
       expect(help_calculate_hours(default_schedule_set.hotWaterEquipmentSchedule, cut_off_value).round(1)).to eql 0.0
       expect(help_calculate_hours(default_schedule_set.infiltrationSchedule, cut_off_value).round(1)).to eql 168.0
