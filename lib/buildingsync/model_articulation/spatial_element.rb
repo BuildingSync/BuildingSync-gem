@@ -222,8 +222,8 @@ module BuildingSync
 
         # else, if occ_type a specified floor number range, see if it matches up
         elsif occ_type[:min_number_floors] || occ_type[:max_number_floors]
-          min_number_floors = occ_type[:min_number_floors].to_i
-          max_number_floors = occ_type[:max_number_floors].to_i
+          min_number_floors = occ_type[:min_number_floors].nil? ? nil : occ_type[:min_number_floors].to_i
+          max_number_floors = occ_type[:max_number_floors].nil? ? nil : occ_type[:max_number_floors].to_i
 
           too_small = min_number_floors && total_number_floors < min_number_floors
           too_big = max_number_floors && total_number_floors >= max_number_floors
