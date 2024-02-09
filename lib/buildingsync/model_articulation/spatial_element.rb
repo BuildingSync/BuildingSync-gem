@@ -234,7 +234,7 @@ module BuildingSync
         end
       end
 
-      # no occ_type fit! We gotta give up
+      # no occ_type fit! We must give up
       return false
     end
 
