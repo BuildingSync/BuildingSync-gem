@@ -86,6 +86,24 @@ RSpec.describe 'SiteSpec' do
     expect(site.get_system_type == 'PSZ-AC with gas coil heat').to be true
   end
 
+  it 'Should return the correct building type based on size' do
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Office', '1954', 'Gross', '10000')
+    expect(site.get_building_type == 'SmallOffice').to be true
+
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Office', '1954', 'Gross', '20000')
+    expect(site.get_building_type == 'MediumOffice').to be true
+
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Office', '1954', 'Gross', '25000')
+    expect(site.get_building_type == 'MediumOffice').to be true
+
+    g = BuildingSync::Generator.new
+    site = g.create_minimum_site('Office', '1954', 'Gross', '75000')
+    expect(site.get_building_type == 'LargeOffice').to be true
+  end
+
   it 'Should return the correct building type' do
     g = BuildingSync::Generator.new
     site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
