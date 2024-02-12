@@ -209,6 +209,12 @@ module BuildingSync
 
     # read systems
     def read_and_create_initial_systems
+      hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
+      lighting_xml = @g.add_lighting_system_to_facility(@base_xml)
+      @hvac_systems = HVACSystem.new(hvac_xml, @ns)
+      @lighting_system = LightingSystemType.new(lighting_xml, @ns)
+      @load_system = LoadsSystem.new
+
       systems_xml = xget_or_create('Systems')
       if !systems_xml.elements.empty?
         systems_xml.elements.each do |system_type|
@@ -223,12 +229,6 @@ module BuildingSync
             end
           end
         end
-      else
-        hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
-        lighting_xml = @g.add_lighting_system_to_facility(@base_xml)
-        @hvac_system = HVACSystem.new(hvac_xml, @ns)
-        @lighting_system = LightingSystemType.new(lighting_xml, @ns)
-        @load_system = LoadsSystem.new
       end
     end
 
