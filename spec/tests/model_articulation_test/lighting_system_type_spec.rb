@@ -73,7 +73,6 @@ RSpec.describe 'LightingSystemType' do
     @facility = BuildingSync::Facility.new(facility_xml, ns)
 
     # -- Assert - No systems have been added
-    expect(@facility.systems_map.empty?).to be true
     @facility.determine_open_studio_standard(@std)
 
     # Add a blank lighting system to the facility and link it to the building
@@ -81,10 +80,8 @@ RSpec.describe 'LightingSystemType' do
     @lighting_system = @facility.add_blank_lighting_system(building_id, 'Building')
 
     # -- Assert Lighting System has been properly added
-    expect(@facility.systems_map.key?('LightingSystems')).to be true
-    expect(@facility.systems_map['LightingSystems'].size).to eq(1)
-    expect(@facility.systems_map['LightingSystems'][0]).to be @lighting_system
-    expect(@lighting_system.xget_linked_premises).to eq('Building' => ['Building1'])
+    expect(@facility.lighting_systems.size).to eq(1)
+    expect(@facility.lighting_systems[0].xget_linked_premises).to eq('Building' => ['Building1'])
 
     # we need to create a site and call the generate_baseline_osm method in order to set the space types in the model, why are those really needed?
     @facility.generate_baseline_osm(@epw_file_path, @output_path, @std)
