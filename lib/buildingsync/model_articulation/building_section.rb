@@ -169,7 +169,7 @@ module BuildingSync
 
     # set building and system type
     def set_bldg_and_system_type
-      super(xget_text('OccupancyClassification'), @total_floor_area, @number_floors, false)
+      super(xget_text('OccupancyClassification'), @total_floor_area, @num_stories, false)
     end
 
     # get peak occupancy
