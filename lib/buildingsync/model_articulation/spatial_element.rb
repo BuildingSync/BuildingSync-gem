@@ -192,7 +192,7 @@ module BuildingSync
 
       # if building_and_system_types doesn't contain occupancy_classification, there's nothing we can do.
       occ_types = building_and_system_types[:"#{occupancy_classification}"]
-      if !occ_types
+      if occ_types.nil?
         raise "BuildingSync Occupancy type #{occupancy_classification} is not available in the building_and_system_types.json dictionary"
       end
 
@@ -203,7 +203,7 @@ module BuildingSync
       end
 
       # Try on each occ_type in the occupancy_classification for size
-      building_and_system_types[:"#{occupancy_classification}"]&.each do |occ_type|
+      occ_types.each do |occ_type|
         # if occ_type has a specified floor area range, see if it matches up
         if occ_type[:min_floor_area] || occ_type[:max_floor_area]
           min_floor_area = occ_type[:min_floor_area].nil? ?
