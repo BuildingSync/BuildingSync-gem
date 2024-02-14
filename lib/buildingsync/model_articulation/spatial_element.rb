@@ -189,40 +189,52 @@ module BuildingSync
     def process_bldg_and_system_type(building_and_system_types, occupancy_classification, total_floor_area, total_number_floors)
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.process_bldg_and_system_type', "Element ID: #{xget_id} started with occupancy_classification #{occupancy_classification} and total floor area: #{total_floor_area}")
       puts "Element ID: #{xget_id} started with occupancy_classification #{occupancy_classification} and total floor area: #{total_floor_area}"
-      min_floor_area_correct = false
-      max_floor_area_correct = false
-      building_and_system_types[:"#{occupancy_classification}"]&.each do |occ_type|
-        if !occ_type[:standards_building_type].nil?
-          if occ_type[:min_floor_area] || occ_type[:max_floor_area]
-            if occ_type[:min_floor_area] && occ_type[:min_floor_area].to_f < total_floor_area
-              min_floor_area_correct = true
-            end
-            if occ_type[:max_floor_area] && occ_type[:max_floor_area].to_f > total_floor_area
-              max_floor_area_correct = true
-            end
-            if (min_floor_area_correct && max_floor_area_correct) || (!occ_type[:min_floor_area] && max_floor_area_correct) || (min_floor_area_correct && !occ_type[:max_floor_area])
-              puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
-              return sets_occupancy_bldg_system_types(occ_type)
-            end
-          elsif occ_type[:min_number_floors] || occ_type[:max_number_floors]
-            if occ_type[:min_number_floors] && occ_type[:min_number_floors].to_i <= total_number_floors
-              puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
-              return sets_occupancy_bldg_system_types(occ_type)
-            elsif occ_type[:max_number_floors] && occ_type[:max_number_floors].to_i > total_number_floors
-              puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
-              return sets_occupancy_bldg_system_types(occ_type)
-            end
-          else
-            # otherwise we assume the first one is correct and we select this
+
+      # if building_and_system_types doesn't contain occupancy_classification, there's nothing we can do.
+      occ_types = building_and_system_types[:"#{occupancy_classification}"]
+      if occ_types.nil?
+        raise "BuildingSync Occupancy type #{occupancy_classification} is not available in the building_and_system_types.json dictionary"
+      end
+
+      # if theres only one, we chose it indiscriminately
+      # TODO: idk if we should do this but its what the tests want
+      if occ_types.length == 1
+        return sets_occupancy_bldg_system_types(occ_types[0])
+      end
+
+      # Try on each occ_type in the occupancy_classification for size
+      occ_types.each do |occ_type|
+        # if occ_type has a specified floor area range, see if it matches up
+        if occ_type[:min_floor_area] || occ_type[:max_floor_area]
+          min_floor_area = occ_type[:min_floor_area].nil? ?
+            nil :
+            OpenStudio.convert(occ_type[:min_floor_area].to_f, 'ft^2', 'm^2').get
+          max_floor_area = occ_type[:max_floor_area].nil? ?
+            nil :
+            OpenStudio.convert(occ_type[:max_floor_area].to_f, 'ft^2', 'm^2').get
+
+          too_small = min_floor_area && total_floor_area < min_floor_area
+          too_big = max_floor_area && total_floor_area >= max_floor_area
+          if !too_big && !too_small
             puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
             return sets_occupancy_bldg_system_types(occ_type)
           end
-        else
-          # otherwise we assume the first one is correct and we select this
-          return sets_occupancy_bldg_system_types(occ_type)
+
+        # else, if occ_type a specified floor number range, see if it matches up
+        elsif occ_type[:min_number_floors] || occ_type[:max_number_floors]
+          min_number_floors = occ_type[:min_number_floors].nil? ? nil : occ_type[:min_number_floors].to_i
+          max_number_floors = occ_type[:max_number_floors].nil? ? nil : occ_type[:max_number_floors].to_i
+
+          too_small = min_number_floors && total_number_floors < min_number_floors
+          too_big = max_number_floors && total_number_floors >= max_number_floors
+          if !too_big && !too_small
+            puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
+            return sets_occupancy_bldg_system_types(occ_type)
+          end
         end
       end
-      raise "BuildingSync Occupancy type #{occupancy_classification} is not available in the building_and_system_types.json dictionary"
+
+      # no occ_type fit! We must give up
       return false
     end
 
