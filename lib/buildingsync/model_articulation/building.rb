@@ -625,8 +625,14 @@ module BuildingSync
       puts @open_studio_standard
       puts @open_studio_standard.class
       puts climate_zone_standard_string
-      if !@open_studio_standard.nil? && !@open_studio_standard.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone_from_climate_zone', "Cannot add design days and weather file for climate zone: #{climate_zone}, no epw file provided")
+
+      # set the model's weather file
+      begin
+        # Note: in future open_studio_standard verisions, model_add_design_days_and_weather_file is replaced with
+        # model_set_building_location. I do not know if it's on purpose, but both can "fail" (return False), or error out
+        successfully_set_weather_file = @open_studio_standard.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
+      rescue
+        raise StandardError, "Could not set weather file because climate zone '#{climate_zone_standard_string}' is not in default weather map."
       end
 
       # overwrite latitude and longitude if available
