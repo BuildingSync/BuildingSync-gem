@@ -145,7 +145,7 @@ RSpec.describe 'BuildingSync' do
       # Trace/BPT trap: 5 gets hit for following 2 lines
       # ['Golden Test File.xml', CA_TITLE24, nil, 'v2.4.0', "Error, cannot find local component for: fa8c9ff0-edc4-0131-a9f8-48e0eb16a403.  Please try a different weather file."],
       # ['Golden Test File.xml', ASHRAE90_1, nil, 'v2.4.0', "Error, cannot find local component for: fa8c9ff0-edc4-0131-a9f8-48e0eb16a403.  Please try a different weather file."],
-      ['Golden Test File.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "Did not find a", false],
+      ['Golden Test File.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES T24 2008_LargeOffice' to create in CaliforniaTitle24", false],
       ['Golden Test File.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "undefined method `add_internal_loads' for nil:NilClass"],
 
       # #####################################
@@ -161,17 +161,17 @@ RSpec.describe 'BuildingSync' do
       # #####################################
       # L000_OpenStudio_Pre-Simulation-02
       # Really this fails because: Could not determine the weather file for climate zone: CEC T24-CEC6A.
-      ['L000_OpenStudio_Pre-Simulation_02.xml', CA_TITLE24, nil, 'v2.4.0', 'no implicit conversion of nil into String'],
+      ['L000_OpenStudio_Pre-Simulation_02.xml', CA_TITLE24, nil, 'v2.4.0', "Could not set weather file because climate zone 'CEC T24-CEC6A' is not in default weather map."],
 
       # #####################################
       # L000_OpenStudio_Pre-Simulation-03
       # Really this fails because: Could not determine the weather file for climate zone: CEC T24-CEC1A.
-      ['L000_OpenStudio_Pre-Simulation_03.xml', CA_TITLE24, nil, 'v2.4.0', 'no implicit conversion of nil into String'],
+      ['L000_OpenStudio_Pre-Simulation_03.xml', CA_TITLE24, nil, 'v2.4.0', "Could not set weather file because climate zone 'CEC T24-CEC1A' is not in default weather map."],
 
       # #####################################
       # L000_OpenStudio_Pre-Simulation-04
       # Really this fails because: Could not determine the weather file for climate zone: CEC T24-CEC6A.
-      ['L000_OpenStudio_Pre-Simulation_04.xml', CA_TITLE24, nil, 'v2.4.0', 'no implicit conversion of nil into String'],
+      ['L000_OpenStudio_Pre-Simulation_04.xml', CA_TITLE24, nil, 'v2.4.0', "Could not set weather file because climate zone 'CEC T24-CEC6A' is not in default weather map."],
 
       #####################################
       ## AT_example_property_report_25
@@ -190,7 +190,7 @@ RSpec.describe 'BuildingSync' do
       #####################################
       ## Office Carolina
       # Really this fails because: Could not determine the weather file for climate zone: CEC T24-CEC6A.
-      ['Office_Carolina.xml', CA_TITLE24, nil, 'v2.4.0', 'no implicit conversion of nil into String']
+      ['Office_Carolina.xml', CA_TITLE24, nil, 'v2.4.0', "Could not set weather file because climate zone 'CEC T24-CEC6A' is not in default weather map."]
     ]
     tests_to_run.each do |file_name, standard, epw_path, schema_version, expected_error_message|
       it "Should fail with message: #{expected_error_message}" do
