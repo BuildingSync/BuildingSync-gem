@@ -623,7 +623,7 @@ module BuildingSync
       # set the model's weather file
       begin
         # Note: in future open_studio_standard verisions, model_add_design_days_and_weather_file is replaced with
-        # model_set_building_location. I know if it's on purpose, but it can both "fail" (return False), or error out
+        # model_set_building_location. I do not know if it's on purpose, but both can "fail" (return False), or error out
         successfully_set_weather_file = @open_studio_standard.model_add_design_days_and_weather_file(@model, climate_zone_standard_string, nil)
       rescue
         raise StandardError, "Could not set weather file because climate zone '#{climate_zone_standard_string}' is not in default weather map."
