@@ -40,7 +40,7 @@ require 'rexml/document'
 require 'buildingsync/constants'
 require 'buildingsync/generator'
 
-require_relative 'model_articulation/spatial_element'
+require_relative 'model_articulation/spatial_element/spatial_element'
 require_relative 'makers/workflow_maker'
 require_relative 'selection_tool'
 require_relative 'extension'

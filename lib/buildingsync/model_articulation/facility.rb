@@ -44,12 +44,12 @@ require 'buildingsync/helpers/helper'
 require 'buildingsync/helpers/xml_get_set'
 require 'buildingsync/helpers/Model.hvac'
 
-require_relative 'site'
-require_relative 'loads_system'
-require_relative 'envelope_system'
-require_relative 'hvac_system'
+require_relative 'location_element/site'
+require_relative 'building_system/loads_system'
+require_relative 'building_system/envelope_system'
+require_relative 'building_system/hvac_system'
 require_relative 'lighting_system'
-require_relative 'service_hot_water_system'
+require_relative 'building_system/service_hot_water_system'
 require_relative 'measure'
 
 module BuildingSync

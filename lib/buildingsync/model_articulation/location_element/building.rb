@@ -41,8 +41,8 @@ require 'date'
 require 'openstudio/extension/core/os_lib_helper_methods'
 require 'openstudio/extension/core/os_lib_model_generation'
 
-require 'buildingsync/model_articulation/building_section'
-require 'buildingsync/model_articulation/location_element'
+require 'buildingsync/model_articulation/spatial_element/building_section'
+require 'buildingsync/model_articulation/spatial_element/location_element'
 require 'buildingsync/get_bcl_weather_file'
 
 module BuildingSync
