@@ -161,17 +161,17 @@ RSpec.describe 'BuildingSync' do
       # #####################################
       # L000_OpenStudio_Pre-Simulation-02
       # Really this fails because: Could not determine the weather file for climate zone: CEC T24-CEC6A.
-      ['L000_OpenStudio_Pre-Simulation_02.xml', CA_TITLE24, nil, 'v2.4.0', 'no implicit conversion of nil into String'],
+      ['L000_OpenStudio_Pre-Simulation_02.xml', CA_TITLE24, nil, 'v2.4.0', "Could not set weather file because climate zone 'CEC T24-CEC6A' is not in default weather map."],
 
       # #####################################
       # L000_OpenStudio_Pre-Simulation-03
       # Really this fails because: Could not determine the weather file for climate zone: CEC T24-CEC1A.
-      ['L000_OpenStudio_Pre-Simulation_03.xml', CA_TITLE24, nil, 'v2.4.0', 'no implicit conversion of nil into String'],
+      ['L000_OpenStudio_Pre-Simulation_03.xml', CA_TITLE24, nil, 'v2.4.0', "Could not set weather file because climate zone 'CEC T24-CEC1A' is not in default weather map."],
 
       # #####################################
       # L000_OpenStudio_Pre-Simulation-04
       # Really this fails because: Could not determine the weather file for climate zone: CEC T24-CEC6A.
-      ['L000_OpenStudio_Pre-Simulation_04.xml', CA_TITLE24, nil, 'v2.4.0', 'no implicit conversion of nil into String'],
+      ['L000_OpenStudio_Pre-Simulation_04.xml', CA_TITLE24, nil, 'v2.4.0', "Could not set weather file because climate zone 'CEC T24-CEC6A' is not in default weather map."],
 
       #####################################
       ## AT_example_property_report_25
@@ -190,7 +190,7 @@ RSpec.describe 'BuildingSync' do
       #####################################
       ## Office Carolina
       # Really this fails because: Could not determine the weather file for climate zone: CEC T24-CEC6A.
-      ['Office_Carolina.xml', CA_TITLE24, nil, 'v2.4.0', 'no implicit conversion of nil into String']
+      ['Office_Carolina.xml', CA_TITLE24, nil, 'v2.4.0', "Could not set weather file because climate zone 'CEC T24-CEC6A' is not in default weather map."]
     ]
     tests_to_run.each do |test|
       it "Should fail with message: #{test[4]}" do
