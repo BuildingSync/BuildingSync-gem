@@ -398,6 +398,12 @@ module BuildingSync
         @open_studio_standard = Standard.build("#{@standard_template}_#{building_type}")
         update_name
       rescue StandardError => e
+        # this error means there's such standard. The default error message is to long to be helpful
+        if e.to_s.include?("Did not find a class called")
+          message =  e.to_s.split("{", 2).first
+          raise StandardError, "BuildingSync.Building.determine_open_studio_standard: #{message}#{standard_to_be_used}"
+        end
+
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.determine_open_studio_standard', e.message[0..20])
         raise StandardError, "BuildingSync.Building.determine_open_studio_standard: #{e.message[0..20]}"
       end

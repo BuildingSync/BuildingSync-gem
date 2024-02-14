@@ -124,13 +124,13 @@ RSpec.describe 'BuildingSync' do
       # ## DC GSA Headquarters
       # Really this fails because: [BuildingSync.GetBCLWeatherFile.download_weather_file_from_city_name] <1> Error, could not find uid for state DC and city Washington. Initial count of weather files: 10. Please try a different weather file.
       ['DC GSA Headquarters.xml', ASHRAE90_1, nil, 'v2.4.0', 'BuildingSync.Building.set_weather_and_climate_zone: epw_file_path is false: false'],
-      ['DC GSA Headquarters.xml', CA_TITLE24, nil, 'v2.4.0', 'Did not find a', false],
-      ['DC GSA Headquarters.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', 'Did not find a', false],
+      ['DC GSA Headquarters.xml', CA_TITLE24, nil, 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],
+      ['DC GSA Headquarters.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],
 
       ####################################
       # DC GSA HeadquartersWithClimateZone
-      ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, nil, 'v2.4.0', 'Did not find a', false],
-      ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', 'Did not find a', false],
+      ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, nil, 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],
+      ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],
 
       # #####################################
       # ## L100 Audit
@@ -156,7 +156,7 @@ RSpec.describe 'BuildingSync' do
       # ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, nil, 'v2.4.0', "Error, cannot find local component for: 1fd3d630-edc5-0131-b802-48e0eb16a403.  Please try a different weather file."],
 
       # We have issues with old CBES files
-      ['L000_OpenStudio_Pre-Simulation_01.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', 'Did not find a', false],
+      ['L000_OpenStudio_Pre-Simulation_01.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],
 
       # #####################################
       # L000_OpenStudio_Pre-Simulation-02
@@ -192,23 +192,14 @@ RSpec.describe 'BuildingSync' do
       # Really this fails because: Could not determine the weather file for climate zone: CEC T24-CEC6A.
       ['Office_Carolina.xml', CA_TITLE24, nil, 'v2.4.0', "Could not set weather file because climate zone 'CEC T24-CEC6A' is not in default weather map."]
     ]
-    tests_to_run.each do |test|
-      it "Should fail with message: #{test[4]}" do
-        puts "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}"
-        xml_path, output_path = create_xml_path_and_output_path(test[0], test[1], __FILE__, test[3])
-        begin
-          translator_sizing_run_and_check(xml_path, output_path, test[2], test[1])
+    tests_to_run.each do |file_name, standard, epw_path, schema_version, expected_error_message|
+      it "Should fail with message: #{expected_error_message}" do
+        puts "File: #{file_name}. Standard: #{standard}. EPW_Path: #{epw_path}. File Schema Version: #{schema_version}"
+        xml_path, output_path = create_xml_path_and_output_path(file_name, standard, __FILE__, schema_version)
 
-          # should not get here
-          expect(false).to be true
-        rescue StandardError => e
-          if test.size == 6
-            # Don't perform exact match
-            expect(e.message.to_s).to include(test[4])
-          else
-            expect(e.message.to_s).to eql test[4]
-          end
-        end
+        expect {
+          translator_sizing_run_and_check(xml_path, output_path, epw_path, standard)
+        }. to raise_error(StandardError, expected_error_message)
       end
     end
   end
