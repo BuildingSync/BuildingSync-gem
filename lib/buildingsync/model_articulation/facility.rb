@@ -388,7 +388,7 @@ module BuildingSync
 
       # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
       if add_exterior_lights
-        if !@lighting_systems.nil?
+        if !@lighting_systems.empty?
           @lighting_systems.each do |lighting_system|
             lighting_system.add_exterior_lights(model, open_studio_system_standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
           end

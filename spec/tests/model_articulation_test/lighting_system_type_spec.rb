@@ -80,8 +80,8 @@ RSpec.describe 'LightingSystemType' do
     @lighting_system = @facility.add_blank_lighting_system(building_id, 'Building')
 
     # -- Assert Lighting System has been properly added
-    expect(@facility.lighting_systems.size).to eq(1)
-    expect(@facility.lighting_systems[0].xget_linked_premises).to eq('Building' => ['Building1'])
+    expect(@facility.lighting_systems.size).to eq(2)
+    expect(@facility.lighting_systems[1].xget_linked_premises).to eq('Building' => ['Building1'])
 
     # we need to create a site and call the generate_baseline_osm method in order to set the space types in the model, why are those really needed?
     @facility.generate_baseline_osm(@epw_file_path, @output_path, @std)
