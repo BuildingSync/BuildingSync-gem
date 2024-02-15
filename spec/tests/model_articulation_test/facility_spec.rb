@@ -172,7 +172,7 @@ RSpec.describe 'Facility Systems' do
     @ns = 'auc'
     g = BuildingSync::Generator.new
     doc = g.create_minimum_snippet('Retail')
-    doc_no_systems = g.create_minimum_snippet('Retail)')
+    doc_no_systems = g.create_minimum_snippet('Retail')
     @facility_no_systems_xml = g.get_first_facility_element(doc_no_systems)
 
     g.add_hvac_system_to_first_facility(doc, 'HVACSystem-1', 'VAV with Hot Water Reheat')

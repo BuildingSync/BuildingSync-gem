@@ -212,7 +212,7 @@ module BuildingSync
       systems_xml = xget_or_create('Systems')
 
       init_hvac_systems(systems_xml.elements["#{@ns}:HVACSystems"])
-      init_lighting_systems(systems_xml.elements["#{@ns}:LightingSystem"])
+      init_lighting_systems(systems_xml.elements["#{@ns}:LightingSystems"])
       init_load_systems(systems_xml.elements["#{@ns}:PlugLoads"])  # PlugLoad, not ProcessLoad
 
     end
@@ -242,7 +242,7 @@ module BuildingSync
       else
         @lighting_systems = []
         lighting_system_xmls.elements.each do |lighting_system_xml|
-          @lighting_systems << BuildingSync::LightingSystem.new(lighting_system_xml, @ns)
+          @lighting_systems << BuildingSync::LightingSystemType.new(lighting_system_xml, @ns)
         end
       end
     end
