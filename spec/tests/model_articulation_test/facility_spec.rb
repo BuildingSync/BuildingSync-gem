@@ -166,13 +166,13 @@ RSpec.describe 'Facility Scenario Parsing' do
   end
 end
 
-RSpec.describe 'Facility Systems Mapping' do
+RSpec.describe 'Facility Systems' do
   before(:all) do
     # -- Setup
     @ns = 'auc'
     g = BuildingSync::Generator.new
     doc = g.create_minimum_snippet('Retail')
-    doc_no_systems = g.create_minimum_snippet('Retail)')
+    doc_no_systems = g.create_minimum_snippet('Retail')
     @facility_no_systems_xml = g.get_first_facility_element(doc_no_systems)
 
     g.add_hvac_system_to_first_facility(doc, 'HVACSystem-1', 'VAV with Hot Water Reheat')
@@ -184,33 +184,20 @@ RSpec.describe 'Facility Systems Mapping' do
     @facility = BuildingSync::Facility.new(facility_xml, @ns)
   end
   describe 'with systems defined' do
-    it 'should be of the correct data structure' do
-      # -- Assert
-      expect(@facility.systems_map).to be_an_instance_of(Hash)
-    end
-    it 'should have the correct keys' do
-      # -- Assert correct keys get created
-      expected_keys = ['HVACSystems', 'LightingSystems', 'PlugLoads']
-      expected_keys.each do |k|
-        expect(@facility.systems_map.key?(k)).to be true
-      end
-    end
-
     it 'values should be of the correct type and size' do
       # -- Assert values of keys are correct type and size
-      expect(@facility.systems_map['HVACSystems']).to be_an_instance_of(Array)
-      expect(@facility.systems_map['LightingSystems']).to be_an_instance_of(Array)
-      expect(@facility.systems_map['PlugLoads']).to be_an_instance_of(Array)
-      expect(@facility.systems_map['HVACSystems'].size).to eq(2)
-      expect(@facility.systems_map['LightingSystems'].size).to eq(1)
-      expect(@facility.systems_map['PlugLoads'].size).to eq(1)
+      expect(@facility.hvac_systems).to be_an_instance_of(Array)
+      expect(@facility.lighting_systems).to be_an_instance_of(Array)
+      expect(@facility.load_systems).to be_an_instance_of(Array)
+      expect(@facility.hvac_systems.size).to eq(2)
+      expect(@facility.lighting_systems.size).to eq(1)
+      expect(@facility.load_systems.size).to eq(1)
     end
 
     it 'values in array should be of the correct type' do
-      # Only HVACSystem and LightingSystem should be typed as BSync element types (for now)
-      expect(@facility.systems_map['HVACSystems'][0]).to be_an_instance_of(BuildingSync::HVACSystem)
-      expect(@facility.systems_map['LightingSystems'][0]).to be_an_instance_of(BuildingSync::LightingSystemType)
-      expect(@facility.systems_map['PlugLoads'][0]).to be_an_instance_of(REXML::Element)
+      expect(@facility.hvac_systems[0]).to be_an_instance_of(BuildingSync::HVACSystem)
+      expect(@facility.lighting_systems[0]).to be_an_instance_of(BuildingSync::LightingSystemType)
+      expect(@facility.load_systems[0]).to be_an_instance_of(BuildingSync::LoadsSystem)
     end
   end
   describe 'with no systems defined' do

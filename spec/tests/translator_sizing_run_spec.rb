@@ -54,6 +54,10 @@ RSpec.describe 'BuildingSync' do
       ['building_151_n1.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
       ['building_151_n1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
 
+      ## building_151_level1
+      ['building_151_level1.xml', ASHRAE90_1, nil, 'v2.4.0'],
+      ['building_151_level1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
+
       # Building 151 multifamily
       ['building_151_multifamily.xml', ASHRAE90_1, nil, 'v2.4.0'],
       ['building_151_multifamily.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
@@ -70,6 +74,14 @@ RSpec.describe 'BuildingSync' do
 
       # BuildingSync Website Valid Schema
       # None of these should work, see errors that get caught in next section.
+
+      # #####################################
+      # ## L100 Audit
+      # Trace/BPT trap: 5 gets hit for following 2 lines
+      # ['L100_Audit.xml', CA_TITLE24, nil, 'v2.4.0', "Error, cannot find local component for: 1ed4ea50-edc6-0131-1b8b-48e0eb16a403.  Please try a different weather file."],
+      # ['L100_Audit.xml', ASHRAE90_1, nil, 'v2.4.0', "Error, cannot find local component for: 1ed4ea50-edc6-0131-1b8b-48e0eb16a403.  Please try a different weather file."],
+      ['L100_Audit.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
+      ['L100_Audit.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
 
       # L000_OpenStudio_Pre-Simulation-01
       ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
@@ -88,11 +100,16 @@ RSpec.describe 'BuildingSync' do
       ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, nil, 'v2.4.0'],
       ['L000_OpenStudio_Pre-Simulation_04.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
       ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
+      ['example-smalloffice-level1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
 
       # Office_Carolina
       ['Office_Carolina.xml', ASHRAE90_1, nil, 'v2.4.0'],
       ['Office_Carolina.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
-      ['Office_Carolina.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0']
+      ['Office_Carolina.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
+
+      #####################################
+      ## Golden File
+      ['Golden Test File.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
     ]
     tests_to_run.each do |test|
       it "File: #{test[0]}. Standard: #{test[1]}. EPW_Path: #{test[2]}. File Schema Version: #{test[3]}" do
@@ -108,10 +125,8 @@ RSpec.describe 'BuildingSync' do
 
       #####################################
       ## building_151_level1
-      ['building_151_level1.xml', CA_TITLE24, nil, 'v2.4.0', "undefined method `add_internal_loads' for nil:NilClass"],
-      ['building_151_level1.xml', ASHRAE90_1, nil, 'v2.4.0', "undefined method `add_internal_loads' for nil:NilClass"],
-      ['building_151_level1.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "undefined method `add_internal_loads' for nil:NilClass"],
-      ['building_151_level1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "undefined method `add_internal_loads' for nil:NilClass"],
+      ['building_151_level1.xml', CA_TITLE24, nil, 'v2.4.0', "This is not a table"],
+      ['building_151_level1.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "This is not a table"],
 
       #####################################
       ## BuildingSync Website Valid Schema
@@ -130,23 +145,14 @@ RSpec.describe 'BuildingSync' do
       ####################################
       # DC GSA HeadquartersWithClimateZone
       ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, nil, 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],
-      ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],
-
-      # #####################################
-      # ## L100 Audit
-      # Trace/BPT trap: 5 gets hit for following 2 lines
-      # ['L100_Audit.xml', CA_TITLE24, nil, 'v2.4.0', "Error, cannot find local component for: 1ed4ea50-edc6-0131-1b8b-48e0eb16a403.  Please try a different weather file."],
-      # ['L100_Audit.xml', ASHRAE90_1, nil, 'v2.4.0', "Error, cannot find local component for: 1ed4ea50-edc6-0131-1b8b-48e0eb16a403.  Please try a different weather file."],
-      ['L100_Audit.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "undefined method `add_internal_loads' for nil:NilClass"],
-      ['L100_Audit.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "undefined method `add_internal_loads' for nil:NilClass"],
+      ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],      # #####################################
 
       # #####################################
       # ## Golden File
       # Trace/BPT trap: 5 gets hit for following 2 lines
       # ['Golden Test File.xml', CA_TITLE24, nil, 'v2.4.0', "Error, cannot find local component for: fa8c9ff0-edc4-0131-a9f8-48e0eb16a403.  Please try a different weather file."],
       # ['Golden Test File.xml', ASHRAE90_1, nil, 'v2.4.0', "Error, cannot find local component for: fa8c9ff0-edc4-0131-a9f8-48e0eb16a403.  Please try a different weather file."],
-      ['Golden Test File.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES T24 2008_LargeOffice' to create in CaliforniaTitle24", false],
-      ['Golden Test File.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "undefined method `add_internal_loads' for nil:NilClass"],
+      ['Golden Test File.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES T24 2008_LargeOffice' to create in CaliforniaTitle24"],
 
       # #####################################
       # L000_OpenStudio_Pre-Simulation-01
