@@ -55,9 +55,7 @@ RSpec.describe 'BuildingSync' do
       ['building_151_n1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
 
       ## building_151_level1
-      ['building_151_level1.xml', CA_TITLE24, nil, 'v2.4.0'],
       ['building_151_level1.xml', ASHRAE90_1, nil, 'v2.4.0'],
-      ['building_151_level1.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
       ['building_151_level1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
 
       # Building 151 multifamily
@@ -71,6 +69,12 @@ RSpec.describe 'BuildingSync' do
       ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
       ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, 'v2.4.0'],
 
+      # L100 Audit
+      # None working
+
+      # BuildingSync Website Valid Schema
+      # None of these should work, see errors that get caught in next section.
+
       # #####################################
       # ## L100 Audit
       # Trace/BPT trap: 5 gets hit for following 2 lines
@@ -78,14 +82,6 @@ RSpec.describe 'BuildingSync' do
       # ['L100_Audit.xml', ASHRAE90_1, nil, 'v2.4.0', "Error, cannot find local component for: 1ed4ea50-edc6-0131-1b8b-48e0eb16a403.  Please try a different weather file."],
       ['L100_Audit.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
       ['L100_Audit.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
-
-      # #####################################
-      # ## Golden File
-      # Trace/BPT trap: 5 gets hit for following 2 lines
-      # ['Golden Test File.xml', CA_TITLE24, nil, 'v2.4.0', "Error, cannot find local component for: fa8c9ff0-edc4-0131-a9f8-48e0eb16a403.  Please try a different weather file."],
-      # ['Golden Test File.xml', ASHRAE90_1, nil, 'v2.4.0', "Error, cannot find local component for: fa8c9ff0-edc4-0131-a9f8-48e0eb16a403.  Please try a different weather file."],
-      ['Golden Test File.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
-      ['Golden Test File.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
 
       # L000_OpenStudio_Pre-Simulation-01
       ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
@@ -124,6 +120,11 @@ RSpec.describe 'BuildingSync' do
       # file_name, standard, epw_path, schema_version, expected_error_message
 
       #####################################
+      ## building_151_level1
+      ['building_151_level1.xml', CA_TITLE24, nil, 'v2.4.0', "This is not a table"],
+      ['building_151_level1.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "This is not a table"],
+
+      #####################################
       ## BuildingSync Website Valid Schema
       ['BuildingSync Website Valid Schema.xml', CA_TITLE24, nil, 'v2.4.0', 'Building ID: Building001. OccupancyClassification must be defined at either the Site or Building level.'],
       ['BuildingSync Website Valid Schema.xml', ASHRAE90_1, nil, 'v2.4.0', 'Building ID: Building001. OccupancyClassification must be defined at either the Site or Building level.'],
@@ -140,7 +141,15 @@ RSpec.describe 'BuildingSync' do
       ####################################
       # DC GSA HeadquartersWithClimateZone
       ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, nil, 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],
-      ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],
+      ['DC GSA HeadquartersWithClimateZone.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES Pre-1978_LargeOffice' to create in CaliforniaTitle24"],      # #####################################
+
+      # #####################################
+      # ## Golden File
+      # Trace/BPT trap: 5 gets hit for following 2 lines
+      # ['Golden Test File.xml', CA_TITLE24, nil, 'v2.4.0', "Error, cannot find local component for: fa8c9ff0-edc4-0131-a9f8-48e0eb16a403.  Please try a different weather file."],
+      # ['Golden Test File.xml', ASHRAE90_1, nil, 'v2.4.0', "Error, cannot find local component for: fa8c9ff0-edc4-0131-a9f8-48e0eb16a403.  Please try a different weather file."],
+      ['Golden Test File.xml', CA_TITLE24, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES T24 2008_LargeOffice' to create in CaliforniaTitle24", false],
+      ['Golden Test File.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', "BuildingSync.Building.determine_open_studio_standard: ERROR: Did not find a class called 'CBES T24 2008_LargeOffice' to create in CaliforniaTitle24"],
 
       # #####################################
       # L000_OpenStudio_Pre-Simulation-01
