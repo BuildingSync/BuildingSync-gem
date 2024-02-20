@@ -103,6 +103,18 @@
           </auc:Buildings>
         </auc:Site>
       </auc:Sites>
+      <auc:Systems>
+        <auc:HVACSystems>
+          <auc:HVACSystem ID="HVACSystem1">
+            <auc:PrincipalHVACSystemType>VAV with Hot Water Reheat</auc:PrincipalHVACSystemType>
+            <auc:LinkedPremises>
+              <auc:Building>
+                <auc:LinkedBuildingID IDref="Building151"></auc:LinkedBuildingID>
+              </auc:Building>
+            </auc:LinkedPremises>
+          </auc:HVACSystem>
+        </auc:HVACSystems>
+      </auc:Systems>
       <auc:Measures>
         <auc:Measure ID="Measure1">
           <auc:SystemCategoryAffected>Lighting</auc:SystemCategoryAffected>
