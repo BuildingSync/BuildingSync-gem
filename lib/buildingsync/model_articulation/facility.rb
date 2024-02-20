@@ -223,6 +223,25 @@ module BuildingSync
             end
           end
         end
+        # check that the system types from below were found, if not initialize?
+        # TODO: double check that this makes sense and isn't hiding a data error (some systems could be present but not others?)
+        if !@systems_map.key?('HVACSystem')
+          hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
+          @hvac_system = HVACSystem.new(hvac_xml, @ns)
+          @systems_map['HVACSystem'] = []
+          @systems_map['HVACSystem'] << BuildingSync::HVACSystem.new(hvac_xml, @ns)
+        end
+        if !@systems_map.key?('LoadsSystem')
+          @load_system = LoadsSystem.new
+          @systems_map['LoadsSystem'] = []
+          @systems_map['LoadsSystem'] << LoadsSystem.new
+        end
+        if !@systems_map.key?('LightingSystem')
+          lighting_xml = @g.add_lighting_system_to_facility(@base_xml)
+          @lighting_system = LightingSystemType.new(lighting_xml, @ns)
+          @systems_map['LightingSystem'] = []
+          @systems_map['LightingSystem'] << LightingSystemType.new(lighting_xml, @ns)
+        end
       else
         hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
         lighting_xml = @g.add_lighting_system_to_facility(@base_xml)
@@ -305,6 +324,7 @@ module BuildingSync
       # Make the open_studio_system_standard applier
       open_studio_system_standard = determine_open_studio_system_standard
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Facility.create_building_system', "Building Standard with template: #{template}.")
+      puts "BuildingSync.Facility.create_building_system - Standard Template set to: #{open_studio_system_standard}"
 
       # add internal loads to space types
       if add_space_type_loads
