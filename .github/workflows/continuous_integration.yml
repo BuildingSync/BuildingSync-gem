@@ -3,6 +3,10 @@ name: Continuous Integration
 on:
   pull_request:
   push:
+    branches:
+      - "develop"
+    tags:
+      - '*'
 
 jobs:
   model_articulation_tests:
