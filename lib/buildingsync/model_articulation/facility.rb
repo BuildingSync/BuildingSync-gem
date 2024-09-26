@@ -76,7 +76,6 @@ module BuildingSync
 
       @measures = []
       @contacts = []
-      @systems_map = {}
 
       # TODO: Go under Report
       @utility_name = nil
@@ -84,8 +83,9 @@ module BuildingSync
       @metering_configuration = nil
       @spaces_excluded_from_gross_floor_area = nil
 
-      @load_system = nil
-      @hvac_system = nil
+      @hvac_systems = nil
+      @lighting_systems = nil
+      @load_systems = nil
 
       # reading the xml
       read_xml
@@ -210,25 +210,55 @@ module BuildingSync
     # read systems
     def read_and_create_initial_systems
       systems_xml = xget_or_create('Systems')
-      if !systems_xml.elements.empty?
-        systems_xml.elements.each do |system_type|
-          @systems_map[system_type.name] = []
-          system_type.elements.each do |system_xml|
-            if system_xml.name == 'HVACSystem'
-              @systems_map[system_type.name] << BuildingSync::HVACSystem.new(system_xml, @ns)
-            elsif system_xml.name == 'LightingSystem'
-              @systems_map[system_type.name] << BuildingSync::LightingSystemType.new(system_xml, @ns)
-            else
-              @systems_map[system_type.name] << system_xml
-            end
-          end
-        end
-      else
+
+      init_hvac_systems(systems_xml.elements["#{@ns}:HVACSystems"])
+      init_lighting_systems(systems_xml.elements["#{@ns}:LightingSystems"])
+      init_load_systems(systems_xml.elements["#{@ns}:PlugLoads"])  # PlugLoad, not ProcessLoad
+
+    end
+
+    def init_hvac_systems(hvac_system_xmls)
+      # if theres no hvac_system_xmls, use a default
+      if hvac_system_xmls.nil? || !hvac_system_xmls.has_elements?
         hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
+        @hvac_systems = [ HVACSystem.new(hvac_xml, @ns)]
+
+      # else, use the hvac_system_xmls
+      else
+        @hvac_systems = []
+        hvac_system_xmls.elements.each do |hvac_system_xml|
+          @hvac_systems << BuildingSync::HVACSystem.new(hvac_system_xml, @ns)
+        end
+      end
+    end
+
+    def init_lighting_systems(lighting_system_xmls)
+      # if theres no lighting_system_xmls, use a default
+      if lighting_system_xmls.nil? || !lighting_system_xmls.has_elements?
         lighting_xml = @g.add_lighting_system_to_facility(@base_xml)
-        @hvac_system = HVACSystem.new(hvac_xml, @ns)
-        @lighting_system = LightingSystemType.new(lighting_xml, @ns)
-        @load_system = LoadsSystem.new
+        @lighting_systems = [LightingSystemType.new(lighting_xml, @ns)]
+
+      # else, use the lighting_system_xmls
+      else
+        @lighting_systems = []
+        lighting_system_xmls.elements.each do |lighting_system_xml|
+          @lighting_systems << BuildingSync::LightingSystemType.new(lighting_system_xml, @ns)
+        end
+      end
+    end
+
+    def init_load_systems(loads_system_xmls)
+      # if theres no loads_system_xmls, use a default
+      if loads_system_xmls.nil? || !loads_system_xmls.has_elements?
+        loads_system_xml = @g.add_plug_load_to_facility(@base_xml)
+        @load_systems = [BuildingSync::LoadsSystem.new(loads_system_xml, @ns)]
+
+      # else, use the lighting_system_xmls
+      else
+        @load_systems = []
+        loads_system_xmls.elements.each do |lighting_system_xml|
+          @load_systems << BuildingSync::LoadsSystem.new(lighting_system_xml, @ns)
+        end
       end
     end
 
@@ -248,13 +278,13 @@ module BuildingSync
       @g.add_linked_premise(lighting_system_xml, premise_id, premise_type)
 
       # Create a new array if doesn't yet exist
-      if !@systems_map.key?('LightingSystems')
-        @systems_map['LightingSystems'] = []
+      if @lighting_systems.nil?
+        @lighting_systems = []
       end
 
       # Create new lighting system and add to array
       new_system = BuildingSync::LightingSystemType.new(lighting_system_xml, @ns)
-      @systems_map['LightingSystems'] << new_system
+      @lighting_systems << new_system
       return new_system
     end
 
@@ -308,13 +338,17 @@ module BuildingSync
 
       # add internal loads to space types
       if add_space_type_loads
-        @load_system.add_internal_loads(model, open_studio_system_standard, template, @site.get_building_sections, remove_objects)
+        @load_systems.each do |load_system|
+          load_system.add_internal_loads(model, open_studio_system_standard, template, @site.get_building_sections, remove_objects)
+        end
         new_occupancy_peak = @site.get_peak_occupancy
         new_occupancy_peak.each do |id, occupancy_peak|
           floor_area = @site.get_floor_area[id]
           if occupancy_peak && floor_area && floor_area > 0.0
             puts "new peak occupancy value found: absolute occupancy: #{occupancy_peak} occupancy per area: #{occupancy_peak.to_f / floor_area.to_f} and area: #{floor_area} m2"
-            @load_system.adjust_occupancy_peak(model, occupancy_peak, floor_area, @site.get_space_types_from_hash(id))
+            @load_systems.each do |load_system|
+              load_system.adjust_occupancy_peak(model, occupancy_peak, floor_area, @site.get_space_types_from_hash(id))
+            end
           end
         end
       end
@@ -347,13 +381,15 @@ module BuildingSync
 
       # add elevators (returns ElectricEquipment object)
       if add_elevators
-        @load_system.add_elevator(model, open_studio_system_standard)
+        @load_systems.each do |load_system|
+          load_system.add_elevator(model, open_studio_system_standard)
+        end
       end
 
       # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
       if add_exterior_lights
-        if !@systems_map['LightingSystems'].nil?
-          @systems_map['LightingSystems'].each do |lighting_system|
+        if !@lighting_systems.empty?
+          @lighting_systems.each do |lighting_system|
             lighting_system.add_exterior_lights(model, open_studio_system_standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
           end
         else
@@ -364,7 +400,9 @@ module BuildingSync
 
       # add_exhaust
       if add_exhaust
-        @hvac_system.add_exhaust(model, open_studio_system_standard, 'Adjacent', remove_objects)
+        @hvac_systems.each do |hvac_system|
+          hvac_system.add_exhaust(model, open_studio_system_standard, 'Adjacent', remove_objects)
+        end
       end
 
       # add service water heating demand and supply
@@ -374,7 +412,9 @@ module BuildingSync
       end
 
       # TODO: Make this better
-      @lighting_system.add_daylighting_controls(model, open_studio_system_standard, template, main_output_dir)
+      @lighting_systems.each do |lighting_system|
+        lighting_system.add_daylighting_controls(model, open_studio_system_standard, template, main_output_dir)
+      end
 
       # TODO: - add internal mass
       # TODO: - add slab modeling and slab insulation
@@ -388,12 +428,16 @@ module BuildingSync
       # works by switching some fraction of electric loads to gas if requested (assuming base load is electric)
       # add thermostats
       if add_thermostat
-        @hvac_system.add_thermostats(model, open_studio_system_standard, remove_objects)
+        @hvac_systems.each do |hvac_system|
+          hvac_system.add_thermostats(model, open_studio_system_standard, remove_objects)
+        end
       end
 
       # add hvac system
       if add_hvac
-        @hvac_system.add_hvac(model, zone_hash, open_studio_system_standard, system_type, hvac_delivery_type, htg_src, clg_src, remove_objects)
+        @hvac_systems.each do |hvac_system|
+          hvac_system.add_hvac(model, zone_hash, open_studio_system_standard, system_type, hvac_delivery_type, htg_src, clg_src, remove_objects)
+        end
       end
 
       # set hvac controls and efficiencies (this should be last model articulation element)
@@ -403,7 +447,9 @@ module BuildingSync
           objects_after_cleanup = initial_objects - model.getModelObjects.size
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Facility.create_building_system', "Removing #{objects_after_cleanup} objects from model")
         end
-        @hvac_system.apply_sizing_and_assumptions(model, main_output_dir, open_studio_system_standard, primary_bldg_type, system_type, climate_zone)
+        @hvac_systems.each do |hvac_system|
+          hvac_system.apply_sizing_and_assumptions(model, main_output_dir, open_studio_system_standard, primary_bldg_type, system_type, climate_zone)
+        end
       end
 
       # remove everything but spaces, zones, and stub space types (extend as needed for additional objects, may make bool arg for this)
@@ -434,6 +480,6 @@ module BuildingSync
       @site.prepare_final_xml
     end
 
-    attr_reader :systems_map, :site, :report, :measures, :contacts
+    attr_reader :site, :report, :measures, :contacts, :hvac_systems, :lighting_systems, :load_systems
   end
 end
