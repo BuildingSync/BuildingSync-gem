@@ -123,6 +123,10 @@ module BuildingSync
       super(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
     end
 
+    def write_baseline_osw()
+      super(@output_dir)
+    end
+
     # write osws - write all workflows into osw files
     def write_osws(only_cb_modeled = false)
       super(@output_dir, only_cb_modeled)

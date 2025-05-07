@@ -46,6 +46,7 @@ require 'buildingsync/extension'
 require 'buildingsync/constants'
 require 'buildingsync/scenario'
 require 'buildingsync/makers/workflow_maker_base'
+require 'buildingsync/makers/osw_arg_populator'
 require 'buildingsync/model_articulation/facility'
 
 module BuildingSync
@@ -460,6 +461,25 @@ module BuildingSync
       return really_successful
     end
 
+    def write_baseline_osw(model_dir)
+      # start with an empty baseline workflow
+      file = File.read(EMPTY_BASELINE_OSW_PATH)
+      baseline_osw = JSON.parse(file, symbolize_names: true)
+
+      # populate the baseline measures
+      OSWARGPopulator::populate_set_run_period_args(baseline_osw, @facility)
+      OSWARGPopulator::populate_change_building_location_args(baseline_osw, @facility)
+      OSWARGPopulator::populate_create_bar_from_building_type_ratios_args(baseline_osw, @facility)
+      OSWARGPopulator::populate_openstudio_results_args(baseline_osw, @facility)
+
+      # write to file
+      workflow_dir = File.join(model_dir, 'baseline')
+      FileUtils.mkdir_p(workflow_dir)
+      File.open(File.join(workflow_dir, 'in.osw'), 'w') do |file|
+        file << JSON.pretty_generate(baseline_osw)
+      end
+    end
+
     # Write an OSW for the provided scenario
     # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
     # @param [BuildingSync::Scenario]
@@ -518,7 +538,7 @@ module BuildingSync
     # Removes unused measures from a workflow, where __SKIP__ == true
     # @param workflow [Hash] a hash of the openstudio workflow, typically after a deep
     # copy is made and the measures are configured for the specific scenario
-    # KAF: reworked to only delete measures with an explicit __SKIP__ == true 
+    # KAF: reworked to only delete measures with an explicit __SKIP__ == true
     # (sometimes measure don't have a skip at all, assume we want to keep those)
     def purge_skipped_from_workflow(workflow)
       non_skipped = []
@@ -535,7 +555,7 @@ module BuildingSync
               # no "SKIP" argument, keep anyway
               non_skipped << step
             end
-          end 
+          end
         end
         workflow['steps'] = non_skipped
       end
