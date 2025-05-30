@@ -559,7 +559,7 @@ module BuildingSync
       base_workflow = deep_copy_workflow
 
       if baseline_osm_path
-        base_workflow["seed_file"] = File.join(Dir.pwd, baseline_osm_path)
+        base_workflow["seed_file"] = baseline_osm_path
       end
 
       # configure the workflow based on measures in this scenario

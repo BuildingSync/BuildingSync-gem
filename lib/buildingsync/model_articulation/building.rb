@@ -38,8 +38,6 @@
 # *******************************************************************************
 require 'date'
 
-# require 'openstudio/extension/core/os_lib_helper_methods'
-# require 'openstudio/extension/core/os_lib_model_generation'
 require 'openstudio-standards'
 
 require 'buildingsync/model_articulation/building_section'
@@ -49,11 +47,6 @@ require 'buildingsync/get_bcl_weather_file'
 module BuildingSync
   # Building class
   class Building < LocationElement
-    # include OpenstudioStandards::Geometry
-    # include OsLib_HelperMethods
-    # include EnergyPlus
-    # include OsLib_ModelGeneration
-
     # initialize
     # @param building_element [REXML::Element] an element corresponding to a single auc:Building
     # @param site_occupancy_classification [String]
@@ -755,7 +748,7 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', "city is #{epw_file.city}. State is #{epw_file.stateProvinceRegion}")
 
       stat_file = get_stat_file(epw_file)
-      # add_site_water_mains_temperature(stat_file) if !stat_file.nil?
+      add_site_water_mains_temperature(stat_file) if !stat_file.nil?
 
       set_climate_zone(climate_zone, standard_to_be_used, stat_file)
 
