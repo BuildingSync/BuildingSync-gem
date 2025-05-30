@@ -36,7 +36,7 @@
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # *******************************************************************************
-require 'openstudio/extension/core/os_lib_geometry'
+# require 'openstudio/extension/core/os_lib_geometry'
 
 require 'buildingsync/report'
 require 'buildingsync/contact'
@@ -55,7 +55,7 @@ require_relative 'measure'
 module BuildingSync
   # Facility class
   class Facility
-    include OsLib_Geometry
+    # include OsLib_Geometry
     include BuildingSync::Helper
     include BuildingSync::XmlGetSet
     # initialize
@@ -147,6 +147,10 @@ module BuildingSync
     # @return [Standard]
     def determine_open_studio_standard(standard_to_be_used)
       return @site.determine_open_studio_standard(standard_to_be_used)
+    end
+
+    def set_weather_and_climate_zone(epw_file_path, output_path, standard_to_be_used, ddy_file = nil)
+      @site.set_weather_and_climate_zone(epw_file_path, standard_to_be_used, ddy_file = nil)
     end
 
     # generating the OpenStudio model based on the imported BuildingSync Data

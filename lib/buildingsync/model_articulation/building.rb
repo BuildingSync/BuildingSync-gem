@@ -38,8 +38,9 @@
 # *******************************************************************************
 require 'date'
 
-require 'openstudio/extension/core/os_lib_helper_methods'
-require 'openstudio/extension/core/os_lib_model_generation'
+# require 'openstudio/extension/core/os_lib_helper_methods'
+# require 'openstudio/extension/core/os_lib_model_generation'
+require 'openstudio-standards'
 
 require 'buildingsync/model_articulation/building_section'
 require 'buildingsync/model_articulation/location_element'
@@ -48,9 +49,10 @@ require 'buildingsync/get_bcl_weather_file'
 module BuildingSync
   # Building class
   class Building < LocationElement
-    include OsLib_HelperMethods
-    include EnergyPlus
-    include OsLib_ModelGeneration
+    # include OpenstudioStandards::Geometry
+    # include OsLib_HelperMethods
+    # include EnergyPlus
+    # include OsLib_ModelGeneration
 
     # initialize
     # @param building_element [REXML::Element] an element corresponding to a single auc:Building
@@ -234,13 +236,14 @@ module BuildingSync
     # set aspect ratio, floor height, and WWR
     def set_building_form_defaults
       # if aspect ratio, story height or wwr have argument value of 0 then use smart building type defaults
-      building_form_defaults = building_form_defaults(get_building_type)
+      building_form_defaults = OpenstudioStandards::Geometry.building_form_defaults(get_building_type)
       if @ns_to_ew_ratio == 0.0 && !building_form_defaults.nil?
         @ns_to_ew_ratio = building_form_defaults[:aspect_ratio]
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_building_form_defaults', "0.0 value for aspect ratio will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:aspect_ratio]}.")
       end
       if @floor_height == 0.0 && !building_form_defaults.nil?
-        @floor_height = OpenStudio.convert(building_form_defaults[:typical_story], 'ft', 'm').get
+        # TODO: should come out of building sync
+        @floor_height = building_form_defaults[:typical_story]
         OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_building_form_defaults', "0.0 value for floor height will be replaced with smart default for #{get_building_type} of #{building_form_defaults[:typical_story]}.")
       end
       # because of this can't set wwr to 0.0. If that is desired then we can change this to check for 1.0 instead of 0.0
@@ -543,52 +546,54 @@ module BuildingSync
     # @param ddy_file [String]
     # @param weather_argb [array]
     def set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file, *weather_argb)
+      weather_station_name, weather_station_id, state_name, city_name = weather_argb
       initialize_model
+      set_climate_zone(standard_to_be_used) if climate_zone.nil?
 
-      determine_climate_zone(standard_to_be_used) if climate_zone.nil?
-
-      # here we check if there is an valid EPW file, if there is we use that file otherwise everything will be generated from climate zone
+      # if weather file passed in
       if !epw_file_path.nil? && File.exist?(epw_file_path)
+        puts "Using passed in weather file: #{epw_file_path}"
         @epw_file_path = epw_file_path
-        puts "case 1: epw file exists #{epw_file_path} and climate_zone is: #{climate_zone}"
-        set_weather_and_climate_zone_from_epw(climate_zone, standard_to_be_used, latitude, longitude, ddy_file)
-      elsif climate_zone.nil? && @climate_zone.nil?
-        weather_station_id = weather_argb[1]
-        state_name = weather_argb[2]
-        city_name = weather_argb[3]
-        puts 'case 2: climate_zone is nil at the Site and Building level'
-        if !weather_station_id.nil?
-          puts "case 2.1: weather_station_id is not nil #{weather_station_id}"
-          @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
-        elsif !city_name.nil? && !state_name.nil?
-          puts "case 2.2: SITE LEVEL city_name and state_name is not nil #{city_name} #{state_name}"
-          @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
-        elsif !@city_name.nil? && !@state_name.nil?
-          puts "case 2.3: BUILDING LEVEL city_name and state_name is not nil #{@city_name} #{@state_name}"
-          @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(@state_name, @city_name)
-        end
+        # set_weather_and_climate_zone_from_epw(climate_zone, standard_to_be_used, latitude, longitude, ddy_file)
 
+      # elsif climate zone passed in
+      elsif !climate_zone.nil?
+        puts "Using passed in climate_zone: #{climate_zone}"
+        @epw_file_path = set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude).to_s
+
+      # elsif climate zone class attr set
+      elsif !@climate_zone.nil?
+        puts "Using building climate_zone: #{climate_zone}"
+        @epw_file_path = set_weather_and_climate_zone_from_climate_zone(@climate_zone, standard_to_be_used, latitude, longitude)
+
+      # elsif weather_station_id passed in
+      elsif !weather_station_id.nil?
+        puts "Using passed in weather_station_id: #{weather_station_id}"
+        @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
+
+      # elsif city and state passed in
+      elsif !city_name.nil? && !state_name.nil?
+        puts "Using passed in city_name and state_name: #{city_name}, #{state_name}"
+        @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
+
+      # elsif city and state class attr set
+      elsif !@city_name.nil? && !@state_name.nil?
+        puts "Using building's city_name and state_name: #{city_name}, #{state_name}"
+        @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(@state_name, @city_name)
+
+      # we've got nothing to go off of
       else
-        puts "case 3: SITE LEVEL climate zone #{climate_zone} BUILDING LEVEL climate zone #{@climate_zone}."
-        puts "lat #{latitude} long #{longitude}"
-        if climate_zone.nil?
-          climate_zone = @climate_zone
-          puts "Climate Zone set at the Building level: #{climate_zone}"
-        else
-          puts "Climate Zone set at the Site level: #{climate_zone}"
-        end
-        @epw_file_path = set_weather_and_climate_zone_from_climate_zone(climate_zone, standard_to_be_used, latitude, longitude)
-        @epw_file_path = @epw_file_path.to_s
+        msg = "epw_file_path is nil and no way to set from Site or Building parameters."
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', msg)
+        raise StandardError, 'BuildingSync.Building.set_weather_and_climate_zone: #{msg}'
       end
 
-      # Ensure a file path gets set, else raise error
-      if @epw_file_path.nil?
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', 'epw_file_path is nil and no way to set from Site or Building parameters.')
-        raise StandardError, 'BuildingSync.Building.set_weather_and_climate_zone: epw_file_path is nil and no way to set from Site or Building parameters.'
-      elsif !@epw_file_path
+      # check files exists
+      if !@epw_file_path
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "epw_file_path is false: #{@epw_file_path}")
         raise StandardError, "BuildingSync.Building.set_weather_and_climate_zone: epw_file_path is false: #{@epw_file_path}"
-      elsif !File.exist?(@epw_file_path)
+      end
+      if !File.exist?(@epw_file_path)
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', "epw_file_path does not exist: #{@epw_file_path}")
         raise StandardError, "BuildingSync.Building.set_weather_and_climate_zone: epw_file_path does not exist: #{@epw_file_path}"
       end
@@ -617,7 +622,7 @@ module BuildingSync
       if standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
         climate_zone_standard_string = "CEC T24-CEC#{climate_zone.gsub('Climate Zone', '').strip}"
       elsif standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
-        climate_zone_standard_string = "ASHRAE 169-2006-#{climate_zone.gsub('Climate Zone', '').strip}"
+        climate_zone_standard_string = "ASHRAE 169-2013-#{climate_zone.gsub('Climate Zone', '').strip}"
       elsif climate_zone.nil?
         climate_zone_standard_string = ''
       end
@@ -750,7 +755,7 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_epw', "city is #{epw_file.city}. State is #{epw_file.stateProvinceRegion}")
 
       stat_file = get_stat_file(epw_file)
-      add_site_water_mains_temperature(stat_file) if !stat_file.nil?
+      # add_site_water_mains_temperature(stat_file) if !stat_file.nil?
 
       set_climate_zone(climate_zone, standard_to_be_used, stat_file)
 
@@ -1126,6 +1131,6 @@ module BuildingSync
     end
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr,
-                :occupant_quantity, :number_of_units, :built_year, :year_major_remodel, :building_sections
+                :occupant_quantity, :number_of_units, :built_year, :year_major_remodel, :building_sections, :party_wall_fraction, :model, :epw_file_path, :climate_zone
   end
 end

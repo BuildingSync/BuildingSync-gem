@@ -39,7 +39,7 @@
 require 'openstudio'
 require 'fileutils'
 require 'json'
-require 'openstudio/extension/core/os_lib_model_generation'
+# require 'openstudio/extension/core/os_lib_model_generation'
 
 require 'buildingsync/helpers/helper'
 require 'buildingsync/helpers/xml_get_set'
@@ -47,7 +47,7 @@ require 'buildingsync/helpers/xml_get_set'
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpatialElement
-    include OsLib_ModelGeneration
+    # include OsLib_ModelGeneration
     include BuildingSync::Helper
     include BuildingSync::XmlGetSet
     # initialize SpatialElement class
@@ -84,7 +84,7 @@ module BuildingSync
 
         floor_area_type = floor_area_element.elements["#{@ns}:FloorAreaType"].text
         if floor_area_type == 'Gross'
-          @total_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('gross_floor_area', floor_area), 'ft^2', 'm^2').get
+          @total_floor_area = validate_positive_number_excluding_zero('gross_floor_area', floor_area)
         elsif floor_area_type == 'Footprint'
           @footprint_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@footprint_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Conditioned' || floor_area_type == 'Common' || floor_area_type == 'Heated and Cooled'

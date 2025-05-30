@@ -67,20 +67,20 @@ module BuildingSync
       read_city_and_state_name
     end
 
-    def determine_climate_zone(standard_to_be_used = nil)
+    def set_climate_zone(standard_to_be_used = nil)
       if standard_to_be_used == ASHRAE90_1
         if !@climate_zone_ashrae.nil?
           @climate_zone = @climate_zone_ashrae
         elsif @climate_zone.nil? && !@climate_zone_ca_t24.nil?
           @climate_zone = @climate_zone_ca_t24
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LocationElement.determine_climate_zone', "Element ID: #{xget_id} - Standard to use is #{standard_to_be_used} but ASHRAE Climate Zone is nil. Using CA T24: #{@climate_zone}")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LocationElement.set_climate_zone', "Element ID: #{xget_id} - Standard to use is #{standard_to_be_used} but ASHRAE Climate Zone is nil. Using CA T24: #{@climate_zone}")
         end
       elsif standard_to_be_used == CA_TITLE24
         if !@climate_zone_ca_t24.nil?
           @climate_zone = @climate_zone_ca_t24
         elsif @climate_zone.nil? && !@climate_zone_ashrae.nil?
           @climate_zone = @climate_zone_ashrae
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LocationElement.determine_climate_zone', "Element ID: #{xget_id} - Standard to use is #{standard_to_be_used} but CA T24 Climate Zone is nil. Using ASHRAE: #{@climate_zone}")
+          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LocationElement.set_climate_zone', "Element ID: #{xget_id} - Standard to use is #{standard_to_be_used} but CA T24 Climate Zone is nil. Using ASHRAE: #{@climate_zone}")
         end
       end
     end
@@ -95,13 +95,15 @@ module BuildingSync
     # read climate zone
     def read_climate_zone
       if @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE"]
-        @climate_zone_ashrae = @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE/#{@ns}:ClimateZone"].text
+        unformatted_climate_zone = @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:ASHRAE/#{@ns}:ClimateZone"].text
+        @climate_zone_ashrae = "ASHRAE 169-2013-#{unformatted_climate_zone}"
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LocationElement.read_climate_zone', "Element ID: #{xget_id} - ASHRAE Climate Zone: #{@climate_zone_ashrae}")
       else
         @climate_zone_ashrae = nil
       end
       if @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24"]
-        @climate_zone_ca_t24 = @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24/#{@ns}:ClimateZone"].text
+        unformatted_climate_zone = @base_xml.elements["#{@ns}:ClimateZoneType/#{@ns}:CaliforniaTitle24/#{@ns}:ClimateZone"].text
+        @climate_zone_ca_t24 = "CEC T24-CEC#{unformatted_climate_zone.gsub('Climate Zone', '').strip}"
         OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.LocationElement.read_climate_zone', "Element ID: #{xget_id} - Title24 Climate Zone: #{@climate_zone_ca_t24}")
       else
         @climate_zone_ca_t24 = nil

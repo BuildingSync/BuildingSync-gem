@@ -123,7 +123,19 @@ module BuildingSync
       super(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
     end
 
-    def write_baseline_osw()
+    def write_baseline_osw(ddy_file = nil)
+      super(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
+    end
+
+    def run_baseline_osw()
+      super(@output_dir)
+    end
+
+    def write_report_osws()
+      super(@output_dir)
+    end
+
+    def run_report_osws()
       super(@output_dir)
     end
 
