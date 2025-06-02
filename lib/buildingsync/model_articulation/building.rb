@@ -370,12 +370,6 @@ module BuildingSync
       return new_hash
     end
 
-    # in initialize an empty model
-    def initialize_model
-      # let's create our new empty model
-      @model = OpenStudio::Model::Model.new if @model.nil?
-    end
-
     # set building and system type for building and sections
     def set_bldg_and_system_type_for_building_and_section
       @building_sections.each(&:set_bldg_and_system_type)
@@ -471,14 +465,6 @@ module BuildingSync
       return list_of_zones
     end
 
-    # get model
-    # @return [OpenStudio::Model]
-    def get_model
-      # in case the model was not initialized before we create a new model if it is nil
-      initialize_model
-      return @model
-    end
-
     # get year building was built
     # @return [Integer]
     def get_built_year
@@ -540,7 +526,6 @@ module BuildingSync
     # @param weather_argb [array]
     def set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file, *weather_argb)
       weather_station_name, weather_station_id, state_name, city_name = weather_argb
-      initialize_model
       set_climate_zone(standard_to_be_used) if climate_zone.nil?
 
       # if weather file passed in
@@ -591,13 +576,6 @@ module BuildingSync
         raise StandardError, "BuildingSync.Building.set_weather_and_climate_zone: epw_file_path does not exist: #{@epw_file_path}"
       end
 
-      # setting the current year, so we do not get these annoying log messages:
-      # [openstudio.model.YearDescription] <1> 'UseWeatherFile' is not yet a supported option for YearDescription
-      year_description = @model.getYearDescription
-      year_description.setCalendarYear(::Date.today.year)
-
-      # add final condition
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone', "The final weather file is #{@model.getWeatherFile.city} and the model has #{@model.getDesignDays.size} design day objects.")
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone', "The path to the epw file is: #{@epw_file_path}")
     end
 
@@ -801,111 +779,6 @@ module BuildingSync
       return true
     end
 
-    # generate baseline model in osm file format
-    def generate_baseline_osm
-      # checking that the fractions add up
-      check_building_fraction
-
-      # set building rotation
-      initial_rotation = @model.getBuilding.northAxis
-      if @building_rotation != initial_rotation
-        @model.getBuilding.setNorthAxis(building_rotation)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "Set Building Rotation to #{@model.getBuilding.northAxis}")
-      end
-      if !@name.nil?
-        @model.getBuilding.setName(@name)
-      end
-
-      create_bldg_space_types(@model)
-
-      # create envelope
-      # populate bar_hash and create envelope with data from envelope_data_hash and user arguments
-      bar_hash = {}
-      bar_hash[:length] = @length
-      bar_hash[:width] = @width
-      bar_hash[:num_stories_below_grade] = num_stories_below_grade.to_i
-      bar_hash[:num_stories_above_grade] = num_stories_above_grade.to_i
-      bar_hash[:floor_height] = floor_height
-      bar_hash[:center_of_footprint] = OpenStudio::Point3d.new(0, 0, 0)
-      bar_hash[:bar_division_method] = 'Multiple Space Types - Individual Stories Sliced'
-      # default for now 'Multiple Space Types - Individual Stories Sliced', 'Multiple Space Types - Simple Sliced', 'Single Space Type - Core and Perimeter'
-      bar_hash[:make_mid_story_surfaces_adiabatic] = false
-      bar_hash[:space_types] = bldg_space_types_floor_area_hash
-      bar_hash[:building_wwr_n] = wwr
-      bar_hash[:building_wwr_s] = wwr
-      bar_hash[:building_wwr_e] = wwr
-      bar_hash[:building_wwr_w] = wwr
-
-      runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-      # remove non-resource objects not removed by removing the building
-      remove_non_resource_objects(runner, @model)
-
-      # party_walls_array to be used by orientation specific or fractional party wall values
-      party_walls_array = generate_party_walls # this is an array of arrays, where each entry is effective building story with array of directions
-
-      # populate bar hash with story information
-      bar_hash[:stories] = {}
-      num_stories.ceil.times do |i|
-        if party_walls_array.empty?
-          party_walls = []
-        else
-          party_walls = party_walls_array[i]
-        end
-
-        # add below_partial_story
-        if num_stories.ceil > num_stories && i == num_stories_round_up - 2
-          below_partial_story = true
-        else
-          below_partial_story = false
-        end
-
-        # bottom_story_ground_exposed_floor and top_story_exterior_exposed_roof already setup as bool
-        bar_hash[:stories]["key #{i}"] = { story_party_walls: party_walls, story_min_multiplier: 1, story_included_in_building_area: true, below_partial_story: below_partial_story, bottom_story_ground_exposed_floor: true, top_story_exterior_exposed_roof: true }
-      end
-
-      # store expected floor areas to check after bar made
-      target_areas = {}
-      bar_hash[:space_types].each do |k, v|
-        target_areas[k] = v[:floor_area]
-      end
-
-      # create bar
-      create_bar(runner, @model, bar_hash, 'Basements Ground Mid Top')
-      # using the default value for story multiplier for now 'Basements Ground Mid Top'
-
-      # check expected floor areas against actual
-      @model.getSpaceTypes.sort.each do |space_type|
-        next if !target_areas.key? space_type
-
-        # convert to IP
-        actual_ip = OpenStudio.convert(space_type.floorArea, 'm^2', 'ft^2').get
-        target_ip = OpenStudio.convert(target_areas[space_type], 'm^2', 'ft^2').get
-
-        if (space_type.floorArea - target_areas[space_type]).abs >= 1.0
-          if !bar_hash[:bar_division_method].include? 'Single Space Type'
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "#{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)")
-            return false
-          else
-            # will see this if use Single Space type division method on multi-use building or single building type without whole building space type
-            OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', "WARNING: #{space_type.name} doesn't have the expected floor area (actual #{OpenStudio.toNeatString(actual_ip, 0, true)} ft^2, target #{OpenStudio.toNeatString(target_ip, 0, true)} ft^2)")
-          end
-        end
-      end
-
-      # test for excessive exterior roof area (indication of problem with intersection and or surface matching)
-      ext_roof_area = @model.getBuilding.exteriorSurfaceArea - @model.getBuilding.exteriorWallArea
-      expected_roof_area = total_floor_area / num_stories.to_f
-      if ext_roof_area > expected_roof_area # only test if using whole-building area input
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.generate_baseline_osm', 'Roof area larger than expected, may indicate problem with inter-floor surface intersection or matching.')
-        return false
-      end
-
-      # report final condition of model
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.generate_baseline_osm', "The building finished with #{@model.getSpaces.size} spaces.")
-
-      return true
-    end
-
     # generate party walls
     def generate_party_walls
       party_walls_array = []
@@ -1045,12 +918,6 @@ module BuildingSync
         # TODO: - currently won't go past making two opposing sets of walls party walls. Info and registerValue are after create_bar in measure.rb
       end
       party_walls_array
-    end
-
-    # write baseline model to osm file
-    # @param dir [String]
-    def write_osm(dir)
-      @model.save("#{dir}/in.osm", true)
     end
 
     # write parameters to xml file
