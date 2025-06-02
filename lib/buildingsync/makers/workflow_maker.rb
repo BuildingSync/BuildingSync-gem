@@ -109,12 +109,6 @@ module BuildingSync
       return @facility.get_space_types
     end
 
-    # get model
-    # @return [OpenStudio::Model] model
-    def get_model
-      return @facility.get_model
-    end
-
     # get the current workflow
     # @return [Hash]
     def get_workflow
@@ -127,29 +121,10 @@ module BuildingSync
       return @facility.report.scenarios
     end
 
-    # generate the baseline model as osm model
-    # @param dir [String]
-    # @param epw_file_path [String]
-    # @param standard_to_be_used [String] 'ASHRAE90.1' or 'CaliforniaTitle24' are supported options
-    # @param ddy_file [String] path to the ddy file
-    # @return @see BuildingSync::Facility.write_osm
-    def setup_and_sizing_run(dir, epw_file_path, standard_to_be_used, ddy_file = nil)
-      @facility.set_all
-      @facility.determine_open_studio_standard(standard_to_be_used)
-      @facility.generate_baseline_osm(epw_file_path, dir, standard_to_be_used, ddy_file)
-      @facility.write_osm(dir)
-    end
-
     # writes the parameters determined during processing back to the BldgSync XML file
     def prepare_final_xml
       @facility.prepare_final_xml
     end
-
-    # # write osm
-    # # @param dir [String]
-    # def write_osm(dir)
-    #   @scenario_types = @facility.write_osm(dir)
-    # end
 
     # iterate over the current measure list in the workflow and check if they are available at the referenced measure directories
     # @return [Boolean]

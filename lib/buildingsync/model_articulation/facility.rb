@@ -150,21 +150,6 @@ module BuildingSync
       @site.set_weather_and_climate_zone(epw_file_path, standard_to_be_used, ddy_file = nil)
     end
 
-    # generating the OpenStudio model based on the imported BuildingSync Data
-    # @param epw_file_path [String]
-    # @param output_path [String]
-    # @param standard_to_be_used [String]
-    # @param ddy_file [String]
-    # @return [Boolean]
-    def generate_baseline_osm(epw_file_path, output_path, standard_to_be_used, ddy_file = nil)
-      @site.generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file)
-
-      @epw_file_path = @site.get_epw_file_path
-      zone_hash = build_zone_hash(@site)
-      create_building_systems(main_output_dir: output_path, zone_hash: zone_hash, remove_objects: true)
-      return true
-    end
-
     # build zone hash
     # @param site [BuildingSync::Site]
     # @return [Hash]
@@ -194,12 +179,6 @@ module BuildingSync
         return contact.xget_text('ContactName')
       end
       return nil
-    end
-
-    # get OpenStudio model
-    # @return [OpenStudio::Model]
-    def get_model
-      return @site.get_model
     end
 
     # determine OpenStudio system standard

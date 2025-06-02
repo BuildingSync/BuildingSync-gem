@@ -92,12 +92,6 @@ module BuildingSync
       return @building.build_zone_hash
     end
 
-    # get the model
-    # @return [OpenStudio::Model]
-    def get_model
-      return @building.get_model
-    end
-
     # get space types
     # @return [array<OpenStudio::Model::SpaceType>]
     def get_space_types
@@ -201,27 +195,6 @@ module BuildingSync
       weather_station_name = @building.xget_text('WeatherStationName').nil? ? xget_text('WeatherStationName') : @building.xget_text('WeatherStationName')
       weather_station_id = @building.xget_text('WeatherDataStationID').nil? ? xget_text('WeatherDataStationID') : @building.xget_text('WeatherDataStationID')
       @building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, lat, long, ddy_file, weather_station_name, weather_station_id, @state_name, @city_name)
-    end
-
-    # generate baseline model in osm file format
-    # @param epw_file_path [String]
-    # @param standard_to_be_used [String]
-    # @param ddy_file [String]
-    def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
-      set_weather_and_climate_zone(epw_file_path, standard_to_be_used, ddy_file = nil)
-      @building.generate_baseline_osm
-    end
-
-    # write model to osm file
-    # @param dir [String]
-    # @return [hash<string, string>]
-    def write_osm(dir)
-      @building.write_osm(dir)
-      scenario_types = {}
-      scenario_types['system_type'] = get_system_type
-      scenario_types['bldg_type'] = get_building_type
-      scenario_types['template'] = get_standard_template
-      return scenario_types
     end
 
     # write parameters to xml file
