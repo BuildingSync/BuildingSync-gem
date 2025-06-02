@@ -306,27 +306,6 @@ module BuildingSync
       end
     end
 
-    # build zone hash that stores zone lists for buildings and building sections
-    # @return [[hash<string, array<Zone>>]]
-    def build_zone_hash
-      zone_hash = {}
-      if @space_types
-        zone_list = []
-        @space_types.each do |space_name, space_type|
-          zone_list.concat(get_zones_per_space_type(space_type[:space_type]))
-        end
-        zone_hash[xget_id] = zone_list
-      end
-      @building_sections.each do |bldg_subsec|
-        zone_list = []
-        bldg_subsec.space_types_floor_area.each do |space_type, hash|
-          zone_list.concat(get_zones_per_space_type(space_type))
-        end
-        zone_hash[bldg_subsec.xget_id] = zone_list
-      end
-      return zone_hash
-    end
-
     # build space types hash
     # @return [hash<string, array<hash<string, string>>]
     def build_space_type_hash

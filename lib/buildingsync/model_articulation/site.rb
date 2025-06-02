@@ -86,12 +86,6 @@ module BuildingSync
       end
     end
 
-    # build zone hash that stores zone lists for buildings and building sections
-    # @return [hash<string, array<OpenStudio::Model::ThermalZone>>]
-    def build_zone_hash
-      return @building.build_zone_hash
-    end
-
     # get space types
     # @return [array<OpenStudio::Model::SpaceType>]
     def get_space_types

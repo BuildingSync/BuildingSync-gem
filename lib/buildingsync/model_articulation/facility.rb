@@ -150,13 +150,6 @@ module BuildingSync
       @site.set_weather_and_climate_zone(epw_file_path, standard_to_be_used, ddy_file = nil)
     end
 
-    # build zone hash
-    # @param site [BuildingSync::Site]
-    # @return [Hash]
-    def build_zone_hash(site)
-      return site.build_zone_hash
-    end
-
     # get space types
     # @return [Array<OpenStudio::Model::SpaceType>]
     def get_space_types
