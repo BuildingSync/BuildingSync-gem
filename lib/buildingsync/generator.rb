@@ -124,12 +124,6 @@ module BuildingSync
       return add_hvac_system_to_facility(facility_xml, id, principal_hvac_system_type)
     end
 
-    # @see add_lighting_system_to_facility
-    def add_lighting_system_to_first_facility(doc, id = 'LightingSystem-1')
-      facility_xml = get_first_facility_element(doc)
-      return add_lighting_system_to_facility(facility_xml, id)
-    end
-
     # @see add_plug_load_to_facility
     def add_plug_load_to_first_facility(doc, id = 'PlugLoad-1')
       facility_xml = get_first_facility_element(doc)
@@ -150,17 +144,6 @@ module BuildingSync
         principal_xml.text = principal_hvac_system_type
       end
       return hvac_system_xml
-    end
-
-    # Adds lighting system with id.  wrapper around:
-    # @see get_or_create_system_of_type
-    # @param facility_xml [REXML::Element]
-    # @param id [String]
-    def add_lighting_system_to_facility(facility_xml, id = 'LightingSystem-1')
-      systems_xml = get_or_create_systems(facility_xml)
-      lighting_system_xml = get_or_create_system_of_type(systems_xml, 'LightingSystem')
-      lighting_system_xml.add_attribute('ID', id)
-      return lighting_system_xml
     end
 
     # Adds plug load with id.  wrapper around:

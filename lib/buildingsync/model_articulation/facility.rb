@@ -46,7 +46,6 @@ require_relative 'site'
 require_relative 'loads_system'
 require_relative 'envelope_system'
 require_relative 'hvac_system'
-require_relative 'lighting_system'
 require_relative 'service_hot_water_system'
 require_relative 'measure'
 
@@ -217,8 +216,6 @@ module BuildingSync
           system_type.elements.each do |system_xml|
             if system_xml.name == 'HVACSystem'
               @systems_map[system_type.name] << BuildingSync::HVACSystem.new(system_xml, @ns)
-            elsif system_xml.name == 'LightingSystem'
-              @systems_map[system_type.name] << BuildingSync::LightingSystemType.new(system_xml, @ns)
             else
               @systems_map[system_type.name] << system_xml
             end
@@ -226,9 +223,7 @@ module BuildingSync
         end
       else
         hvac_xml = @g.add_hvac_system_to_facility(@base_xml)
-        lighting_xml = @g.add_lighting_system_to_facility(@base_xml)
         @hvac_system = HVACSystem.new(hvac_xml, @ns)
-        @lighting_system = LightingSystemType.new(lighting_xml, @ns)
         @load_system = LoadsSystem.new
       end
     end
@@ -236,27 +231,6 @@ module BuildingSync
     # @see BuildingSync::Report.add_cb_modeled
     def add_cb_modeled(id = 'Scenario-Baseline')
       @report.add_cb_modeled(id)
-    end
-
-    # Add a minimal lighting system in the doc and as an object
-    # @param premise_id [String] id of the premise which the system will be linked to
-    # @param premise_type [String] type of premise, i.e. Building, Section, etc.
-    # @param lighting_system_id [String] id for new lighting system
-    # @return [BuildingSync::LightingSystemType] new lighting system object
-    def add_blank_lighting_system(premise_id, premise_type, lighting_system_id = 'LightingSystem-1')
-      # Create new lighting system and link it
-      lighting_system_xml = @g.add_lighting_system_to_facility(@base_xml, lighting_system_id)
-      @g.add_linked_premise(lighting_system_xml, premise_id, premise_type)
-
-      # Create a new array if doesn't yet exist
-      if !@systems_map.key?('LightingSystems')
-        @systems_map['LightingSystems'] = []
-      end
-
-      # Create new lighting system and add to array
-      new_system = BuildingSync::LightingSystemType.new(lighting_system_xml, @ns)
-      @systems_map['LightingSystems'] << new_system
-      return new_system
     end
 
     # read other details from the xml
@@ -351,18 +325,6 @@ module BuildingSync
         @load_system.add_elevator(model, open_studio_system_standard)
       end
 
-      # add exterior lights (returns a hash where key is lighting type and value is exteriorLights object)
-      if add_exterior_lights
-        if !@systems_map['LightingSystems'].nil?
-          @systems_map['LightingSystems'].each do |lighting_system|
-            lighting_system.add_exterior_lights(model, open_studio_system_standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
-          end
-        else
-          new_lighting_system = add_blank_lighting_system(@site.get_building.xget_id, 'Building')
-          new_lighting_system.add_exterior_lights(model, open_studio_system_standard, onsite_parking_fraction, exterior_lighting_zone, remove_objects)
-        end
-      end
-
       # add_exhaust
       if add_exhaust
         @hvac_system.add_exhaust(model, open_studio_system_standard, 'Adjacent', remove_objects)
@@ -373,9 +335,6 @@ module BuildingSync
         service_hot_water_system = ServiceHotWaterSystem.new
         service_hot_water_system.add(model, open_studio_system_standard, remove_objects)
       end
-
-      # TODO: Make this better
-      @lighting_system.add_daylighting_controls(model, open_studio_system_standard, template, main_output_dir)
 
       # TODO: - add internal mass
       # TODO: - add slab modeling and slab insulation
