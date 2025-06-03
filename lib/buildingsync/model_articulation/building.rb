@@ -246,43 +246,6 @@ module BuildingSync
       end
     end
 
-    # check building fraction
-    def check_building_fraction
-      # check that sum of fractions for b,c, and d is less than 1.0 (so something is left for primary building type)
-      building_fraction = 1.0
-      if @building_sections.count > 0
-        # first we check if the building sections do have a fraction
-        if @building_sections.count > 1
-          areas = []
-          floor_area = 0
-          @building_sections.each do |section|
-            if section.fraction_area.nil?
-              areas.push(section.total_floor_area)
-              floor_area += section.total_floor_area
-            end
-          end
-          i = 0
-          @building_sections.each do |section|
-            section.fraction_area = areas[i] / @total_floor_area
-            i += 1
-          end
-        elsif @building_sections.count == 1
-          # only if we have just one section the section fraction is set to the building fraction (1)
-          @building_sections[0].fraction_area = building_fraction
-        end
-        @building_sections.each do |section|
-          puts "section with ID: #{section.xget_id} and type: '#{section.xget_text('SectionType')}' has fraction: #{section.fraction_area}"
-          next if section.fraction_area.nil?
-          building_fraction -= section.fraction_area
-        end
-        if building_fraction.round(3) < 0.0
-          puts "building fraction is #{building_fraction}"
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.check_building_fraction', 'Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.')
-          raise 'ERROR: Primary Building Type fraction of floor area must be greater than 0. Please lower one or more of the fractions for Building Type B-D.'
-        end
-      end
-    end
-
     # read other building details
     def read_other_building_details
       if @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"]
