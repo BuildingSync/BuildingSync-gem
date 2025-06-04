@@ -57,7 +57,6 @@ module BuildingSync
 
       @doc = doc
       @ns = ns
-      @workflow = nil
     end
 
     def get_prefix
@@ -90,38 +89,6 @@ module BuildingSync
       end
     end
 
-    # set only one measure path
-    # @param workflow [Hash] a hash of the openstudio workflow
-    # @param measures_dir [String]
-    def set_measure_path(workflow, measures_dir)
-      workflow['measure_paths'] = [measures_dir]
-    end
-
-    # set multiple measure paths
-    # @param measures_dir_array [Array]
-    def set_measure_paths(measures_dir_array)
-      @workflow['measure_paths'] = measures_dir_array
-    end
-
-    # clear all measures from the list in the workflow
-    def clear_all_measures
-      @workflow.delete('steps')
-      @workflow['steps'] = []
-    end
-
-    # add measure path
-    # @param measures_dir [String]
-    # @return [Boolean]
-    def add_measure_path(measures_dir)
-      @workflow['measure_paths'].each do |dir|
-        if dir == measures_dir
-          return false
-        end
-      end
-      @workflow['measure_paths'] << measures_dir
-      return true
-    end
-
     # set measure argument
     # @param workflow [Hash] a hash of the openstudio workflow
     # @param measure_dir_name [String] the directory name for the measure, as it appears
@@ -143,25 +110,6 @@ module BuildingSync
       end
 
       return result
-    end
-
-    # Adds a new measure to the workflow ONLY if it doesn't already exist
-    # @param workflow [Hash] a hash of the openstudio workflow
-    # @param measure_dir_name [String] the directory name for the measure, as it appears
-    #   in any of the gems, i.e. openstudio-common-measures-gem/lib/measures/[measure_dir_name]
-    # @return [Boolean] whether or not a new measure was added
-    def add_new_measure(workflow, measure_dir_name)
-      # first we check if the measure already exists
-      workflow['steps'].each do |step|
-        if step['measure_dir_name'] == measure_dir_name
-          return false
-        end
-      end
-      # if it does not exist we add it
-      new_step = {}
-      new_step['measure_dir_name'] = measure_dir_name
-      workflow['steps'].unshift(new_step)
-      return true
     end
   end
 end

@@ -61,19 +61,10 @@ module BuildingSync
       @facility_xml = nil
       @facility = nil
 
-      # TODO: Be consistent in symbolizing names in hashes or not
-      File.open(PHASE_0_BASE_OSW_FILE_PATH, 'r') do |file|
-        @workflow = JSON.parse(file.read)
-      end
-
       File.open(WORKFLOW_MAKER_JSON_FILE_PATH, 'r') do |file|
         @workflow_maker_json = JSON.parse(file.read, symbolize_names: true)
       end
 
-      # Add all of the measure directories from the extension gems
-      # into the @workflow, then check they exist
-      set_measure_paths(get_measure_directories_array)
-      measures_exist?
       read_xml
     end
 
@@ -109,12 +100,6 @@ module BuildingSync
       return @facility.get_space_types
     end
 
-    # get the current workflow
-    # @return [Hash]
-    def get_workflow
-      return @workflow
-    end
-
     # get scenario elements
     # @return [Array<BuildingSync::Scenario>]
     def get_scenarios
@@ -124,35 +109,6 @@ module BuildingSync
     # writes the parameters determined during processing back to the BldgSync XML file
     def prepare_final_xml
       @facility.prepare_final_xml
-    end
-
-    # iterate over the current measure list in the workflow and check if they are available at the referenced measure directories
-    # @return [Boolean]
-    def measures_exist?
-      all_measures_found = true
-      number_measures_found = 0
-      @workflow['steps'].each do |step|
-        measure_is_valid = false
-        measure_dir_name = step['measure_dir_name']
-        get_measure_directories_array.each do |potential_measure_path|
-          measure_dir_full_path = "#{potential_measure_path}/#{measure_dir_name}"
-          if Dir.exist?(measure_dir_full_path)
-            measure_is_valid = true
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.measures_exist?', "Measure: #{measure_dir_name} found at: #{measure_dir_full_path}")
-            number_measures_found += 1
-            break
-          end
-        end
-        if !measure_is_valid
-          all_measures_found = false
-          OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.measures_exist?', "CANNOT find measure with name (#{measure_dir_name}) in any of the measure paths  ")
-        end
-      end
-      if all_measures_found
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.measures_exist?', "Total measures found: #{number_measures_found}. All measures defined by @workflow found.")
-        puts "Total measures found: #{number_measures_found}. All measures defined by @workflow found."
-      end
-      return all_measures_found
     end
 
     # gets all available measures across all measure directories
@@ -175,57 +131,6 @@ module BuildingSync
       ee_measures_instance = OpenStudio::EeMeasures::Extension.new
       bldg_sync_instance = BuildingSync::Extension.new
       return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir]
-    end
-
-    # inserts any measure.  traverses through the measures available in the included extensions
-    # (common measures, model articulation, etc.) to find the lib/measures/[measure_dir] specified.
-    # It is inserted at the relative position according to its type
-    # @param measure_goal_type [String] one of: 'EnergyPlusMeasure', 'ReportingMeasure', or 'ModelMeasure'
-    # @param measure_dir_name [String] the directory name for the measure, as it appears
-    #   in any of the gems, i.e. openstudio-common-measures-gem/lib/measures/[measure_dir_name]
-    # @param relative_position [Integer] the position where the measure should be inserted with respect to the measure_goal_type
-    # @param args_hash [hash]
-    def insert_measure_into_workflow(measure_goal_type, measure_dir_name, relative_position = 0, args_hash = {})
-      successfully_added = false
-      count = 0 # count for all of the measures, regardless of the type
-      measure_type_count = 0 # count of measures specific to the measure_goal_type
-      measure_type_found = false
-      new_step = {}
-      new_step['measure_dir_name'] = measure_dir_name
-      new_step['arguments'] = args_hash
-      if @workflow['steps'].empty?
-        @workflow['steps'].insert(count, new_step)
-        successfully_added = true
-      else
-        @workflow['steps'].each do |step|
-          measure_dir_name = step['measure_dir_name']
-          measure_type = get_measure_type(measure_dir_name)
-          OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "measure: #{measure_dir_name} with type: #{measure_type} found")
-          if measure_type == measure_goal_type
-            measure_type_found = true
-            if measure_type_count == relative_position
-              # insert measure here
-              OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir_name} and type: #{get_measure_type(measure_dir_name)}")
-              puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir_name} and type: #{get_measure_type(measure_dir_name)}"
-              @workflow['steps'].insert(count, new_step)
-              successfully_added = true
-              break
-            end
-            measure_type_count += 1
-          elsif measure_type_found
-            OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.insert_measure_into_workflow', "inserting measure with type (#{measure_goal_type})at position #{count} and dir: #{measure_dir_name} and type: #{get_measure_type(measure_dir_name)}")
-            puts "inserting measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir_name} and type: #{get_measure_type(measure_dir_name)}"
-            @workflow['steps'].insert(count - 1, new_step)
-            successfully_added = true
-            break
-          end
-          count += 1
-        end
-      end
-      if !successfully_added
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMakerPhaseZero.insert_measure_into_workflow', "CANNOT insert measure with type (#{measure_goal_type}) at position #{count} and dir: #{measure_dir_name} and type: #{get_measure_type(measure_dir_name)}")
-      end
-      return successfully_added
     end
 
     # gets the measure type of a measure given its directory - looking up the measure type in the measure.xml file
@@ -577,12 +482,6 @@ module BuildingSync
       return runner.run_osws(osw_files - osw_sr_files)
     end
 
-    # Creates a deep copy of the @workflow be serializing and reloading with JSON
-    # @return [Hash] a new workflow object
-    def deep_copy_workflow
-      return JSON.load(JSON.generate(@workflow))
-    end
-
     # Removes unused measures from a workflow, where __SKIP__ == true
     # @param workflow [Hash] a hash of the openstudio workflow, typically after a deep
     # copy is made and the measures are configured for the specific scenario
@@ -617,23 +516,6 @@ module BuildingSync
         failed << scenario if !scenario.simulation_success?
       end
       return failed
-    end
-
-    # cleanup larger files
-    # @param osw_dir [String]
-    def cleanup_larger_files(osw_dir)
-      path = File.join(osw_dir, 'eplusout.sql')
-      FileUtils.rm_f(path) if File.exist?(path)
-      path = File.join(osw_dir, 'data_point.zip')
-      FileUtils.rm_f(path) if File.exist?(path)
-      path = File.join(osw_dir, 'eplusout.eso')
-      FileUtils.rm_f(path) if File.exist?(path)
-      Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-        FileUtils.rm_rf(path) if File.exist?(path)
-      end
-      Dir.glob(File.join(osw_dir, '*create_typical_building_from_model*')).each do |path|
-        FileUtils.rm_rf(path) if File.exist?(path)
-      end
     end
 
     # gather results for all CB Modeled and POM Scenarios, including both annual and monthly results
