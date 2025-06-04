@@ -468,7 +468,6 @@ module BuildingSync
     # @param weather_argb [array]
     def set_weather_and_climate_zone(climate_zone, epw_file_path, standard_to_be_used, latitude, longitude, ddy_file, *weather_argb)
       weather_station_name, weather_station_id, state_name, city_name = weather_argb
-      set_climate_zone(standard_to_be_used) if climate_zone.nil?
 
       # if weather file passed in
       if !epw_file_path.nil? && File.exist?(epw_file_path)
@@ -568,59 +567,7 @@ module BuildingSync
 
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_weather_and_climate_zone_from_climate_zone', "city is #{weather_file.city}. State is #{weather_file.stateProvinceRegion}")
 
-      set_climate_zone(climate_zone, standard_to_be_used)
       return weather_file.path.get
-    end
-
-    # set climate zone
-    # @param climate_zone [String]
-    # @param standard_to_be_used [String]
-    # @param stat_file [String]
-    # @return [Boolean]
-    def set_climate_zone(climate_zone, standard_to_be_used, stat_file = nil)
-      # Set climate zone
-      if climate_zone.nil?
-        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_climate_zone', 'Climate Zone is nil, trying to get it from stat file')
-        # get climate zone from stat file
-        text = nil
-        File.open(stat_file) do |f|
-          text = f.read.force_encoding('iso-8859-1')
-        end
-
-        # Get Climate zone.
-        # - Climate type "3B" (ASHRAE Standard 196-2006 Climate Zone)**
-        # - Climate type "6A" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
-        regex = /Climate type \"(.*?)\" \(ASHRAE Standards?(.*)\)\*\*/
-        match_data = text.match(regex)
-        if match_data.nil?
-          OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_climate_zone', "Can't find ASHRAE climate zone in stat file.")
-        else
-          climate_zone = match_data[1].to_s.strip
-        end
-      end
-
-      climate_zones = @model.getClimateZones
-      # set climate zone
-      climate_zones.clear
-      if standard_to_be_used == ASHRAE90_1 && !climate_zone.nil?
-        climate_zones.setClimateZone('ASHRAE', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_climate_zone', "Setting Climate Zone to #{climate_zones.getClimateZones('ASHRAE').first.value}")
-        puts "setting ASHRAE climate zone to: #{climate_zone}"
-        return true
-      elsif standard_to_be_used == CA_TITLE24 && !climate_zone.nil?
-        climate_zone = climate_zone.gsub('CEC', '').strip
-        climate_zone = climate_zone.gsub('Climate Zone', '').strip
-        climate_zone = climate_zone.delete('A').strip
-        climate_zone = climate_zone.delete('B').strip
-        climate_zone = climate_zone.delete('C').strip
-        climate_zones.setClimateZone('CEC', climate_zone)
-        OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.set_climate_zone', "Setting Climate Zone to #{climate_zone}")
-        puts "setting CA_TITLE24 climate zone to: #{climate_zone}"
-        return true
-      end
-      puts "could not set climate_zone #{climate_zone}"
-      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Building.set_climate_zone', "Cannot set the #{climate_zone} in context of this standard #{standard_to_be_used}")
-      return false
     end
 
     # set weather file and climate zone from EPW file
@@ -669,8 +616,6 @@ module BuildingSync
 
       stat_file = get_stat_file(epw_file)
       add_site_water_mains_temperature(stat_file) if !stat_file.nil?
-
-      set_climate_zone(climate_zone, standard_to_be_used, stat_file)
 
       # Remove all the Design Day objects that are in the file
       @model.getObjectsByType('OS:SizingPeriod:DesignDay'.to_IddObjectType).each(&:remove)

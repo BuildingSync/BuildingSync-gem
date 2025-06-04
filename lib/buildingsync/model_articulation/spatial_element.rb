@@ -206,10 +206,10 @@ module BuildingSync
         if occ_type[:min_floor_area] || occ_type[:max_floor_area]
           min_floor_area = occ_type[:min_floor_area].nil? ?
             nil :
-            OpenStudio.convert(occ_type[:min_floor_area].to_f, 'ft^2', 'm^2').get
+            occ_type[:min_floor_area].to_f
           max_floor_area = occ_type[:max_floor_area].nil? ?
             nil :
-            OpenStudio.convert(occ_type[:max_floor_area].to_f, 'ft^2', 'm^2').get
+            occ_type[:max_floor_area].to_f
 
           too_small = min_floor_area && total_floor_area < min_floor_area
           too_big = max_floor_area && total_floor_area >= max_floor_area
