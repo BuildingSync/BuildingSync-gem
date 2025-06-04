@@ -173,22 +173,6 @@ RSpec.describe 'BuildingSpec' do
     expect(building.get_standard_template == 'CBES Pre-1978').to be true
   end
 
-  it 'Should successfully set an ASHRAE 90.1 climate zone' do
-    g = BuildingSync::Generator.new
-    building = g.create_minimum_building('Retail', '1954', 'Gross', '69452')
-    building.get_model
-    puts "expected climate zone: true but got: #{building.set_climate_zone('ASHRAE 3C', ASHRAE90_1, '')} " if building.set_climate_zone('ASHRAE 3C', ASHRAE90_1, '') != true
-    expect(building.set_climate_zone('ASHRAE 3C', ASHRAE90_1, '')).to be true
-  end
-
-  it 'Should successfully set a CA T24 climate zone' do
-    g = BuildingSync::Generator.new
-    building = g.create_minimum_building('Office', '2015', 'Gross', '20000')
-    building.get_model
-    puts "expected climate zone: true but got: #{building.set_climate_zone('Climate Zone 6', CA_TITLE24, '')} " if building.set_climate_zone('Climate Zone 6', CA_TITLE24, '') != true
-    expect(building.set_climate_zone('Climate Zone 6', CA_TITLE24, '')).to be true
-  end
-
   describe 'Building XmlGetSet Accessors' do
     before(:all) do
       # -- Setup

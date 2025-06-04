@@ -40,14 +40,8 @@ require 'buildingsync/report'
 require 'buildingsync/contact'
 require 'buildingsync/helpers/helper'
 require 'buildingsync/helpers/xml_get_set'
-require 'buildingsync/helpers/Model.hvac'
 
 require_relative 'site'
-require_relative 'loads_system'
-require_relative 'envelope_system'
-require_relative 'hvac_system'
-require_relative 'lighting_system'
-require_relative 'service_hot_water_system'
 require_relative 'measure'
 
 module BuildingSync
@@ -129,7 +123,6 @@ module BuildingSync
       end
 
       read_other_details
-      read_and_create_initial_systems
     end
 
     # set_all wrapper for Site

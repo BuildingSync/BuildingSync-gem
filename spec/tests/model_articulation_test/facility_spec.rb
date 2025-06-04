@@ -68,65 +68,6 @@ RSpec.describe 'FacilitySpec' do
     generator = BuildingSync::Generator.new
     generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
   end
-
-  it 'Should return the boolean value for creating osm file correctly or not.' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
-    epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
-    expect(File.exist?(epw_path)).to be true
-
-    generator = BuildingSync::Generator.new
-    facility = generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
-    facility.determine_open_studio_standard(std)
-
-    # -- Assert
-    expect(facility.generate_baseline_osm(epw_path, output_path, std)).to be true
-  end
-
-  # TODO: Add actual assertions
-  it 'Should create a building system with parameters set to true' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
-    doc = nil
-    File.open(xml_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-    ns = 'auc'
-
-    # -- Act
-    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
-    facility.determine_open_studio_standard(ASHRAE90_1)
-    facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
-    facility.create_building_systems(main_output_dir: output_path, htg_src: 'Electricity',
-                                     add_elevators: true, add_exterior_lights: true, remove_objects: true)
-  end
-
-  # TODO: Add actual assertions
-  it 'Should create a building system with parameters set to false' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
-    doc = nil
-    File.open(xml_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-
-    # -- Act
-    ns = 'auc'
-    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
-    facility.determine_open_studio_standard(ASHRAE90_1)
-    facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
-    facility.create_building_systems(main_output_dir: output_path, zone_hash: nil, hvac_delivery_type: 'Forced Air',
-                                     htg_src: 'Electricity', clg_src: 'Electricity', add_space_type_loads: false,
-                                     add_constructions: false, add_elevators: false, add_exterior_lights: false,
-                                     add_exhaust: false, add_swh: false, add_hvac: false, add_thermostat: false,
-                                     remove_objects: false)
-  end
 end
 
 RSpec.describe 'Facility Scenario Parsing' do
@@ -182,52 +123,6 @@ RSpec.describe 'Facility Systems Mapping' do
 
     facility_xml = g.get_first_facility_element(doc)
     @facility = BuildingSync::Facility.new(facility_xml, @ns)
-  end
-  describe 'with systems defined' do
-    it 'should be of the correct data structure' do
-      # -- Assert
-      expect(@facility.systems_map).to be_an_instance_of(Hash)
-    end
-    it 'should have the correct keys' do
-      # -- Assert correct keys get created
-      expected_keys = ['HVACSystems', 'LightingSystems', 'PlugLoads']
-      expected_keys.each do |k|
-        expect(@facility.systems_map.key?(k)).to be true
-      end
-    end
-
-    it 'values should be of the correct type and size' do
-      # -- Assert values of keys are correct type and size
-      expect(@facility.systems_map['HVACSystems']).to be_an_instance_of(Array)
-      expect(@facility.systems_map['LightingSystems']).to be_an_instance_of(Array)
-      expect(@facility.systems_map['PlugLoads']).to be_an_instance_of(Array)
-      expect(@facility.systems_map['HVACSystems'].size).to eq(2)
-      expect(@facility.systems_map['LightingSystems'].size).to eq(1)
-      expect(@facility.systems_map['PlugLoads'].size).to eq(1)
-    end
-
-    it 'values in array should be of the correct type' do
-      # Only HVACSystem and LightingSystem should be typed as BSync element types (for now)
-      expect(@facility.systems_map['HVACSystems'][0]).to be_an_instance_of(BuildingSync::HVACSystem)
-      expect(@facility.systems_map['LightingSystems'][0]).to be_an_instance_of(BuildingSync::LightingSystemType)
-      expect(@facility.systems_map['PlugLoads'][0]).to be_an_instance_of(REXML::Element)
-    end
-  end
-  describe 'with no systems defined' do
-    it 'should not error when Systems has no children' do
-      # -- Setup - add a blank Systems element
-      REXML::Element.new("#{@ns}:Systems", @facility_no_systems_xml)
-
-      expect(@facility_no_systems_xml.get_elements("#{@ns}:Systems").size).to eq(1)
-      facility_no_systems = BuildingSync::Facility.new(@facility_no_systems_xml, @ns)
-    end
-    it 'should not error when Systems does not exist' do
-      # -- Setup - remove the Systems element
-      @facility_no_systems_xml.elements.delete("#{@ns}:Systems")
-
-      expect(@facility_no_systems_xml.get_elements("#{@ns}:Systems").size).to eq(0)
-      facility_no_systems = BuildingSync::Facility.new(@facility_no_systems_xml, @ns)
-    end
   end
 end
 
