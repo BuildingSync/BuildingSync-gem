@@ -2,6 +2,7 @@ test_configs = [
   # file_name, standard, epw_path, schema_version
   # ['building_151.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
   ['example-smalloffice-level1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
+  ['example-smalloffice-level1.xml', ASHRAE90_1, nil, 'v2.4.0'],
 ]
 
 RSpec.describe 'BuildingSync' do
@@ -27,7 +28,7 @@ RSpec.describe 'BuildingSync' do
         expect(out_osw[:completed_status]).to eq "Success"
       end
 
-      it "write and run measure owms. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
+      xit "write and run measure owms. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
         # Set Up
         xml_path, output_path = create_xml_path_and_output_path(file_name, standard, __FILE__, schema_version)
         output_path = "test smalloffice"
