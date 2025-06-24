@@ -62,13 +62,14 @@ class OSWARGPopulator
     # -  num_stories_below_grade
     set_measure_argument.call("num_stories_below_grade", building.num_stories_below_grade.to_i)
     # -  building_rotation
-    set_measure_argument.call("building_rotation", building.building_rotation.to_i)
+    set_measure_argument.call("building_rotation", building.building_rotation.to_f)
     # -  template
     # -  ns_to_ew_ratio
+    set_measure_argument.call("ns_to_ew_ratio", building.ns_to_ew_ratio.to_f)
     # -  wwr
-    set_measure_argument.call("wwr", building.wwr.to_i)
+    set_measure_argument.call("wwr", building.wwr.to_f)
     # -  party_wall_fraction
-    set_measure_argument.call("party_wall_fraction", building.party_wall_fraction.to_i)
+    set_measure_argument.call("party_wall_fraction", building.party_wall_fraction.to_f)
     # -  story_multiplier_method
     # -  bar_division_method
 

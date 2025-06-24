@@ -878,6 +878,7 @@ module BuildingSync
     end
 
     attr_reader :building_rotation, :name, :length, :width, :num_stories_above_grade, :num_stories_below_grade, :floor_height, :space, :wwr,
-                :occupant_quantity, :number_of_units, :built_year, :year_major_remodel, :building_sections, :party_wall_fraction, :model, :epw_file_path, :climate_zone
+                :occupant_quantity, :number_of_units, :built_year, :year_major_remodel, :building_sections, :party_wall_fraction, :model, :epw_file_path, :climate_zone,
+              :ns_to_ew_ratio
   end
 end
