@@ -35,6 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.13'
   spec.add_development_dependency 'yard', '~> 0.9.26'
   spec.add_development_dependency 'yard-sitemap', '~> 1.0.1'
-  spec.add_development_dependency 'pry', '~> 0.10.4'
-  spec.add_development_dependency 'pry-nav', '~> 0.2.4'
+  spec.add_development_dependency 'pry', '~> 0.15.2'
 end

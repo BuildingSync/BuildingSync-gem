@@ -86,7 +86,7 @@ class OSWARGPopulator
     # template
     set_measure_argument.call("template", building.get_standard_template)
     # system_type
-    # set_measure_argument.call("system_type", building.get_system_type)
+    set_measure_argument.call("system_type", facility.get_principal_HVAC_system_type)
     # hvac_delivery_type
     # htg_src
     # clg_src
