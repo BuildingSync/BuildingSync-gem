@@ -40,9 +40,12 @@ require 'buildingsync/report'
 require 'buildingsync/contact'
 require 'buildingsync/helpers/helper'
 require 'buildingsync/helpers/xml_get_set'
+require 'pry'
 
 require_relative 'site'
 require_relative 'measure'
+require_relative 'systems_map'
+
 
 module BuildingSync
   # Facility class
@@ -169,6 +172,16 @@ module BuildingSync
     # @return [Standard]
     def determine_open_studio_system_standard
       return @site.determine_open_studio_system_standard
+    end
+
+    # get principal hvac system type
+    # @return [String]
+    def get_principal_HVAC_system_type
+      hvac_systems = @base_xml.elements["#{@ns}:Systems/#{@ns}:HVACSystems/"]
+      all_principal_HVAC_system_types = hvac_systems.map {|s| s.elements["#{@ns}:PrincipalHVACSystemType/"].first}
+      first_principal_HVAC_system_type = all_principal_HVAC_system_types[0]
+
+      return BuildingSyncToOSSytemMaps.get_hvac_map[first_principal_HVAC_system_type.to_s]
     end
 
     # @see BuildingSync::Report.add_cb_modeled
