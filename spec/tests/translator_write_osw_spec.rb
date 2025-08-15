@@ -1,8 +1,21 @@
 test_configs = [
   # file_name, standard, epw_path, schema_version
-  # ['building_151.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
-  # ['example-smalloffice-level1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
-  ['example-smalloffice-level1.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['example-smalloffice-level1.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['example-smalloffice-level1.xml', CA_TITLE24, nil, 'v2.4.0'],
+  # ['ASHRAE 211 Export.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['ASHRAE 211 Export.xml', CA_TITLE24, nil, 'v2.4.0'],
+  # ['AT_example_AS_conversion_audit_report.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['AT_example_AS_conversion_audit_report.xml', CA_TITLE24, nil, 'v2.4.0'],
+  ['AT_example_NYC_audit_report_property.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['AT_example_NYC_audit_report_property.xml', CA_TITLE24, nil, 'v2.4.0'],
+  # ['AT_example_SF_audit_report.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['AT_example_SF_audit_report.xml', CA_TITLE24, nil, 'v2.4.0'],
+  # ['BuildingEQ-1.0.0.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['BuildingEQ-1.0.0.xml', CA_TITLE24, nil, 'v2.4.0'],
+  # ['CMS Woodlawn Campus.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['CMS Woodlawn Campus.xml', CA_TITLE24, nil, 'v2.4.0'],
+  # ['LL87.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['LL87.xml', CA_TITLE24, nil, 'v2.4.0'],
 ]
 
 RSpec.describe 'BuildingSync' do
@@ -13,7 +26,7 @@ RSpec.describe 'BuildingSync' do
       it "write and run baseline owm. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
         # Set Up
         xml_path, output_path = create_xml_path_and_output_path(file_name, standard, __FILE__, schema_version)
-        output_path = "test smalloffice"
+        output_path = "hannahs_tests_outputs"
         translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, standard)
 
         # Action

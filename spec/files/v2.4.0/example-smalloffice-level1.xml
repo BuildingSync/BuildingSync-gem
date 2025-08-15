@@ -132,6 +132,21 @@
                             </LinearFluorescent>
                         </LampType>
                         <BallastType>Standard Electronic</BallastType>
+                        <InstalledPower>4.75</InstalledPower>
+                        <LinkedPremises>
+                            <Section>
+                                <LinkedSectionID IDref="Section-1" />
+                            </Section>
+                        </LinkedPremises>
+                    </LightingSystem>
+                    <LightingSystem ID="LightingSystem-1">
+                        <LampType>
+                            <LinearFluorescent>
+                                <LampLabel>T8</LampLabel>
+                            </LinearFluorescent>
+                        </LampType>
+                        <BallastType>Standard Electronic</BallastType>
+                        <InstalledPower>0.75</InstalledPower>
                         <LinkedPremises>
                             <Section>
                                 <LinkedSectionID IDref="Section-1" />

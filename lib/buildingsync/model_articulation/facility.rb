@@ -140,8 +140,8 @@ module BuildingSync
       return @site.determine_open_studio_standard(standard_to_be_used)
     end
 
-    def set_weather_and_climate_zone(epw_file_path, output_path, standard_to_be_used, ddy_file = nil)
-      @site.set_weather_and_climate_zone(epw_file_path, standard_to_be_used, ddy_file = nil)
+    def set_weather_and_climate_zone(epw_file_path, standard_to_be_used)
+      @site.set_weather_and_climate_zone(epw_file_path, standard_to_be_used)
     end
 
     # get space types
@@ -172,6 +172,24 @@ module BuildingSync
     # @return [Standard]
     def determine_open_studio_system_standard
       return @site.determine_open_studio_system_standard
+    end
+
+    # get sum of /Systems/LightingSystems/PlugLoads/WeightedAverageLoad
+    # @return [String]
+    def get_total_weighted_average_load
+      plug_loads = @base_xml.elements["#{@ns}:Systems/#{@ns}:PlugLoads/"]
+      all_weighted_average_loads = plug_loads.map {|s| s.elements["#{@ns}:WeightedAverageLoad/"].first.to_s.to_f}
+
+      return all_weighted_average_loads.sum
+    end
+
+    # get sum of /Systems/LightingSystems/LightingSystem/InstalledPower
+    # @return [String]
+    def get_total_installed_power
+      lighting_systems = @base_xml.elements["#{@ns}:Systems/#{@ns}:LightingSystems/"]
+      all_installed_powers = lighting_systems.map {|s| s.elements["#{@ns}:InstalledPower/"].first.to_s.to_f}
+
+      return all_installed_powers.sum
     end
 
     # get principal hvac system type

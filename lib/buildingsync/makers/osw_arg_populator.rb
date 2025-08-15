@@ -55,8 +55,8 @@ class OSWARGPopulator
     # -  bldg_type_d_num_units
     # -  total_bldg_floor_area
     set_measure_argument.call("total_bldg_floor_area", building.total_floor_area)
-    # -  floor_height
-    set_measure_argument.call("floor_height", building.floor_height)
+    # -  floor_height -> FloorToFloorHeight, in total building section, else set to 0, smart default.
+    set_measure_argument.call("floor_height", building.get_floor_to_floor_height || 0)
     # -  num_stories_above_grade
     set_measure_argument.call("num_stories_above_grade", building.num_stories_above_grade.to_i)
     # -  num_stories_below_grade
@@ -72,6 +72,7 @@ class OSWARGPopulator
     set_measure_argument.call("party_wall_fraction", building.party_wall_fraction.to_f)
     # -  story_multiplier_method
     # -  bar_division_method
+    set_measure_argument.call("bar_division_method", building.bar_division_method)
 
   end
 
@@ -115,6 +116,66 @@ class OSWARGPopulator
     # remove_objects
     # use_upstream_args
     # enable_dst
+
+  end
+
+  def self.populate_set_lighting_loads_by_LPD_args(osw, facility)
+      # TODO: skip if no get_total_weighted_average_load
+    building = facility.site.get_building
+    osw[:steps].append({"measure_dir_name": "SetLightingLoadsByLPD", "arguments": {}})
+    set_measure_argument = lambda {| key, value | OpenStudio::Extension.set_measure_argument(osw, "SetLightingLoadsByLPD", key, value) }
+
+    # skip if no total_installed_power
+    total_installed_power = facility.get_total_installed_power
+    if total_installed_power == 0
+      set_measure_argument.call("__SKIP__", true)
+      return
+    end
+
+    # Add args
+    # -  __SKIP__
+    set_measure_argument.call("__SKIP__", false)
+    # space_type "entire building"
+    # lpd
+    set_measure_argument.call("lpd", facility.get_total_installed_power * 1000 / building.total_floor_area)
+    # add_instance_all_spaces
+    # material_cost
+    # demolition_cost
+    # years_until_costs_start
+    # demo_cost_initial_const
+    # expected_life
+    # om_cost
+    # om_frequency
+
+  end
+
+
+  def self.populate_set_electric_equipment_loads_by_epd_args(osw, facility)
+    building = facility.site.get_building
+    osw[:steps].append({"measure_dir_name": "set_electric_equipment_loads_by_epd", "arguments": {}})
+    set_measure_argument = lambda {| key, value | OpenStudio::Extension.set_measure_argument(osw, "set_electric_equipment_loads_by_epd", key, value) }
+
+    # skip if no total_weighted_average_load
+    total_weighted_average_load = facility.get_total_weighted_average_load
+    if total_weighted_average_load == 0
+      set_measure_argument.call("__SKIP__", true)
+      return
+    end
+
+    # Add args
+    # -  __SKIP__
+    set_measure_argument.call("__SKIP__", false)
+    # space_type "entire building"
+    # epd
+    set_measure_argument.call("epd", total_weighted_average_load / building.total_floor_area)
+    # add_instance_all_spaces
+    # material_cost
+    # demolition_cost
+    # years_until_costs_start
+    # demo_cost_initial_const
+    # expected_life
+    # om_cost
+    # om_frequency
 
   end
 

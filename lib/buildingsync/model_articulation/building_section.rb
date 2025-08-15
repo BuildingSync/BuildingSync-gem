@@ -71,7 +71,7 @@ module BuildingSync
       # parameter to read and write.
       @fraction_area = nil
       @standards_building_type = nil
-      @occupancy_classification_original = nil
+      @occupancy_classification = nil
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
       @occupant_quantity = nil
@@ -79,19 +79,17 @@ module BuildingSync
       @num_stories = num_stories
 
       @total_floor_area = read_floor_areas(building_total_floor_area)
-      xset_or_create('OccupancyClassification', building_occupancy_classification, false)
 
       # code to initialize
-      read_xml
+      read_xml(building_occupancy_classification)
     end
 
     # read xml
     # @param building_occupancy_classification [String]
-    # @param building_total_floor_area [Float]
-    def read_xml
+    def read_xml(building_occupancy_classification)
       # floor areas
       # based on the occupancy type set building type, system type and bar division method
-      read_building_section_other_detail
+      read_building_section_other_detail(building_occupancy_classification)
       read_construction_types
 
       if @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"]
@@ -102,7 +100,7 @@ module BuildingSync
     end
 
     # read building section other details
-    def read_building_section_other_detail
+    def read_building_section_other_detail(building_occupancy_classification)
       if @base_xml.elements["#{@ns}:TypicalOccupantUsages"]
         @base_xml.elements.each("#{@ns}:TypicalOccupantUsages/#{@ns}:TypicalOccupantUsage") do |occ_usage|
           if occ_usage.elements["#{@ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'
@@ -119,6 +117,20 @@ module BuildingSync
             @occupant_quantity = occ_level.elements["#{@ns}:OccupantQuantity"].text
           end
         end
+      end
+
+      # read floor_to_floor_height
+      floor_to_floor_height_xml = @base_xml.elements["#{@ns}:FloorToFloorHeight"]
+      if floor_to_floor_height_xml
+        @floor_to_floor_height = floor_to_floor_height_xml.first.to_s.to_f
+      end
+
+      # read occupancy_classification
+      occupancy_classification_xml = @base_xml.elements["#{@ns}:OccupancyClassification"]
+      if !occupancy_classification_xml.nil?
+        @occupancy_classification = occupancy_classification_xml.text
+      else
+        @occupancy_classification = building_occupancy_classification
       end
     end
 
@@ -184,7 +196,7 @@ module BuildingSync
       return @total_floor_area
     end
 
-    attr_reader :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :standards_building_type, :section_type, :id
+    attr_reader :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :standards_building_type, :section_type, :id, :floor_to_floor_height, :base_xml
     attr_accessor :fraction_area
   end
 end
