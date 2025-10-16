@@ -97,7 +97,7 @@ module BuildingSync
         puts "File '#{xml_file_path}' was not validated against the BuildingSync schema version #{@schema_version}"
       end
 
-      super(doc, ns)
+      super(doc, ns, @standard_to_be_used)
     end
 
     # Validate the xml file against the schema
@@ -118,7 +118,7 @@ module BuildingSync
     end
 
     def write_baseline_osw()
-      super(@output_dir, @epw_path, @standard_to_be_used)
+      super(@output_dir, @epw_path)
     end
 
     def run_baseline_osw()

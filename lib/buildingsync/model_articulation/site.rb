@@ -43,11 +43,12 @@ module BuildingSync
     # initialize
     # @param base_xml [REXML::Element] an element corresponding to a single auc:Site
     # @param ns [String] namespace, likely 'auc'
-    def initialize(base_xml, ns)
-      super(base_xml, ns)
+    def initialize(base_xml, ns, standard_to_be_used)
+      super(base_xml, ns, standard_to_be_used)
       @base_xml = base_xml
       @ns = ns
       help_element_class_type_check(base_xml, 'Site')
+      @standard_to_be_used = standard_to_be_used
 
       @building = nil
       @all_set = false
@@ -75,7 +76,7 @@ module BuildingSync
       @total_floor_area = read_floor_areas(nil)
       read_location_values
 
-      @building = BuildingSync::Building.new(@building_xml, xget_text('OccupancyClassification'), @total_floor_area, @ns)
+      @building = BuildingSync::Building.new(@building_xml, xget_text('OccupancyClassification'), @total_floor_area, @ns, @standard_to_be_used)
     end
 
     # set all function to set all parameters for each building
@@ -110,12 +111,9 @@ module BuildingSync
       return @building.building_sections
     end
 
-    # determine the open studio standard and call the set_all function
-    # @param standard_to_be_used [String]
-    # @return [Standard]
-    def determine_open_studio_standard(standard_to_be_used)
-      set_all
-      return @building.determine_open_studio_standard(standard_to_be_used)
+    # set standard template
+    def set_standard_template
+      @building.set_standard_template
     end
 
     # determine the open studio system standard and call the set_all function
@@ -176,9 +174,9 @@ module BuildingSync
       return @building.get_epw_file_path
     end
 
-    def set_weather_and_climate_zone(epw_file_path, standard_to_be_used)
+    def set_weather_and_climate_zone(epw_file_path)
       set_all
-      determine_climate_zone(standard_to_be_used)
+      determine_climate_zone
 
       # If we can't get the CZ from the site, we attempt to get from the building
       @climate_zone = @building.get_climate_zone if @climate_zone.nil?

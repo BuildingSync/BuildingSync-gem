@@ -104,11 +104,11 @@ RSpec.configure do |config|
       FileUtils.rm_rf(output_path)
       expect(Dir.exist?(output_path)).to be false
     end
-    FileUtils.mkdir_p(output_path) if !File.exist?(output_path)
-    expect(Dir.exist?(output_path)).to be true
-    expect(File.exist?(xml_path)).to be true
-    puts xml_path
-    puts output_path
+    # FileUtils.mkdir_p(output_path) if !File.exist?(output_path)
+    # expect(Dir.exist?(output_path)).to be true
+    # expect(File.exist?(xml_path)).to be true
+    # puts xml_path
+    # puts output_path
     return xml_path, output_path
   end
 

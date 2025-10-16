@@ -55,11 +55,12 @@ module BuildingSync
     # initialize - load workflow json file and add necessary measure paths
     # @param doc [REXML::Document]
     # @param ns [String]
-    def initialize(doc, ns)
+    def initialize(doc, ns, standard_to_be_used)
       super(doc, ns)
 
       @facility_xml = nil
       @facility = nil
+      @standard_to_be_used = standard_to_be_used
 
       File.open(WORKFLOW_MAKER_JSON_FILE_PATH, 'r') do |file|
         @workflow_maker_json = JSON.parse(file.read, symbolize_names: true)
@@ -85,7 +86,7 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.WorkflowMaker.read_xml', "Setting up workflow for Facility ID: #{@facility_xml.attributes['ID']}")
 
       # Initialize Facility object
-      @facility = BuildingSync::Facility.new(@facility_xml, @ns)
+      @facility = BuildingSync::Facility.new(@facility_xml, @ns, @standard_to_be_used)
     end
 
     # get the facility object from this workflow
@@ -363,21 +364,23 @@ module BuildingSync
       end
     end
 
-    def write_baseline_osw(model_dir, epw_file_path, standard_to_be_used)
+    def write_baseline_osw(model_dir, epw_file_path)
       # start with an empty baseline workflow
       file = File.read(EMPTY_BASELINE_OSW_PATH)
       baseline_osw = JSON.parse(file, symbolize_names: true)
 
       # parse the facility
       @facility.set_all
-      @facility.determine_open_studio_standard(standard_to_be_used)
-      @facility.set_weather_and_climate_zone(epw_file_path, standard_to_be_used)
+      @facility.set_standard_template
+      @facility.set_weather_and_climate_zone(epw_file_path)
 
       # populate the baseline measures
       OSWARGPopulator::populate_set_run_period_args(baseline_osw, @facility)
       OSWARGPopulator::populate_change_building_location_args(baseline_osw, @facility)
+
       OSWARGPopulator::populate_create_bar_from_building_type_ratios_args(baseline_osw, @facility)
       OSWARGPopulator::populate_create_typical_building_from_model_args(baseline_osw, @facility)
+
       OSWARGPopulator::populate_set_lighting_loads_by_LPD_args(baseline_osw, @facility)
       OSWARGPopulator::populate_set_electric_equipment_loads_by_epd_args(baseline_osw, @facility)
       OSWARGPopulator::populate_openstudio_results_args(baseline_osw, @facility)
@@ -420,7 +423,7 @@ module BuildingSync
       )
     end
 
-    def run_report_osws(output_dir, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
+    def run_report_osws(output_dir, runner_options = { run_simulations: true, verbose: true, num_parallel: 7, max_to_run: Float::INFINITY })
       # get the all the osws but for the baseline
       report_osws = Dir.glob("#{output_dir}/**/in.osw")
       report_osws = report_osws - ["#{output_dir}/baseline/**/in.osw"]

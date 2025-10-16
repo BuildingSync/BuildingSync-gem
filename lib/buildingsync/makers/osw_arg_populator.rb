@@ -29,7 +29,7 @@ class OSWARGPopulator
     # -  weather_file_name
     set_measure_argument.call("weather_file_name", building.epw_file_path)
     # -  climate_zone
-    set_measure_argument.call("climate_zone", "Lookup From Stat File")
+    set_measure_argument.call("climate_zone", facility.site.get_climate_zone || "Lookup From Stat File")
 
   end
 
@@ -64,6 +64,7 @@ class OSWARGPopulator
     # -  building_rotation
     set_measure_argument.call("building_rotation", building.building_rotation.to_f)
     # -  template
+    set_measure_argument.call("template", building.get_standard_template)
     # -  ns_to_ew_ratio
     set_measure_argument.call("ns_to_ew_ratio", building.ns_to_ew_ratio.to_f)
     # -  wwr
@@ -71,8 +72,9 @@ class OSWARGPopulator
     # -  party_wall_fraction
     set_measure_argument.call("party_wall_fraction", building.party_wall_fraction.to_f)
     # -  story_multiplier_method
-    # -  bar_division_method
-    set_measure_argument.call("bar_division_method", building.bar_division_method)
+    set_measure_argument.call("story_multiplier_method", "None") # needed until os allows mutli basement
+    # -  bar_division_method, as of right now, always use the default
+    # set_measure_argument.call("bar_division_method", building.bar_division_method)
 
   end
 
@@ -80,6 +82,7 @@ class OSWARGPopulator
     building = facility.site.get_building
     osw[:steps].append({"measure_dir_name": "create_typical_building_from_model", "arguments": {}})
     set_measure_argument = lambda {| key, value | OpenStudio::Extension.set_measure_argument(osw, "create_typical_building_from_model", key, value) }
+    principal_HVAC_system_type = facility.get_principal_HVAC_system_type
 
     # Add args
     # -  __SKIP__
@@ -87,7 +90,7 @@ class OSWARGPopulator
     # template
     set_measure_argument.call("template", building.get_standard_template)
     # system_type
-    set_measure_argument.call("system_type", facility.get_principal_HVAC_system_type)
+    set_measure_argument.call("system_type", principal_HVAC_system_type || "Inferred")
     # hvac_delivery_type
     # htg_src
     # clg_src
@@ -103,8 +106,10 @@ class OSWARGPopulator
     # onsite_parking_fraction
     # add_exhaust
     # add_swh
+    set_measure_argument.call("add_swh", !principal_HVAC_system_type.nil?)
     # add_thermostat
     # add_hvac
+    set_measure_argument.call("add_hvac", !principal_HVAC_system_type.nil?)
     # add_refrigeration
     # modify_wkdy_op_hrs
     # wkdy_op_hrs_start_time
@@ -127,7 +132,7 @@ class OSWARGPopulator
 
     # skip if no total_installed_power
     total_installed_power = facility.get_total_installed_power
-    if total_installed_power == 0
+    if total_installed_power.nil? or total_installed_power == 0
       set_measure_argument.call("__SKIP__", true)
       return
     end
@@ -137,7 +142,7 @@ class OSWARGPopulator
     set_measure_argument.call("__SKIP__", false)
     # space_type "entire building"
     # lpd
-    set_measure_argument.call("lpd", facility.get_total_installed_power * 1000 / building.total_floor_area)
+    set_measure_argument.call("lpd", total_installed_power * 1000 / building.total_floor_area)
     # add_instance_all_spaces
     # material_cost
     # demolition_cost
@@ -157,7 +162,7 @@ class OSWARGPopulator
 
     # skip if no total_weighted_average_load
     total_weighted_average_load = facility.get_total_weighted_average_load
-    if total_weighted_average_load == 0
+    if total_weighted_average_load.nil? or total_weighted_average_load == 0
       set_measure_argument.call("__SKIP__", true)
       return
     end

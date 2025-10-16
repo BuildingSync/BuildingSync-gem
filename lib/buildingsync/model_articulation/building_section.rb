@@ -53,8 +53,8 @@ module BuildingSync
     # @param building_total_floor_area [Float]
     # @param num_stories [Float]
     # @param ns [String] namespace, likely 'auc'
-    def initialize(base_xml, building_occupancy_classification, building_total_floor_area, num_stories, ns)
-      super(base_xml, ns)
+    def initialize(base_xml, building_occupancy_classification, building_total_floor_area, num_stories, ns, standard_to_be_used)
+      super(base_xml, ns, standard_to_be_used)
       @base_xml = base_xml
       @ns = ns
 
@@ -77,6 +77,7 @@ module BuildingSync
       @occupant_quantity = nil
       @principal_hvac_type = nil
       @num_stories = num_stories
+      @standard_to_be_used = standard_to_be_used
 
       @total_floor_area = read_floor_areas(building_total_floor_area)
 

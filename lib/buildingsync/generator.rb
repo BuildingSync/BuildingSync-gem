@@ -542,7 +542,6 @@ module BuildingSync
 
     # get hvac system from xml file
     # @param xml_file_name [String]
-    # @param standard_to_be_used [String]
     # @return [BuildingSync::HVACSystem]
     def get_hvac_system_from_file(xml_file_path)
       doc = nil
