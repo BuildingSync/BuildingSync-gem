@@ -178,7 +178,7 @@ module BuildingSync
 
     def set_weather_and_climate_zone(epw_file_path, standard_to_be_used, ddy_file = nil)
       set_all
-      set_climate_zone(standard_to_be_used)
+      determine_climate_zone(standard_to_be_used)
 
       # If we can't get the CZ from the site, we attempt to get from the building
       @climate_zone = @building.get_climate_zone if @climate_zone.nil?

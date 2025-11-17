@@ -29,7 +29,7 @@ class OSWARGPopulator
     # -  weather_file_name
     set_measure_argument.call("weather_file_name", building.epw_file_path)
     # -  climate_zone
-    set_measure_argument.call("climate_zone", facility.site.get_climate_zone)
+    set_measure_argument.call("climate_zone", "Lookup From Stat File")
 
   end
 
