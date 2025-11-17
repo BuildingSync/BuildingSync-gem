@@ -461,15 +461,43 @@ module BuildingSync
       return really_successful
     end
 
-    def write_baseline_osw(model_dir)
+    def assert_baseline_osw_exists(baseline_osw_path)
+      if !File.file?(baseline_osw_path)
+        error_message = (
+          "this function required #{baseline_owm_path}, which does not exist. "\
+          "Create #{baseline_owm_path} with `write_baseline_osw` and try again."
+        )
+        OpenStudio.logFree(OpenStudio::Error, "BuildingSync.WorkflowMaker.assert_baseline_osw_exists", error_message)
+        raise StandardError, "BuildingSync.WorkflowMaker.assert_baseline_osw_exists: #{error_message}"
+      end
+    end
+
+    def assert_baseline_osm_exists(baseline_osm_path)
+      if !File.file?(baseline_osm_path)
+        error_message = (
+          "this function required #{baseline_osm_path}, which does not exist. "\
+          "Create #{baseline_osm_path} with `run_baseline_osw` and try again."
+        )
+        OpenStudio.logFree(OpenStudio::Error, "BuildingSync.WorkflowMaker.assert_baseline_osm_exists", error_message)
+        raise StandardError, "BuildingSync.WorkflowMaker.assert_baseline_osm_exists: #{error_message}"
+      end
+    end
+
+    def write_baseline_osw(model_dir, epw_file_path, standard_to_be_used, ddy_file = nil)
       # start with an empty baseline workflow
       file = File.read(EMPTY_BASELINE_OSW_PATH)
       baseline_osw = JSON.parse(file, symbolize_names: true)
+
+      # parse the facility
+      @facility.set_all
+      @facility.determine_open_studio_standard(standard_to_be_used)
+      @facility.set_weather_and_climate_zone(epw_file_path, model_dir, standard_to_be_used, ddy_file)
 
       # populate the baseline measures
       OSWARGPopulator::populate_set_run_period_args(baseline_osw, @facility)
       OSWARGPopulator::populate_change_building_location_args(baseline_osw, @facility)
       OSWARGPopulator::populate_create_bar_from_building_type_ratios_args(baseline_osw, @facility)
+      OSWARGPopulator::populate_create_typical_building_from_model_args(baseline_osw, @facility)
       OSWARGPopulator::populate_openstudio_results_args(baseline_osw, @facility)
 
       # write to file
@@ -480,14 +508,59 @@ module BuildingSync
       end
     end
 
+    def run_baseline_osw(output_dir, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
+      # assert we have a baseline osm
+      baseline_osw_path = "#{output_dir}/baseline/in.osw"
+      assert_baseline_osw_exists(baseline_osw_path)
+
+      # run the baseline osm
+      runner = OpenStudio::Extension::Runner.new(dirname = Dir.pwd, bundle_without = [], options = runner_options)
+      return runner.run_osws([baseline_osw_path])
+    end
+
+    def write_report_osws(output_dir)
+      # assert we have a baseline osm
+      baseline_owm_path = "#{output_dir}/baseline/in.osm"
+      assert_baseline_osm_exists(baseline_owm_path)
+
+      # write a osw for each scenario in the report
+      number_successful = 0
+      @facility.report.poms.each do |scenario|
+        successful = write_osw(output_dir, scenario, baseline_owm_path)
+        number_successful += successful.to_i
+      end
+
+      # Log it
+      OpenStudio.logFree(
+        OpenStudio::Error,
+        'BuildingSync.WorkflowMaker.write_report_osws',
+        "Facility ID: #{@facility.xget_id}. Expected #{@facility.report.poms.length()}, Got #{number_successful} OSWs"
+      )
+    end
+
+    def run_report_osws(output_dir, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
+      # get the all the osws but for the baseline
+      report_osws = Dir.glob("#{output_dir}/**/in.osw")
+      report_osws = report_osws - ["#{output_dir}/baseline/**/in.osw"]
+
+      # run them
+      runner = OpenStudio::Extension::Runner.new(dirname = Dir.pwd, bundle_without = [], options = runner_options)
+      return runner.run_osws(report_osws)
+    end
+
+
     # Write an OSW for the provided scenario
     # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
     # @param [BuildingSync::Scenario]
     # @return [Boolean] whether the writing was successful
-    def write_osw(main_output_dir, scenario)
+    def write_osw(main_output_dir, scenario, baseline_osm_path=nil)
       successful = true
       # deep clone
       base_workflow = deep_copy_workflow
+
+      if baseline_osm_path
+        base_workflow["seed_file"] = File.join(Dir.pwd, baseline_osm_path)
+      end
 
       # configure the workflow based on measures in this scenario
       begin

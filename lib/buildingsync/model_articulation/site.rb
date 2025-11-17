@@ -188,13 +188,9 @@ module BuildingSync
       return @building.get_epw_file_path
     end
 
-    # generate baseline model in osm file format
-    # @param epw_file_path [String]
-    # @param standard_to_be_used [String]
-    # @param ddy_file [String]
-    def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
+    def set_weather_and_climate_zone(epw_file_path, standard_to_be_used, ddy_file = nil)
       set_all
-      determine_climate_zone(standard_to_be_used)
+      set_climate_zone(standard_to_be_used)
 
       # If we can't get the CZ from the site, we attempt to get from the building
       @climate_zone = @building.get_climate_zone if @climate_zone.nil?
@@ -205,6 +201,14 @@ module BuildingSync
       weather_station_name = @building.xget_text('WeatherStationName').nil? ? xget_text('WeatherStationName') : @building.xget_text('WeatherStationName')
       weather_station_id = @building.xget_text('WeatherDataStationID').nil? ? xget_text('WeatherDataStationID') : @building.xget_text('WeatherDataStationID')
       @building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, lat, long, ddy_file, weather_station_name, weather_station_id, @state_name, @city_name)
+    end
+
+    # generate baseline model in osm file format
+    # @param epw_file_path [String]
+    # @param standard_to_be_used [String]
+    # @param ddy_file [String]
+    def generate_baseline_osm(epw_file_path, standard_to_be_used, ddy_file = nil)
+      set_weather_and_climate_zone(epw_file_path, standard_to_be_used, ddy_file = nil)
       @building.generate_baseline_osm
     end
 
