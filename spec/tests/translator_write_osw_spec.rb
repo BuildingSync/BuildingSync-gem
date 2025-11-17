@@ -1,8 +1,28 @@
 test_configs = [
   # file_name, standard, epw_path, schema_version
-  # ['building_151.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
-  # ['example-smalloffice-level1.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0'],
+  # ['179D_Example_Building.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['ASHRAE 211 Export.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['BETTER-1.0.0_SampleOffice_gemtest.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['building_151.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  ['BuildingEQ-1.0.0_gemtest.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  ['BuildingEQ-1.0.0.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['Chula_Vista_ASHRAE_L1_Example_Building.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['Chula_Vista_ASHRAE_L2_Example_Building.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['Demo_ASHRAE_L2_Example_Building.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['Example_ASHRAE_L2_Report_-_with_Energy_Use_Data_2.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['Example_ASHRAE_L2_Report_-_with_Energy_Use_Data.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['Example_ASHRAE_L2_Report.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['Example_HOMES_Template_Building.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['Example_NYC_Energy_Efficiency_Report_Property_2.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['Example_NYC_Energy_Efficiency_Report_Property.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['Example_San_Francisco_Audit_Report.xml', ASHRAE90_1, nil, 'v2.4.0'],
   ['example-smalloffice-level1.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  ['Golden Test File.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  ['L100_Audit-1.0.0_and_BSyncr-1.0.0.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  ['L100_Audit-1.0.0.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  ['L100_Pre-Simulation-1.0.0.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['NYC_BBL_AT_Demo_Property.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  ['Reference-PrimarySchool-L100-Audit.xml', ASHRAE90_1, nil, 'v2.4.0'],
 ]
 
 RSpec.describe 'BuildingSync' do
