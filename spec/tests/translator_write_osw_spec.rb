@@ -2,8 +2,8 @@ require_relative './../spec_helper'
 
 test_configs = [
   # file_name, standard, epw_path, schema_version
-  # ['building_151.xml', ASHRAE90_1, nil, 'v2.4.0'],
-  # ['building_151.xml', CA_TITLE24, nil, 'v2.4.0'],
+  ['building_151.xml', ASHRAE90_1, nil, 'v2.4.0'],
+  # ['building_151.xml', CA_TIT LE24, nil, 'v2.4.0'],
   # ['example-smalloffice-level1.xml', ASHRAE90_1, nil, 'v2.4.0'],
   # ['Reference-PrimarySchool-L100-Audit.xml', ASHRAE90_1, nil, 'v2.4.0'],
   # ['Golden Test File.xml', ASHRAE90_1, nil, 'v2.4.0'],
@@ -40,7 +40,7 @@ test_configs = [
   # ["/Users/heslinge/Play/bsync_tests/Example_NYC_Energy_Efficiency_Report_Property_2.xml", ASHRAE90_1, nil, 'v2.4.0'],
   # ["/Users/heslinge/Play/bsync_tests/Example_San_Francisco_Audit_Report.xml", ASHRAE90_1, nil, 'v2.4.0'],
   # ["/Users/heslinge/Play/bsync_tests/NYC_BBL_AT_Demo_Property.xml", ASHRAE90_1, nil, 'v2.4.0'],
-  ["/Users/heslinge/Play/bsync_tests/BETTER-1.0.0_SampleOffice_gemtest.xml", ASHRAE90_1, nil, 'v2.4.0'],
+  # ["/Users/heslinge/Play/bsync_tests/BETTER-1.0.0_SampleOffice_gemtest.xml", ASHRAE90_1, nil, 'v2.4.0'],
   # ["/Users/heslinge/Play/bsync_tests/BuildingEQ-1.0.0_gemtest.xml", ASHRAE90_1, nil, 'v2.4.0'],
 ]
 
@@ -52,7 +52,7 @@ RSpec.describe 'BuildingSync' do
       it "write and run baseline owm. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
         # Set Up
         xml_path, output_path = create_xml_path_and_output_path(file_name, standard, __FILE__, schema_version)
-        translator = BuildingSync::Translator.new(file_name, output_path, epw_path, standard)
+        translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, standard)
 
         # Action
         translator.write_baseline_osw
