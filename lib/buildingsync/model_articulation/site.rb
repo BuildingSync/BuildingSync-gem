@@ -176,7 +176,7 @@ module BuildingSync
       return @building.get_epw_file_path
     end
 
-    def set_weather_and_climate_zone(epw_file_path, standard_to_be_used, ddy_file = nil)
+    def set_weather_and_climate_zone(epw_file_path, standard_to_be_used)
       set_all
       determine_climate_zone(standard_to_be_used)
 
@@ -188,7 +188,7 @@ module BuildingSync
       long = @building.xget_text('Longitude').nil? ? xget_text('Longitude') : @building.xget_text('Longitude')
       weather_station_name = @building.xget_text('WeatherStationName').nil? ? xget_text('WeatherStationName') : @building.xget_text('WeatherStationName')
       weather_station_id = @building.xget_text('WeatherDataStationID').nil? ? xget_text('WeatherDataStationID') : @building.xget_text('WeatherDataStationID')
-      @building.set_weather_and_climate_zone(@climate_zone, epw_file_path, standard_to_be_used, lat, long, ddy_file, weather_station_name, weather_station_id, @state_name, @city_name)
+      @building.set_weather_and_climate_zone(@climate_zone, epw_file_path, weather_station_name, weather_station_id, @state_name, @city_name)
     end
 
     # write parameters to xml file

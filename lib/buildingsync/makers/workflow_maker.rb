@@ -363,7 +363,7 @@ module BuildingSync
       end
     end
 
-    def write_baseline_osw(model_dir, epw_file_path, standard_to_be_used, ddy_file = nil)
+    def write_baseline_osw(model_dir, epw_file_path, standard_to_be_used)
       # start with an empty baseline workflow
       file = File.read(EMPTY_BASELINE_OSW_PATH)
       baseline_osw = JSON.parse(file, symbolize_names: true)
@@ -371,13 +371,15 @@ module BuildingSync
       # parse the facility
       @facility.set_all
       @facility.determine_open_studio_standard(standard_to_be_used)
-      @facility.set_weather_and_climate_zone(epw_file_path, model_dir, standard_to_be_used, ddy_file)
+      @facility.set_weather_and_climate_zone(epw_file_path, standard_to_be_used)
 
       # populate the baseline measures
       OSWARGPopulator::populate_set_run_period_args(baseline_osw, @facility)
       OSWARGPopulator::populate_change_building_location_args(baseline_osw, @facility)
       OSWARGPopulator::populate_create_bar_from_building_type_ratios_args(baseline_osw, @facility)
       OSWARGPopulator::populate_create_typical_building_from_model_args(baseline_osw, @facility)
+      OSWARGPopulator::populate_set_lighting_loads_by_LPD_args(baseline_osw, @facility)
+      OSWARGPopulator::populate_set_electric_equipment_loads_by_epd_args(baseline_osw, @facility)
       OSWARGPopulator::populate_openstudio_results_args(baseline_osw, @facility)
 
       # write to file

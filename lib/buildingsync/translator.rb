@@ -117,8 +117,8 @@ module BuildingSync
       OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Translator.initialize', "File '#{@xml_file_path}' does not validate against the BuildingSync schema version #{@schema_version}")
     end
 
-    def write_baseline_osw(ddy_file = nil)
-      super(@output_dir, @epw_path, @standard_to_be_used, ddy_file)
+    def write_baseline_osw()
+      super(@output_dir, @epw_path, @standard_to_be_used)
     end
 
     def run_baseline_osw()
