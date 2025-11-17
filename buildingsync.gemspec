@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'openstudio-ee', '~> 0.11.1'
   spec.add_dependency 'openstudio-extension', '~> 0.8.3'
   spec.add_dependency 'openstudio-model-articulation', '~> 0.11.1'
+  spec.add_dependency 'httparty', '~> 0.23.2'
 
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.13'

@@ -44,8 +44,8 @@ module BuildingSync
     # @param base_xml [REXML::Element] an element corresponding to a locational element
     #   either an auc:Site or auc:Building
     # @param ns [String] namespace, likely 'auc'
-    def initialize(base_xml, ns)
-      super(base_xml, ns)
+    def initialize(base_xml, ns, standard_to_be_used)
+      super(base_xml, ns, standard_to_be_used)
       @base_xml = base_xml
       @ns = ns
 
@@ -54,6 +54,7 @@ module BuildingSync
       @climate_zone_ca_t24 = nil
       @city_name = nil
       @state_name = nil
+      @standard_to_be_used = standard_to_be_used
 
       read_location_values
     end
@@ -67,15 +68,15 @@ module BuildingSync
       read_city_and_state_name
     end
 
-    def determine_climate_zone(standard_to_be_used = nil)
-      if standard_to_be_used == ASHRAE90_1
+    def determine_climate_zone
+      if @standard_to_be_used == ASHRAE90_1
         if !@climate_zone_ashrae.nil?
           @climate_zone = @climate_zone_ashrae
         elsif @climate_zone.nil? && !@climate_zone_ca_t24.nil?
           @climate_zone = @climate_zone_ca_t24
           OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.LocationElement.determine_climate_zone', "Element ID: #{xget_id} - Standard to use is #{standard_to_be_used} but ASHRAE Climate Zone is nil. Using CA T24: #{@climate_zone}")
         end
-      elsif standard_to_be_used == CA_TITLE24
+      elsif @standard_to_be_used == CA_TITLE24
         if !@climate_zone_ca_t24.nil?
           @climate_zone = @climate_zone_ca_t24
         elsif @climate_zone.nil? && !@climate_zone_ashrae.nil?
@@ -86,7 +87,6 @@ module BuildingSync
     end
 
     # get climate zone
-    # @param standard_to_be_used [String]
     # @return [String]
     def get_climate_zone
       return @climate_zone

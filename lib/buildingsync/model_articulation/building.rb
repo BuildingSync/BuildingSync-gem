@@ -42,7 +42,9 @@ require 'openstudio-standards'
 
 require 'buildingsync/model_articulation/building_section'
 require 'buildingsync/model_articulation/location_element'
-require 'buildingsync/get_bcl_weather_file'
+require 'buildingsync/bcl_weather_file_downloader'
+
+require_relative 'DOE_to_DEER_building_type'
 
 module BuildingSync
   # Building class
@@ -52,8 +54,8 @@ module BuildingSync
     # @param site_occupancy_classification [String]
     # @param site_total_floor_area [String]
     # @param ns [String] namespace, likely 'auc'
-    def initialize(base_xml, site_occupancy_classification, site_total_floor_area, ns)
-      super(base_xml, ns)
+    def initialize(base_xml, site_occupancy_classification, site_total_floor_area, ns, standard_to_be_used)
+      super(base_xml, ns, standard_to_be_used)
       @base_xml = base_xml
       @ns = ns
 
@@ -82,6 +84,7 @@ module BuildingSync
       @occupant_quantity = nil
       @number_of_units = nil
       @fraction_area = 1.0
+      @standard_to_be_used = standard_to_be_used
       # code to initialize
       read_xml(site_occupancy_classification, site_total_floor_area)
     end
@@ -109,7 +112,7 @@ module BuildingSync
 
       # Create the BuildingSections
       @base_xml.elements.each("#{@ns}:Sections/#{@ns}:Section") do |section_element|
-        section = BuildingSection.new(section_element, xget_text('OccupancyClassification'), @total_floor_area, num_stories, @ns)
+        section = BuildingSection.new(section_element, xget_text('OccupancyClassification'), @total_floor_area, num_stories, @ns, @standard_to_be_used)
         if section.section_type == 'Whole building'
           @building_sections_whole_building.push(section)
         elsif section.section_type == 'Space function' || section.section_type.nil?
@@ -184,11 +187,6 @@ module BuildingSync
         @num_stories_below_grade = @base_xml.elements["#{@ns}:ConditionedFloorsBelowGrade"].text.to_f
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
-      end
-
-      if @num_stories_below_grade > 1.0
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.read_stories_above_and_below_grade', "Number of stories below grade is larger than 1: #{@num_stories_below_grade}, currently only one basement story is supported.")
-        raise StandardError, "Building ID: #{xget_id}. Number of stories below grade is > 1 (#{num_stories_below_grade}).  Currently, only one story below grade is supported."
       end
     end
 
@@ -316,31 +314,12 @@ module BuildingSync
       end
 
       set_bldg_and_system_type(building_occupancy_classification, @total_floor_area, num_stories, true)
-    end
 
-    # determine the open studio standard and call the set_all function
-    # @param standard_to_be_used [String]
-    # @return [Standard]
-    def determine_open_studio_standard(standard_to_be_used)
-      set_all
-      begin
-        set_standard_template(standard_to_be_used, get_built_year)
-        building_type = get_building_type
-        @open_studio_standard = Standard.build("#{@standard_template}_#{building_type}")
-        update_name
-      rescue StandardError => e
-        # this error means there's such standard. The default error message is to long to be helpful
-        if e.to_s.include?("Did not find a class called")
-          message =  e.to_s.split("{", 2).first
-          raise StandardError, "BuildingSync.Building.determine_open_studio_standard: #{message}#{standard_to_be_used}"
-        end
-
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.determine_open_studio_standard', e.message[0..20])
-        raise StandardError, "BuildingSync.Building.determine_open_studio_standard: #{e.message[0..20]}"
+      if @standards_building_type.nil?
+        raise StandardError, "Building has building type `#{building_occupancy_classification}` which is not handled by the gem."
       end
-      OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.determine_open_studio_standard', "Building Standard with template: #{@standard_template}_#{building_type}") if !@open_studio_standard.nil?
-      return @open_studio_standard
     end
+
 
     # update the name of the building
     def update_name
@@ -355,38 +334,36 @@ module BuildingSync
     end
 
     # set standard template
-    # @param standard_to_be_used [String]
-    # @param built_year [Integer]
-    def set_standard_template(standard_to_be_used, built_year)
-      if standard_to_be_used == CA_TITLE24
+    def set_standard_template
+      if @standard_to_be_used == CA_TITLE24
         # price is right rules
         deer_templates = ["DEER Pre-1975", "DEER 1985", "DEER 1996", "DEER 2003", "DEER 2007", "DEER 2011", "DEER 2014", "DEER 2015", "DEER 2017", "DEER 2020"]
         for template in deer_templates do
           year = template[-4..-1].to_i
-          if built_year <= year
+          if @built_year <= year
             @standard_template = template
             return
           end
         end
         @standard_template = "DEER 2020"
-      elsif standard_to_be_used == ASHRAE90_1
-        if built_year < 1980
+      elsif @standard_to_be_used == ASHRAE90_1
+        if @built_year < 1980
           @standard_template = 'DOE Ref Pre-1980'
-        elsif built_year >= 1980 && built_year < 2004
+        elsif @built_year >= 1980 && built_year < 2004
           @standard_template = 'DOE Ref 1980-2004'
-        elsif built_year >= 2004 && built_year < 2007
+        elsif @built_year >= 2004 && built_year < 2007
           @standard_template = '90.1-2004'
-        elsif built_year >= 2007 && built_year < 2010
+        elsif @built_year >= 2007 && built_year < 2010
           @standard_template = '90.1-2007'
-        elsif built_year >= 2010 && built_year < 2013
+        elsif @built_year >= 2010 && built_year < 2013
           @standard_template = '90.1-2010'
-        elsif built_year >= 2013
+        elsif @built_year >= 2013
           @standard_template = '90.1-2013'
         end
         # TODO: add ASHRAE 2016 once it is available
       else
-        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_standard_template', "Unknown standard_to_be_used #{standard_to_be_used}.")
-        raise StandardError, "BuildingSync.Building.get_standard_template: Unknown standard_to_be_used #{standard_to_be_used}."
+        OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.get_standard_template', "Unknown standard_to_be_used #{@standard_to_be_used}.")
+        raise StandardError, "BuildingSync.Building.get_standard_template: Unknown standard_to_be_used #{@standard_to_be_used}."
       end
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.Building.get_standard_template', "Using the following standard for default values #{@standard_template}.")
     end
@@ -476,20 +453,15 @@ module BuildingSync
         puts "Using building climate_zone: #{climate_zone}"
         @epw_file_path = OpenstudioStandards::Weather.climate_zone_representative_weather_file_path(@climate_zone)
 
-      # elsif weather_station_id passed in
-      elsif !weather_station_id.nil?
-        puts "Using passed in weather_station_id: #{weather_station_id}"
-        @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_weather_id(weather_station_id)
-
       # elsif city and state passed in
       elsif !city_name.nil? && !state_name.nil?
         puts "Using passed in city_name and state_name: #{city_name}, #{state_name}"
-        @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(state_name, city_name)
+        @epw_file_path = BuildingSync::BCLWeatherFileDownloader.download_weather_file_from_city_name(city_name, state_name)
 
       # elsif city and state class attr set
       elsif !@city_name.nil? && !@state_name.nil?
-        puts "Using building's city_name and state_name: #{city_name}, #{state_name}"
-        @epw_file_path = BuildingSync::GetBCLWeatherFile.new.download_weather_file_from_city_name(@state_name, @city_name)
+        puts "Using building's city_name and state_name: #{@city_name}, #{@state_name}"
+        @epw_file_path = BuildingSync::BCLWeatherFileDownloader.download_weather_file_from_city_name(@city_name, @state_name)
 
       # we've got nothing to go off of
       else

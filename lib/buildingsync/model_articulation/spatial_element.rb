@@ -52,7 +52,7 @@ module BuildingSync
     # @param base_xml [REXML::Element] an element corresponding to a spatial element,
     #   either an auc:Site, auc:Building, auc:Section
     # @param ns [String] namespace, likely 'auc'
-    def initialize(base_xml, ns)
+    def initialize(base_xml, ns, standard_to_be_used)
       @base_xml = base_xml
       @ns = ns
 
@@ -68,6 +68,7 @@ module BuildingSync
       @conditioned_floor_area_heated_cooled = 0
       @custom_conditioned_above_grade_floor_area = nil
       @custom_conditioned_below_grade_floor_area = nil
+      @standard_to_be_used = standard_to_be_used
 
       @user_defined_fields = REXML::Element.new("#{@ns}:UserDefinedFields")
     end
@@ -170,7 +171,7 @@ module BuildingSync
     # @param occ_type [Hash]
     # @return [Boolean]
     def sets_occupancy_bldg_system_types(occ_type)
-      @standards_building_type = occ_type[:standards_building_type]
+      @standards_building_type = occ_type[:standards_building_type][:"#{@standard_to_be_used}"]
       @bar_division_method = occ_type[:bar_division_method]
       @system_type = occ_type[:system_type]
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.sets_occupancy_bldg_system_types', "Element ID: #{xget_id} @standards_building_type #{@standards_building_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}")
@@ -191,7 +192,8 @@ module BuildingSync
       # if building_and_system_types doesn't contain occupancy_classification, there's nothing we can do.
       occ_types = building_and_system_types[:"#{occupancy_classification}"]
       if occ_types.nil?
-        raise "BuildingSync Occupancy type #{occupancy_classification} is not available in the building_and_system_types.json dictionary"
+        puts "BuildingSync Occupancy type #{occupancy_classification} is not available in the building_and_system_types.json dictionary"
+        return
       end
 
       # if theres only one, we chose it indiscriminately
@@ -214,7 +216,7 @@ module BuildingSync
           too_small = min_floor_area && total_floor_area < min_floor_area
           too_big = max_floor_area && total_floor_area >= max_floor_area
           if !too_big && !too_small
-            puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
+            puts "selected the following standards_building_type: #{occ_type[:standards_building_type][:"#{@standard_to_be_used}"]}"
             return sets_occupancy_bldg_system_types(occ_type)
           end
 
@@ -226,7 +228,7 @@ module BuildingSync
           too_small = min_number_floors && total_number_floors < min_number_floors
           too_big = max_number_floors && total_number_floors >= max_number_floors
           if !too_big && !too_small
-            puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
+            puts "selected the following standards_building_type: #{occ_type[:standards_building_type][:"#{@standard_to_be_used}"]}"
             return sets_occupancy_bldg_system_types(occ_type)
           end
         end

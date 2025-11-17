@@ -55,7 +55,7 @@ module BuildingSync
     # initialize
     # @param base_xml [REXML:Element]
     # @param ns [String]
-    def initialize(base_xml, ns)
+    def initialize(base_xml, ns, standard_to_be_used)
       @base_xml = base_xml
       @ns = ns
 
@@ -78,6 +78,7 @@ module BuildingSync
 
       @load_system = nil
       @hvac_system = nil
+      @standard_to_be_used = standard_to_be_used
 
       # reading the xml
       read_xml
@@ -97,7 +98,7 @@ module BuildingSync
         @site_xml = site_xml_temp.first
       end
       # Create new Site
-      @site = BuildingSync::Site.new(@site_xml, @ns)
+      @site = BuildingSync::Site.new(@site_xml, @ns, @standard_to_be_used)
 
       # Report - checks
       report_xml_temp = @base_xml.get_elements("#{@ns}:Reports/#{@ns}:Report")
@@ -133,15 +134,13 @@ module BuildingSync
       @site.set_all
     end
 
-    # determine open studio standard
-    # @param standard_to_be_used [String]
-    # @return [Standard]
-    def determine_open_studio_standard(standard_to_be_used)
-      return @site.determine_open_studio_standard(standard_to_be_used)
+    # set standard template
+    def set_standard_template
+      @site.set_standard_template
     end
 
-    def set_weather_and_climate_zone(epw_file_path, standard_to_be_used)
-      @site.set_weather_and_climate_zone(epw_file_path, standard_to_be_used)
+    def set_weather_and_climate_zone(epw_file_path)
+      @site.set_weather_and_climate_zone(epw_file_path)
     end
 
     # get space types
@@ -177,28 +176,48 @@ module BuildingSync
     # get sum of /Systems/LightingSystems/PlugLoads/WeightedAverageLoad
     # @return [String]
     def get_total_weighted_average_load
+      # if no plug_loads, return nil
       plug_loads = @base_xml.elements["#{@ns}:Systems/#{@ns}:PlugLoads/"]
-      all_weighted_average_loads = plug_loads.map {|s| s.elements["#{@ns}:WeightedAverageLoad/"].first.to_s.to_f}
+      return nil if plug_loads.nil?
 
-      return all_weighted_average_loads.sum
+      # get all weighted_average_loads
+      plug_loads = plug_loads.reject {|s| s.class == REXML::Comment}
+      all_weighted_average_loads = plug_loads.map {|s| s.elements["#{@ns}:WeightedAverageLoad/"]}
+
+      # if any nil, return nil, else return sum
+      return nil if !all_weighted_average_loads.all?
+      return all_weighted_average_loads.map {|s| s.first.to_s.to_f}.sum
     end
 
     # get sum of /Systems/LightingSystems/LightingSystem/InstalledPower
     # @return [String]
     def get_total_installed_power
+      # if no lighting systems, return nil
       lighting_systems = @base_xml.elements["#{@ns}:Systems/#{@ns}:LightingSystems/"]
-      all_installed_powers = lighting_systems.map {|s| s.elements["#{@ns}:InstalledPower/"].first.to_s.to_f}
+      return nil if lighting_systems.nil?
 
+      # get all all_installed_powers
+      lighting_systems = lighting_systems.reject {|s| s.class == REXML::Comment}
+      all_installed_powers = lighting_systems.map {|s| s.elements["#{@ns}:InstalledPower/"]&.first&.to_s&.to_f}
+
+      # if any nil, return nil, else return sum
+      return nil if !all_installed_powers.all?
       return all_installed_powers.sum
     end
 
     # get principal hvac system type
     # @return [String]
     def get_principal_HVAC_system_type
+      # if no hvac systems, return nil
       hvac_systems = @base_xml.elements["#{@ns}:Systems/#{@ns}:HVACSystems/"]
-      all_principal_HVAC_system_types = hvac_systems.map {|s| s.elements["#{@ns}:PrincipalHVACSystemType/"].first}
-      first_principal_HVAC_system_type = all_principal_HVAC_system_types[0]
+      return nil if hvac_systems.nil?
 
+      # find first none nil principal_HVAC_system_type
+      hvac_systems = hvac_systems.reject {|s| s.class == REXML::Comment}
+      first_principal_HVAC_system_type = hvac_systems.find {|s| s.elements["#{@ns}:PrincipalHVACSystemType/"]}
+
+      # if none, return nil, else return mapping
+      return nil if first_principal_HVAC_system_type.nil?
       return BuildingSyncToOSSytemMaps.get_hvac_map[first_principal_HVAC_system_type.to_s]
     end
 
