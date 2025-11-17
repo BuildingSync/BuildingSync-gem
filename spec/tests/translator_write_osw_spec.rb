@@ -13,7 +13,6 @@ RSpec.describe 'BuildingSync' do
       it "write and run baseline owm. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
         # Set Up
         xml_path, output_path = create_xml_path_and_output_path(file_name, standard, __FILE__, schema_version)
-        output_path = "test smalloffice"
         translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, standard)
 
         # Action

@@ -49,7 +49,7 @@ module BuildingSync
 
     def self.download_weather_file_from_city_name(city_name, state_name)
       # from BCL, get closest weather station to city
-      response = HTTParty.get("#{@@base_BCL_uri}/location:#{city_name.gsub! ' ', '+'},#{state_name}.xml?fq=component_tags:\"Weather File\"")
+      response = HTTParty.get("#{@@base_BCL_uri}/location:#{city_name.gsub(' ', '+')},#{state_name}.xml?fq=component_tags:\"Weather File\"")
       results = REXML::Document.new(response.body, {ignore_whitespace_nodes: :all, compress_whitespace: :all}).elements["results"]
       results = results.children.filter {|x| x.name == "result"}
 
