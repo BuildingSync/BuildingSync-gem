@@ -7,8 +7,8 @@ require 'buildingsync/version'
 Gem::Specification.new do |spec|
   spec.name          = 'buildingsync'
   spec.version       = BuildingSync::VERSION
-  spec.authors       = ['Nicholas Long', 'Cory Mosiman', 'Dan Macumber', 'Katherine Fleming']
-  spec.email         = ['nicholas.long@nrel.gov', 'cory.mosiman@nrel.gov', 'daniel.macumber@nrel.gov', 'katherine.fleming@nrel.gov']
+  spec.authors       = ['Nicholas Long', 'Cory Mosiman', 'Dan Macumber', 'Katherine Fleming', 'Hannah Eslinger']
+  spec.email         = ['nicholas.long@nrel.gov', 'cory.mosiman@nrel.gov', 'daniel.macumber@nrel.gov', 'katherine.fleming@nrel.gov', 'hannah.eslinger@nrel.gov']
 
   spec.summary       = 'BuildingSync library for reading, writing, and exporting BuildingSync to OpenStudio'
   spec.description   = 'BuildingSync library for reading, writing, and exporting BuildingSync to OpenStudio'
@@ -25,11 +25,11 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '~> 3.2.2'
 
-  spec.add_dependency 'bundler', '~> 2.1'
-  spec.add_dependency 'openstudio-common-measures', '~> 0.11.1'
-  spec.add_dependency 'openstudio-ee', '~> 0.11.1'
-  spec.add_dependency 'openstudio-extension', '~> 0.8.3'
-  spec.add_dependency 'openstudio-model-articulation', '~> 0.11.1'
+  spec.add_dependency 'bundler', '~> 2.4.10'
+  spec.add_dependency 'openstudio-common-measures', '~> 0.12.3'
+  spec.add_dependency 'openstudio-ee', '~> 0.12.5'
+  spec.add_dependency 'openstudio-extension', '~> 0.9.4'
+  spec.add_dependency 'openstudio-model-articulation', '~> 0.12.2'
   spec.add_dependency 'httparty', '~> 0.23.2'
 
   spec.add_development_dependency 'rake', '~> 13.0'
