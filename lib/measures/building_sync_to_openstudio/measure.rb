@@ -1,5 +1,10 @@
 # insert your copyright here
 
+# *******************************************************************************
+# OpenStudio(R), Copyright (c) Alliance for Energy Innovation, LLC.
+# See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
+# *******************************************************************************
+
 # see the URL below for information on how to write OpenStudio measures
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
@@ -96,12 +101,12 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
       translator.gather_results
 
       # Add in UserDefinedFields, which contain information about the
-      # OpenStudio model run 
+      # OpenStudio model run
       translator.prepare_final_xml
 
       # write results to xml
-      # default file name is 'results.xml' 
-      file_name = 'results.xml' 
+      # default file name is 'results.xml'
+      file_name = 'results.xml'
       translator.save_xml(file_name)
 
       # report final condition of model

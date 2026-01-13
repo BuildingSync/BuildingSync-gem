@@ -1,3 +1,7 @@
+# *******************************************************************************
+# OpenStudio(R), Copyright (c) Alliance for Energy Innovation, LLC.
+# See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
+# *******************************************************************************
 
 module DoeToDeerBuildingTypeMap
     def self.get_building_type_map

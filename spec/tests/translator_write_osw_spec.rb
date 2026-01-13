@@ -1,3 +1,8 @@
+# *******************************************************************************
+# OpenStudio(R), Copyright (c) Alliance for Energy Innovation, LLC.
+# See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
+# *******************************************************************************
+
 test_configs = [
   # file_name, standard, epw_path, schema_version
   # ['179D_Example_Building.xml', ASHRAE90_1, nil, 'v2.4.0'],

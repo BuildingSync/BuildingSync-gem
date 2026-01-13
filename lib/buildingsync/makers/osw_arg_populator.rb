@@ -1,3 +1,8 @@
+# *******************************************************************************
+# OpenStudio(R), Copyright (c) Alliance for Energy Innovation, LLC.
+# See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
+# *******************************************************************************
+
 class OSWARGPopulator
   # static class of methods for populating a given osw with the given facility.
   # each function is named after the measure it populates
