@@ -675,6 +675,7 @@ module BuildingSync
 
     def get_floor_to_floor_height
       largest_section = @building_sections.max_by {|s| s.get_floor_area }
+      return nil if largest_section.nil?
       return largest_section.floor_to_floor_height
     end
 

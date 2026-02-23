@@ -30,6 +30,7 @@ module BuildingSync
       filenames = result.elements["component/files"].children.map {|x| x.elements["filename"].text}
       filename = filenames[0]
       filename[".epw"] = ""
+      state_name = filename.split("_")[1]
 
       # from ep, get the zip
       uri = "#{@@base_EP_uri}/USA/#{state_name}/#{filename}/#{filename}.zip"

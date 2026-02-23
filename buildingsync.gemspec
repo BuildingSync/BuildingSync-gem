@@ -32,9 +32,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'openstudio-model-articulation', '~> 0.12.2'
   spec.add_dependency 'httparty', '~> 0.23.2'
 
+  spec.add_development_dependency 'rubocop', '1.50'
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.13'
   spec.add_development_dependency 'yard', '~> 0.9.26'
   spec.add_development_dependency 'yard-sitemap', '~> 1.0.1'
   spec.add_development_dependency 'pry', '~> 0.15.2'
+  # spec.add_development_dependency 'pry-byebug'
 end

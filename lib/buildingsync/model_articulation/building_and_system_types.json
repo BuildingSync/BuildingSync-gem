@@ -9,6 +9,16 @@
       "system_type": "PSZ-AC with gas coil heat"
     }
   ],
+  "Mixed-use commercial": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "RetailStandalone",
+        "CaliforniaTitle24": "RtL"
+      },
+      "bar_division_method": "Multiple Space Types - Individual Stories Sliced",
+      "system_type": "PSZ-AC with gas coil heat"
+    }
+  ],
   "Office": [
     {
       "standards_building_type": {
@@ -200,6 +210,26 @@
     }
   ],
   "Multifamily": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "MidriseApartment",
+        "CaliforniaTitle24": "MFm"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PTAC",
+      "max_number_floors": "10"
+    },
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "HighriseApartment",
+        "CaliforniaTitle24": "OfL"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PSZ-HP",
+      "min_number_floors": "10"
+    }
+  ],
+  "Multifamily with commercial": [
     {
       "standards_building_type": {
         "ASHRAE90.1": "MidriseApartment",

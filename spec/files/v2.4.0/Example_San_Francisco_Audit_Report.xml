@@ -1,7 +1,7 @@
-<!-- Taken From https://github.com/BuildingSync/use-cases/blob/52394ca5e1220e5f386f512d4ce60dec44dc550a/AuditTemplate/Example_San_Francisco_Audit_Report.xml -->
+<!-- Taken From https://github.com/BuildingSync/use-cases/blob/659208741ce25105bfec886536636d4b801f1b04/AuditTemplate/Example_San_Francisco_Audit_Report.xml -->
 <?xml version="1.0" encoding="utf-8"?>
 <auc:BuildingSync version="2.6.0"
-    xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019">
+  xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019">
   <auc:Facilities>
     <auc:Facility ID="Facility-45002920">
       <auc:Sites>
@@ -9,8 +9,11 @@
           <auc:Buildings>
             <auc:Building ID="BuildingType-45002960">
               <auc:PremisesName>Example San Francisco Audit Report </auc:PremisesName>
-              <auc:PremisesNotes>Example San Francisco audit report building for import/export.  Input data entered may not necessarily be considered reflective of a typical building.  &#xd;
-This example is configured to import and export with BuildingSync version 2.3.0.  The building will also successfully convert to an Asset Score building for modeling.  </auc:PremisesNotes>
+              <auc:PremisesNotes>Example San Francisco audit report building for import/export.
+                Input data entered may not necessarily be considered reflective of a typical
+                building. &#xd;
+                This example is configured to import and export with BuildingSync version 2.3.0. The
+                building will also successfully convert to an Asset Score building for modeling. </auc:PremisesNotes>
               <auc:PremisesIdentifiers>
                 <auc:PremisesIdentifier>
                   <auc:IdentifierLabel>Custom</auc:IdentifierLabel>
@@ -46,6 +49,7 @@ This example is configured to import and export with BuildingSync version 2.3.0.
               <auc:eGRIDSubregionCodes>
                 <auc:eGRIDSubregionCode>CAMX</auc:eGRIDSubregionCode>
               </auc:eGRIDSubregionCodes>
+              <auc:OccupancyClassification>Office</auc:OccupancyClassification>
               <auc:Ownership>Property management company</auc:Ownership>
               <auc:MultiTenant>false</auc:MultiTenant>
               <auc:ConditionedFloorsAboveGrade>4</auc:ConditionedFloorsAboveGrade>
@@ -304,51 +308,63 @@ This example is configured to import and export with BuildingSync version 2.3.0.
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Direct metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Direct
+                    metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Direct metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Direct
+                    metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master meter with sub metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master
+                    meter with sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master meter with sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master
+                    meter with sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master meter without sub metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master
+                    meter without sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master meter without sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master
+                    meter without sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Direct metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Direct
+                    metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Direct metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Direct
+                    metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master meter with sub metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master
+                    meter with sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master meter with sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master
+                    meter with sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master meter without sub metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master
+                    meter without sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master meter without sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master
+                    meter without sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -444,7 +460,8 @@ This example is configured to import and export with BuildingSync version 2.3.0.
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Percentage Onsite Generation Peak Generating Capacity Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Percentage Onsite Generation Peak Generating Capacity Is Not
+                    Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -460,7 +477,8 @@ This example is configured to import and export with BuildingSync version 2.3.0.
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Premises Identifier For Portfolio Manager Building ID Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Premises Identifier For Portfolio Manager Building ID Is Not
+                    Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -484,51 +502,63 @@ This example is configured to import and export with BuildingSync version 2.3.0.
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Direct metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Direct
+                    metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Direct metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Direct
+                    metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master meter with sub metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master
+                    meter with sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master meter with sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master
+                    meter with sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master meter without sub metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master
+                    meter without sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master meter without sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master
+                    meter without sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Direct metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Direct
+                    metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Direct metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Direct
+                    metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master meter with sub metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master
+                    meter with sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master meter with sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master
+                    meter with sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master meter without sub metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master
+                    meter without sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master meter without sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master
+                    meter without sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -584,7 +614,8 @@ This example is configured to import and export with BuildingSync version 2.3.0.
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Shared Meters For Multiple buildings on a single lot Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Shared Meters For Multiple buildings on a single lot Is Not
+                    Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -592,7 +623,8 @@ This example is configured to import and export with BuildingSync version 2.3.0.
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Shared Meters For Multiple buildings on multiple lots Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Shared Meters For Multiple buildings on multiple lots Is Not
+                    Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -2203,7 +2235,8 @@ This example is configured to import and export with BuildingSync version 2.3.0.
           </auc:ConveyanceSystem>
         </auc:ConveyanceSystems>
         <auc:OnsiteStorageTransmissionGenerationSystems>
-          <auc:OnsiteStorageTransmissionGenerationSystem ID="OnsiteStorageTransmissionGenerationSystemType-45003420">
+          <auc:OnsiteStorageTransmissionGenerationSystem
+            ID="OnsiteStorageTransmissionGenerationSystemType-45003420">
             <auc:BackupGenerator>true</auc:BackupGenerator>
             <auc:DemandReduction>false</auc:DemandReduction>
             <auc:CapacityUnits>kBtu/hr</auc:CapacityUnits>
@@ -2235,7 +2268,8 @@ This example is configured to import and export with BuildingSync version 2.3.0.
               </auc:UserDefinedField>
             </auc:UserDefinedFields>
           </auc:OnsiteStorageTransmissionGenerationSystem>
-          <auc:OnsiteStorageTransmissionGenerationSystem ID="OnsiteStorageTransmissionGenerationSystemType-45003440">
+          <auc:OnsiteStorageTransmissionGenerationSystem
+            ID="OnsiteStorageTransmissionGenerationSystemType-45003440">
             <auc:BackupGenerator>false</auc:BackupGenerator>
             <auc:DemandReduction>false</auc:DemandReduction>
             <auc:CapacityUnits>kBtu/hr</auc:CapacityUnits>
@@ -2421,11 +2455,13 @@ This example is configured to import and export with BuildingSync version 2.3.0.
                   <auc:EnergyCost>75.0</auc:EnergyCost>
                   <auc:UserDefinedFields>
                     <auc:UserDefinedField>
-                      <auc:FieldName>Weather Normalized Pre-retrofit Site Energy Use Intensity Is Not Applicable</auc:FieldName>
+                      <auc:FieldName>Weather Normalized Pre-retrofit Site Energy Use Intensity Is
+                        Not Applicable</auc:FieldName>
                       <auc:FieldValue>false</auc:FieldValue>
                     </auc:UserDefinedField>
                     <auc:UserDefinedField>
-                      <auc:FieldName>Weather Normalized Post-retrofit Site Energy Use Intensity Is Not Applicable</auc:FieldName>
+                      <auc:FieldName>Weather Normalized Post-retrofit Site Energy Use Intensity Is
+                        Not Applicable</auc:FieldName>
                       <auc:FieldValue>false</auc:FieldValue>
                     </auc:UserDefinedField>
                     <auc:UserDefinedField>
@@ -2451,7 +2487,10 @@ This example is configured to import and export with BuildingSync version 2.3.0.
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
                   <auc:FieldName>San Francisco Affidavit Benchmark Affirmation</auc:FieldName>
-                  <auc:FieldValue>affirm the historical energy use data in ENERGY STAR Portfolio Manager is complete for the calendar year prior to the audit and consistent with my observations. Gross floor area herein is accurate within +/-3%, and is consistent with Portfolio Manager.</auc:FieldValue>
+                  <auc:FieldValue>affirm the historical energy use data in ENERGY STAR Portfolio
+                    Manager is complete for the calendar year prior to the audit and consistent with
+                    my observations. Gross floor area herein is accurate within +/-3%, and is
+                    consistent with Portfolio Manager.</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
                   <auc:FieldName>San Francisco Affidavit Benchmark Signature</auc:FieldName>
@@ -3331,7 +3370,8 @@ This example is configured to import and export with BuildingSync version 2.3.0.
           <auc:RetrocommissioningAudit>false</auc:RetrocommissioningAudit>
           <auc:Qualifications>
             <auc:Qualification ID="Qualification-45003820">
-              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Auditor (CEA)</auc:AuditorQualification>
+              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Auditor
+                (CEA)</auc:AuditorQualification>
               <auc:AuditorQualificationNumber>123456</auc:AuditorQualificationNumber>
               <auc:AuditorQualificationState>CA</auc:AuditorQualificationState>
               <auc:CertificationExpirationDate>2030-10-01</auc:CertificationExpirationDate>
@@ -3393,7 +3433,8 @@ This example is configured to import and export with BuildingSync version 2.3.0.
               <auc:FieldValue>false</auc:FieldValue>
             </auc:UserDefinedField>
             <auc:UserDefinedField>
-              <auc:FieldName>Audit Date For Qualified Retrofit Property Placed in Service Is Not Applicable</auc:FieldName>
+              <auc:FieldName>Audit Date For Qualified Retrofit Property Placed in Service Is Not
+                Applicable</auc:FieldName>
               <auc:FieldValue>false</auc:FieldValue>
             </auc:UserDefinedField>
             <auc:UserDefinedField>

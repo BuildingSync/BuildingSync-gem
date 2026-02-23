@@ -1,7 +1,7 @@
-<!-- Taken From https://github.com/BuildingSync/use-cases/blob/52394ca5e1220e5f386f512d4ce60dec44dc550a/AuditTemplate/Example_HOMES_Template_Building.xml -->
+<!-- Taken From https://github.com/BuildingSync/use-cases/blob/659208741ce25105bfec886536636d4b801f1b04/AuditTemplate/Example_HOMES_Template_Building.xml -->
 <?xml version="1.0" encoding="utf-8"?>
 <auc:BuildingSync version="2.6.0"
-    xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019">
+  xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019">
   <auc:Facilities>
     <auc:Facility ID="Facility-45135440">
       <auc:Sites>
@@ -37,6 +37,7 @@
                 <auc:State>CO</auc:State>
                 <auc:PostalCode>80405</auc:PostalCode>
               </auc:Address>
+              <auc:OccupancyClassification>Multifamily</auc:OccupancyClassification>
               <auc:Ownership>Property management company</auc:Ownership>
               <auc:MultiTenant>false</auc:MultiTenant>
               <auc:ConditionedFloorsAboveGrade>9</auc:ConditionedFloorsAboveGrade>
@@ -200,51 +201,63 @@
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Direct metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Direct
+                    metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Direct metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Direct
+                    metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master meter with sub metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master
+                    meter with sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master meter with sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master
+                    meter with sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master meter without sub metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master
+                    meter without sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master meter without sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Electricity Is Master
+                    meter without sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Direct metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Direct
+                    metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Direct metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Direct
+                    metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master meter with sub metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master
+                    meter with sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master meter with sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master
+                    meter with sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master meter without sub metering</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master
+                    meter without sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master meter without sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Commercial Tenant Metering Configuration For Natural gas Is Master
+                    meter without sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -340,7 +353,8 @@
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Percentage Onsite Generation Peak Generating Capacity Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Percentage Onsite Generation Peak Generating Capacity Is Not
+                    Applicable</auc:FieldName>
                   <auc:FieldValue>true</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -352,7 +366,8 @@
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Premises Identifier For Portfolio Manager Building ID Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Premises Identifier For Portfolio Manager Building ID Is Not
+                    Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -376,51 +391,63 @@
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Direct metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Direct
+                    metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Direct metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Direct
+                    metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master meter with sub metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master
+                    meter with sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master meter with sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master
+                    meter with sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master meter without sub metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master
+                    meter without sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master meter without sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Electricity Is Master
+                    meter without sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Direct metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Direct
+                    metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Direct metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Direct
+                    metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master meter with sub metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master
+                    meter with sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master meter with sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master
+                    meter with sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master meter without sub metering</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master
+                    meter without sub metering</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master meter without sub metering Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Residential Tenant Metering Configuration For Natural gas Is Master
+                    meter without sub metering Is Not Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -476,7 +503,8 @@
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Shared Meters For Multiple buildings on a single lot Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Shared Meters For Multiple buildings on a single lot Is Not
+                    Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -484,7 +512,8 @@
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
-                  <auc:FieldName>Shared Meters For Multiple buildings on multiple lots Is Not Applicable</auc:FieldName>
+                  <auc:FieldName>Shared Meters For Multiple buildings on multiple lots Is Not
+                    Applicable</auc:FieldName>
                   <auc:FieldValue>false</auc:FieldValue>
                 </auc:UserDefinedField>
                 <auc:UserDefinedField>
@@ -1720,7 +1749,8 @@
           </auc:PlugLoad>
         </auc:PlugLoads>
         <auc:OnsiteStorageTransmissionGenerationSystems>
-          <auc:OnsiteStorageTransmissionGenerationSystem ID="OnsiteStorageTransmissionGenerationSystemType-45135760">
+          <auc:OnsiteStorageTransmissionGenerationSystem
+            ID="OnsiteStorageTransmissionGenerationSystemType-45135760">
             <auc:BackupGenerator>true</auc:BackupGenerator>
             <auc:DemandReduction>false</auc:DemandReduction>
             <auc:CapacityUnits>kBtu/hr</auc:CapacityUnits>
@@ -1752,7 +1782,8 @@
               </auc:UserDefinedField>
             </auc:UserDefinedFields>
           </auc:OnsiteStorageTransmissionGenerationSystem>
-          <auc:OnsiteStorageTransmissionGenerationSystem ID="OnsiteStorageTransmissionGenerationSystemType-45135780">
+          <auc:OnsiteStorageTransmissionGenerationSystem
+            ID="OnsiteStorageTransmissionGenerationSystemType-45135780">
             <auc:BackupGenerator>false</auc:BackupGenerator>
             <auc:DemandReduction>false</auc:DemandReduction>
             <auc:CapacityUnits>kBtu/hr</auc:CapacityUnits>
@@ -1803,7 +1834,8 @@
           </auc:TechnologyCategories>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:CustomMeasureName>HVAC - Smart Thermostats</auc:CustomMeasureName>
-          <auc:LongDescription>Replace existing thermostats in apartments and common areas with Energy Star smart thermostats that include occupancy sensors</auc:LongDescription>
+          <auc:LongDescription>Replace existing thermostats in apartments and common areas with
+            Energy Star smart thermostats that include occupancy sensors</auc:LongDescription>
           <auc:MeasureSavingsAnalysis>
             <auc:CalculationMethod>
               <auc:Estimated></auc:Estimated>
@@ -1874,7 +1906,8 @@
           </auc:TechnologyCategories>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:CustomMeasureName>HVAC - Chiller VFD</auc:CustomMeasureName>
-          <auc:LongDescription>Replace existing single-speed chiller pump to/with a variable frequency drive (VFD) controlled pump</auc:LongDescription>
+          <auc:LongDescription>Replace existing single-speed chiller pump to/with a variable
+            frequency drive (VFD) controlled pump</auc:LongDescription>
           <auc:MeasureSavingsAnalysis>
             <auc:CalculationMethod>
               <auc:Estimated></auc:Estimated>
@@ -1945,7 +1978,8 @@
           </auc:TechnologyCategories>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:CustomMeasureName>Heating - Garage Heaters</auc:CustomMeasureName>
-          <auc:LongDescription>Add an in-line thermostatic radiator valve with thermostat to regulate heating hot water in garage</auc:LongDescription>
+          <auc:LongDescription>Add an in-line thermostatic radiator valve with thermostat to
+            regulate heating hot water in garage</auc:LongDescription>
           <auc:MeasureSavingsAnalysis>
             <auc:CalculationMethod>
               <auc:Estimated></auc:Estimated>
@@ -2371,7 +2405,8 @@
           </auc:TechnologyCategories>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:CustomMeasureName>Capital - Space Heating Boiler</auc:CustomMeasureName>
-          <auc:LongDescription>Upgrade existing space heating hot water boiler to a higher efficiency boiler</auc:LongDescription>
+          <auc:LongDescription>Upgrade existing space heating hot water boiler to a higher
+            efficiency boiler</auc:LongDescription>
           <auc:MeasureSavingsAnalysis>
             <auc:CalculationMethod>
               <auc:Estimated></auc:Estimated>
@@ -2442,7 +2477,8 @@
           </auc:TechnologyCategories>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:CustomMeasureName>Capital - Hot Water Heat Pump</auc:CustomMeasureName>
-          <auc:LongDescription>Replace central domestic hot water gas boiler with a hot water heat pump</auc:LongDescription>
+          <auc:LongDescription>Replace central domestic hot water gas boiler with a hot water heat
+            pump</auc:LongDescription>
           <auc:MeasureSavingsAnalysis>
             <auc:CalculationMethod>
               <auc:Estimated></auc:Estimated>
@@ -2513,7 +2549,8 @@
           </auc:TechnologyCategories>
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:CustomMeasureName>Capital - Rooftop Solar</auc:CustomMeasureName>
-          <auc:LongDescription>Install a rooftop solar photovoltaic (PV) system with 80 kW DC capacity (qty = DC kW)</auc:LongDescription>
+          <auc:LongDescription>Install a rooftop solar photovoltaic (PV) system with 80 kW DC
+            capacity (qty = DC kW)</auc:LongDescription>
           <auc:MeasureSavingsAnalysis>
             <auc:CalculationMethod>
               <auc:Estimated></auc:Estimated>
@@ -2592,11 +2629,13 @@
                   <auc:EnergyCost>0.0</auc:EnergyCost>
                   <auc:UserDefinedFields>
                     <auc:UserDefinedField>
-                      <auc:FieldName>Weather Normalized Pre-retrofit Site Energy Use Intensity Is Not Applicable</auc:FieldName>
+                      <auc:FieldName>Weather Normalized Pre-retrofit Site Energy Use Intensity Is
+                        Not Applicable</auc:FieldName>
                       <auc:FieldValue>false</auc:FieldValue>
                     </auc:UserDefinedField>
                     <auc:UserDefinedField>
-                      <auc:FieldName>Weather Normalized Post-retrofit Site Energy Use Intensity Is Not Applicable</auc:FieldName>
+                      <auc:FieldName>Weather Normalized Post-retrofit Site Energy Use Intensity Is
+                        Not Applicable</auc:FieldName>
                       <auc:FieldValue>false</auc:FieldValue>
                     </auc:UserDefinedField>
                     <auc:UserDefinedField>
@@ -4307,7 +4346,8 @@
           <auc:EarlyCompliance>false</auc:EarlyCompliance>
           <auc:Qualifications>
             <auc:Qualification ID="Qualification-45136140">
-              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Manager (CEM)</auc:AuditorQualification>
+              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Manager
+                (CEM)</auc:AuditorQualification>
               <auc:AuditorQualificationNumber>21539</auc:AuditorQualificationNumber>
               <auc:AuditorQualificationState>CO</auc:AuditorQualificationState>
               <auc:CertificationExpirationDate>2026-12-31</auc:CertificationExpirationDate>
@@ -4378,7 +4418,8 @@
               <auc:FieldValue>false</auc:FieldValue>
             </auc:UserDefinedField>
             <auc:UserDefinedField>
-              <auc:FieldName>Audit Date For Qualified Retrofit Property Placed in Service Is Not Applicable</auc:FieldName>
+              <auc:FieldName>Audit Date For Qualified Retrofit Property Placed in Service Is Not
+                Applicable</auc:FieldName>
               <auc:FieldValue>false</auc:FieldValue>
             </auc:UserDefinedField>
             <auc:UserDefinedField>
