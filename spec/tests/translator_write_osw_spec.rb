@@ -5,7 +5,7 @@
 
 test_configs = [
   # file_name, standard, epw_path, schema_version
-  # ['179D_Example_Building.xml', ASHRAE90_1, nil, 'v2.4.0'],  # FAILS: weather file????????
+  ['179D_Example_Building.xml', ASHRAE90_1, nil, 'v2.4.0'],  # FAILS: weather file????????
   # ['ASHRAE 211 Export.xml', ASHRAE90_1, nil, 'v2.4.0'],  # FAILS:  Building has building type Agricultural estate which is not handled by the gem.
   ['BETTER-1.0.0_SampleOffice_gemtest.xml', ASHRAE90_1, nil, 'v2.4.0'],
   ['building_151.xml', ASHRAE90_1, nil, 'v2.4.0'],

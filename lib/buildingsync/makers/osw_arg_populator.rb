@@ -16,7 +16,7 @@ class OSWARGPopulator
     # -  __SKIP__
     set_measure_argument.call("__SKIP__", false)
     # -  timesteps_per_hour
-    set_measure_argument.call("timesteps_per_hour", "1")
+    set_measure_argument.call("timesteps_per_hour", "4")
     # -  begin_date
     set_measure_argument.call("begin_date", "2019-01-01")
     # -  end_date
