@@ -6,9 +6,11 @@
 # *******************************************************************************
 require 'json'
 require 'fileutils'
-require 'HTTParty'
+require 'httparty'
 require 'buildingsync/constants'
 require 'rexml/document'
+require 'zip'
+require 'stringio'
 
 
 module BuildingSync
