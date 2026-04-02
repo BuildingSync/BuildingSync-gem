@@ -5,9 +5,11 @@
 # See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
 # *******************************************************************************
 require 'json'
-require 'HTTParty'
+require 'httparty'
 require 'buildingsync/constants'
 require 'rexml/document'
+require 'zip'
+require 'stringio'
 
 
 module BuildingSync
