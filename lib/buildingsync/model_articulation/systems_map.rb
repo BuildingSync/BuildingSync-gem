@@ -3,7 +3,7 @@
 # See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
 # *******************************************************************************
 
-module BuildingSyncToOSSytemMaps
+module BuildingSyncToOSSystemMaps
     def self.get_hvac_map
         return {
             "Packaged Terminal Air Conditioner" => "PTAC with gas coil",

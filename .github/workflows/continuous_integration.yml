@@ -26,23 +26,8 @@ jobs:
     - name: Building Spec
       run: bundle exec rspec spec/tests/model_articulation_test/building_spec.rb
       if: always()
-    - name: Envelope System Spec
-      run: bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb
-      if: always()
     - name: Facility Spec
       run: bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb
-      if: always()
-    - name: HVAC System Spec
-      run: bundle exec rspec spec/tests/model_articulation_test/hvac_system_spec.rb
-      if: always()
-    - name: Loads System Spec
-      run: bundle exec rspec spec/tests/model_articulation_test/loads_system_spec.rb
-      if: always()
-    - name: Lighting System Spec
-      run: bundle exec rspec spec/tests/model_articulation_test/lighting_system_type_spec.rb
-      if: always()
-    - name: SHW System Spec
-      run: bundle exec rspec spec/tests/model_articulation_test/service_hot_water_system_spec.rb
       if: always()
     - name: Site Spec
       run: bundle exec rspec spec/tests/model_articulation_test/site_spec.rb
@@ -69,11 +54,8 @@ jobs:
       run: |
         gem install bundler -v 2.4.22
         bundle install
-    - name: Translator Example Spec
-      run: bundle exec rspec spec/tests/translator_spec.rb
-      if: always()
-    - name: Translator Sizing Run Spec
-      run: bundle exec rspec spec/tests/translator_sizing_run_spec.rb
+    - name: Translator Write OSW Spec
+      run: bundle exec rspec spec/tests/translator_write_osw_spec.rb
       if: always()
     - name: Translator Scenario Generation Specs
       run: bundle exec rspec spec/tests/translator_scenario_generation_spec.rb

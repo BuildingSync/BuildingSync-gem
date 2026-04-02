@@ -186,7 +186,7 @@ module BuildingSync
 
       # if none, return nil, else return mapping
       return nil if first_principal_HVAC_system_type.nil?
-      return BuildingSyncToOSSytemMaps.get_hvac_map[first_principal_HVAC_system_type.to_s]
+      return BuildingSyncToOSSystemMaps.get_hvac_map[first_principal_HVAC_system_type.to_s]
     end
 
     # @see BuildingSync::Report.add_cb_modeled

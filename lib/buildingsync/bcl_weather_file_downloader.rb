@@ -5,6 +5,7 @@
 # See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
 # *******************************************************************************
 require 'json'
+require 'fileutils'
 require 'HTTParty'
 require 'buildingsync/constants'
 require 'rexml/document'
@@ -22,7 +23,7 @@ module BuildingSync
       results = results.children.filter {|x| x.name == "result"}
 
       if results.empty?
-         raise StandardError, "No weather files found within a 40 mile radius #{city_name},#{state_name} within the BCL."
+        raise StandardError, "No weather files found within a 40 mile radius #{city_name},#{state_name} within the BCL."
       end
 
       # just pick the closest
@@ -37,10 +38,11 @@ module BuildingSync
       response = HTTParty.get(uri)
 
       # extract and write the zip to disk
+      FileUtils.mkdir_p(WEATHER_DIR)
       Zip::InputStream.open(::StringIO.new(response.body)) do |zip_stream|
         while entry = zip_stream.get_next_entry
           filepath = File.join(WEATHER_DIR, entry.name)
-          File.open(filepath, 'w') { |file| file.write(entry.get_input_stream.read) }
+          File.open(filepath, 'wb') { |file| file.write(entry.get_input_stream.read) }
         end
       end
 

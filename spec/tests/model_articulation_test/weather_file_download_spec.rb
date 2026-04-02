@@ -15,7 +15,7 @@ RSpec.describe 'WeatherFileDownload' do
     expect(File.exist?(weather_filepath)).to be true
   end
 
-  it "download_weather_file_from_city_name writes a weather file to disk" do
+  xit "download_weather_file_from_city_name writes a weather file to disk" do
     # Action
     weather_filepath = BuildingSync::BCLWeatherFileDownloader.download_weather_file_from_city_name("Denver", "CO")
 

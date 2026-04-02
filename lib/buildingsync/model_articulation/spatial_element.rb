@@ -123,7 +123,7 @@ module BuildingSync
 
         process_bldg_and_system_type(building_and_system_types, occupancy_classification, total_floor_area, total_number_floors)
 
-        if @standards_building_type == ''
+        if @standards_building_type.nil? || @standards_building_type.empty?
           raise "Building type '#{occupancy_classification}' is beyond BuildingSync scope"
         end
       elsif raise_exception
@@ -160,8 +160,9 @@ module BuildingSync
       # if building_and_system_types doesn't contain occupancy_classification, there's nothing we can do.
       occ_types = building_and_system_types[:"#{occupancy_classification}"]
       if occ_types.nil?
-        puts "BuildingSync Occupancy type #{occupancy_classification} is not available in the building_and_system_types.json dictionary"
-        return
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.SpatialElement.process_bldg_and_system_type', "BuildingSync Occupancy type #{occupancy_classification} is not available in the building_and_system_types.json dictionary")
+        @standards_building_type = ''
+        return false
       end
 
       # if theres only one, we chose it indiscriminately
@@ -203,6 +204,8 @@ module BuildingSync
       end
 
       # no occ_type fit! We must give up
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.SpatialElement.process_bldg_and_system_type', "No building_and_system_type entry matched occupancy_classification '#{occupancy_classification}' with floor area #{total_floor_area} and #{total_number_floors} floors")
+      @standards_building_type = ''
       return false
     end
 

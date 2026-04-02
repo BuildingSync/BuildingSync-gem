@@ -27,25 +27,22 @@ BOSS uses its `Translator` class to 1) write openstudio workflows and 2) run tho
 ```ruby
 require 'buildingsync/translator'
 
-# init  translator
-translator = BuildingSync::Translator.new(
-  bsync_file="BuildingEQ-1.0.0_gemtest.xml", 
-  output_path="output", 
-  epw_path=nil, # optional weather file
-  standard="ASHRAE90.1"
-)
+# init translator
+xml_file_path = "BuildingEQ-1.0.0_gemtest.xml"
+output_dir = "output"
+translator = BuildingSync::Translator.new(xml_file_path, output_dir, nil, "ASHRAE90.1")
 
 # create baseline workflow from buildingsync file
 translator.write_baseline_osw
-expect(File.exist?(output_path + "/baseline/in.osw")).to be true
+expect(File.exist?("#{output_dir}/baseline/in.osw")).to be true
 
 # create baseline model from workflow
 translator.run_baseline_osw
-expect(File.exist?(output_path + "/baseline/out.osw")).to be true
-expect(File.exist?(output_path + "/baseline/in.osm")).to be true
-
+expect(File.exist?("#{output_dir}/baseline/out.osw")).to be true
+expect(File.exist?("#{output_dir}/baseline/in.osm")).to be true
 ```
-The file `` does all of the actual writing to the osw. Each function writes one measure. Heres an overview of how each measure is populated.
+
+The file `workflow_maker.rb` does all of the actual writing to the osw. Each function writes one measure. Heres an overview of how each measure is populated.
 
 [set_run_period]: https://github.com/NatLabRockies/openstudio-common-measures-gem/blob/v0.12.3/lib/measures/set_run_period/README.md
 [ChangeBuildingLocation]: https://github.com/NatLabRockies/openstudio-common-measures-gem/blob/v0.12.3/lib/measures/ChangeBuildingLocation/README.md
