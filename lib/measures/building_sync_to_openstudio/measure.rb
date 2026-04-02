@@ -1,5 +1,3 @@
-# insert your copyright here
-
 # *******************************************************************************
 # OpenStudio(R), Copyright (c) Alliance for Energy Innovation, LLC.
 # See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md

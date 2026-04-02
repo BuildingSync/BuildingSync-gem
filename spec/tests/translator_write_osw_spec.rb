@@ -34,7 +34,7 @@ RSpec.describe 'BuildingSync' do
     test_configs.each do |test_config|
       (file_name, standard, epw_path, schema_version) = test_config
 
-      it "write and run baseline owm. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
+      it "write and run baseline osw. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
         # Set Up
         xml_path, output_path = create_xml_path_and_output_path(file_name, standard, __FILE__, schema_version)
         translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, standard)
@@ -51,7 +51,7 @@ RSpec.describe 'BuildingSync' do
         expect(out_osw[:completed_status]).to eq "Success"
       end
 
-      xit "write and run measure owms. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
+      xit "write and run measure osws. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
         # Set Up
         xml_path, output_path = create_xml_path_and_output_path(file_name, standard, __FILE__, schema_version)
         output_path = "test smalloffice"
