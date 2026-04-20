@@ -1,5 +1,5 @@
-<!-- Taken from https://github.com/BuildingSync/use-cases/blob/main/ASHRAE_211/examples/L100_Audit-1.0.0_and_BSyncr-1.0.0.xml -->
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Taken from https://github.com/BuildingSync/use-cases/blob/main/ASHRAE_211/examples/L100_Audit-1.0.0_and_BSyncr-1.0.0.xml -->
 <!--
   This file is intended to document all of the required elements and attributes
   for a L100 audit

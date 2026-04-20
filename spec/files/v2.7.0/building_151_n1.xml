@@ -297,7 +297,7 @@
           <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Install plug load controls</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
-          <n1:UsefulLife>5.6</n1:UsefulLife>
+          <n1:UsefulLife>6</n1:UsefulLife>
           <n1:MeasureTotalFirstCost>56950.64</n1:MeasureTotalFirstCost>
           <n1:MeasureInstallationCost>0</n1:MeasureInstallationCost>
           <n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
@@ -497,7 +497,7 @@
           <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Replace ice/refrigeration equipment with high efficiency units</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
-          <n1:UsefulLife>12.5</n1:UsefulLife>
+          <n1:UsefulLife>12</n1:UsefulLife>
           <n1:MeasureTotalFirstCost>135431.4</n1:MeasureTotalFirstCost>
           <n1:MeasureInstallationCost>0</n1:MeasureInstallationCost>
           <n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
@@ -672,7 +672,7 @@
           <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Improve ventilation fans</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
-          <n1:UsefulLife>4.4</n1:UsefulLife>
+          <n1:UsefulLife>4</n1:UsefulLife>
           <n1:MeasureTotalFirstCost>69452.0</n1:MeasureTotalFirstCost>
           <n1:MeasureInstallationCost>0</n1:MeasureInstallationCost>
           <n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>
@@ -722,7 +722,7 @@
           <n1:CustomMeasureName>TBD</n1:CustomMeasureName>
           <n1:LongDescription>Add or repair economizer</n1:LongDescription>
           <n1:MVCost>0</n1:MVCost>
-          <n1:UsefulLife>12.5</n1:UsefulLife>
+          <n1:UsefulLife>12</n1:UsefulLife>
           <n1:MeasureTotalFirstCost>55561.600000000006</n1:MeasureTotalFirstCost>
           <n1:MeasureInstallationCost>0</n1:MeasureInstallationCost>
           <n1:MeasureMaterialCost>0</n1:MeasureMaterialCost>

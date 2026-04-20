@@ -1,5 +1,5 @@
-<!-- taken from https://github.com/BuildingSync/use-cases/blob/main/BuildingSync-Gem/examples/L100_Pre-Simulation-1.0.0.xml -->
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- taken from https://github.com/BuildingSync/use-cases/blob/main/BuildingSync-Gem/examples/L100_Pre-Simulation-1.0.0.xml -->
 <auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.7.0/BuildingSync.xsd" version="2.7.0">
   <auc:Facilities>
     <auc:Facility ID="Facility-69916113180740">

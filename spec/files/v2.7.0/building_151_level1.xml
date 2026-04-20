@@ -365,7 +365,7 @@
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Install plug load controls</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
-          <auc:UsefulLife>5.6</auc:UsefulLife>
+          <auc:UsefulLife>6</auc:UsefulLife>
           <auc:MeasureTotalFirstCost>56950.64</auc:MeasureTotalFirstCost>
           <auc:MeasureInstallationCost>0</auc:MeasureInstallationCost>
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
@@ -605,7 +605,7 @@
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Replace ice/refrigeration equipment with high efficiency units</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
-          <auc:UsefulLife>12.5</auc:UsefulLife>
+          <auc:UsefulLife>12</auc:UsefulLife>
           <auc:MeasureTotalFirstCost>135431.4</auc:MeasureTotalFirstCost>
           <auc:MeasureInstallationCost>0</auc:MeasureInstallationCost>
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
@@ -815,7 +815,7 @@
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Improve ventilation fans</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
-          <auc:UsefulLife>4.4</auc:UsefulLife>
+          <auc:UsefulLife>4</auc:UsefulLife>
           <auc:MeasureTotalFirstCost>69452.0</auc:MeasureTotalFirstCost>
           <auc:MeasureInstallationCost>0</auc:MeasureInstallationCost>
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>
@@ -875,7 +875,7 @@
           <auc:MeasureScaleOfApplication>Entire building</auc:MeasureScaleOfApplication>
           <auc:LongDescription>Add or repair economizer</auc:LongDescription>
           <auc:MVCost>0</auc:MVCost>
-          <auc:UsefulLife>12.5</auc:UsefulLife>
+          <auc:UsefulLife>12</auc:UsefulLife>
           <auc:MeasureTotalFirstCost>55561.600000000006</auc:MeasureTotalFirstCost>
           <auc:MeasureInstallationCost>0</auc:MeasureInstallationCost>
           <auc:MeasureMaterialCost>0</auc:MeasureMaterialCost>

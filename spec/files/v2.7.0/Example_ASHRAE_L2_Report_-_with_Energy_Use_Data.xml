@@ -4734,8 +4734,7 @@
           <auc:EarlyCompliance>false</auc:EarlyCompliance>
           <auc:Qualifications>
             <auc:Qualification ID="Qualification-45032060">
-              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Manager
-                (CEM)</auc:AuditorQualification>
+              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Manager (CEM)</auc:AuditorQualification>
               <auc:AuditorQualificationNumber>11111</auc:AuditorQualificationNumber>
               <auc:AuditorQualificationState>NY</auc:AuditorQualificationState>
               <auc:CertificationExpirationDate>2023-12-31</auc:CertificationExpirationDate>

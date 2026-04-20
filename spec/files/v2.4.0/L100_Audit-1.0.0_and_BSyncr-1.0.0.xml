@@ -1,11 +1,10 @@
-<!-- Taken from https://github.com/BuildingSync/use-cases/blob/main/ASHRAE_211/examples/L100_Audit-1.0.0_and_BSyncr-1.0.0.xml -->
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   This file is intended to document all of the required elements and attributes
   for a L100 audit
   and use of R package bsyncr.
 -->
-<auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.7.0/BuildingSync.xsd" version="2.7.0">
+<auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.4.0/BuildingSync.xsd" version="2.4.0">
   <auc:Facilities>
     <auc:Facility ID="Facility-A">
       <auc:Sites>

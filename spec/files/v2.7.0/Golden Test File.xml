@@ -1,5 +1,5 @@
-<!-- Taken From https://github.com/BuildingSync/schema/blob/develop-v2/examples/Golden%20Test%20File.xml -->
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Taken From https://github.com/BuildingSync/schema/blob/develop-v2/examples/Golden%20Test%20File.xml -->
 <BuildingSync xmlns="http://buildingsync.net/schemas/bedes-auc/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 ../BuildingSync.xsd" version="2.7.0">
   <Facilities>
     <Facility ID="Facility-be7020ff-fbdb-4901-86a8-0f868bbca12f">

@@ -1,5 +1,5 @@
-<!-- Taken From https://github.com/BuildingSync/use-cases/blob/52394ca5e1220e5f386f512d4ce60dec44dc550a/BuildingEQ/examples/BuildingEQ-1.0.0_gemtest.xml -->
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Taken From https://github.com/BuildingSync/use-cases/blob/52394ca5e1220e5f386f512d4ce60dec44dc550a/BuildingEQ/examples/BuildingEQ-1.0.0_gemtest.xml -->
 <auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.githubusercontent.com/BuildingSync/schema/v2.7.0/BuildingSync.xsd" version="2.7.0">
   <auc:Facilities>
     <auc:Facility ID="Facility-70023827412660">

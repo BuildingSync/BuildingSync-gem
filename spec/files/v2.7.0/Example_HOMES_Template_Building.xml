@@ -1,5 +1,5 @@
-<!-- Taken From https://github.com/BuildingSync/use-cases/blob/659208741ce25105bfec886536636d4b801f1b04/AuditTemplate/Example_HOMES_Template_Building.xml -->
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Taken From https://github.com/BuildingSync/use-cases/blob/659208741ce25105bfec886536636d4b801f1b04/AuditTemplate/Example_HOMES_Template_Building.xml -->
 <auc:BuildingSync version="2.7.0"
   xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019">
   <auc:Facilities>
@@ -4346,8 +4346,7 @@
           <auc:EarlyCompliance>false</auc:EarlyCompliance>
           <auc:Qualifications>
             <auc:Qualification ID="Qualification-45136140">
-              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Manager
-                (CEM)</auc:AuditorQualification>
+              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Manager (CEM)</auc:AuditorQualification>
               <auc:AuditorQualificationNumber>21539</auc:AuditorQualificationNumber>
               <auc:AuditorQualificationState>CO</auc:AuditorQualificationState>
               <auc:CertificationExpirationDate>2026-12-31</auc:CertificationExpirationDate>

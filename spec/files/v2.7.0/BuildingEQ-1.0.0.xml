@@ -1,6 +1,5 @@
-
-<!-- Taken From https://github.com/BuildingSync/schema/blob/3495aa09c43fa796b0acbf80093f72c04b0fa8f4/examples/BuildingEQ-1.0.0.xml -->
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Taken From https://github.com/BuildingSync/schema/blob/3495aa09c43fa796b0acbf80093f72c04b0fa8f4/examples/BuildingEQ-1.0.0.xml -->
 <auc:BuildingSync xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019" version="2.7.0">
   <auc:Facilities>
     <auc:Facility ID="Facility-70023827412660">

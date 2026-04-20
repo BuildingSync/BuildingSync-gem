@@ -1,5 +1,5 @@
-<!-- Taken From https://github.com/BuildingSync/use-cases/blob/659208741ce25105bfec886536636d4b801f1b04/BETTER/examples/BETTER-1.0.0_SampleOffice_gemtest.xml -->
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Taken From https://github.com/BuildingSync/use-cases/blob/659208741ce25105bfec886536636d4b801f1b04/BETTER/examples/BETTER-1.0.0_SampleOffice_gemtest.xml -->
 <auc:BuildingSync version="2.7.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019"
   xsi:schemaLocation="http://buildingsync.net/schemas/bedes-auc/2019 https://raw.github.com/BuildingSync/schema/v2.7.0/BuildingSync.xsd">

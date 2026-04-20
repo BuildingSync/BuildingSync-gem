@@ -6,11 +6,6 @@
     <Facility ID="FirstFuel">
       <Sites>
         <Site ID="DC0021ZZ">
-          <ClimateZoneType>
-            <ASHRAE>
-              <ClimateZone>2B</ClimateZone>
-            </ASHRAE>
-          </ClimateZoneType>
           <PremisesName>DC0021ZZ GSA Headquarters</PremisesName>
           <OccupancyClassification>Office</OccupancyClassification>
           <Address>
@@ -18,6 +13,11 @@
             <State>DC</State>
             <PostalCode>20006</PostalCode>
           </Address>
+          <ClimateZoneType>
+            <ASHRAE>
+              <ClimateZone>2B</ClimateZone>
+            </ASHRAE>
+          </ClimateZoneType>
           <FloorAreas>
             <FloorArea>
               <FloorAreaType>Gross</FloorAreaType>

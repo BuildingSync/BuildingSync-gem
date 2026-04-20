@@ -1,5 +1,5 @@
-<!-- Taken From https://github.com/BuildingSync/use-cases/blob/52394ca5e1220e5f386f512d4ce60dec44dc550a/AuditTemplate/Chula_Vista_ASHRAE_L2_Example_Building.xml -->
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Taken From https://github.com/BuildingSync/use-cases/blob/52394ca5e1220e5f386f512d4ce60dec44dc550a/AuditTemplate/Chula_Vista_ASHRAE_L2_Example_Building.xml -->
 <auc:BuildingSync version="2.7.0"
     xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019">
   <auc:Facilities>

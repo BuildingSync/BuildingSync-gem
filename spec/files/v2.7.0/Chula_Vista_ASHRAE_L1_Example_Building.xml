@@ -1,5 +1,5 @@
-<!-- Taken From https://github.com/BuildingSync/use-cases/blob/659208741ce25105bfec886536636d4b801f1b04/AuditTemplate/Chula_Vista_ASHRAE_L1_Example_Building.xml -->
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Taken From https://github.com/BuildingSync/use-cases/blob/659208741ce25105bfec886536636d4b801f1b04/AuditTemplate/Chula_Vista_ASHRAE_L1_Example_Building.xml -->
 <auc:BuildingSync version="2.7.0"
   xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019">
   <auc:Facilities>
@@ -3645,8 +3645,7 @@
           <auc:EarlyCompliance>false</auc:EarlyCompliance>
           <auc:Qualifications>
             <auc:Qualification ID="Qualification-45162200">
-              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Manager
-                (CEM)</auc:AuditorQualification>
+              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Manager (CEM)</auc:AuditorQualification>
               <auc:AuditorQualificationNumber></auc:AuditorQualificationNumber>
               <auc:CertifiedAuditTeamMemberContactID IDref="ContactType-45162180"></auc:CertifiedAuditTeamMemberContactID>
             </auc:Qualification>

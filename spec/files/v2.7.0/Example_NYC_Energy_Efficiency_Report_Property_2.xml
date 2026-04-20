@@ -1,5 +1,5 @@
-<!-- Taken From https://github.com/BuildingSync/use-cases/blob/659208741ce25105bfec886536636d4b801f1b04/AuditTemplate/Example_NYC_Energy_Efficiency_Report_Property_2.xml -->
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Taken From https://github.com/BuildingSync/use-cases/blob/659208741ce25105bfec886536636d4b801f1b04/AuditTemplate/Example_NYC_Energy_Efficiency_Report_Property_2.xml -->
 <auc:BuildingSync version="2.7.0"
   xmlns:auc="http://buildingsync.net/schemas/bedes-auc/2019">
   <auc:Facilities>
@@ -2489,8 +2489,7 @@
           <auc:EarlyCompliance>false</auc:EarlyCompliance>
           <auc:Qualifications>
             <auc:Qualification ID="Qualification-44988140">
-              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Manager
-                (CEM)</auc:AuditorQualification>
+              <auc:AuditorQualification>Association of Energy Engineers Certified Energy Manager (CEM)</auc:AuditorQualification>
               <auc:AuditorQualificationNumber>12345</auc:AuditorQualificationNumber>
               <auc:AuditorQualificationState>NY</auc:AuditorQualificationState>
               <auc:CertificationExpirationDate>2030-10-01</auc:CertificationExpirationDate>
@@ -2501,8 +2500,7 @@
               <auc:AuditorQualificationState>NY</auc:AuditorQualificationState>
               <auc:CertificationExpirationDate>2030-10-01</auc:CertificationExpirationDate>
               <auc:CertifiedAuditTeamMemberContactID IDref="ContactType-44988160"></auc:CertifiedAuditTeamMemberContactID>
-              <auc:AuditTeamMemberCertificationType>Building Performance Institute (BPI)
-                Certification</auc:AuditTeamMemberCertificationType>
+              <auc:AuditTeamMemberCertificationType>Building Performance Institute (BPI) Certification</auc:AuditTeamMemberCertificationType>
             </auc:Qualification>
             <auc:Qualification ID="Qualification-44988220">
               <auc:AuditorQualificationNumber>123456</auc:AuditorQualificationNumber>
