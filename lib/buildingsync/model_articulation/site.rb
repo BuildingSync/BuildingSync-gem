@@ -88,6 +88,7 @@ module BuildingSync
     # @return [Standard]
     def determine_open_studio_system_standard
       set_all
+      @building.set_standard_template
       return Standard.build(get_standard_template)
     end
 
@@ -147,7 +148,10 @@ module BuildingSync
       determine_climate_zone
 
       # If we can't get the CZ from the site, we attempt to get from the building
-      @climate_zone = @building.get_climate_zone if @climate_zone.nil?
+      if @climate_zone.nil?
+        @building.determine_climate_zone
+        @climate_zone = @building.get_climate_zone
+      end
 
       OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.Site.generate_baseline_osm', 'Could not find a climate zone in the BuildingSync file.') if @climate_zone.nil?
       lat = @building.xget_text('Latitude').nil? ? xget_text('Latitude') : @building.xget_text('Latitude')

@@ -139,10 +139,9 @@ RSpec.configure do |config|
   # @param standard_to_be_used [String]
   # @param spec_name [String]
   def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used, spec_name, floors_above_grade = 1)
-    # -- Setup
+    # -- Setup: generate minimum XML and write to a temp file
     generator = BuildingSync::Generator.new
-    facility = generator.create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade)
-    facility.determine_open_studio_standard(standard_to_be_used)
+    doc = generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade)
 
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     output_path = File.join(SPEC_OUTPUT_DIR, "#{spec_name}/#{occupancy_classification}/Year#{year_of_const}")
@@ -157,10 +156,42 @@ RSpec.configure do |config|
     FileUtils.mkdir_p(output_path)
     expect(Dir.exist?(output_path)).to be true
 
-    expect(facility.generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)).to be true
-    facility.write_osm(output_path)
+    # Write the generated XML to a file for the Translator
+    xml_file_path = File.join(output_path, 'in.xml')
+    File.open(xml_file_path, 'w') { |f| doc.write(f) }
+    expect(File.exist?(xml_file_path)).to be true
 
-    sizing_run_checks(output_path)
+    # Use Translator workflow: write baseline OSW and run it
+    translator = BuildingSync::Translator.new(xml_file_path, output_path, epw_file_path, standard_to_be_used, false)
+    translator.write_baseline_osw
+    expect(File.exist?(File.join(output_path, 'baseline', 'in.osw'))).to be true
+
+    translator.run_baseline_osw
+    out_osw_path = File.join(output_path, 'baseline', 'out.osw')
+    expect(File.exist?(out_osw_path)).to be true
+
+    out_osw = JSON.parse(File.read(out_osw_path), symbolize_names: true)
+    expect(out_osw[:completed_status]).to eq 'Success'
+  end
+
+  # Create a Translator, write and run the baseline OSW, and check that it succeeded.
+  # @param xml_path [String] path to BuildingSync XML file
+  # @param output_path [String] path to output directory
+  # @param epw_path [String, nil] path to EPW weather file
+  # @param standard [String] standard to use (e.g., ASHRAE90_1)
+  # @return [BuildingSync::Translator]
+  def translator_sizing_run_and_check(xml_path, output_path, epw_path, standard)
+    translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, standard)
+    translator.write_baseline_osw
+    translator.run_baseline_osw
+
+    out_osw_path = File.join(output_path, 'baseline', 'out.osw')
+    expect(File.exist?(out_osw_path)).to be true
+
+    out_osw = JSON.parse(File.read(out_osw_path), symbolize_names: true)
+    expect(out_osw[:completed_status]).to eq 'Success'
+
+    return translator
   end
 
   # test writing scenarios
@@ -174,17 +205,17 @@ RSpec.configure do |config|
     expect(workflows_successfully_written).to be true
 
     osw_files = []
-    osw_sr_files = []
+    baseline_osw_files = []
     Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
-    Dir.glob("#{output_path}/SR/in.osw") { |osw| osw_sr_files << osw }
+    Dir.glob("#{output_path}/baseline/in.osw") { |osw| baseline_osw_files << osw }
 
     # We always expect there to only be one
-    # sizing run file
-    expect(osw_sr_files.size).to eq 1
+    # baseline osw file
+    expect(baseline_osw_files.size).to eq 1
 
     # Here we test the actual number of additional scenarios that got created
-    non_sr_osws = osw_files - osw_sr_files
-    expect(non_sr_osws.size).to eq expected_number_of_scenarios
+    non_baseline_osws = osw_files - baseline_osw_files
+    expect(non_baseline_osws.size).to eq expected_number_of_scenarios
   end
 
   # Checks that results from a single Baseline modeling scenario have been added to the REXML::Document in memory
@@ -240,18 +271,18 @@ RSpec.configure do |config|
     end
   end
 
-  def check_osws_simulated(main_output_dir, expected_number_scenarios_excluding_sr)
+  def check_osws_simulated(main_output_dir, expected_number_scenarios_excluding_baseline)
     osw_files = []
-    osw_sr_files = []
+    baseline_osw_files = []
     Dir.glob("#{main_output_dir}/**/in.osw") { |osw| osw_files << osw }
-    Dir.glob("#{main_output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
+    Dir.glob("#{main_output_dir}/baseline/in.osw") { |osw| baseline_osw_files << osw }
 
     # -- Assert - simulations are as we expect them
-    expect(osw_files.size).to eq(expected_number_scenarios_excluding_sr + 1) # includes SR
-    expect(osw_sr_files.size).to eq(1)
+    expect(osw_files.size).to eq(expected_number_scenarios_excluding_baseline + 1) # includes baseline
+    expect(baseline_osw_files.size).to eq(1)
 
-    osw_exclude_sr = osw_files - osw_sr_files
-    osw_exclude_sr.each do |osw|
+    osw_exclude_baseline = osw_files - baseline_osw_files
+    osw_exclude_baseline.each do |osw|
       sql_file = osw.gsub('in.osw', 'eplusout.sql')
       finished_job = osw.gsub('in.osw', 'finished.job')
       failed_job = osw.gsub('in.osw', 'failed.job')
@@ -277,14 +308,14 @@ RSpec.configure do |config|
   def get_tests
     tests = [
       # file_name, standard, epw_path, schema_version, expected number of scenarios, including cb_modeled
-      ['building_151.xml', ASHRAE90_1, nil, 'v2.4.0', 17],
-      ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.4.0', 17],
-      ['DC GSA Headquarters.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', 2],
-      ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, 'v2.4.0', 2],
-      ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', 1],
-      ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.4.0', 1],
-      ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, nil, 'v2.4.0', 1],
-      ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, nil, 'v2.4.0', 1],
+      ['building_151.xml', ASHRAE90_1, nil, 'v2.7.0', 17],
+      ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.7.0', 30],
+      ['DC GSA Headquarters.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.7.0', 2],
+      ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, 'v2.7.0', 2],
+      ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.7.0', 1],
+      ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.7.0', 1],
+      ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, nil, 'v2.7.0', 1],
+      ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, nil, 'v2.7.0', 1],
 
       # Test once issues get fixed
       # See translator_sizing_run_spec errors
@@ -332,7 +363,7 @@ RSpec.configure do |config|
   end
 
   def get_xml_object(file_name)
-    xml_path = File.join(SPEC_FILES_DIR, 'v2.4.0', file_name)
+    xml_path = File.join(SPEC_FILES_DIR, 'v2.7.0', file_name)
     expect(File.exist?(xml_path)).to be true
 
     return help_load_doc(xml_path)

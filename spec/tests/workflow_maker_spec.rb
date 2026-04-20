@@ -15,7 +15,7 @@ RSpec.describe 'WorkflowMaker' do
 
       # -- Assert
       begin
-        workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+        workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns, ASHRAE90_1)
       rescue StandardError => e
         expect(e.message).to eql 'doc must be an REXML::Document.  Passed object of class: String'
       end
@@ -28,7 +28,7 @@ RSpec.describe 'WorkflowMaker' do
 
       # -- Assert
       begin
-        workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+        workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns, ASHRAE90_1)
       rescue StandardError => e
         expect(e.message).to eql 'ns must be String.  Passed object of class: Integer'
       end
@@ -49,7 +49,7 @@ RSpec.describe 'WorkflowMaker' do
       bsync = BuildingSync::Extension.new
 
       @expected_measure_paths = Set[cm.measures_dir, ma.measures_dir, ee.measures_dir, bsync.measures_dir]
-      @workflow_maker = BuildingSync::WorkflowMaker.new(@doc, @ns)
+      @workflow_maker = BuildingSync::WorkflowMaker.new(@doc, @ns, ASHRAE90_1)
     end
 
     # TODO: What does this spec do?
@@ -139,11 +139,11 @@ RSpec.describe 'WorkflowMaker' do
       # -- Setup
       file_name = 'building_151_one_scenario.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.7.0')
       ns = 'auc'
       doc = help_load_doc(xml_path)
 
-      workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+      workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns, std)
 
       # -- Setup - Create deep copies of the workflows for modification
       baseline_base_workflow = workflow_maker.deep_copy_workflow
@@ -168,10 +168,10 @@ RSpec.describe 'WorkflowMaker' do
       # -- Setup
       file_name = 'building_151_one_scenario.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.7.0')
       ns = 'auc'
       doc = help_load_doc(xml_path)
-      workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
+      workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns, std)
 
       baseline_scenario_xml = doc.get_elements("//#{ns}:Scenario")[0]
       pom_scenario_xml = doc.get_elements("//#{ns}:Scenario")[1]
@@ -188,7 +188,7 @@ RSpec.describe 'WorkflowMaker' do
       expect(pom_success).to be true
 
       # -- Assert files exist
-      expect(File.exist?(File.join(output_path, 'Baseline', 'in.osw'))).to be true
+      expect(File.exist?(File.join(output_path, 'cb_modeled', 'in.osw'))).to be true
       expect(File.exist?(File.join(output_path, 'LED Only', 'in.osw'))).to be true
     end
   end
@@ -198,12 +198,12 @@ RSpec.describe 'WorkflowMaker' do
       # -- Setup
       file_name = 'building_151_no_measures.xml'
       @std = ASHRAE90_1
-      xml_path, @output_path = create_xml_path_and_output_path(file_name, @std, __FILE__, 'v2.4.0')
+      xml_path, @output_path = create_xml_path_and_output_path(file_name, @std, __FILE__, 'v2.7.0')
       @doc = help_load_doc(xml_path)
 
       @ns = 'auc'
 
-      @workflow_maker = BuildingSync::WorkflowMaker.new(@doc, @ns)
+      @workflow_maker = BuildingSync::WorkflowMaker.new(@doc, @ns, @std)
     end
 
     it 'clear_all_measures should remove all the steps from the workflow' do
@@ -212,29 +212,34 @@ RSpec.describe 'WorkflowMaker' do
     end
 
     measure_inserts_to_check = [
-      ['EnergyPlusMeasure', 'AddSimplePvToShadingSurfacesByType', 0, 15, {}],
-      ['ReportingMeasure', 'openstudio_results', 0, 17 , nil],
+      ['EnergyPlusMeasure', 'AddSimplePvToShadingSurfacesByType', 0, 27, {}],
+      ['ReportingMeasure', 'openstudio_results', 0, 27, nil],
       ['ModelMeasure', 'scale_geometry', 3, 3, nil]
     ]
     measure_inserts_to_check.each do |to_check|
       it "insert_measure_into_workflow: #{to_check[0]} (#{to_check[1]}) at the expected position and still simulates" do
         # -- Setup
-        # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
+        # Workflow is pre-populated with ModelMeasures from workflow_maker.json that exist in installed gems
         # -- Assert
-        expect(@workflow_maker.get_workflow['steps'].size).to eq(17)
+        expect(@workflow_maker.get_workflow['steps'].size).to eq(28)
 
         # -- Setup - insert new measure
         @workflow_maker.insert_measure_into_workflow(to_check[0], to_check[1], to_check[2], to_check[4])
 
         # -- Assert
-        expect(@workflow_maker.get_workflow['steps'].size).to eq(18)
+        expect(@workflow_maker.get_workflow['steps'].size).to eq(29)
         expect(@workflow_maker.get_workflow['steps'][to_check[3]]['measure_dir_name']).to eq(to_check[1])
 
-        # -- Setup
-        @workflow_maker.setup_and_sizing_run(@output_path, nil, @std)
+        # -- Setup - write and run baseline OSW
+        epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
+        @workflow_maker.write_baseline_osw(@output_path, epw_file_path)
+        @workflow_maker.run_baseline_osw(@output_path)
 
-        # -- Assert SR completed successfully
-        sizing_run_checks(@output_path)
+        # -- Assert baseline completed successfully
+        out_osw_path = File.join(@output_path, 'baseline', 'out.osw')
+        expect(File.exist?(out_osw_path)).to be true
+        out_osw = JSON.parse(File.read(out_osw_path), symbolize_names: true)
+        expect(out_osw[:completed_status]).to eq 'Success'
 
         # -- Setup
         successfully_written = @workflow_maker.write_osws(@output_path)
@@ -256,7 +261,7 @@ RSpec.describe 'WorkflowMaker' do
 
     it 'remove measures then insert_measure_into_workflow: EnergyPlusMeasure (AddSimplePvToShadingSurfacesByType) at the expected position and still simulate' do
       # -- Setup
-      # phase_zero_base.osw has 27 ModelMeasures, 1 E+ Measure, 1 Reporting Measure
+      # Workflow is pre-populated with ModelMeasures from workflow_maker.json that exist in installed gems
       measure_type = 'EnergyPlusMeasure'
       measure_dir_name = 'AddSimplePvToShadingSurfacesByType'
       item = 1
@@ -272,11 +277,16 @@ RSpec.describe 'WorkflowMaker' do
       expect(@workflow_maker.get_workflow['steps'].size).to eq(1)
       expect(@workflow_maker.get_workflow['steps'][final_expected_position]['measure_dir_name']).to eq(measure_dir_name)
 
-      # -- Setup
-      @workflow_maker.setup_and_sizing_run(@output_path, nil, @std)
+      # -- Setup - write and run baseline OSW
+      epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
+      @workflow_maker.write_baseline_osw(@output_path, epw_file_path)
+      @workflow_maker.run_baseline_osw(@output_path)
 
-      # -- Assert SR completed successfully
-      sizing_run_checks(@output_path)
+      # -- Assert baseline completed successfully
+      out_osw_path = File.join(@output_path, 'baseline', 'out.osw')
+      expect(File.exist?(out_osw_path)).to be true
+      out_osw = JSON.parse(File.read(out_osw_path), symbolize_names: true)
+      expect(out_osw[:completed_status]).to eq 'Success'
 
       # -- Setup
       workflows_successfully_written = @workflow_maker.write_osws(@output_path)
@@ -305,15 +315,22 @@ RSpec.describe 'WorkflowMaker' do
         # -- Setup
         file_name = 'building_151_one_scenario.xml'
         std = standard[0]
-        xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
+        xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.7.0')
         doc = help_load_doc(xml_path)
         ns = 'auc'
 
-        workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns)
-        workflow_maker.setup_and_sizing_run(output_path, nil, std)
+        workflow_maker = BuildingSync::WorkflowMaker.new(doc, ns, std)
 
-        # -- Assert SR completed successfully
-        sizing_run_checks(output_path)
+        # -- Setup - write and run baseline OSW
+        epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
+        workflow_maker.write_baseline_osw(output_path, epw_file_path)
+        workflow_maker.run_baseline_osw(output_path)
+
+        # -- Assert baseline completed successfully
+        out_osw_path = File.join(output_path, 'baseline', 'out.osw')
+        expect(File.exist?(out_osw_path)).to be true
+        out_osw = JSON.parse(File.read(out_osw_path), symbolize_names: true)
+        expect(out_osw[:completed_status]).to eq 'Success'
 
         workflows_successfully_written = workflow_maker.write_osws(output_path)
         # -- Assert - should only have 1 workflow written

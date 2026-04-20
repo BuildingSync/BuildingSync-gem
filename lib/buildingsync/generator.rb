@@ -324,11 +324,11 @@ module BuildingSync
     # @param floor_area_type [String]
     # @param floor_area_value [Float]
     # @return BuildingSync::Facility
-    def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade = 1)
+    def create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade = 1, standard_to_be_used = ASHRAE90_1)
       xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade)
       facility_element = xml_snippet.elements["/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility"]
       if !facility_element.nil?
-        return BuildingSync::Facility.new(facility_element, @ns)
+        return BuildingSync::Facility.new(facility_element, @ns, standard_to_be_used)
       else
         expect(facility_element.nil?).to be false
       end
@@ -340,22 +340,22 @@ module BuildingSync
     # @param floor_area_type [String]
     # @param floor_area_value [Float]
     # @return [BuildingSync::Site]
-    def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    def create_minimum_site(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used = ASHRAE90_1)
       xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
       site_element = xml_snippet.elements["/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site"]
       if !site_element.nil?
-        return BuildingSync::Site.new(site_element, @ns)
+        return BuildingSync::Site.new(site_element, @ns, standard_to_be_used)
       else
         expect(site_element.nil?).to be false
       end
     end
 
-    def create_minimum_building(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
+    def create_minimum_building(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used = ASHRAE90_1)
       xml_snippet = create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value)
 
       building_element = xml_snippet.elements["/#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility/#{@ns}:Sites/#{@ns}:Site/#{@ns}:Buildings/#{@ns}:Building"]
       if !building_element.nil?
-        return BuildingSync::Building.new(building_element, '', '', @ns)
+        return BuildingSync::Building.new(building_element, '', '', @ns, standard_to_be_used)
       else
         expect(building_element.nil?).to be false
       end
@@ -378,47 +378,47 @@ module BuildingSync
     end
 
     # -- Generate Baseline functions
-    def generate_baseline_facilities(xml_path)
+    def generate_baseline_facilities(xml_path, standard_to_be_used = ASHRAE90_1)
       facilities = []
       doc = help_load_doc(xml_path)
 
       doc.elements.each("#{@ns}:BuildingSync/#{@ns}:Facilities/#{@ns}:Facility") do |facility_element|
-        facilities.push(BuildingSync::Facility.new(facility_element, @ns))
+        facilities.push(BuildingSync::Facility.new(facility_element, @ns, standard_to_be_used))
       end
       return facilities
     end
 
-    def generate_baseline_sites(xml_path)
+    def generate_baseline_sites(xml_path, standard_to_be_used = ASHRAE90_1)
       sites = []
       doc = help_load_doc(xml_path)
       facility_xml = get_first_facility_element(doc)
 
       facility_xml.elements.each("#{@ns}:Sites/#{@ns}:Site") do |site_element|
-        sites.push(BuildingSync::Site.new(site_element, @ns))
+        sites.push(BuildingSync::Site.new(site_element, @ns, standard_to_be_used))
       end
       return sites
     end
 
-    def generate_baseline_buildings(xml_path, occupancy_classification, total_floor_area)
+    def generate_baseline_buildings(xml_path, occupancy_classification, total_floor_area, standard_to_be_used = ASHRAE90_1)
       buildings = []
 
       doc = help_load_doc(xml_path)
       site_xml = get_first_site_element(doc)
 
       site_xml.elements.each("#{@ns}:Buildings/#{@ns}:Building") do |building_element|
-        buildings.push(BuildingSync::Building.new(building_element, occupancy_classification, total_floor_area, @ns))
+        buildings.push(BuildingSync::Building.new(building_element, occupancy_classification, total_floor_area, @ns, standard_to_be_used))
       end
       return buildings
     end
 
-    def generate_baseline_building_sections(xml_path, occupancy_classification, total_floor_area)
+    def generate_baseline_building_sections(xml_path, occupancy_classification, total_floor_area, standard_to_be_used = ASHRAE90_1)
       building_sections = []
 
       doc = help_load_doc(xml_path)
       building_xml = get_first_building_element(doc)
 
       building_xml.elements.each("#{@ns}:Sections/#{@ns}:Section") do |building_element|
-        building_sections.push(BuildingSync::BuildingSection.new(building_element, occupancy_classification, total_floor_area, 1, @ns))
+        building_sections.push(BuildingSync::BuildingSection.new(building_element, occupancy_classification, total_floor_area, 1, @ns, standard_to_be_used))
       end
       return building_sections
     end
@@ -481,31 +481,31 @@ module BuildingSync
       return BuildingSync::Report.new(report, @ns)
     end
 
-    def get_facility_from_file(xml_file_path)
+    def get_facility_from_file(xml_file_path, standard_to_be_used = ASHRAE90_1)
       doc = nil
       File.open(xml_file_path, 'r') do |file|
         doc = REXML::Document.new(file)
       end
       facility = get_first_facility_element(doc)
-      return BuildingSync::Facility.new(facility, @ns)
+      return BuildingSync::Facility.new(facility, @ns, standard_to_be_used)
     end
 
-    def get_building_from_file(xml_file_path)
+    def get_building_from_file(xml_file_path, standard_to_be_used = ASHRAE90_1)
       doc = nil
       File.open(xml_file_path, 'r') do |file|
         doc = REXML::Document.new(file)
       end
       building = get_first_building_element(doc)
-      return BuildingSync::Building.new(building, 'Office', '20000', @ns)
+      return BuildingSync::Building.new(building, 'Office', '20000', @ns, standard_to_be_used)
     end
 
-    def get_building_section_from_file(xml_file_path)
+    def get_building_section_from_file(xml_file_path, standard_to_be_used = ASHRAE90_1)
       doc = nil
       File.open(xml_file_path, 'r') do |file|
         doc = REXML::Document.new(file)
       end
       section = get_first_building_section_element(doc)
-      return BuildingSync::BuildingSection.new(section, 'Office', '20000', 1, @ns)
+      return BuildingSync::BuildingSection.new(section, 'Office', '20000', 1, @ns, standard_to_be_used)
     end
 
     # get hvac system from xml file

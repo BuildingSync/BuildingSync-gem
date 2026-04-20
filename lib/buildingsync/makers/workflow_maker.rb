@@ -34,7 +34,39 @@ module BuildingSync
         @workflow_maker_json = JSON.parse(file.read, symbolize_names: true)
       end
 
+      # Initialize base workflow from empty baseline OSW
+      file = File.read(EMPTY_BASELINE_OSW_PATH)
+      @workflow = JSON.parse(file)
+      @workflow['measure_paths'] = get_measure_directories_array
+
+      # Pre-populate workflow steps from workflow_maker.json with __SKIP__ = true
+      added_measures = Set.new
+      @workflow_maker_json.each_value do |category_measures|
+        category_measures.each do |measure_hash|
+          measure_hash.each_value do |details|
+            measure_dir_name = details[:measure_dir_name]
+            if !added_measures.include?(measure_dir_name)
+              added_measures.add(measure_dir_name)
+              @workflow['steps'] << { 'measure_dir_name' => measure_dir_name, 'arguments' => { '__SKIP__' => true } }
+            end
+          end
+        end
+      end
+
+      # Always include openstudio_results as the last step (ReportingMeasure) for results processing
+      @workflow['steps'] << { 'measure_dir_name' => 'openstudio_results', 'arguments' => { '__SKIP__' => false, 'reg_monthly_details' => true } }
+
       read_xml
+    end
+
+    # @return [Hash] the base workflow
+    def get_workflow
+      return @workflow
+    end
+
+    # @return [Hash] a deep copy of the base workflow
+    def deep_copy_workflow
+      return Marshal.load(Marshal.dump(@workflow))
     end
 
     def read_xml
@@ -100,6 +132,91 @@ module BuildingSync
       ee_measures_instance = OpenStudio::EeMeasures::Extension.new
       bldg_sync_instance = BuildingSync::Extension.new
       return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir]
+    end
+
+    # checks if all measures referenced in the workflow steps exist in the available measure directories
+    # @return [Boolean] true if all measures exist, false otherwise
+    def measures_exist?
+      available_measures = get_available_measures_hash
+      workflow_measure_names = []
+      
+      # Extract measure names from workflow steps that are not skipped
+      @workflow['steps'].each do |step|
+        next if step['measure_dir_name'].nil?
+        next if step['arguments'] && step['arguments']['__SKIP__'] == true
+        workflow_measure_names << step['measure_dir_name']
+      end
+      
+      # Check if each non-skipped workflow measure exists in available measures
+      workflow_measure_names.each do |measure_name|
+        measure_found = false
+        available_measures.each do |path, measure_list|
+          if measure_list.include?(measure_name)
+            measure_found = true
+            break
+          end
+        end
+        return false unless measure_found
+      end
+      
+      return true
+    end
+
+    # clear all measures from the list in the workflow
+    def clear_all_measures
+      @workflow.delete('steps')
+      @workflow['steps'] = []
+    end
+
+    # Insert a measure into the workflow at the correct position based on measure type ordering.
+    # OpenStudio workflows maintain the order: ModelMeasure, EnergyPlusMeasure, ReportingMeasure.
+    # @param measure_type [String] 'ModelMeasure', 'EnergyPlusMeasure', or 'ReportingMeasure'
+    # @param measure_dir_name [String] the directory name for the measure
+    # @param position [Integer] the position within the measure type group to insert at
+    # @param args [Hash, nil] optional arguments hash for the measure
+    def insert_measure_into_workflow(measure_type, measure_dir_name, position, args)
+      type_order = { 'ModelMeasure' => 0, 'EnergyPlusMeasure' => 1, 'ReportingMeasure' => 2 }
+      target_order = type_order[measure_type]
+
+      # Find the start and end indices for each measure type section
+      section_start = nil
+      section_end = nil
+      current_idx = 0
+
+      @workflow['steps'].each_with_index do |step, idx|
+        step_type = get_measure_type(step['measure_dir_name'])
+        step_order = type_order[step_type] || 0
+        if step_order == target_order
+          section_start = idx if section_start.nil?
+          section_end = idx
+        end
+        # Track where the next section after ours begins
+        if step_order > target_order && section_end.nil? && section_start.nil?
+          section_start = idx
+          section_end = idx - 1
+        end
+      end
+
+      # Build the new step
+      new_step = { 'measure_dir_name' => measure_dir_name, 'arguments' => args || {} }
+
+      if section_start.nil?
+        # No measures of this type exist yet - find the right insertion point
+        insert_idx = 0
+        @workflow['steps'].each_with_index do |step, idx|
+          step_type = get_measure_type(step['measure_dir_name'])
+          step_order = type_order[step_type] || 0
+          if step_order < target_order
+            insert_idx = idx + 1
+          end
+        end
+        # If no measures of lower order exist either, insert at the beginning
+        @workflow['steps'].insert(insert_idx, new_step)
+      else
+        # Insert at the specified position within this type's section
+        actual_position = [section_start + position, section_end + 1].min
+        @workflow['steps'].insert(actual_position, new_step)
+      end
     end
 
     # gets the measure type of a measure given its directory - looking up the measure type in the measure.xml file
@@ -270,8 +387,12 @@ module BuildingSync
         raise StandardError, 'BuildingSync.WorkflowMaker.write_osws: OSW cannot be written since no current building modeled scenario is defined. One can be added after file import using the add_cb_modeled method'
       end
 
+      # Use baseline OSM as seed file for scenario OSWs if it exists
+      baseline_osm_path = File.join(main_output_dir, 'baseline', 'in.osm')
+      seed_path = File.exist?(baseline_osm_path) ? baseline_osm_path : nil
+
       # Write a workflow for the current building modeled scenario
-      cb_modeled_success = write_osw(main_output_dir, @facility.report.cb_modeled)
+      cb_modeled_success = write_osw(main_output_dir, @facility.report.cb_modeled, seed_path)
 
       if !cb_modeled_success
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.WorkflowMaker.write_osws', 'A workflow was not successfully written for the cb_modeled (Current Building Modeled) Scenario.')
@@ -283,7 +404,7 @@ module BuildingSync
       if !only_cb_modeled
         # write an osw for each Package Of Measures scenario
         @facility.report.poms.each do |scenario|
-          successful = write_osw(main_output_dir, scenario)
+          successful = write_osw(main_output_dir, scenario, seed_path)
           if successful
             number_successful += 1
           else
@@ -403,7 +524,7 @@ module BuildingSync
 
 
     # Write an OSW for the provided scenario
-    # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
+    # @param main_output_dir [String] main output path, not scenario specific. i.e. baseline should be a subdirectory
     # @param [BuildingSync::Scenario]
     # @return [Boolean] whether the writing was successful
     def write_osw(main_output_dir, scenario, baseline_osm_path=nil)
@@ -441,18 +562,18 @@ module BuildingSync
     # @param runner_options [hash]
     def run_osws(output_dir, only_cb_modeled = false, runner_options = { run_simulations: true, verbose: false, num_parallel: 7, max_to_run: Float::INFINITY })
       osw_files = []
-      osw_sr_files = []
+      baseline_osw_files = []
       if only_cb_modeled
         osw_files << "#{@facility.report.cb_modeled.get_osw_dir}/in.osw"
       else
         Dir.glob("#{output_dir}/**/in.osw") { |osw| osw_files << osw }
       end
-      Dir.glob("#{output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
+      Dir.glob("#{output_dir}/baseline/in.osw") { |osw| baseline_osw_files << osw }
 
       runner = OpenStudio::Extension::Runner.new(dirname = Dir.pwd, bundle_without = [], options = runner_options)
 
-      # This doesn't run the workflow defined by the Sizing Run
-      return runner.run_osws(osw_files - osw_sr_files)
+      # This doesn't run the baseline workflow (already run via run_baseline_osw)
+      return runner.run_osws(osw_files - baseline_osw_files)
     end
 
     # Removes unused measures from a workflow, where __SKIP__ == true

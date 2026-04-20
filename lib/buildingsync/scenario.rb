@@ -209,6 +209,10 @@ module BuildingSync
       elsif !xget_id.nil?
         to_use = xget_id
       end
+      # Avoid collision with the reserved 'baseline' directory used by the sizing run
+      if to_use.casecmp('baseline').zero?
+        to_use = 'cb_modeled'
+      end
       @osw_dir = File.join(main_output_dir, to_use)
       return @osw_dir
     end
@@ -304,7 +308,7 @@ module BuildingSync
           OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.simulation_success?', "Scenario ID: #{xget_id}: eplusout.end detected error, simulation unsuccessful: #{energy_plus_string}")
           success = false
           # if we found out that there was a fatal error we search the err file for the first error.
-          File.open(File.join(scenario.get_osw_dir, 'eplusout.err')).each do |line|
+          File.open(File.join(get_osw_dir, 'eplusout.err')).each do |line|
             if line.include? '** Severe  **'
               OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Scenario.simulation_success?', "Scenario ID: #{xget_id}: Severe error occurred! #{line}")
             elsif line.include? '**  Fatal  **'

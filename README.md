@@ -2,9 +2,18 @@
 
 BuildingSync OpenStudio Simulator (BOSS) takes in BuildingSync files, creates OpenStudio workflows from their contents, and runs those workflows to create models.
 
+## Current Configuration  and Compatibility Matrix
+
+BOSS currently supports OpenStudio 3.10 and BuildingSync 2.7.0
+
+| BOSS Version | OpenStudio Version | BuildingSync Version |
+|--------------|--------------------|----------------------|
+| v0.2.1    | OpenStudio v3.0.1 | BuildingSync v2.2.0 |
+
+
 
 ## Installation
-1. Install OpenStudio 3.10. Check installation with 
+1. Install OpenStudio 3.10. Check installation with
     ```console
     🌟 openstudio --version
     3.10.0+ce46db07de

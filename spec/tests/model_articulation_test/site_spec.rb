@@ -21,7 +21,7 @@ RSpec.describe 'SiteSpec' do
 
     # -- Create Site object from Facility
     begin
-      BuildingSync::Site.new(facility_element, ns)
+      BuildingSync::Site.new(facility_element, ns, ASHRAE90_1)
 
       # Should not reach this
       expect(false).to be true
@@ -39,8 +39,8 @@ RSpec.describe 'SiteSpec' do
 
   it 'Should return the correct building template' do
     g = BuildingSync::Generator.new
-    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452')
-    site.determine_open_studio_standard(ASHRAE90_1)
+    site = g.create_minimum_site('Retail', '1954', 'Gross', '69452', ASHRAE90_1)
+    site.determine_open_studio_system_standard
 
     # -- Assert
     puts "expected building template: DOE Ref Pre-1980 but got: #{site.get_standard_template} " if site.get_standard_template != 'DOE Ref Pre-1980'

@@ -73,6 +73,9 @@ module BuildingSync
       read_location_values
       set_built_year
 
+      # Validate and set occupancy classification
+      check_occupancy_classification(site_occupancy_classification)
+
       # deal with stories above and below grade
       read_stories_above_and_below_grade
       # aspect ratio
@@ -113,12 +116,17 @@ module BuildingSync
 
     def check_occupancy_classification(site_occupancy_classification)
       # Set the OccupancyClassification text as that defined by the Site
-      # ONLY if it is not already defined
-      if !site_occupancy_classification.nil?
+      # ONLY if it is not already defined and is not empty
+      if !site_occupancy_classification.nil? && !site_occupancy_classification.strip.empty?
         xset_or_create('OccupancyClassification', site_occupancy_classification, false)
       end
-      if xget_text('OccupancyClassification').nil?
-        raise StandardError, "Building ID: #{xget_id}. OccupancyClassification must be defined at either the Site or Building level."
+      occ = xget_text('OccupancyClassification')
+      if occ.nil?
+        if !site_occupancy_classification.nil? && site_occupancy_classification.strip.empty?
+          raise StandardError, 'Unable to set OccupancyClassification to be empty'
+        else
+          raise StandardError, "Building ID: #{xget_id}. OccupancyClassification must be defined at either the Site or Building level."
+        end
       end
     end
 
@@ -149,12 +157,16 @@ module BuildingSync
         @num_stories_above_grade = 1.0 # setDefaultValue
       end
 
-      if @base_xml.elements["#{@ns}:FloorsBelowGrade"]
-        @num_stories_below_grade = @base_xml.elements["#{@ns}:FloorsBelowGrade"].text.to_f
-      elsif @base_xml.elements["#{@ns}:ConditionedFloorsBelowGrade"]
+      if @base_xml.elements["#{@ns}:ConditionedFloorsBelowGrade"]
         @num_stories_below_grade = @base_xml.elements["#{@ns}:ConditionedFloorsBelowGrade"].text.to_f
+      elsif @base_xml.elements["#{@ns}:FloorsBelowGrade"]
+        @num_stories_below_grade = @base_xml.elements["#{@ns}:FloorsBelowGrade"].text.to_f
       else
         @num_stories_below_grade = 0.0 # setDefaultValue
+      end
+
+      if @num_stories_below_grade > 1
+        raise StandardError, "Building ID: #{xget_id}. Number of stories below grade is > 1 (#{@num_stories_below_grade}).  Currently, only one story below grade is supported."
       end
     end
 
@@ -435,7 +447,7 @@ module BuildingSync
       else
         msg = "epw_file_path is nil and no way to set from Site or Building parameters."
         OpenStudio.logFree(OpenStudio::Error, 'BuildingSync.Building.set_weather_and_climate_zone', msg)
-        raise StandardError, 'BuildingSync.Building.set_weather_and_climate_zone: #{msg}'
+        raise StandardError, "BuildingSync.Building.set_weather_and_climate_zone: #{msg}"
       end
 
       # check files exists
@@ -622,19 +634,21 @@ module BuildingSync
       add_user_defined_field_to_xml_file('Width', @width)
       add_user_defined_field_to_xml_file('Length', @length)
       add_user_defined_field_to_xml_file('PartyWallFraction', @party_wall_fraction)
-      add_user_defined_field_to_xml_file('ModelNumberThermalZones', @model.getThermalZones.size)
-      add_user_defined_field_to_xml_file('ModelNumberSpaces', @model.getSpaces.size)
-      add_user_defined_field_to_xml_file('ModelNumberStories', @model.getBuildingStorys.size)
-      add_user_defined_field_to_xml_file('ModelNumberPeople', @model.getBuilding.numberOfPeople)
-      add_user_defined_field_to_xml_file('ModelFloorArea(m2)', @model.getBuilding.floorArea)
+      if !@model.nil?
+        add_user_defined_field_to_xml_file('ModelNumberThermalZones', @model.getThermalZones.size)
+        add_user_defined_field_to_xml_file('ModelNumberSpaces', @model.getSpaces.size)
+        add_user_defined_field_to_xml_file('ModelNumberStories', @model.getBuildingStorys.size)
+        add_user_defined_field_to_xml_file('ModelNumberPeople', @model.getBuilding.numberOfPeople)
+        add_user_defined_field_to_xml_file('ModelFloorArea(m2)', @model.getBuilding.floorArea)
 
-      wf = @model.weatherFile.get
-      add_user_defined_field_to_xml_file('ModelWeatherFileName', wf.nameString)
-      add_user_defined_field_to_xml_file('ModelWeatherFileDataSource', wf.dataSource)
-      add_user_defined_field_to_xml_file('ModelWeatherFileCity', wf.city)
-      add_user_defined_field_to_xml_file('ModelWeatherFileStateProvinceRegion', wf.stateProvinceRegion)
-      add_user_defined_field_to_xml_file('ModelWeatherFileLatitude', wf.latitude)
-      add_user_defined_field_to_xml_file('ModelWeatherFileLongitude', wf.longitude)
+        wf = @model.weatherFile.get
+        add_user_defined_field_to_xml_file('ModelWeatherFileName', wf.nameString)
+        add_user_defined_field_to_xml_file('ModelWeatherFileDataSource', wf.dataSource)
+        add_user_defined_field_to_xml_file('ModelWeatherFileCity', wf.city)
+        add_user_defined_field_to_xml_file('ModelWeatherFileStateProvinceRegion', wf.stateProvinceRegion)
+        add_user_defined_field_to_xml_file('ModelWeatherFileLatitude', wf.latitude)
+        add_user_defined_field_to_xml_file('ModelWeatherFileLongitude', wf.longitude)
+      end
       prepare_final_xml_for_spatial_element
     end
 

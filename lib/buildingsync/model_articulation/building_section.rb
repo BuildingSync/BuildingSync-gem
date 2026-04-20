@@ -101,6 +101,10 @@ module BuildingSync
       else
         @occupancy_classification = building_occupancy_classification
       end
+
+      if @occupancy_classification.nil?
+        raise StandardError, 'Unable to set OccupancyClassification to nil'
+      end
     end
 
     # read construction types

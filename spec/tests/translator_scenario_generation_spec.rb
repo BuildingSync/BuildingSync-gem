@@ -20,17 +20,16 @@ RSpec.describe 'BuildingSync' do
         translator.write_osws
 
         osw_files = []
-        osw_sr_files = []
+        baseline_osw_files = []
         Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
-        Dir.glob("#{output_path}/SR/in.osw") { |osw| osw_sr_files << osw }
+        Dir.glob("#{output_path}/baseline/in.osw") { |osw| baseline_osw_files << osw }
 
-        # We always expect there to only be one
-        # sizing run file
-        expect(osw_sr_files.size).to eq 1
+        # We always expect there to only be one baseline osw file
+        expect(baseline_osw_files.size).to eq 1
 
         # Here we test the actual number of additional scenarios that got created
-        non_sr_osws = osw_files - osw_sr_files
-        expect(non_sr_osws.size).to eq test[4]
+        non_baseline_osws = osw_files - baseline_osw_files
+        expect(non_baseline_osws.size).to eq test[4]
       end
     end
   end
@@ -44,17 +43,16 @@ RSpec.describe 'BuildingSync' do
         translator.write_osws(only_cb_modeled = true)
 
         osw_files = []
-        osw_sr_files = []
+        baseline_osw_files = []
         Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
-        Dir.glob("#{output_path}/SR/in.osw") { |osw| osw_sr_files << osw }
+        Dir.glob("#{output_path}/baseline/in.osw") { |osw| baseline_osw_files << osw }
 
-        # We always expect there to only be one
-        # sizing run file
-        expect(osw_sr_files.size).to eq 1
+        # We always expect there to only be one baseline osw file
+        expect(baseline_osw_files.size).to eq 1
 
         # Here we test the actual number of additional scenarios that got created
-        non_sr_osws = osw_files - osw_sr_files
-        expect(non_sr_osws.size).to eq 1
+        non_baseline_osws = osw_files - baseline_osw_files
+        expect(non_baseline_osws.size).to eq 1
       end
     end
   end

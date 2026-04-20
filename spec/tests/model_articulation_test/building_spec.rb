@@ -19,7 +19,7 @@ RSpec.describe 'BuildingSpec' do
 
       # -- Create Building object from Facility
       begin
-        BuildingSync::Building.new(facility_element, '', '', ns)
+        BuildingSync::Building.new(facility_element, '', '', ns, ASHRAE90_1)
 
         # Should not reach this
         expect(false).to be true
@@ -36,7 +36,7 @@ RSpec.describe 'BuildingSpec' do
       building_xml = g.get_first_building_element(doc)
 
       begin
-        b = BuildingSync::Building.new(building_xml, 'Retail', '', 'auc')
+        b = BuildingSync::Building.new(building_xml, 'Retail', '', 'auc', ASHRAE90_1)
 
         # Should not reach this line
         expect(false).to be true
@@ -55,7 +55,7 @@ RSpec.describe 'BuildingSpec' do
       year_of_construction.text = 1990
 
       begin
-        b = BuildingSync::Building.new(building_xml, '', '', 'auc')
+        b = BuildingSync::Building.new(building_xml, '', '', 'auc', ASHRAE90_1)
 
         # Should not reach this line
         expect(false).to be true
@@ -74,7 +74,7 @@ RSpec.describe 'BuildingSpec' do
       year_of_construction.text = 1990
 
       begin
-        b = BuildingSync::Building.new(building_xml, nil, '', 'auc')
+        b = BuildingSync::Building.new(building_xml, nil, '', 'auc', ASHRAE90_1)
 
         # Should not reach this line
         expect(false).to be true
@@ -97,7 +97,7 @@ RSpec.describe 'BuildingSpec' do
       floors_below_grade.text = 2
 
       begin
-        b = BuildingSync::Building.new(building_xml, 'Retail', '', 'auc')
+        b = BuildingSync::Building.new(building_xml, 'Retail', '', 'auc', ASHRAE90_1)
 
         # Should not reach this line
         expect(false).to be true
@@ -135,10 +135,11 @@ RSpec.describe 'BuildingSpec' do
 
   it 'Should return the correct building template' do
     g = BuildingSync::Generator.new
-    building = g.create_minimum_building('Retail', '1954', 'Gross', '69452')
-    building.determine_open_studio_standard(CA_TITLE24)
-    puts "expected building template: CBES Pre-1978 but got: #{building.get_standard_template} " if building.get_standard_template != 'CBES Pre-1978'
-    expect(building.get_standard_template == 'CBES Pre-1978').to be true
+    building = g.create_minimum_building('Retail', '1954', 'Gross', '69452', CA_TITLE24)
+    building.set_all
+    building.set_standard_template
+    puts "expected building template: DEER Pre-1975 but got: #{building.get_standard_template} " if building.get_standard_template != 'DEER Pre-1975'
+    expect(building.get_standard_template == 'DEER Pre-1975').to be true
   end
 
   describe 'Building XmlGetSet Accessors' do
@@ -146,7 +147,7 @@ RSpec.describe 'BuildingSpec' do
       # -- Setup
       file_name = 'building_151_level1.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.7.0')
       @building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     end
 
@@ -176,7 +177,7 @@ RSpec.describe 'BuildingSpec' do
       # -- Setup
       file_name = 'building_151_level1.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.7.0')
       @building = BuildingSync::Generator.new.get_building_from_file(xml_path)
     end
     it 'Should return OccupantQuantity' do

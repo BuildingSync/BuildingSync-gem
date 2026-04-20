@@ -20,7 +20,7 @@ RSpec.describe 'FacilitySpec' do
 
       # -- Create Building object from Facility
       begin
-        BuildingSync::Facility.new(doc.root, ns)
+        BuildingSync::Facility.new(doc.root, ns, ASHRAE90_1)
 
         # Should not reach this
         expect(false).to be true
@@ -50,7 +50,7 @@ RSpec.describe 'Facility Scenario Parsing' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.7.0')
 
     facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
 
@@ -67,7 +67,7 @@ RSpec.describe 'Facility Scenario Parsing' do
     scenario_elements = @doc.get_elements("//#{@ns}:Scenarios/#{@ns}:Scenario")
     expect(scenario_elements.size).to eq(0)
 
-    facility = BuildingSync::Facility.new(@facility_xml, @ns)
+    facility = BuildingSync::Facility.new(@facility_xml, @ns, ASHRAE90_1)
 
     # -- Assert
     expect(facility.report.scenarios).to be_an_instance_of(Array)
@@ -90,7 +90,7 @@ RSpec.describe 'Facility Systems Mapping' do
     g.add_plug_load_to_first_facility(doc)
 
     facility_xml = g.get_first_facility_element(doc)
-    @facility = BuildingSync::Facility.new(facility_xml, @ns)
+    @facility = BuildingSync::Facility.new(facility_xml, @ns, ASHRAE90_1)
   end
 end
 
@@ -99,7 +99,7 @@ RSpec.describe 'Facility Methods' do
     # -- Setup
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.7.0')
 
     @facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
   end

@@ -197,6 +197,8 @@ class OSWARGPopulator
     # Add args
     # -  __SKIP__
     set_measure_argument.call("__SKIP__", false)
+    # -  reg_monthly_details - enable monthly fuel breakdown for results processing
+    set_measure_argument.call("reg_monthly_details", true)
 
   end
 

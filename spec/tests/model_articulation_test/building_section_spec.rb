@@ -17,13 +17,13 @@ RSpec.describe 'BuildingSection' do
       @section_xml = g.get_first_building_section_element(doc)
     end
     it 'should raise an error given a non-Section REXML Element' do
-      BuildingSync::BuildingSection.new(@facility_xml, nil, nil, nil, @ns)
+      BuildingSync::BuildingSection.new(@facility_xml, nil, nil, nil, @ns, ASHRAE90_1)
     rescue StandardError => e
       expect(e.message).to eql 'Attempted to initialize Section object with Element name of: Facility'
     end
 
     it 'Should generate meaningful error when passing empty XML data' do
-      section = BuildingSync::BuildingSection.new(@section_xml, nil, nil, nil, @ns)
+      section = BuildingSync::BuildingSection.new(@section_xml, nil, nil, nil, @ns, ASHRAE90_1)
 
       # Should not reach this line
       expect(false).to be true
@@ -44,7 +44,7 @@ RSpec.describe 'BuildingSection methods' do
       # -- Setup
       file_name = 'building_151_level1.xml'
       std = ASHRAE90_1
-      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
+      xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.7.0')
       building_section = BuildingSync::Generator.new.get_building_section_from_file(xml_path)
 
       # -- Assert

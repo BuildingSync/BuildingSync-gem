@@ -76,11 +76,12 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
 
     # add a new space to the model
     translator = BuildingSync::Translator.new(building_sync_xml_file_path, out_path)
-    translator.setup_and_sizing_run
+    translator.write_baseline_osw
+    translator.run_baseline_osw
     # fetch the model from the output directory
     ostranslator = OpenStudio::OSVersion::VersionTranslator.new
-    path = "#{out_path}/in.osm"
-    model = ostranslator.loadModel(path)#translator.output_dir)
+    path = "#{out_path}/baseline/in.osm"
+    model = ostranslator.loadModel(path)
     model = model.get
     runner.registerFinalCondition("The building finished with #{model.getSpaces.size} spaces.")
 
