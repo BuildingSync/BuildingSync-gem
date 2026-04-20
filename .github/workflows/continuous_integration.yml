@@ -16,6 +16,8 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+    - name: Mark workspace as safe for git
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: Setup
       run: |
         gem install bundler -v 2.4.10
@@ -50,6 +52,8 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+    - name: Mark workspace as safe for git
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: Setup
       run: |
         gem install bundler -v 2.4.10
@@ -71,6 +75,8 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+    - name: Mark workspace as safe for git
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: Setup
       run: |
         gem install bundler -v 2.4.10
@@ -104,6 +110,8 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+    - name: Mark workspace as safe for git
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: Setup
       run: |
         gem install bundler -v 2.4.10
