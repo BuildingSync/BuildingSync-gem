@@ -11,11 +11,11 @@ on:
 jobs:
   model_articulation_tests:
     name: Model Articulation Tests
-    container: nrel/openstudio:9.0
+    container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Setup
       run: |
         gem install bundler -v 2.4.22
@@ -45,11 +45,11 @@ jobs:
 
   translator_tests:
     name: Translator Tests
-    container: nrel/openstudio:3.9.0
+    container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Setup
       run: |
         gem install bundler -v 2.4.22
@@ -66,11 +66,11 @@ jobs:
 
   report_and_scenario_tests:
     name: Report and Scenario Tests
-    container: nrel/openstudio:3.9.0
+    container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Setup
       run: |
         gem install bundler -v 2.4.22
@@ -99,11 +99,11 @@ jobs:
 
   other_specs:
     name: Other Tests
-    container: nrel/openstudio:3.9.0
+    container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Setup
       run: |
         gem install bundler -v 2.4.22
@@ -126,7 +126,6 @@ jobs:
     - name: XMLGetSet Spec
       run: bundle exec rspec spec/tests/xml_get_set_spec.rb
       if: always()
-#     selection tool is not working with ASHRAE level 1.5 yet
-#    - name: Selection Tool Spec
-#      run: bundle exec rspec spec/tests/selection_tool_spec.rb
-#      if: always()
+    - name: Selection Tool Spec
+      run: bundle exec rspec spec/tests/selection_tool_spec.rb
+      if: always()
