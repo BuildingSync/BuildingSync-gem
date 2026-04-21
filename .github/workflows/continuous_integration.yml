@@ -13,6 +13,9 @@ jobs:
     name: Model Articulation Tests
     container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -49,6 +52,9 @@ jobs:
     name: Translator Tests
     container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -72,6 +78,9 @@ jobs:
     name: Report and Scenario Tests
     container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -107,6 +116,9 @@ jobs:
     name: Other Tests
     container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
