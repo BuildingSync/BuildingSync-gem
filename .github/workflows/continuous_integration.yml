@@ -16,6 +16,7 @@ jobs:
     env:
       LANG: en_US.UTF-8
       LC_ALL: en_US.UTF-8
+      RUBYOPT: "-EUTF-8"
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -55,6 +56,7 @@ jobs:
     env:
       LANG: en_US.UTF-8
       LC_ALL: en_US.UTF-8
+      RUBYOPT: "-EUTF-8"
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -81,6 +83,7 @@ jobs:
     env:
       LANG: en_US.UTF-8
       LC_ALL: en_US.UTF-8
+      RUBYOPT: "-EUTF-8"
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -119,6 +122,7 @@ jobs:
     env:
       LANG: en_US.UTF-8
       LC_ALL: en_US.UTF-8
+      RUBYOPT: "-EUTF-8"
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
