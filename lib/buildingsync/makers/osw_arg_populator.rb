@@ -89,6 +89,11 @@ class OSWARGPopulator
     set_measure_argument = lambda {| key, value | OpenStudio::Extension.set_measure_argument(osw, "create_typical_building_from_model", key, value) }
     principal_HVAC_system_type = facility.get_principal_HVAC_system_type
 
+    if principal_HVAC_system_type.nil?
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.OSWARGPopulator.populate_create_typical_building_from_model_args',
+        'No PrincipalHVACSystemType found in the BuildingSync XML. HVAC and SWH systems will be defaulted using the Inferred system type.')
+    end
+
     # Add args
     # -  __SKIP__
     set_measure_argument.call("__SKIP__", false)
@@ -111,10 +116,10 @@ class OSWARGPopulator
     # onsite_parking_fraction
     # add_exhaust
     # add_swh
-    set_measure_argument.call("add_swh", !principal_HVAC_system_type.nil?)
+    set_measure_argument.call("add_swh", true)
     # add_thermostat
     # add_hvac
-    set_measure_argument.call("add_hvac", !principal_HVAC_system_type.nil?)
+    set_measure_argument.call("add_hvac", true)
     # add_refrigeration
     # modify_wkdy_op_hrs
     # wkdy_op_hrs_start_time
