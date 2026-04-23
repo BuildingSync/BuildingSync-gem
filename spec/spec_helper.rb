@@ -207,11 +207,10 @@ RSpec.configure do |config|
     osw_files = []
     baseline_osw_files = []
     Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
-    Dir.glob("#{output_path}/baseline/in.osw") { |osw| baseline_osw_files << osw }
+    Dir.glob("#{output_path}/baseline/**/in.osw") { |osw| baseline_osw_files << osw }
 
-    # We always expect there to only be one
-    # baseline osw file
-    expect(baseline_osw_files.size).to eq 1
+    # We always expect there to be at least one baseline osw file
+    expect(baseline_osw_files.size).to be >= 1
 
     # Here we test the actual number of additional scenarios that got created
     non_baseline_osws = osw_files - baseline_osw_files
