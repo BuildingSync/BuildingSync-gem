@@ -567,6 +567,12 @@ module BuildingSync
         osw_files << "#{@facility.report.cb_modeled.get_osw_dir}/in.osw"
       else
         Dir.glob("#{output_dir}/**/in.osw") { |osw| osw_files << osw }
+        # Filter out nested OSW files created by measure sub-runners (e.g., create_typical_building_from_model)
+        # These should not be run as they cause boost::filesystem errors
+        osw_files = osw_files.reject do |osw|
+          osw.include?('003_create_typical_building_from_model') || 
+          osw.include?('create_typical_building_from_model_SR')
+        end
       end
       Dir.glob("#{output_dir}/baseline/in.osw") { |osw| baseline_osw_files << osw }
 

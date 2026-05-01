@@ -129,7 +129,8 @@ class OSWARGPopulator
     # wknd_op_hrs_duration
     # unmet_hours_tolerance
     # remove_objects
-    # use_upstream_args
+    # use_upstream_args - set to false to prevent nested workflow creation
+    set_measure_argument.call("use_upstream_args", false)
     # enable_dst
 
   end

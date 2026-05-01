@@ -276,11 +276,18 @@ RSpec.configure do |config|
     Dir.glob("#{main_output_dir}/**/in.osw") { |osw| osw_files << osw }
     Dir.glob("#{main_output_dir}/baseline/in.osw") { |osw| baseline_osw_files << osw }
 
+    # Filter out nested OSW files created by measure sub-runners (e.g., create_typical_building_from_model)
+    # These should not be counted as scenario OSWs
+    osw_files_filtered = osw_files.reject do |osw|
+      osw.include?('003_create_typical_building_from_model') || 
+      osw.include?('create_typical_building_from_model_SR')
+    end
+
     # -- Assert - simulations are as we expect them
-    expect(osw_files.size).to eq(expected_number_scenarios_excluding_baseline + 1) # includes baseline
+    expect(osw_files_filtered.size).to eq(expected_number_scenarios_excluding_baseline + 1) # includes baseline
     expect(baseline_osw_files.size).to eq(1)
 
-    osw_exclude_baseline = osw_files - baseline_osw_files
+    osw_exclude_baseline = osw_files_filtered - baseline_osw_files
     osw_exclude_baseline.each do |osw|
       sql_file = osw.gsub('in.osw', 'eplusout.sql')
       finished_job = osw.gsub('in.osw', 'finished.job')
