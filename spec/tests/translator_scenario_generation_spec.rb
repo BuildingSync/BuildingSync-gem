@@ -24,11 +24,18 @@ RSpec.describe 'BuildingSync' do
         Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
         Dir.glob("#{output_path}/baseline/in.osw") { |osw| baseline_osw_files << osw }
 
+        # Filter out nested OSW files created by measure sub-runners (e.g., create_typical_building_from_model)
+        # These should not be counted as scenario OSWs
+        osw_files_filtered = osw_files.reject do |osw|
+          osw.include?('003_create_typical_building_from_model') || 
+          osw.include?('create_typical_building_from_model_SR')
+        end
+
         # We always expect there to only be one baseline osw file
         expect(baseline_osw_files.size).to eq 1
 
         # Here we test the actual number of additional scenarios that got created
-        non_baseline_osws = osw_files - baseline_osw_files
+        non_baseline_osws = osw_files_filtered - baseline_osw_files
         expect(non_baseline_osws.size).to eq test[4]
       end
     end
@@ -47,11 +54,18 @@ RSpec.describe 'BuildingSync' do
         Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
         Dir.glob("#{output_path}/baseline/in.osw") { |osw| baseline_osw_files << osw }
 
+        # Filter out nested OSW files created by measure sub-runners (e.g., create_typical_building_from_model)
+        # These should not be counted as scenario OSWs
+        osw_files_filtered = osw_files.reject do |osw|
+          osw.include?('003_create_typical_building_from_model') || 
+          osw.include?('create_typical_building_from_model_SR')
+        end
+
         # We always expect there to only be one baseline osw file
         expect(baseline_osw_files.size).to eq 1
 
         # Here we test the actual number of additional scenarios that got created
-        non_baseline_osws = osw_files - baseline_osw_files
+        non_baseline_osws = osw_files_filtered - baseline_osw_files
         expect(non_baseline_osws.size).to eq 1
       end
     end
