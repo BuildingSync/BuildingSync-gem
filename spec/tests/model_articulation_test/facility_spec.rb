@@ -1,40 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# (1) Redistributions of source code must retain the above copyright notice,
-# this list of conditions and the following disclaimer.
-#
-# (2) Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# (3) Neither the name of the copyright holder nor the names of any contributors
-# may be used to endorse or promote products derived from this software without
-# specific prior written permission from the respective party.
-#
-# (4) Other than as required in clauses (1) and (2), distributions in any form
-# of modifications or other derivative works may not use the "OpenStudio"
-# trademark, "OS", "os", or any other confusingly similar designation without
-# specific prior written permission from Alliance for Sustainable Energy, LLC.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER(S) AND ANY CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER(S), ANY CONTRIBUTORS, THE
-# UNITED STATES GOVERNMENT, OR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-# THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-# OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# OpenStudio(R), Copyright (c) Alliance for Energy Innovation, LLC.
+# See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
 # *******************************************************************************
 require 'builder'
 
@@ -52,7 +20,7 @@ RSpec.describe 'FacilitySpec' do
 
       # -- Create Building object from Facility
       begin
-        BuildingSync::Facility.new(doc.root, ns)
+        BuildingSync::Facility.new(doc.root, ns, ASHRAE90_1)
 
         # Should not reach this
         expect(false).to be true
@@ -68,65 +36,6 @@ RSpec.describe 'FacilitySpec' do
     generator = BuildingSync::Generator.new
     generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
   end
-
-  it 'Should return the boolean value for creating osm file correctly or not.' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
-    epw_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
-    expect(File.exist?(epw_path)).to be true
-
-    generator = BuildingSync::Generator.new
-    facility = generator.create_minimum_facility('Retail', '1954', 'Gross', '69452')
-    facility.determine_open_studio_standard(std)
-
-    # -- Assert
-    expect(facility.generate_baseline_osm(epw_path, output_path, std)).to be true
-  end
-
-  # TODO: Add actual assertions
-  it 'Should create a building system with parameters set to true' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
-    doc = nil
-    File.open(xml_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-    ns = 'auc'
-
-    # -- Act
-    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
-    facility.determine_open_studio_standard(ASHRAE90_1)
-    facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
-    facility.create_building_systems(main_output_dir: output_path, htg_src: 'Electricity',
-                                     add_elevators: true, add_exterior_lights: true, remove_objects: true)
-  end
-
-  # TODO: Add actual assertions
-  it 'Should create a building system with parameters set to false' do
-    # -- Setup
-    file_name = 'building_151.xml'
-    std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
-    doc = nil
-    File.open(xml_path, 'r') do |file|
-      doc = REXML::Document.new(file)
-    end
-
-    # -- Act
-    ns = 'auc'
-    facility = BuildingSync::Facility.new(doc.elements["/#{ns}:BuildingSync/#{ns}:Facilities/#{ns}:Facility"], ns)
-    facility.determine_open_studio_standard(ASHRAE90_1)
-    facility.generate_baseline_osm(nil, output_path, ASHRAE90_1)
-    facility.create_building_systems(main_output_dir: output_path, zone_hash: nil, hvac_delivery_type: 'Forced Air',
-                                     htg_src: 'Electricity', clg_src: 'Electricity', add_space_type_loads: false,
-                                     add_constructions: false, add_elevators: false, add_exterior_lights: false,
-                                     add_exhaust: false, add_swh: false, add_hvac: false, add_thermostat: false,
-                                     remove_objects: false)
-  end
 end
 
 RSpec.describe 'Facility Scenario Parsing' do
@@ -141,7 +50,7 @@ RSpec.describe 'Facility Scenario Parsing' do
     # -- Setup
     file_name = 'building_151.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.7.0')
 
     facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
 
@@ -158,7 +67,7 @@ RSpec.describe 'Facility Scenario Parsing' do
     scenario_elements = @doc.get_elements("//#{@ns}:Scenarios/#{@ns}:Scenario")
     expect(scenario_elements.size).to eq(0)
 
-    facility = BuildingSync::Facility.new(@facility_xml, @ns)
+    facility = BuildingSync::Facility.new(@facility_xml, @ns, ASHRAE90_1)
 
     # -- Assert
     expect(facility.report.scenarios).to be_an_instance_of(Array)
@@ -181,53 +90,7 @@ RSpec.describe 'Facility Systems Mapping' do
     g.add_plug_load_to_first_facility(doc)
 
     facility_xml = g.get_first_facility_element(doc)
-    @facility = BuildingSync::Facility.new(facility_xml, @ns)
-  end
-  describe 'with systems defined' do
-    it 'should be of the correct data structure' do
-      # -- Assert
-      expect(@facility.systems_map).to be_an_instance_of(Hash)
-    end
-    it 'should have the correct keys' do
-      # -- Assert correct keys get created
-      expected_keys = ['HVACSystems', 'LightingSystems', 'PlugLoads']
-      expected_keys.each do |k|
-        expect(@facility.systems_map.key?(k)).to be true
-      end
-    end
-
-    it 'values should be of the correct type and size' do
-      # -- Assert values of keys are correct type and size
-      expect(@facility.systems_map['HVACSystems']).to be_an_instance_of(Array)
-      expect(@facility.systems_map['LightingSystems']).to be_an_instance_of(Array)
-      expect(@facility.systems_map['PlugLoads']).to be_an_instance_of(Array)
-      expect(@facility.systems_map['HVACSystems'].size).to eq(2)
-      expect(@facility.systems_map['LightingSystems'].size).to eq(1)
-      expect(@facility.systems_map['PlugLoads'].size).to eq(1)
-    end
-
-    it 'values in array should be of the correct type' do
-      # Only HVACSystem and LightingSystem should be typed as BSync element types (for now)
-      expect(@facility.systems_map['HVACSystems'][0]).to be_an_instance_of(BuildingSync::HVACSystem)
-      expect(@facility.systems_map['LightingSystems'][0]).to be_an_instance_of(BuildingSync::LightingSystemType)
-      expect(@facility.systems_map['PlugLoads'][0]).to be_an_instance_of(REXML::Element)
-    end
-  end
-  describe 'with no systems defined' do
-    it 'should not error when Systems has no children' do
-      # -- Setup - add a blank Systems element
-      REXML::Element.new("#{@ns}:Systems", @facility_no_systems_xml)
-
-      expect(@facility_no_systems_xml.get_elements("#{@ns}:Systems").size).to eq(1)
-      facility_no_systems = BuildingSync::Facility.new(@facility_no_systems_xml, @ns)
-    end
-    it 'should not error when Systems does not exist' do
-      # -- Setup - remove the Systems element
-      @facility_no_systems_xml.elements.delete("#{@ns}:Systems")
-
-      expect(@facility_no_systems_xml.get_elements("#{@ns}:Systems").size).to eq(0)
-      facility_no_systems = BuildingSync::Facility.new(@facility_no_systems_xml, @ns)
-    end
+    @facility = BuildingSync::Facility.new(facility_xml, @ns, ASHRAE90_1)
   end
 end
 
@@ -236,7 +99,7 @@ RSpec.describe 'Facility Methods' do
     # -- Setup
     file_name = 'building_151_level1.xml'
     std = ASHRAE90_1
-    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.4.0')
+    xml_path, output_path = create_xml_path_and_output_path(file_name, std, __FILE__, 'v2.7.0')
 
     @facility = BuildingSync::Generator.new.get_facility_from_file(xml_path)
   end

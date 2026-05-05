@@ -1,101 +1,108 @@
-# BuildingSync
+# BOSS - BuildingSync OpenStudio Simulator
 
-![BuildingSync-gem](https://github.com/BuildingSync/BuildingSync-gem/actions/workflows/continuous_integration.yml/badge.svg?branch=develop)
+BuildingSync OpenStudio Simulator (BOSS) takes in BuildingSync files, creates OpenStudio workflows from their contents, and runs those workflows to create models.
 
-The BuildingSync-Gem is a repository of helpers for reading and writing BuildingSync XML files, and for using that data 
-to drive energy simulations of the subject building. See full documentation [here](https://buildingsync-gem.buildingsync.net).
+## Current Configuration  and Compatibility Matrix
 
-All of the following are supported: 
+BOSS currently supports OpenStudio 3.10 and BuildingSync 2.7.0
 
-  * convert BuildingSync XML file into: 
-      * an OpenStudio Baseline model 
-      * an OpenStudio workflow for each scenario defined in the XML file 
-  * enable simulation of the baseline model and all workflows and 
-  * insert simulation results back into the Building XML file. 
+| BOSS Version | OpenStudio Version | BuildingSync Version |
+|--------------|--------------------|----------------------|
+| v0.2.1    | OpenStudio v3.0.1 | BuildingSync v2.2.0 |
+
+
 
 ## Installation
+1. Install OpenStudio 3.10. Check installation with
+    ```console
+    🌟 openstudio --version
+    3.10.0+ce46db07de
+    ```
 
-The BuildingSync Gem requires installation of OpenStudio, specifically [OpenStudio v3.4.0](https://openstudio-builds.s3.amazonaws.com/index.html?prefix=3.4.0/).
-The newer versions of OpenStudio have minor breaking changes that have not been addressed in this repository yet. After OpenStudio is 
-installed, then export the path of the folder that contains the openstudio.rb file to RUBYLIB environment variable
-(e.g., `export RUBYLIB=/Applications/OpenStudio-3.4.0/Ruby`)
+2. Set enviroment variable `RUBYLIB` to the location of your openstudio installation. Check env var with:
+    ```console
+    🌟 echo $RUBYLIB
+    /Applications/OpenStudio-3.10.0/Ruby
+    ```
 
-After installing OpenStudio and setting the environment variable, then add this line to your application's Gemfile:
-```ruby
-gem 'buildingsync', '0.2.1'
-```
+3. From local repo, bundle install
 
-And then execute:
-```bash
-bundle install
-```
-
-Or install it yourself as:
-```bash
-gem install 'buildingsync'
-```
+    ```bash
+    🌟 bundle install
+    ```
 
 ## Usage
-
-All of the features described above are provided by the translator class, as shown in the following sample code. There
-are also BuildingSync Gem example files in [this repository](https://github.com/BuildingSync/BuildingSync-gem-examples).
-
+BOSS uses its `Translator` class to 1) write openstudio workflows and 2) run those workflows.
 ```ruby
 require 'buildingsync/translator'
 
-building_sync_xml_file_path = 'path/to/bsync.xml'
-out_path = 'path/to/output_dir'
+# init translator
+xml_file_path = "BuildingEQ-1.0.0_gemtest.xml"
+output_dir = "output"
+translator = BuildingSync::Translator.new(xml_file_path, output_dir, nil, "ASHRAE90.1")
 
-# initializing the translator 
-translator = BuildingSync::Translator.new(building_sync_xml_file_path, out_path)
+# create baseline workflow from buildingsync file
+translator.write_baseline_osw
+expect(File.exist?("#{output_dir}/baseline/in.osw")).to be true
 
-# generating the OpenStudio Model and writing the osm file.
-# path/to/output_dir/SR and path/to/output_dir/in.osm created
-translator.setup_and_sizing_run
-
-# generating the OpenStudio workflows and writing the osw files
-# auc:Scenario elements with measures are turned into new simulation dirs
-# path/to/output_dir/scenario_name
-translator.write_osws
-
-# run all simulations
-translator.run_osws
-
-# gather the results for all scenarios found in out_path,
-# such as annual and monthly data for different energy
-# sources (electricity, natural gas, etc.)
-translator.gather_results(out_path)
-
-# Add in UserDefinedFields, which contain information about the
-# OpenStudio model run 
-translator.prepare_final_xml
-
-# write results to xml
-# default file name is 'results.xml' 
-file_name = 'abc-123.xml' 
-translator.save_xml(file_name)
+# create baseline model from workflow
+translator.run_baseline_osw
+expect(File.exist?("#{output_dir}/baseline/out.osw")).to be true
+expect(File.exist?("#{output_dir}/baseline/in.osm")).to be true
 ```
+
+The file `workflow_maker.rb` does all of the actual writing to the osw. Each function writes one measure. Heres an overview of how each measure is populated.
+
+[set_run_period]: https://github.com/NatLabRockies/openstudio-common-measures-gem/blob/v0.12.3/lib/measures/set_run_period/README.md
+[ChangeBuildingLocation]: https://github.com/NatLabRockies/openstudio-common-measures-gem/blob/v0.12.3/lib/measures/ChangeBuildingLocation/README.md
+[create_bar_from_building_type_ratios]: https://github.com/NatLabRockies/openstudio-model-articulation-gem/blob/v0.12.2/lib/measures/create_bar_from_building_type_ratios/README.md
+[create_typical_building_from_model]: https://github.com/NatLabRockies/openstudio-model-articulation-gem/blob/v0.12.2/lib/measures/create_typical_building_from_model/README.md
+[SetLightingLoadsByLPD]: https://github.com/NatLabRockies/openstudio-common-measures-gem/blob/v0.12.3/lib/measures/SetLightingLoadsByLPD/README.md
+[set_electric_equipment_loads_by_epd]: https://github.com/NatLabRockies/openstudio-common-measures-gem/tree/v0.12.3/lib/measures/set_electric_equipment_loads_by_epd
+[openstudio_results]: https://github.com/NatLabRockies/openstudio-common-measures-gem/blob/v0.12.3/lib/measures/openstudio_results/README.md
+
+| Measure                                | Argument                | Will error if Unset | Description                                                                                                                       |
+|----------------------------------------|-------------------------|:-------------------:|-----------------------------------------------------------------------------------------------------------------------------------|
+| [set_run_period]                       |                         |                     |                                                                                                                                   |
+|                                        | timesteps_per_hour      |                     | Hard Coded to `1`                                                                                                                 |
+|                                        | begin_date              |                     | Hard Coded to `2019-01-01`                                                                                                        |
+|                                        | end_date                |                     | Hard Coded to `2019-12-31`                                                                                                        |
+| [ChangeBuildingLocation]               |                         |                     |                                                                                                                                   |
+|                                        | weather_file_name       |          X          | set via `set_weather_and_climate_zone` from the given weather file, or the building's climate zone, or city and state.            |
+|                                        | climate_zone            |                     | The site's climate zone, set via `determine_climate_zone`, which chooses either the `CaliforniaTitle24` or  `ASHRAE` climate zone |
+| [create_bar_from_building_type_ratios] |                         |                     |                                                                                                                                   |
+|                                        | bldg_type_a             |          X          | set via `building.get_building_type`, which in turn is set via `set_bldg_and_system_type_for_building_and_section`                |
+|                                        | total_bldg_floor_area   |          X          | set via `building.total_bldg_floor_area`, which is set via `read_floor_areas`                                                     |
+|                                        | floor_height            |                     | set via `get_floor_to_floor_height`. Set to the `floor_to_floor_height` of the largest building section                           |
+|                                        | num_stories_above_grade |                     | set via `building.num_stories_above_grade`, which is set via `read_stories_above_and_below_grade`                                 |
+|                                        | num_stories_below_grade |                     | set via `building.num_stories_below_grade`, which is set via `read_stories_above_and_below_grade`                                 |
+|                                        | building_rotation       |                     | always set to 0, not read from BuildingSync file                                                                                  |
+|                                        | template                |          X          | set via `building.get_standard_template`, which is set via `set_standard_template`                                                |
+|                                        | ns_to_ew_ratio          |                     | set via `building.ns_to_ew_ratio`, which is set via `set_ns_to_ew_ratio`                                                          |
+|                                        | wwr                     |                     | set via `building.wwr`, which is set via `set_building_form_defaults`                                                             |
+|                                        | party_wall_fraction     |                     | set via `building.party_wall_fraction`, which is always set to zero                                                               |
+|                                        | story_multiplier_method |                     | set to None                                                                                                                       |
+| [create_typical_building_from_model]   |                         |                     |                                                                                                                                   |
+|                                        | template                |          X          | set via `building.get_standard_template`, which is set via `set_standard_template`                                                |
+|                                        | system_type             |                     | set to `facility.get_principal_HVAC_system_type`                                                                                  |
+|                                        | add_swh                 |                     | set to `facility.get_principal_HVAC_system_type`                                                                                  |
+|                                        | add_hvac                |                     | set to `facility.get_principal_HVAC_system_type`                                                                                  |
+| [SetLightingLoadsByLPD]                |                         |                     |                                                                                                                                   |
+|                                        | lpd                     |                     | set to `facility.get_total_installed_power`                                                                                       |
+| [set_electric_equipment_loads_by_epd]  |                         |                     |                                                                                                                                   |
+|                                        | epd                     |                     | set to `facility.get_total_installed_power * 1000 / building.total_floor_area`                                                    |
+| [openstudio_results]                   |                         |                     |                                                                                                                                   |
+
 
 ## Testing
 
 Check out the repository and then execute:
 
 ```bash
-bundle install
-bundle exec rake
-```
-    
-## Documentation
-
-The documentation of the BuildingSync-Gem is done with Yard (https://yardoc.org)
-To generate the documentation locally do the following:
-
-```bash
-gem install yard
-SITEMAP_BASEURL=https://buildingsync-gem.buildingsync.net bundle exec yard doc --plugin sitemap
+bundle exec rspec ./spec/tests/translator_write_osw_spec.rb
 ```
 
-Documentation for the develop branch is automatically released when code is merged into the branch.
+This only runs only files worth of tests, which are integration tests very similar to the code in the usage section. The gem has under gone major rewrites and many of the other tests use  dead and/or delete code. Further clean up and testing is underway.  
 
 # Releasing
 
@@ -105,8 +112,3 @@ Documentation for the develop branch is automatically released when code is merg
 1. Create PR to main, after tests and reviews complete, then merge
 1. Locally - from the main branch, run `bundle exec rake release`
 1. On GitHub, go to the releases page and update the latest release tag. Name it “Version x.y.z” and copy the CHANGELOG entry into the description box.
-
-# TODO
-
-* [ ] Support BuildingSync 2.3.0
-* [ ] Update to OpenStudio version 3.2.0

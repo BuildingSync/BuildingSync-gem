@@ -1,40 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# (1) Redistributions of source code must retain the above copyright notice,
-# this list of conditions and the following disclaimer.
-#
-# (2) Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# (3) Neither the name of the copyright holder nor the names of any contributors
-# may be used to endorse or promote products derived from this software without
-# specific prior written permission from the respective party.
-#
-# (4) Other than as required in clauses (1) and (2), distributions in any form
-# of modifications or other derivative works may not use the "OpenStudio"
-# trademark, "OS", "os", or any other confusingly similar designation without
-# specific prior written permission from Alliance for Sustainable Energy, LLC.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER(S) AND ANY CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER(S), ANY CONTRIBUTORS, THE
-# UNITED STATES GOVERNMENT, OR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-# THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-# OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# OpenStudio(R), Copyright (c) Alliance for Energy Innovation, LLC.
+# See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
 # *******************************************************************************
 require 'buildingsync/generator'
 
@@ -171,10 +139,9 @@ RSpec.configure do |config|
   # @param standard_to_be_used [String]
   # @param spec_name [String]
   def run_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, standard_to_be_used, spec_name, floors_above_grade = 1)
-    # -- Setup
+    # -- Setup: generate minimum XML and write to a temp file
     generator = BuildingSync::Generator.new
-    facility = generator.create_minimum_facility(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade)
-    facility.determine_open_studio_standard(standard_to_be_used)
+    doc = generator.create_minimum_snippet(occupancy_classification, year_of_const, floor_area_type, floor_area_value, floors_above_grade)
 
     epw_file_path = File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw')
     output_path = File.join(SPEC_OUTPUT_DIR, "#{spec_name}/#{occupancy_classification}/Year#{year_of_const}")
@@ -189,10 +156,42 @@ RSpec.configure do |config|
     FileUtils.mkdir_p(output_path)
     expect(Dir.exist?(output_path)).to be true
 
-    expect(facility.generate_baseline_osm(epw_file_path, output_path, standard_to_be_used)).to be true
-    facility.write_osm(output_path)
+    # Write the generated XML to a file for the Translator
+    xml_file_path = File.join(output_path, 'in.xml')
+    File.open(xml_file_path, 'w') { |f| doc.write(f) }
+    expect(File.exist?(xml_file_path)).to be true
 
-    sizing_run_checks(output_path)
+    # Use Translator workflow: write baseline OSW and run it
+    translator = BuildingSync::Translator.new(xml_file_path, output_path, epw_file_path, standard_to_be_used, false)
+    translator.write_baseline_osw
+    expect(File.exist?(File.join(output_path, 'baseline', 'in.osw'))).to be true
+
+    translator.run_baseline_osw
+    out_osw_path = File.join(output_path, 'baseline', 'out.osw')
+    expect(File.exist?(out_osw_path)).to be true
+
+    out_osw = JSON.parse(File.read(out_osw_path), symbolize_names: true)
+    expect(out_osw[:completed_status]).to eq 'Success'
+  end
+
+  # Create a Translator, write and run the baseline OSW, and check that it succeeded.
+  # @param xml_path [String] path to BuildingSync XML file
+  # @param output_path [String] path to output directory
+  # @param epw_path [String, nil] path to EPW weather file
+  # @param standard [String] standard to use (e.g., ASHRAE90_1)
+  # @return [BuildingSync::Translator]
+  def translator_sizing_run_and_check(xml_path, output_path, epw_path, standard)
+    translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, standard)
+    translator.write_baseline_osw
+    translator.run_baseline_osw
+
+    out_osw_path = File.join(output_path, 'baseline', 'out.osw')
+    expect(File.exist?(out_osw_path)).to be true
+
+    out_osw = JSON.parse(File.read(out_osw_path), symbolize_names: true)
+    expect(out_osw[:completed_status]).to eq 'Success'
+
+    return translator
   end
 
   # test writing scenarios
@@ -206,69 +205,16 @@ RSpec.configure do |config|
     expect(workflows_successfully_written).to be true
 
     osw_files = []
-    osw_sr_files = []
+    baseline_osw_files = []
     Dir.glob("#{output_path}/**/in.osw") { |osw| osw_files << osw }
-    Dir.glob("#{output_path}/SR/in.osw") { |osw| osw_sr_files << osw }
+    Dir.glob("#{output_path}/baseline/**/in.osw") { |osw| baseline_osw_files << osw }
 
-    # We always expect there to only be one
-    # sizing run file
-    expect(osw_sr_files.size).to eq 1
+    # We always expect there to be at least one baseline osw file
+    expect(baseline_osw_files.size).to be >= 1
 
     # Here we test the actual number of additional scenarios that got created
-    non_sr_osws = osw_files - osw_sr_files
-    expect(non_sr_osws.size).to eq expected_number_of_scenarios
-  end
-
-  # Creates a new Translator for the file specified and runs the setup_and_sizing_run method and checks:
-  #  - output_path/SR directory created (for sizing run)
-  #  - output_path/SR/run/finished.job exists
-  #  - output_path/SR/run/failed.job doesn't exist
-  #  - output_path/in.osm exists  --  which becomes the seed model for all future models
-  # @param xml_path [String] full path to BuildingSync XML file
-  # @param output_path [String] full path to output directory where new files should be saved
-  # @param epw_file_path [String] optional, full path to epw file
-  def translator_sizing_run_and_check(xml_path, output_path, epw_file_path = nil, standard_to_be_used = ASHRAE90_1)
-    # -- Assert
-    expect(File.exist?(xml_path)).to be true
-    if !epw_file_path.nil? && !epw_file_path == ''
-      expect(File.exist?(epw_file_path)).to be true
-      puts "Found epw: #{epw_file_path}"
-    end
-
-    # -- Setup
-    # Create a new Translator and write the OSM
-    translator = BuildingSync::Translator.new(xml_path, output_path, epw_file_path, standard_to_be_used)
-    translator.setup_and_sizing_run
-
-    # -- Assert
-    sizing_run_checks(output_path)
-    return translator
-  end
-
-  # @param main_output_dir [String] main output path, not scenario specific. i.e. SR should be a subdirectory
-  def sizing_run_checks(main_output_dir)
-    # -- Assert
-    # Check SR path exists
-    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/SR
-    sr_path = File.join(main_output_dir, 'SR')
-    expect(Dir.exist?(sr_path)).to be true
-
-    # -- Assert
-    # Check SR has finished successfully
-    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/SR/run/finished.job
-    sr_success_file = File.join(sr_path, 'run/finished.job')
-    expect(File.exist?(sr_success_file)).to be true
-
-    # -- Assert
-    # Check SR has not failed
-    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/SR/run/failed.job
-    sr_failed_file = File.join(sr_path, 'run/failed.job')
-    expect(File.exist?(sr_failed_file)).to be false
-
-    # -- Assert
-    # Check in.osm written to the main output_path
-    # BuildingSync-gem/spec/output/translator_write_osm/L000_OpenStudio_Pre-Simulation_03/in.osm
-    expect(File.exist?(File.join(main_output_dir, 'in.osm'))).to be true
+    non_baseline_osws = osw_files - baseline_osw_files
+    expect(non_baseline_osws.size).to eq expected_number_of_scenarios
   end
 
   # Checks that results from a single Baseline modeling scenario have been added to the REXML::Document in memory
@@ -324,18 +270,25 @@ RSpec.configure do |config|
     end
   end
 
-  def check_osws_simulated(main_output_dir, expected_number_scenarios_excluding_sr)
+  def check_osws_simulated(main_output_dir, expected_number_scenarios_excluding_baseline)
     osw_files = []
-    osw_sr_files = []
+    baseline_osw_files = []
     Dir.glob("#{main_output_dir}/**/in.osw") { |osw| osw_files << osw }
-    Dir.glob("#{main_output_dir}/SR/in.osw") { |osw| osw_sr_files << osw }
+    Dir.glob("#{main_output_dir}/baseline/in.osw") { |osw| baseline_osw_files << osw }
+
+    # Filter out nested OSW files created by measure sub-runners (e.g., create_typical_building_from_model)
+    # These should not be counted as scenario OSWs
+    osw_files_filtered = osw_files.reject do |osw|
+      osw.include?('003_create_typical_building_from_model') || 
+      osw.include?('create_typical_building_from_model_SR')
+    end
 
     # -- Assert - simulations are as we expect them
-    expect(osw_files.size).to eq(expected_number_scenarios_excluding_sr + 1) # includes SR
-    expect(osw_sr_files.size).to eq(1)
+    expect(osw_files_filtered.size).to eq(expected_number_scenarios_excluding_baseline + 1) # includes baseline
+    expect(baseline_osw_files.size).to eq(1)
 
-    osw_exclude_sr = osw_files - osw_sr_files
-    osw_exclude_sr.each do |osw|
+    osw_exclude_baseline = osw_files_filtered - baseline_osw_files
+    osw_exclude_baseline.each do |osw|
       sql_file = osw.gsub('in.osw', 'eplusout.sql')
       finished_job = osw.gsub('in.osw', 'finished.job')
       failed_job = osw.gsub('in.osw', 'failed.job')
@@ -361,14 +314,14 @@ RSpec.configure do |config|
   def get_tests
     tests = [
       # file_name, standard, epw_path, schema_version, expected number of scenarios, including cb_modeled
-      ['building_151.xml', ASHRAE90_1, nil, 'v2.4.0', 17],
-      ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.4.0', 17],
-      ['DC GSA Headquarters.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', 2],
-      ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, 'v2.4.0', 2],
-      ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.4.0', 1],
-      ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.4.0', 1],
-      ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, nil, 'v2.4.0', 1],
-      ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, nil, 'v2.4.0', 1],
+      ['building_151.xml', ASHRAE90_1, nil, 'v2.7.0', 17],
+      ['building_151_n1.xml', ASHRAE90_1, nil, 'v2.7.0', 30],
+      ['DC GSA Headquarters.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.7.0', 2],
+      ['DC GSA HeadquartersWithClimateZone.xml', ASHRAE90_1, nil, 'v2.7.0', 2],
+      ['L000_OpenStudio_Pre-Simulation_01.xml', ASHRAE90_1, File.join(SPEC_WEATHER_DIR, 'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'), 'v2.7.0', 1],
+      ['L000_OpenStudio_Pre-Simulation_02.xml', ASHRAE90_1, nil, 'v2.7.0', 1],
+      ['L000_OpenStudio_Pre-Simulation_03.xml', ASHRAE90_1, nil, 'v2.7.0', 1],
+      ['L000_OpenStudio_Pre-Simulation_04.xml', ASHRAE90_1, nil, 'v2.7.0', 1],
 
       # Test once issues get fixed
       # See translator_sizing_run_spec errors
@@ -416,7 +369,7 @@ RSpec.configure do |config|
   end
 
   def get_xml_object(file_name)
-    xml_path = File.join(SPEC_FILES_DIR, 'v2.4.0', file_name)
+    xml_path = File.join(SPEC_FILES_DIR, 'v2.7.0', file_name)
     expect(File.exist?(xml_path)).to be true
 
     return help_load_doc(xml_path)

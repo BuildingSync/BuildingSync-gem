@@ -7,8 +7,8 @@ require 'buildingsync/version'
 Gem::Specification.new do |spec|
   spec.name          = 'buildingsync'
   spec.version       = BuildingSync::VERSION
-  spec.authors       = ['Nicholas Long', 'Cory Mosiman', 'Dan Macumber', 'Katherine Fleming']
-  spec.email         = ['nicholas.long@nrel.gov', 'cory.mosiman@nrel.gov', 'daniel.macumber@nrel.gov', 'katherine.fleming@nrel.gov']
+  spec.authors       = ['Nicholas Long', 'Cory Mosiman', 'Dan Macumber', 'Katherine Fleming', 'Hannah Eslinger']
+  spec.email         = ['nicholas.long@nrel.gov', 'cory.mosiman@nrel.gov', 'daniel.macumber@nrel.gov', 'katherine.fleming@nrel.gov', 'hannah.eslinger@nrel.gov']
 
   spec.summary       = 'BuildingSync library for reading, writing, and exporting BuildingSync to OpenStudio'
   spec.description   = 'BuildingSync library for reading, writing, and exporting BuildingSync to OpenStudio'
@@ -17,25 +17,26 @@ Gem::Specification.new do |spec|
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
   spec.files         = Dir.chdir(File.expand_path(__dir__)) do
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+    `git ls-files -z`.force_encoding('UTF-8').split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   end
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '~> 2.7.0'
+  spec.required_ruby_version = '~> 3.2.2'
 
-  spec.add_dependency 'bundler', '~> 2.1'
-  spec.add_dependency 'openstudio-common-measures', '~> 0.6.1'
-  spec.add_dependency 'openstudio-ee', '~> 0.6.0'
-  spec.add_dependency 'openstudio-extension', '~> 0.5.1'
-  spec.add_dependency 'openstudio-model-articulation', '~> 0.6.1'
-  spec.add_dependency 'openstudio-standards', '~> 0.2.16'
+  spec.add_dependency 'bundler', '~> 2.4.10'
+  spec.add_dependency 'openstudio-common-measures', '~> 0.12.3'
+  spec.add_dependency 'openstudio-ee', '~> 0.12.5'
+  spec.add_dependency 'openstudio-extension', '~> 0.9.4'
+  spec.add_dependency 'openstudio-model-articulation', '~> 0.12.2'
+  spec.add_dependency 'httparty', '~> 0.23.2'
 
+  spec.add_development_dependency 'rubocop', '1.50'
   spec.add_development_dependency 'rake', '~> 13.0'
-  spec.add_development_dependency 'rspec', '~> 3.9'
+  spec.add_development_dependency 'rspec', '~> 3.13'
   spec.add_development_dependency 'yard', '~> 0.9.26'
   spec.add_development_dependency 'yard-sitemap', '~> 1.0.1'
-  spec.add_development_dependency 'pry', '~> 0.10.4'
-  spec.add_development_dependency 'pry-nav', '~> 0.2.4'
+  spec.add_development_dependency 'pry', '~> 0.15.2'
+  # spec.add_development_dependency 'pry-byebug'
 end

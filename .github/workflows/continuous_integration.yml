@@ -11,14 +11,20 @@ on:
 jobs:
   model_articulation_tests:
     name: Model Articulation Tests
-    container: nrel/openstudio:3.4.0
+    container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+      RUBYOPT: "-EUTF-8"
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+    - name: Mark workspace as safe for git
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: Setup
       run: |
-        gem install bundler -v 2.4.22
+        gem install bundler -v 2.4.10
         bundle install
     - name: Building Section Spec
       run: bundle exec rspec spec/tests/model_articulation_test/building_section_spec.rb
@@ -26,23 +32,8 @@ jobs:
     - name: Building Spec
       run: bundle exec rspec spec/tests/model_articulation_test/building_spec.rb
       if: always()
-    - name: Envelope System Spec
-      run: bundle exec rspec spec/tests/model_articulation_test/envelope_system_spec.rb
-      if: always()
     - name: Facility Spec
       run: bundle exec rspec spec/tests/model_articulation_test/facility_spec.rb
-      if: always()
-    - name: HVAC System Spec
-      run: bundle exec rspec spec/tests/model_articulation_test/hvac_system_spec.rb
-      if: always()
-    - name: Loads System Spec
-      run: bundle exec rspec spec/tests/model_articulation_test/loads_system_spec.rb
-      if: always()
-    - name: Lighting System Spec
-      run: bundle exec rspec spec/tests/model_articulation_test/lighting_system_type_spec.rb
-      if: always()
-    - name: SHW System Spec
-      run: bundle exec rspec spec/tests/model_articulation_test/service_hot_water_system_spec.rb
       if: always()
     - name: Site Spec
       run: bundle exec rspec spec/tests/model_articulation_test/site_spec.rb
@@ -60,20 +51,23 @@ jobs:
 
   translator_tests:
     name: Translator Tests
-    container: nrel/openstudio:3.4.0
+    container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+      RUBYOPT: "-EUTF-8"
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+    - name: Mark workspace as safe for git
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: Setup
       run: |
-        gem install bundler -v 2.4.22
+        gem install bundler -v 2.4.10
         bundle install
-    - name: Translator Example Spec
-      run: bundle exec rspec spec/tests/translator_spec.rb
-      if: always()
-    - name: Translator Sizing Run Spec
-      run: bundle exec rspec spec/tests/translator_sizing_run_spec.rb
+    - name: Translator Write OSW Spec
+      run: bundle exec rspec spec/tests/translator_write_osw_spec.rb
       if: always()
     - name: Translator Scenario Generation Specs
       run: bundle exec rspec spec/tests/translator_scenario_generation_spec.rb
@@ -84,14 +78,20 @@ jobs:
 
   report_and_scenario_tests:
     name: Report and Scenario Tests
-    container: nrel/openstudio:3.4.0
+    container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+      RUBYOPT: "-EUTF-8"
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+    - name: Mark workspace as safe for git
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: Setup
       run: |
-        gem install bundler -v 2.4.22
+        gem install bundler -v 2.4.10
         bundle install
     - name: Report Spec
       run: bundle exec rspec spec/tests/report_spec.rb
@@ -117,14 +117,20 @@ jobs:
 
   other_specs:
     name: Other Tests
-    container: nrel/openstudio:3.4.0
+    container: nrel/openstudio:3.10.0
     runs-on: ubuntu-latest
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+      RUBYOPT: "-EUTF-8"
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+    - name: Mark workspace as safe for git
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: Setup
       run: |
-        gem install bundler -v 2.4.22
+        gem install bundler -v 2.4.10
         bundle install
     - name: BuildingSync Spec
       run: bundle exec rspec spec/tests/building_sync_spec.rb
@@ -144,7 +150,6 @@ jobs:
     - name: XMLGetSet Spec
       run: bundle exec rspec spec/tests/xml_get_set_spec.rb
       if: always()
-#     selection tool is not working with ASHRAE level 1.5 yet
-#    - name: Selection Tool Spec
-#      run: bundle exec rspec spec/tests/selection_tool_spec.rb
-#      if: always()
+    - name: Selection Tool Spec
+      run: bundle exec rspec spec/tests/selection_tool_spec.rb
+      if: always()

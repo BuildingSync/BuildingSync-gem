@@ -1,121 +1,272 @@
 {
-  "Retail": [{
-    "standards_building_type": "RetailStandalone",
-    "bar_division_method": "Multiple Space Types - Individual Stories Sliced",
-    "system_type": "PSZ-AC with gas coil heat"
-  }],
+  "Retail": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "RetailStandalone",
+        "CaliforniaTitle24": "RtL"
+      },
+      "bar_division_method": "Multiple Space Types - Individual Stories Sliced",
+      "system_type": "PSZ-AC with gas coil heat"
+    }
+  ],
+  "Mixed-use commercial": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "RetailStandalone",
+        "CaliforniaTitle24": "RtL"
+      },
+      "bar_division_method": "Multiple Space Types - Individual Stories Sliced",
+      "system_type": "PSZ-AC with gas coil heat"
+    }
+  ],
   "Office": [
     {
-      "standards_building_type": "SmallOffice",
+      "standards_building_type": {
+        "ASHRAE90.1": "SmallOffice",
+        "CaliforniaTitle24": "OfS"
+      },
       "bar_division_method": "Single Space Type - Core and Perimeter",
       "system_type": "PSZ-AC with gas coil heat",
       "max_floor_area": "20000"
     },
     {
-      "standards_building_type": "MediumOffice",
+      "standards_building_type": {
+        "ASHRAE90.1": "MediumOffice",
+        "CaliforniaTitle24": "OfL"
+      },
       "bar_division_method": "Single Space Type - Core and Perimeter",
       "system_type": "PVAV with reheat",
       "min_floor_area": "20000",
       "max_floor_area": "75000"
     },
     {
-      "standards_building_type": "LargeOffice",
+      "standards_building_type": {
+        "ASHRAE90.1": "LargeOffice",
+        "CaliforniaTitle24": "OfL"
+      },
       "bar_division_method": "Single Space Type - Core and Perimeter",
       "system_type": "VAV with reheat",
       "min_floor_area": "75000"
     }
   ],
-  "StripMall": [{
-    "standards_building_type": "RetailStripmall",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PSZ-AC with gas coil heat"
-  }],
-  "Education-Primary": [{
-    "standards_building_type": "PrimarySchool",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PVAV with reheat"
-  }],
-  "Education-Secondary": [{
-    "standards_building_type": "SecondarySchool",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "VAV with reheat"
-  }],
-  "Health care-Outpatient rehabilitation": [{
-    "standards_building_type": "Outpatient",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PVAV with reheat"
-  }],
-  "Health care-Outpatient facility": [{
-    "standards_building_type": "Outpatient",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PVAV with reheat"
-  }],
-  "Health care-Outpatient non-diagnostic": [{
-    "standards_building_type": "Outpatient",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PVAV with reheat"
-  }],
-  "Health care-Outpatient surgical": [{
-    "standards_building_type": "Outpatient",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PVAV with reheat"
-  }],
-  "Health care-Inpatient hospital": [{
-    "standards_building_type": "Hospital",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "VAV with reheat"
-  }],
+  "StripMall": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "RetailStripmall",
+        "CaliforniaTitle24": "RtS"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PSZ-AC with gas coil heat"
+    }
+  ],
+  "Classroom": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "PrimarySchool",
+        "CaliforniaTitle24": "Epr"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PVAV with reheat"
+    }
+  ],
+  "Education-Primary": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "PrimarySchool",
+        "CaliforniaTitle24": "Epr"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PVAV with reheat"
+    }
+  ],
+  "Education-Secondary": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "SecondarySchool",
+        "CaliforniaTitle24": "ESe"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "VAV with reheat"
+    }
+  ],
+  "Health care-Outpatient rehabilitation": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "Outpatient",
+        "CaliforniaTitle24": "OfL"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PVAV with reheat"
+    }
+  ],
+  "Health care-Outpatient facility": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "Outpatient",
+        "CaliforniaTitle24": "OfL"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PVAV with reheat"
+    }
+  ],
+  "Health care-Outpatient non-diagnostic": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "Outpatient",
+        "CaliforniaTitle24": "OfL"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PVAV with reheat"
+    }
+  ],
+  "Health care-Outpatient surgical": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "Outpatient",
+        "CaliforniaTitle24": "OfL"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PVAV with reheat"
+    }
+  ],
+  "Health care-Inpatient hospital": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "Hospital",
+        "CaliforniaTitle24": "Hsp"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "VAV with reheat"
+    }
+  ],
   "Lodging": [
     {
-      "standards_building_type": "SmallHotel",
+      "standards_building_type": {
+        "ASHRAE90.1": "SmallHotel",
+        "CaliforniaTitle24": "Mtl"
+      },
       "bar_division_method": "Single Space Type - Core and Perimeter",
       "system_type": "PTAC with electric baseboard heat",
       "max_floor_area": "50000"
     },
     {
-      "standards_building_type": "LargeHotel",
+      "standards_building_type": {
+        "ASHRAE90.1": "LargeHotel",
+        "CaliforniaTitle24": "Htl"
+      },
       "bar_division_method": "Single Space Type - Core and Perimeter",
       "system_type": "VAV with reheat",
       "min_floor_area": "50000"
     }
   ],
-  "Food service-Fast": [{
-    "standards_building_type": "QuickServiceRestaurant",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PSZ-AC with gas coil heat"
-  }],
-  "Food service-Full": [{
-    "standards_building_type": "FullServiceRestaurant",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PSZ-AC with gas coil heat"
-  }],
-  "Food service": [{
-    "standards_building_type": "FullServiceRestaurant",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PSZ-AC with gas coil heat"
-  }],
+  "Lodging with extended amenities": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "SmallHotel",
+        "CaliforniaTitle24": "Mtl"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PTAC with electric baseboard heat",
+      "max_floor_area": "50000"
+    },
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "LargeHotel",
+        "CaliforniaTitle24": "Htl"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "VAV with reheat",
+      "min_floor_area": "50000"
+    }
+  ],
+  "Food service-Fast": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "QuickServiceRestaurant",
+        "CaliforniaTitle24": "RFF"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PSZ-AC with gas coil heat"
+    }
+  ],
+  "Food service-Full": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "FullServiceRestaurant",
+        "CaliforniaTitle24": "RSD"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PSZ-AC with gas coil heat"
+    }
+  ],
+  "Food service": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "FullServiceRestaurant",
+        "CaliforniaTitle24": "RSD"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PSZ-AC with gas coil heat"
+    }
+  ],
   "Multifamily": [
     {
-      "standards_building_type": "MidriseApartment",
+      "standards_building_type": {
+        "ASHRAE90.1": "MidriseApartment",
+        "CaliforniaTitle24": "MFm"
+      },
       "bar_division_method": "Single Space Type - Core and Perimeter",
       "system_type": "PTAC",
       "max_number_floors": "10"
     },
     {
-      "standards_building_type": "HighriseApartment",
+      "standards_building_type": {
+        "ASHRAE90.1": "HighriseApartment",
+        "CaliforniaTitle24": "OfL"
+      },
       "bar_division_method": "Single Space Type - Core and Perimeter",
       "system_type": "PSZ-HP",
       "min_number_floors": "10"
     }
   ],
-  "Warehouse": [{
-    "standards_building_type": "Warehouse",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PSZ-AC with gas coil heat"
-  }],
-  "Food sales-Grocery store": [{
-    "standards_building_type": "SuperMarket",
-    "bar_division_method": "Single Space Type - Core and Perimeter",
-    "system_type": "PSZ-AC with gas coil heat"
-  }]
+  "Multifamily with commercial": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "MidriseApartment",
+        "CaliforniaTitle24": "MFm"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PTAC",
+      "max_number_floors": "10"
+    },
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "HighriseApartment",
+        "CaliforniaTitle24": "OfL"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PSZ-HP",
+      "min_number_floors": "10"
+    }
+  ],
+  "Warehouse": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "Warehouse",
+        "CaliforniaTitle24": "SUn"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PSZ-AC with gas coil heat"
+    }
+  ],
+  "Food sales-Grocery store": [
+    {
+      "standards_building_type": {
+        "ASHRAE90.1": "SuperMarket",
+        "CaliforniaTitle24": "Gro"
+      },
+      "bar_division_method": "Single Space Type - Core and Perimeter",
+      "system_type": "PSZ-AC with gas coil heat"
+    }
+  ]
 }

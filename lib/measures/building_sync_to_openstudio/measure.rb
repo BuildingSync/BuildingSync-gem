@@ -1,4 +1,7 @@
-# insert your copyright here
+# *******************************************************************************
+# OpenStudio(R), Copyright (c) Alliance for Energy Innovation, LLC.
+# See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
+# *******************************************************************************
 
 # see the URL below for information on how to write OpenStudio measures
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
@@ -73,11 +76,12 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
 
     # add a new space to the model
     translator = BuildingSync::Translator.new(building_sync_xml_file_path, out_path)
-    translator.setup_and_sizing_run
+    translator.write_baseline_osw
+    translator.run_baseline_osw
     # fetch the model from the output directory
     ostranslator = OpenStudio::OSVersion::VersionTranslator.new
-    path = "#{out_path}/in.osm"
-    model = ostranslator.loadModel(path)#translator.output_dir)
+    path = "#{out_path}/baseline/in.osm"
+    model = ostranslator.loadModel(path)
     model = model.get
     runner.registerFinalCondition("The building finished with #{model.getSpaces.size} spaces.")
 
@@ -96,12 +100,12 @@ class BuildingSyncToOpenStudio < OpenStudio::Measure::ModelMeasure
       translator.gather_results
 
       # Add in UserDefinedFields, which contain information about the
-      # OpenStudio model run 
+      # OpenStudio model run
       translator.prepare_final_xml
 
       # write results to xml
-      # default file name is 'results.xml' 
-      file_name = 'results.xml' 
+      # default file name is 'results.xml'
+      file_name = 'results.xml'
       translator.save_xml(file_name)
 
       # report final condition of model

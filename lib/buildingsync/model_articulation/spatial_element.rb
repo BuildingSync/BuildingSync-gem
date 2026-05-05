@@ -1,45 +1,12 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# (1) Redistributions of source code must retain the above copyright notice,
-# this list of conditions and the following disclaimer.
-#
-# (2) Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# (3) Neither the name of the copyright holder nor the names of any contributors
-# may be used to endorse or promote products derived from this software without
-# specific prior written permission from the respective party.
-#
-# (4) Other than as required in clauses (1) and (2), distributions in any form
-# of modifications or other derivative works may not use the "OpenStudio"
-# trademark, "OS", "os", or any other confusingly similar designation without
-# specific prior written permission from Alliance for Sustainable Energy, LLC.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER(S) AND ANY CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER(S), ANY CONTRIBUTORS, THE
-# UNITED STATES GOVERNMENT, OR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-# THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-# OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# OpenStudio(R), Copyright (c) Alliance for Energy Innovation, LLC.
+# See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
 # *******************************************************************************
 require 'openstudio'
 require 'fileutils'
 require 'json'
-require 'openstudio/extension/core/os_lib_model_generation'
 
 require 'buildingsync/helpers/helper'
 require 'buildingsync/helpers/xml_get_set'
@@ -47,14 +14,13 @@ require 'buildingsync/helpers/xml_get_set'
 module BuildingSync
   # base class for objects that will configure workflows based on building sync files
   class SpatialElement
-    include OsLib_ModelGeneration
     include BuildingSync::Helper
     include BuildingSync::XmlGetSet
     # initialize SpatialElement class
     # @param base_xml [REXML::Element] an element corresponding to a spatial element,
     #   either an auc:Site, auc:Building, auc:Section
     # @param ns [String] namespace, likely 'auc'
-    def initialize(base_xml, ns)
+    def initialize(base_xml, ns, standard_to_be_used)
       @base_xml = base_xml
       @ns = ns
 
@@ -70,6 +36,7 @@ module BuildingSync
       @conditioned_floor_area_heated_cooled = 0
       @custom_conditioned_above_grade_floor_area = nil
       @custom_conditioned_below_grade_floor_area = nil
+      @standard_to_be_used = standard_to_be_used
 
       @user_defined_fields = REXML::Element.new("#{@ns}:UserDefinedFields")
     end
@@ -84,7 +51,7 @@ module BuildingSync
 
         floor_area_type = floor_area_element.elements["#{@ns}:FloorAreaType"].text
         if floor_area_type == 'Gross'
-          @total_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('gross_floor_area', floor_area), 'ft^2', 'm^2').get
+          @total_floor_area = validate_positive_number_excluding_zero('gross_floor_area', floor_area)
         elsif floor_area_type == 'Footprint'
           @footprint_floor_area = OpenStudio.convert(validate_positive_number_excluding_zero('@footprint_floor_area', floor_area), 'ft^2', 'm^2').get
         elsif floor_area_type == 'Conditioned' || floor_area_type == 'Common' || floor_area_type == 'Heated and Cooled'
@@ -172,7 +139,7 @@ module BuildingSync
     # @param occ_type [Hash]
     # @return [Boolean]
     def sets_occupancy_bldg_system_types(occ_type)
-      @standards_building_type = occ_type[:standards_building_type]
+      @standards_building_type = occ_type[:standards_building_type][:"#{@standard_to_be_used}"]
       @bar_division_method = occ_type[:bar_division_method]
       @system_type = occ_type[:system_type]
       OpenStudio.logFree(OpenStudio::Info, 'BuildingSync.SpatialElement.sets_occupancy_bldg_system_types', "Element ID: #{xget_id} @standards_building_type #{@standards_building_type}, @bar_division_method #{@bar_division_method} and @system_type: #{@system_type}")
@@ -193,7 +160,8 @@ module BuildingSync
       # if building_and_system_types doesn't contain occupancy_classification, there's nothing we can do.
       occ_types = building_and_system_types[:"#{occupancy_classification}"]
       if occ_types.nil?
-        raise "BuildingSync Occupancy type #{occupancy_classification} is not available in the building_and_system_types.json dictionary"
+        OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.SpatialElement.process_bldg_and_system_type', "BuildingSync Occupancy type #{occupancy_classification} is not available in the building_and_system_types.json dictionary")
+        return false
       end
 
       # if theres only one, we chose it indiscriminately
@@ -208,15 +176,15 @@ module BuildingSync
         if occ_type[:min_floor_area] || occ_type[:max_floor_area]
           min_floor_area = occ_type[:min_floor_area].nil? ?
             nil :
-            OpenStudio.convert(occ_type[:min_floor_area].to_f, 'ft^2', 'm^2').get
+            occ_type[:min_floor_area].to_f
           max_floor_area = occ_type[:max_floor_area].nil? ?
             nil :
-            OpenStudio.convert(occ_type[:max_floor_area].to_f, 'ft^2', 'm^2').get
+            occ_type[:max_floor_area].to_f
 
           too_small = min_floor_area && total_floor_area < min_floor_area
           too_big = max_floor_area && total_floor_area >= max_floor_area
           if !too_big && !too_small
-            puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
+            puts "selected the following standards_building_type: #{occ_type[:standards_building_type][:"#{@standard_to_be_used}"]}"
             return sets_occupancy_bldg_system_types(occ_type)
           end
 
@@ -228,13 +196,14 @@ module BuildingSync
           too_small = min_number_floors && total_number_floors < min_number_floors
           too_big = max_number_floors && total_number_floors >= max_number_floors
           if !too_big && !too_small
-            puts "selected the following standards_building_type: #{occ_type[:standards_building_type]}"
+            puts "selected the following standards_building_type: #{occ_type[:standards_building_type][:"#{@standard_to_be_used}"]}"
             return sets_occupancy_bldg_system_types(occ_type)
           end
         end
       end
 
       # no occ_type fit! We must give up
+      OpenStudio.logFree(OpenStudio::Warn, 'BuildingSync.SpatialElement.process_bldg_and_system_type', "No building_and_system_type entry matched occupancy_classification '#{occupancy_classification}' with floor area #{total_floor_area} and #{total_number_floors} floors")
       return false
     end
 

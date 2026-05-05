@@ -28,9 +28,7 @@ lib/measures/.rubocop.yml
 lib/measures/building_sync_to_openstudio/tests/output
 
 # OSW tests for gem
-osw_test/generated_files
-osw_test/run
-osw_test/out.osw
+osw_test
 
 spec/files/filecomparison/in.idf
 spec/files/filecomparison/in.osm

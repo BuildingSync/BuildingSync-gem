@@ -1,40 +1,8 @@
 # frozen_string_literal: true
 
 # *******************************************************************************
-# OpenStudio(R), Copyright (c) 2008-2022, Alliance for Sustainable Energy, LLC.
-# BuildingSync(R), Copyright (c) 2015-2022, Alliance for Sustainable Energy, LLC.
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# (1) Redistributions of source code must retain the above copyright notice,
-# this list of conditions and the following disclaimer.
-#
-# (2) Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# (3) Neither the name of the copyright holder nor the names of any contributors
-# may be used to endorse or promote products derived from this software without
-# specific prior written permission from the respective party.
-#
-# (4) Other than as required in clauses (1) and (2), distributions in any form
-# of modifications or other derivative works may not use the "OpenStudio"
-# trademark, "OS", "os", or any other confusingly similar designation without
-# specific prior written permission from Alliance for Sustainable Energy, LLC.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER(S) AND ANY CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER(S), ANY CONTRIBUTORS, THE
-# UNITED STATES GOVERNMENT, OR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-# THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-# OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# OpenStudio(R), Copyright (c) Alliance for Energy Innovation, LLC.
+# See also https://github.com/BuildingSync/BuildingSync-gem/blob/develop/LICENSE.md
 # *******************************************************************************
 require 'openstudio-standards'
 
@@ -53,8 +21,8 @@ module BuildingSync
     # @param building_total_floor_area [Float]
     # @param num_stories [Float]
     # @param ns [String] namespace, likely 'auc'
-    def initialize(base_xml, building_occupancy_classification, building_total_floor_area, num_stories, ns)
-      super(base_xml, ns)
+    def initialize(base_xml, building_occupancy_classification, building_total_floor_area, num_stories, ns, standard_to_be_used)
+      super(base_xml, ns, standard_to_be_used)
       @base_xml = base_xml
       @ns = ns
 
@@ -71,27 +39,26 @@ module BuildingSync
       # parameter to read and write.
       @fraction_area = nil
       @standards_building_type = nil
-      @occupancy_classification_original = nil
+      @occupancy_classification = nil
       @typical_occupant_usage_value_hours = nil
       @typical_occupant_usage_value_weeks = nil
       @occupant_quantity = nil
       @principal_hvac_type = nil
       @num_stories = num_stories
+      @standard_to_be_used = standard_to_be_used
 
       @total_floor_area = read_floor_areas(building_total_floor_area)
-      xset_or_create('OccupancyClassification', building_occupancy_classification, false)
 
       # code to initialize
-      read_xml
+      read_xml(building_occupancy_classification)
     end
 
     # read xml
     # @param building_occupancy_classification [String]
-    # @param building_total_floor_area [Float]
-    def read_xml
+    def read_xml(building_occupancy_classification)
       # floor areas
       # based on the occupancy type set building type, system type and bar division method
-      read_building_section_other_detail
+      read_building_section_other_detail(building_occupancy_classification)
       read_construction_types
 
       if @base_xml.elements["#{@ns}:OccupancyLevels/#{@ns}:OccupancyLevel/#{@ns}:OccupantQuantity"]
@@ -102,7 +69,7 @@ module BuildingSync
     end
 
     # read building section other details
-    def read_building_section_other_detail
+    def read_building_section_other_detail(building_occupancy_classification)
       if @base_xml.elements["#{@ns}:TypicalOccupantUsages"]
         @base_xml.elements.each("#{@ns}:TypicalOccupantUsages/#{@ns}:TypicalOccupantUsage") do |occ_usage|
           if occ_usage.elements["#{@ns}:TypicalOccupantUsageUnits"].text == 'Hours per week'
@@ -119,6 +86,24 @@ module BuildingSync
             @occupant_quantity = occ_level.elements["#{@ns}:OccupantQuantity"].text
           end
         end
+      end
+
+      # read floor_to_floor_height
+      floor_to_floor_height_xml = @base_xml.elements["#{@ns}:FloorToFloorHeight"]
+      if floor_to_floor_height_xml
+        @floor_to_floor_height = floor_to_floor_height_xml.first.to_s.to_f
+      end
+
+      # read occupancy_classification
+      occupancy_classification_xml = @base_xml.elements["#{@ns}:OccupancyClassification"]
+      if !occupancy_classification_xml.nil?
+        @occupancy_classification = occupancy_classification_xml.text
+      else
+        @occupancy_classification = building_occupancy_classification
+      end
+
+      if @occupancy_classification.nil?
+        raise StandardError, 'Unable to set OccupancyClassification to nil'
       end
     end
 
@@ -184,7 +169,7 @@ module BuildingSync
       return @total_floor_area
     end
 
-    attr_reader :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :standards_building_type, :section_type, :id
+    attr_reader :space_types_floor_area, :occupancy_classification, :typical_occupant_usage_value_weeks, :typical_occupant_usage_value_hours, :standards_building_type, :section_type, :id, :floor_to_floor_height, :base_xml
     attr_accessor :fraction_area
   end
 end
