@@ -194,6 +194,62 @@ module BuildingSync
       @report.add_cb_modeled(id)
     end
 
+
+    # first valid window that has all mappable fields
+    def get_window_data
+      # if no windows, return nil
+      fenestration_systems = @base_xml.elements["#{@ns}:Systems/#{@ns}:FenestrationSystems/"]
+      return nil if fenestration_systems.nil?
+      windows = fenestration_systems.select {|fs| fs.elements["#{@ns}:FenestrationType/#{@ns}:Window"] }
+      return nil if windows.empty?
+
+      # iter through windows until we get one with all the required fields
+      windows.each do |window|
+        # get data
+        fenestration_frame_material = window.elements["#{@ns}:FenestrationFrameMaterial"]&.text
+        glass_type = window.elements["#{@ns}:GlassType"]&.text
+        fenestration_glass_layers = window.elements["#{@ns}:FenestrationGlassLayers"]&.text
+        solar_heat_gain_coefficient = window.elements["#{@ns}:SolarHeatGainCoefficient"]&.text
+        visible_transmittance = window.elements["#{@ns}:VisibleTransmittance"]&.text
+
+        # We only need one of fenestration_u_factor/fenestration_r_value
+        fenestration_u_factor = window.elements["#{@ns}:FenestrationUFactor"]&.text
+        if fenestration_u_factor.nil?
+          fenestration_r_value = window.elements["#{@ns}:FenestrationRValue"]&.text
+          if !fenestration_r_value.nil? then fenestration_u_factor = 1 / fenestration_r_value end
+        end
+
+        # map data
+        os_fenestration_frame_material = BuildingSyncToOSSytemMaps.get_frame_material_map[fenestration_frame_material.to_s]
+        os_glass_type = BuildingSyncToOSSytemMaps.get_glass_type_map[glass_type.to_s]
+        os_fenestration_glass_layers = BuildingSyncToOSSytemMaps.get_glass_layers_map[fenestration_glass_layers.to_s]
+
+        # return if we can use this one
+        puts "os_fenestration_frame_material #{os_fenestration_frame_material} #{!os_fenestration_frame_material.nil?}"
+        puts "os_glass_type #{os_glass_type}"
+        puts "os_fenestration_glass_layers #{os_fenestration_glass_layers}"
+        puts "fenestration_u_factor #{fenestration_u_factor}"
+        puts "solar_heat_gain_coefficient #{solar_heat_gain_coefficient}"
+        puts "visible_transmittance #{visible_transmittance}"
+        if (
+          !os_fenestration_frame_material.nil? &&
+          !os_glass_type.nil? &&
+          !os_fenestration_glass_layers.nil? &&
+          !fenestration_u_factor.nil? &&
+          !solar_heat_gain_coefficient.nil? &&
+          !visible_transmittance.nil?
+        )
+          window_pane_type = [os_fenestration_glass_layers, os_glass_type, os_fenestration_frame_material].join(' - ')
+          return window_pane_type, fenestration_u_factor, solar_heat_gain_coefficient, visible_transmittance
+        end
+      end
+
+      #  If here, no useable windows, warn and return nil
+      message = "No window exists that can be mapped to OPenStudio window pane type"
+      OpenStudio.logFree(OpenStudio::Warn, "BuildingSync.Facility.get_window_data", message)
+      return nil
+    end
+
     # read other details from the xml
     # - contact information
     # - audit levels and dates
@@ -213,6 +269,6 @@ module BuildingSync
       @site.prepare_final_xml
     end
 
-    attr_reader :site, :report, :measures, :contacts
+    attr_reader :site, :report, :measures, :contacts, :base_xml
   end
 end

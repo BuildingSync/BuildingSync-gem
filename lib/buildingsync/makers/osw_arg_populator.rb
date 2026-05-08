@@ -189,6 +189,49 @@ class OSWARGPopulator
 
   end
 
+  # def self.populate_set_nist_infiltration_correlations_args(osw, facility)
+  #   building = facility.site.get_building
+  #   osw[:steps].append({"measure_dir_name": "set_nist_infiltration_correlations", "arguments": {}})
+  #   set_measure_argument = lambda {| key, value | OpenStudio::Extension.set_measure_argument(osw, "set_nist_infiltration_correlations", key, value) }
+
+  #   # Add args
+  #   # -  __SKIP__
+  #   set_measure_argument.call("__SKIP__", false)
+  #   set_measure_argument.call("airtightness_value", false)
+  #   set_measure_argument.call("airtightness_pressure", false)
+  #   set_measure_argument.call("airtightness_area", "6-sided")
+  #   set_measure_argument.call("air_barrier", false)
+  #   set_measure_argument.call("hvac_schedule", "Lookup From Model")
+  #   set_measure_argument.call("climate_zone", "Lookup From Model")
+  #   set_measure_argument.call("building_type", "Lookup From Model")
+
+  # end
+
+  def self.populate_replace_baseline_windows_args(osw, facility)
+    building = facility.site.get_building
+    osw[:steps].append({"measure_dir_name": "replace_baseline_windows", "arguments": {}})
+    set_measure_argument = lambda {| key, value | OpenStudio::Extension.set_measure_argument(osw, "replace_baseline_windows", key, value) }
+
+    # skip if no window_data
+    window_data = facility.get_window_data
+    if window_data.nil?
+      set_measure_argument.call("__SKIP__", true)
+      return
+    end
+    window_pane_type, fenestration_u_factor, solar_heat_gain_coefficient, visible_transmittance = window_data
+
+
+    # Add args
+    # -  __SKIP__
+    set_measure_argument.call("__SKIP__", false)
+    set_measure_argument.call("window_pane_type", window_pane_type)
+    set_measure_argument.call("u_value_ip", fenestration_u_factor)
+    set_measure_argument.call("shgc", solar_heat_gain_coefficient)
+    set_measure_argument.call("vlt", visible_transmittance)
+
+  end
+
+
   def self.populate_openstudio_results_args(osw, facility)
     building = facility.site.get_building
     osw[:steps].append({"measure_dir_name": "openstudio_results", "arguments": {}})

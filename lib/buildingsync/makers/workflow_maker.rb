@@ -351,6 +351,8 @@ module BuildingSync
 
       OSWARGPopulator::populate_set_lighting_loads_by_LPD_args(baseline_osw, @facility)
       OSWARGPopulator::populate_set_electric_equipment_loads_by_epd_args(baseline_osw, @facility)
+      OSWARGPopulator::populate_replace_baseline_windows_args(baseline_osw, @facility)
+
       OSWARGPopulator::populate_openstudio_results_args(baseline_osw, @facility)
 
       # write to file

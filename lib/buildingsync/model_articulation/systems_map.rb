@@ -25,4 +25,42 @@ module BuildingSyncToOSSytemMaps
             "Other" => ""
         }
     end
+
+    def self.get_glass_layers_map
+        return {
+            "Single pane" => "Single",
+            "Double pane" => "Double",
+            "Triple pane" => "Triple",
+            "Single paned with storm panel" => "Single",
+        }
+    end
+
+    def self.get_glass_type_map
+        return {
+            "Clear uncoated" => "No LowE - Clear",
+            "Low e" => "LowE - Clear",
+            "Tinted" => "No LowE - Tinted/Reflective",
+            "Tinted plus low e" => "LowE - Tinted/Reflective",
+            "Reflective" => "No LowE - Tinted/Reflective",
+            "Reflective on tint" => "No LowE - Tinted/Reflective",
+            "High performance tint" => "LowE - Tinted/Reflective",
+            "Sunbelt low E low SHGC" => "LowE - Tinted/Reflective",
+            # "Suspended film" => "",
+            # "Plastic" => "",
+        }
+    end
+
+    def self.get_frame_material_map
+        return {
+            "Aluminum uncategorized" => "Aluminum",
+            "Aluminum no thermal break" => "Aluminum",
+            "Aluminum thermal break" => "Thermally Broken Aluminum",
+            # "Clad" => "",
+            # "Composite" => "",
+            # "Fiberglass" => "",
+            # "Steel" => "",
+            # "Vinyl" => "",
+            "Wood" => "Wood",
+        }
+    end
 end
