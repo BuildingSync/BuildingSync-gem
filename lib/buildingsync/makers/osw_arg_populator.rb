@@ -214,7 +214,9 @@ class OSWARGPopulator
 
     # skip if no window_data
     window_data = facility.get_window_data
+    puts("window data: #{window_data}\n")
     if window_data.nil?
+      puts("WARNING: No window data found, skipping replace_baseline_windows measure.\n")
       set_measure_argument.call("__SKIP__", true)
       return
     end

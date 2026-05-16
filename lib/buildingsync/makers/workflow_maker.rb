@@ -12,6 +12,7 @@ require 'openstudio/ee_measures'
 
 require 'buildingsync/extension'
 require 'buildingsync/constants'
+require 'buildingsync/external_measure_repo_manager'
 require 'buildingsync/scenario'
 require 'buildingsync/makers/workflow_maker_base'
 require 'buildingsync/makers/osw_arg_populator'
@@ -85,6 +86,8 @@ module BuildingSync
     def get_available_measures_hash
       measures_hash = {}
       get_measure_directories_array.each do |potential_measure_path|
+        next if !Dir.exist?(potential_measure_path)
+
         Dir.chdir(potential_measure_path) do
           measures_hash[potential_measure_path] = Dir.glob('*').select { |f| File.directory? f }
         end
@@ -99,7 +102,23 @@ module BuildingSync
       model_articulation_instance = OpenStudio::ModelArticulation::Extension.new
       ee_measures_instance = OpenStudio::EeMeasures::Extension.new
       bldg_sync_instance = BuildingSync::Extension.new
-      return [common_measures_instance.measures_dir, model_articulation_instance.measures_dir, bldg_sync_instance.measures_dir, ee_measures_instance.measures_dir]
+      external_repo_manager = BuildingSync::ExternalMeasureRepoManager.new
+
+      local_measure_paths = external_repo_manager.local_measure_directories
+
+      gem_measure_paths = [
+        common_measures_instance.measures_dir,
+        model_articulation_instance.measures_dir,
+        bldg_sync_instance.measures_dir,
+        ee_measures_instance.measures_dir
+      ]
+
+      external_measure_paths = []
+      if external_repo_manager.manifest_exists?
+        external_measure_paths = external_repo_manager.resolved_measure_directories
+      end
+
+      return ordered_unique(local_measure_paths + gem_measure_paths + external_measure_paths)
     end
 
     # gets the measure type of a measure given its directory - looking up the measure type in the measure.xml file
@@ -107,7 +126,6 @@ module BuildingSync
     #   in any of the gems, i.e. openstudio-common-measures-gem/lib/measures/[measure_dir_name]
     # @return [String]
     def get_measure_type(measure_dir_name)
-      measure_type = nil
       get_measure_directories_array.each do |potential_measure_path|
         measure_dir_full_path = "#{potential_measure_path}/#{measure_dir_name}"
         if Dir.exist?(measure_dir_full_path)
@@ -118,12 +136,26 @@ module BuildingSync
           measure_xml_doc.elements.each('/measure/attributes/attribute') do |attribute|
             attribute_name = attribute.elements['name'].text
             if attribute_name == 'Measure Type'
-              measure_type = attribute.elements['value'].text
+              return attribute.elements['value'].text
             end
           end
         end
       end
-      return measure_type
+      return nil
+    end
+
+    def ordered_unique(paths)
+      seen = {}
+      ordered = []
+
+      paths.each do |path|
+        next if path.nil? || path.empty? || seen[path]
+
+        seen[path] = true
+        ordered << path
+      end
+
+      return ordered
     end
 
     # Based on the MeasureIDs defined by the Scenario, configure the workflow provided
@@ -336,6 +368,9 @@ module BuildingSync
       # start with an empty baseline workflow
       file = File.read(EMPTY_BASELINE_OSW_PATH)
       baseline_osw = JSON.parse(file, symbolize_names: true)
+
+      # Keep baseline workflow measure discovery consistent with scenario workflows.
+      baseline_osw[:measure_paths] = get_measure_directories_array
 
       # parse the facility
       @facility.set_all

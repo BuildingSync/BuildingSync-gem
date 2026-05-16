@@ -1,0 +1,34 @@
+# External non-gem measure repositories.
+#
+# Precedence in workflow measure lookup is:
+# 1) local_measure_roots below
+# 2) gem-provided measure dirs
+# 3) external repos listed here
+#
+# local_measure_roots are resolved relative to this file.
+# The default shipped configuration keeps this repository's local measures first.
+local_measure_roots:
+  - ../lib/measures
+
+# For each repo:
+# - name: local checkout folder name under vendor/external_measures
+# - url: git repository URL
+# - ref: pinned tag/branch/commit to checkout
+# - measure_roots: one or more paths inside the repo that contain measure directories
+#
+# Example:
+# repos:
+#   - name: comstock
+#     url: https://github.com/NatLabRockies/comstock.git
+#     ref: main
+#     measure_roots:
+#       - measures
+#       - resources/measures
+
+repos:
+  - name: comstock
+    url: https://github.com/NatLabRockies/comstock.git
+    ref: main
+    measure_roots:
+      - measures
+      - resources/measures
