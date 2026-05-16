@@ -52,7 +52,7 @@ RSpec.describe 'BuildingSync' do
         expect(out_osw[:completed_status]).to eq "Success"
       end
 
-      xit "write and run measure owms. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
+      xit "write and run measure osws. File: #{file_name}, Standard: #{standard}, EPW_Path: #{epw_path}, File Schema Version: #{schema_version}" do
         # Set Up
         xml_path, output_path = create_xml_path_and_output_path(file_name, standard, __FILE__, schema_version)
         output_path = "test smalloffice"
@@ -90,6 +90,84 @@ RSpec.describe 'BuildingSync' do
           out_osw = JSON.parse(out_osw, symbolize_names: true)
           expect(out_osw[:completed_status]).to eq "Success"
         end
+      end
+    end
+  end
+
+  describe 'External measure manifest integration' do
+    before(:each) do
+      @comstock_repo_root = File.join(EXTERNAL_MEASURE_REPOS_INSTALL_DIR, 'comstock')
+      @expected_external_roots = [
+        File.join(@comstock_repo_root, 'measures'),
+        File.join(@comstock_repo_root, 'resources', 'measures')
+      ]
+
+      @created_roots = []
+      @expected_external_roots.each do |root|
+        next if Dir.exist?(root)
+
+        FileUtils.mkdir_p(root)
+        @created_roots << root
+      end
+    end
+
+    after(:each) do
+      @created_roots.each do |root|
+        FileUtils.rm_rf(root) if Dir.exist?(root)
+      end
+
+      if Dir.exist?(@comstock_repo_root)
+        # Remove empty parent folders created by this test.
+        resources_dir = File.join(@comstock_repo_root, 'resources')
+        Dir.rmdir(resources_dir) if Dir.exist?(resources_dir) && Dir.empty?(resources_dir)
+        Dir.rmdir(@comstock_repo_root) if Dir.empty?(@comstock_repo_root)
+      end
+    end
+
+    it 'writes baseline in.osw with expected ordered measure_paths from local, gems, and external manifest repos' do
+      file_name = 'Reference-PrimarySchool-L100-Audit.xml'
+      standard = ASHRAE90_1
+      epw_path = nil
+      schema_version = 'v2.4.0'
+
+      xml_path, output_path = create_xml_path_and_output_path(file_name, standard, __FILE__, schema_version)
+      translator = BuildingSync::Translator.new(xml_path, output_path, epw_path, standard)
+
+      translator.write_baseline_osw
+      translator.run_baseline_osw
+
+      in_osw_path = File.join(output_path, 'baseline', 'in.osw')
+      expect(File.exist?(in_osw_path)).to be true
+
+      osw = JSON.parse(File.read(in_osw_path))
+      measure_paths = osw['measure_paths']
+
+      puts 'Generated measure_paths from baseline/in.osw:'
+      measure_paths.each_with_index do |path, idx|
+        puts "  #{idx}: #{path}"
+      end
+
+      expect(measure_paths).to be_an(Array)
+      expect(measure_paths.first).to eq(LOCAL_MEASURES_DIR)
+      @expected_external_roots.each do |external_root|
+        expect(measure_paths).to include(external_root)
+      end
+
+      gem_paths = [
+        OpenStudio::CommonMeasures::Extension.new.measures_dir,
+        OpenStudio::ModelArticulation::Extension.new.measures_dir,
+        BuildingSync::Extension.new.measures_dir,
+        OpenStudio::EeMeasures::Extension.new.measures_dir
+      ].uniq
+
+      gem_paths.each do |gem_path|
+        expect(measure_paths).to include(gem_path)
+      end
+
+      last_gem_index = gem_paths.map { |gem_path| measure_paths.index(gem_path) }.compact.max
+      @expected_external_roots.each do |external_root|
+        external_index = measure_paths.index(external_root)
+        expect(external_index).to be > last_gem_index
       end
     end
   end

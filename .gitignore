@@ -26,6 +26,7 @@ schedules-*.csv
 # measures tests
 lib/measures/.rubocop.yml
 lib/measures/building_sync_to_openstudio/tests/output
+vendor/external_measures
 
 # OSW tests for gem
 osw_test

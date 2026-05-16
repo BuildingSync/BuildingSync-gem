@@ -13,6 +13,9 @@ EMPTY_BASELINE_OSW_PATH = File.expand_path(File.join(__dir__, 'makers/empty_base
 WORKFLOW_MAKER_JSON_FILE_PATH = File.expand_path(File.join(__dir__, 'makers/workflow_maker.json'))
 BUILDING_AND_SYSTEMS_FILE_PATH = File.expand_path(File.join(__dir__, 'model_articulation/building_and_system_types.json'))
 WEATHER_DIR = File.expand_path(File.join(__dir__, '../data/weather'))
+LOCAL_MEASURES_DIR = File.expand_path(File.join(__dir__, '..', 'measures'))
+EXTERNAL_MEASURE_REPOS_MANIFEST_PATH = File.expand_path(File.join(__dir__, '..', '..', 'config', 'external_measure_repos.yml'))
+EXTERNAL_MEASURE_REPOS_INSTALL_DIR = File.expand_path(File.join(__dir__, '..', '..', 'vendor', 'external_measures'))
 
 # Standards strings
 ASHRAE90_1 = 'ASHRAE90.1'

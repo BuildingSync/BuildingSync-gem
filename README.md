@@ -22,6 +22,22 @@ BuildingSync OpenStudio Simulator (BOSS) takes in BuildingSync files, creates Op
     🌟 bundle install
     ```
 
+4. Install external non-gem measure repositories declared in the shipped manifest.
+
+    ```bash
+    🌟 bundle exec rake measures:install_external
+    ```
+
+5. (Optional) List resolved external measure roots.
+
+    ```bash
+    🌟 bundle exec rake measures:list_external
+    ```
+
+The shipped manifest lives at [config/external_measure_repos.yml](config/external_measure_repos.yml) and is preconfigured with:
+- local measure roots: `lib/measures` (first in precedence)
+- external repository: comstock (`measures` and `resources/measures`)
+
 ## Usage
 BOSS uses its `Translator` class to 1) write openstudio workflows and 2) run those workflows.
 ```ruby
@@ -45,6 +61,14 @@ expect(File.exist?(output_path + "/baseline/out.osw")).to be true
 expect(File.exist?(output_path + "/baseline/in.osm")).to be true
 
 ```
+
+Measure path precedence is:
+1. local measure roots from [config/external_measure_repos.yml](config/external_measure_repos.yml)
+2. gem-provided measure directories
+3. external non-gem repository measure roots from [config/external_measure_repos.yml](config/external_measure_repos.yml)
+
+The generated `in.osw` will include these paths in order under `measure_paths`.
+
 The file `` does all of the actual writing to the osw. Each function writes one measure. Heres an overview of how each measure is populated.
 
 [set_run_period]: https://github.com/NatLabRockies/openstudio-common-measures-gem/blob/v0.12.3/lib/measures/set_run_period/README.md
@@ -96,7 +120,7 @@ Check out the repository and then execute:
 bundle exec rspec ./spec/tests/translator_write_osw_spec.rb
 ```
 
-This only runs only files worth of tests, which are integration tests very similar to the code in the usage section. The gem has under gone major rewrites and many of the other tests use  dead and/or delete code. Further clean up and testing is underway.  
+This only runs files worth of tests, which are integration tests very similar to the code in the usage section. The gem has under gone major rewrites and many of the other tests use dead and/or delete code. Further clean up and testing is underway.
 
 # Releasing
 
